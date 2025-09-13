@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		3FCE402F2E7589A9009C271D /* JumpRec Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3FCE402E2E7589A9009C271D /* JumpRec Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3FCE40512E758A82009C271D /* JumpRecShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FCE40492E758A82009C271D /* JumpRecShared.framework */; };
+		3FCE40522E758A82009C271D /* JumpRecShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3FCE40492E758A82009C271D /* JumpRecShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3FCE40582E758A98009C271D /* JumpRecShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FCE40492E758A82009C271D /* JumpRecShared.framework */; };
+		3FCE40592E758A98009C271D /* JumpRecShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3FCE40492E758A82009C271D /* JumpRecShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -17,6 +21,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = 3FCE402D2E7589A9009C271D;
 			remoteInfo = "JumpRec Watch App";
+		};
+		3FCE404F2E758A82009C271D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3FCE40192E7589A8009C271D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3FCE40482E758A82009C271D;
+			remoteInfo = JumpRecShared;
+		};
+		3FCE405A2E758A98009C271D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3FCE40192E7589A8009C271D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3FCE40482E758A82009C271D;
+			remoteInfo = JumpRecShared;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -32,22 +50,91 @@
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3FCE40562E758A82009C271D /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				3FCE40522E758A82009C271D /* JumpRecShared.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3FCE405C2E758A98009C271D /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				3FCE40592E758A98009C271D /* JumpRecShared.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		3FCE40212E7589A8009C271D /* JumpRec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JumpRec.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FCE402E2E7589A9009C271D /* JumpRec Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "JumpRec Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3FCE40492E758A82009C271D /* JumpRecShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JumpRecShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3FCE40612E759589009C271D /* Exceptions for "JumpRecShared" folder in "JumpRec" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				JumpRecIcon.icon,
+			);
+			target = 3FCE40202E7589A8009C271D /* JumpRec */;
+		};
+		3FCE40622E759589009C271D /* Exceptions for "JumpRecShared" folder in "JumpRec Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				JumpRecIcon.icon,
+			);
+			target = 3FCE402D2E7589A9009C271D /* JumpRec Watch App */;
+		};
+		3FCE40642E7597AF009C271D /* Exceptions for "JumpRec" folder in "JumpRec" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3FCE40202E7589A8009C271D /* JumpRec */;
+		};
+		3FCE40662E7597B9009C271D /* Exceptions for "JumpRec Watch App" folder in "JumpRec Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"JumpRec-Watch-App-Info.plist",
+			);
+			target = 3FCE402D2E7589A9009C271D /* JumpRec Watch App */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3FCE40232E7589A8009C271D /* JumpRec */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3FCE40642E7597AF009C271D /* Exceptions for "JumpRec" folder in "JumpRec" target */,
+			);
 			path = JumpRec;
 			sourceTree = "<group>";
 		};
 		3FCE40322E7589A9009C271D /* JumpRec Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3FCE40662E7597B9009C271D /* Exceptions for "JumpRec Watch App" folder in "JumpRec Watch App" target */,
+			);
 			path = "JumpRec Watch App";
+			sourceTree = "<group>";
+		};
+		3FCE404A2E758A82009C271D /* JumpRecShared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3FCE40612E759589009C271D /* Exceptions for "JumpRecShared" folder in "JumpRec" target */,
+				3FCE40622E759589009C271D /* Exceptions for "JumpRecShared" folder in "JumpRec Watch App" target */,
+			);
+			path = JumpRecShared;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -57,10 +144,19 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FCE40512E758A82009C271D /* JumpRecShared.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		3FCE402B2E7589A9009C271D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3FCE40582E758A98009C271D /* JumpRecShared.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3FCE40462E758A82009C271D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -75,6 +171,8 @@
 			children = (
 				3FCE40232E7589A8009C271D /* JumpRec */,
 				3FCE40322E7589A9009C271D /* JumpRec Watch App */,
+				3FCE404A2E758A82009C271D /* JumpRecShared */,
+				3FCE40572E758A98009C271D /* Frameworks */,
 				3FCE40222E7589A8009C271D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -84,11 +182,29 @@
 			children = (
 				3FCE40212E7589A8009C271D /* JumpRec.app */,
 				3FCE402E2E7589A9009C271D /* JumpRec Watch App.app */,
+				3FCE40492E758A82009C271D /* JumpRecShared.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
+		3FCE40572E758A98009C271D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		3FCE40442E758A82009C271D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		3FCE40202E7589A8009C271D /* JumpRec */ = {
@@ -99,11 +215,13 @@
 				3FCE401E2E7589A8009C271D /* Frameworks */,
 				3FCE401F2E7589A8009C271D /* Resources */,
 				3FCE403E2E7589A9009C271D /* Embed Watch Content */,
+				3FCE40562E758A82009C271D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				3FCE40312E7589A9009C271D /* PBXTargetDependency */,
+				3FCE40502E758A82009C271D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				3FCE40232E7589A8009C271D /* JumpRec */,
@@ -122,10 +240,12 @@
 				3FCE402A2E7589A9009C271D /* Sources */,
 				3FCE402B2E7589A9009C271D /* Frameworks */,
 				3FCE402C2E7589A9009C271D /* Resources */,
+				3FCE405C2E758A98009C271D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				3FCE405B2E758A98009C271D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				3FCE40322E7589A9009C271D /* JumpRec Watch App */,
@@ -136,6 +256,29 @@
 			productName = "JumpRec Watch App";
 			productReference = 3FCE402E2E7589A9009C271D /* JumpRec Watch App.app */;
 			productType = "com.apple.product-type.application";
+		};
+		3FCE40482E758A82009C271D /* JumpRecShared */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3FCE40532E758A82009C271D /* Build configuration list for PBXNativeTarget "JumpRecShared" */;
+			buildPhases = (
+				3FCE40442E758A82009C271D /* Headers */,
+				3FCE40452E758A82009C271D /* Sources */,
+				3FCE40462E758A82009C271D /* Frameworks */,
+				3FCE40472E758A82009C271D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				3FCE404A2E758A82009C271D /* JumpRecShared */,
+			);
+			name = JumpRecShared;
+			packageProductDependencies = (
+			);
+			productName = JumpRecShared;
+			productReference = 3FCE40492E758A82009C271D /* JumpRecShared.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
 
@@ -151,6 +294,9 @@
 						CreatedOnToolsVersion = 26.0;
 					};
 					3FCE402D2E7589A9009C271D = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					3FCE40482E758A82009C271D = {
 						CreatedOnToolsVersion = 26.0;
 					};
 				};
@@ -171,6 +317,7 @@
 			targets = (
 				3FCE40202E7589A8009C271D /* JumpRec */,
 				3FCE402D2E7589A9009C271D /* JumpRec Watch App */,
+				3FCE40482E758A82009C271D /* JumpRecShared */,
 			);
 		};
 /* End PBXProject section */
@@ -184,6 +331,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		3FCE402C2E7589A9009C271D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3FCE40472E758A82009C271D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -207,6 +361,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3FCE40452E758A82009C271D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -214,6 +375,16 @@
 			isa = PBXTargetDependency;
 			target = 3FCE402D2E7589A9009C271D /* JumpRec Watch App */;
 			targetProxy = 3FCE40302E7589A9009C271D /* PBXContainerItemProxy */;
+		};
+		3FCE40502E758A82009C271D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3FCE40482E758A82009C271D /* JumpRecShared */;
+			targetProxy = 3FCE404F2E758A82009C271D /* PBXContainerItemProxy */;
+		};
+		3FCE405B2E758A98009C271D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3FCE40482E758A82009C271D /* JumpRecShared */;
+			targetProxy = 3FCE405A2E758A98009C271D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -337,14 +508,17 @@
 		3FCE403C2E7589A9009C271D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = JumpRecIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "JumpRec Watch App/JumpRec Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6W8B6G9KYD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = JumpRec;
+				INFOPLIST_FILE = "JumpRec-Watch-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = JumpRec.;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kinn.JumpRec;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -363,21 +537,24 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
 			};
 			name = Debug;
 		};
 		3FCE403D2E7589A9009C271D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = JumpRecIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "JumpRec Watch App/JumpRec Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6W8B6G9KYD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = JumpRec;
+				INFOPLIST_FILE = "JumpRec-Watch-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = JumpRec.;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kinn.JumpRec;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -397,27 +574,30 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
 			};
 			name = Release;
 		};
 		3FCE40402E7589A9009C271D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = JumpRecIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = JumpRec/JumpRec.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6W8B6G9KYD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = JumpRec;
+				INFOPLIST_FILE = JumpRec/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = JumpRec.;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -439,20 +619,23 @@
 		3FCE40412E7589A9009C271D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = JumpRecIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = JumpRec/JumpRec.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6W8B6G9KYD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = JumpRec;
+				INFOPLIST_FILE = JumpRec/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = JumpRec.;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -469,6 +652,104 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3FCE40542E758A82009C271D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6W8B6G9KYD;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.kinn.JumpRecShared;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx watchos watchsimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,4,7";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+				XROS_DEPLOYMENT_TARGET = 2.6;
+			};
+			name = Debug;
+		};
+		3FCE40552E758A82009C271D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6W8B6G9KYD;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.kinn.JumpRecShared;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx watchos watchsimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,4,7";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+				XROS_DEPLOYMENT_TARGET = 2.6;
 			};
 			name = Release;
 		};
@@ -498,6 +779,15 @@
 			buildConfigurations = (
 				3FCE40402E7589A9009C271D /* Debug */,
 				3FCE40412E7589A9009C271D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3FCE40532E758A82009C271D /* Build configuration list for PBXNativeTarget "JumpRecShared" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3FCE40542E758A82009C271D /* Debug */,
+				3FCE40552E758A82009C271D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
