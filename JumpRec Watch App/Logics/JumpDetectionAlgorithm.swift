@@ -1,5 +1,5 @@
 //
-//  JumpDetectionLogic.swift
+//  JumpDetectionAlgorithm.swift
 //  JumpRec
 //
 //  Created by Yuunan kin on 2025/09/14.
@@ -10,7 +10,7 @@ import CoreMotion
 import Foundation
 
 /// Advanced jump detection algorithm with signal processing
-class JumpDetectionLogic {
+class JumpDetectionAlgorithm {
     // MARK: - Algorithm Parameters
 
     struct Parameters {
@@ -374,7 +374,7 @@ struct AccelerationData {
 struct JumpDetectionResult {
     let isJump: Bool
     let confidence: Double
-    let phase: JumpDetectionLogic.JumpPhase
+    let phase: JumpDetectionAlgorithm.JumpPhase
     var jumpCharacteristics: JumpCharacteristics?
 }
 
@@ -395,7 +395,7 @@ enum JumpQuality {
 
 // MARK: - Frequency Analysis Extension
 
-extension JumpDetectionLogic {
+extension JumpDetectionAlgorithm {
     /// Perform FFT to detect jump rhythm
     func detectJumpRhythm(from signal: [Double]) -> Double? {
         guard signal.count >= 64 else { return nil } // Need enough samples for FFT

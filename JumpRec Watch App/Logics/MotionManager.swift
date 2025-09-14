@@ -63,6 +63,9 @@ class MotionManager: NSObject {
         motionManager.deviceMotionUpdateInterval = updateInterval
         motionManager.accelerometerUpdateInterval = updateInterval
 
+        // Enable background motion updates
+        motionManager.showsDeviceMovementDisplay = true
+
         // Set up operation queue
         queue.maxConcurrentOperationCount = 1
         queue.name = "MotionManagerQueue"
@@ -104,6 +107,7 @@ class MotionManager: NSObject {
         if let startTime = sessionStartTime {
             let duration = Date().timeIntervalSince(startTime)
             print("Session ended: \(jumpCount) jumps in \(duration) seconds")
+            print("Jump timestamps: \(jumpTimestamps)")
         }
     }
 
@@ -157,6 +161,10 @@ class MotionManager: NSObject {
     }
 
     private func processAccelerometerData(_ data: CMAccelerometerData) {
+        // Only use if device motion is not available
+        if motionManager.isDeviceMotionActive {
+            return
+        }
         // Fallback processing if device motion fails
         // This includes gravity, so we need different thresholds
         let acceleration = data.acceleration
@@ -165,14 +173,10 @@ class MotionManager: NSObject {
                 acceleration.y * acceleration.y +
                 acceleration.z * acceleration.z
         )
-
-        // Only use if device motion is not available
-        if !motionManager.isDeviceMotionActive {
-            detectJumpFromRawAccelerometer(
-                acceleration: totalAcceleration - 1.0, // Subtract gravity
-                timestamp: data.timestamp
-            )
-        }
+        detectJumpFromRawAccelerometer(
+            acceleration: totalAcceleration - 1.0, // Subtract gravity
+            timestamp: data.timestamp
+        )
     }
 
     private func detectJump(acceleration: Double,
@@ -261,19 +265,10 @@ class MotionManager: NSObject {
             jumpTimestamps.append(Date())
 
             // Trigger haptic feedback
-            provideHapticFeedback()
-        }
-    }
-
-    private func provideHapticFeedback() {
-        #if os(watchOS)
-            WKInterfaceDevice.current().play(.click)
-
-            // Special feedback for milestones
             if jumpCount % 100 == 0 {
                 WKInterfaceDevice.current().play(.success)
             }
-        #endif
+        }
     }
 
     private func finishCalibration() {
