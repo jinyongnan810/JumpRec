@@ -102,13 +102,6 @@
 			);
 			target = 3FCE40202E7589A8009C271D /* JumpRec */;
 		};
-		3FCE40662E7597B9009C271D /* Exceptions for "JumpRec Watch App" folder in "JumpRec Watch App" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"JumpRec-Watch-App-Info.plist",
-			);
-			target = 3FCE402D2E7589A9009C271D /* JumpRec Watch App */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -122,9 +115,6 @@
 		};
 		3FCE40322E7589A9009C271D /* JumpRec Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				3FCE40662E7597B9009C271D /* Exceptions for "JumpRec Watch App" folder in "JumpRec Watch App" target */,
-			);
 			path = "JumpRec Watch App";
 			sourceTree = "<group>";
 		};
@@ -519,6 +509,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "JumpRec-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = JumpRec.;
+				INFOPLIST_KEY_NSMotionUsageDescription = "JumpRec. want to use your motion data to detect jump motion.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kinn.JumpRec;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -555,6 +546,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "JumpRec-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = JumpRec.;
+				INFOPLIST_KEY_NSMotionUsageDescription = "JumpRec. want to use your motion data to detect jump motion.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kinn.JumpRec;
 				LD_RUNPATH_SEARCH_PATHS = (
