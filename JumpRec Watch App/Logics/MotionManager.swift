@@ -26,6 +26,7 @@ class MotionManager: NSObject {
 
     private let motionManager = CMMotionManager()
     private let queue = OperationQueue()
+    private let jumpDetectionAlgorithm = JumpDetectionAlgorithm()
 
     // MARK: - Detection Parameters
 
@@ -91,10 +92,10 @@ class MotionManager: NSObject {
         }
 
         // Also start raw accelerometer as backup
-        motionManager.startAccelerometerUpdates(to: queue) { [weak self] data, _ in
-            guard let self, let data else { return }
-            processAccelerometerData(data)
-        }
+//        motionManager.startAccelerometerUpdates(to: queue) { [weak self] data, _ in
+//            guard let self, let data else { return }
+//            processAccelerometerData(data)
+//        }
     }
 
     /// Stop motion tracking
@@ -153,6 +154,19 @@ class MotionManager: NSObject {
         detectJump(acceleration: totalAcceleration,
                    verticalAcceleration: userAcceleration.y,
                    timestamp: motion.timestamp)
+//        print("total: \(totalAcceleration), y: \(userAcceleration.y)")
+//        let result = jumpDetectionAlgorithm
+//            .processAcceleration(
+//                AccelerationData(
+//                    totalAcceleration: totalAcceleration,
+//                    verticalAcceleration: userAcceleration.y,
+//                    horizontalAcceleration: userAcceleration.x,
+//                    timestamp: motion.timestamp
+//                )
+//            )
+//        if result.isJump {
+//            registerJump(timestamp: motion.timestamp)
+//        }
 
         // Collect calibration data if needed
         if isCalibrating {
@@ -201,6 +215,8 @@ class MotionManager: NSObject {
         // Detect jump using multiple criteria
         if isJumpDetected(verticalAcceleration: verticalAcceleration, timestamp: timestamp) {
             registerJump(timestamp: timestamp)
+//            print("jump detected. peaks: \(peakDetectionWindow)")
+//            peakDetectionWindow.removeAll()
         }
     }
 
@@ -229,19 +245,10 @@ class MotionManager: NSObject {
 
         // 5. Verify it's a vertical jump (not lateral movement)
         // Vertical component should be significant
-        guard abs(verticalAcceleration) > adjustedThreshold * 0.7 else {
+        guard verticalAcceleration < adjustedThreshold * -0.7 else {
             return false
         }
-
-        // 6. Check for characteristic jump pattern
-        // Before peak: acceleration increases (takeoff)
-        // After peak: acceleration decreases (landing)
-        let beforePeak = peakDetectionWindow[maxIndex - 1]
-        let afterPeak = peakDetectionWindow[maxIndex + 1]
-
-        let hasJumpPattern = beforePeak < maxAccel && afterPeak < maxAccel
-
-        return hasJumpPattern
+        return true
     }
 
     private func detectJumpFromRawAccelerometer(acceleration: Double,
@@ -250,6 +257,8 @@ class MotionManager: NSObject {
         // Simplified detection for raw accelerometer
         // Uses different thresholds since gravity is included
         guard timestamp - lastJumpTimestamp > minTimeBetweenJumps else { return }
+
+        print("Detect jump in raw accelerometer")
 
         if acceleration > detectionSensitivity {
             registerJump(timestamp: timestamp)
