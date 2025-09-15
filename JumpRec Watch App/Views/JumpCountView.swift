@@ -6,32 +6,66 @@
 //
 
 import Combine
+import JumpRecShared
 import SwiftUI
+
+let TimeString = "Time"
+let MinuteString = "Minute"
 
 struct JumpCountView: View {
     @State var motionManager = MotionManager()
+    @Environment(JumpRecSettings.self)
+    private var settings: JumpRecSettings
+    @State var showSettings: Bool = false
+
+    var goal: Text {
+        switch settings.goalType {
+        case .count:
+            return Text("^[\(settings.jumpCount) \(TimeString)](inflect: true)")
+        case .time:
+            return Text("^[\(settings.jumpTime) \(MinuteString)](inflect: true)")
+        @unknown default:
+            return Text("^[\(settings.jumpCount) \(TimeString)](inflect: true)")
+        }
+    }
+
     var body: some View {
-        if motionManager.isTracking {
-            ZStack {
-                VStack {
-                    Text("Jumps:")
-                        .font(.headline)
-                    Spacer()
+        NavigationStack {
+            if motionManager.isTracking {
+                ZStack {
+                    VStack {
+                        Text("Jumps:")
+                            .font(.headline)
+                        Spacer()
+                    }
+                    VStack {
+                        Spacer()
+                        Text("\(motionManager.jumpCount)")
+                            .font(.largeTitle)
+                        Spacer()
+                    }
+                }.onTapGesture {
+                    WKInterfaceDevice.current().play(.stop)
+                    DispatchQueue.main.async {
+                        motionManager.stopTracking()
+                    }
                 }
-                VStack {
-                    Spacer()
-                    Text("\(motionManager.jumpCount)")
-                        .font(.largeTitle)
-                    Spacer()
-                }
-            }.onTapGesture {
-                WKInterfaceDevice.current().play(.stop)
-                DispatchQueue.main.async {
-                    motionManager.stopTracking()
-                }
+            } else {
+                StartView(motionManager: $motionManager)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button(action: {
+                                showSettings.toggle()
+                            }) {
+                                Image(systemName: "gearshape.fill")
+                            }
+                        }
+                    }
+                    .navigationTitle(goal)
+                    .navigationDestination(isPresented: $showSettings) {
+                        GoalView()
+                    }
             }
-        } else {
-            StartView(motionManager: $motionManager)
         }
     }
 }
@@ -64,8 +98,4 @@ struct StartView: View {
                 }
         }
     }
-}
-
-#Preview {
-    JumpCountView()
 }
