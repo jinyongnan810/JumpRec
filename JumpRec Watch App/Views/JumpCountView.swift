@@ -17,6 +17,7 @@ struct JumpCountView: View {
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
     @State var showSettings: Bool = false
+    @State var startTime: Date = .init()
 
     var goal: Text {
         switch settings.goalType {
@@ -44,6 +45,13 @@ struct JumpCountView: View {
                             .font(.largeTitle)
                         Spacer()
                     }
+                    VStack {
+                        Spacer()
+                        HStack {
+                            TimeCountView(startTime: startTime)
+                            Spacer()
+                        }
+                    }
                 }.onTapGesture {
                     WKInterfaceDevice.current().play(.stop)
                     DispatchQueue.main.async {
@@ -51,7 +59,7 @@ struct JumpCountView: View {
                     }
                 }
             } else {
-                StartView(motionManager: $motionManager)
+                StartView(motionManager: $motionManager, startTime: $startTime)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button(action: {
@@ -74,6 +82,7 @@ struct StartView: View {
     @State var isCountingDown: Bool = false
     @State var countdown: Double = 3
     @Binding var motionManager: MotionManager
+    @Binding var startTime: Date
     var timer = Timer.publish(every: 1, on: .main, in: .common)
     var body: some View {
         if isCountingDown {
@@ -92,10 +101,39 @@ struct StartView: View {
             Text("Start")
                 .font(.largeTitle)
                 .onTapGesture {
+                    startTime = Date()
                     withAnimation {
                         isCountingDown.toggle()
                     }
                 }
         }
+    }
+}
+
+struct TimeCountView: View {
+    let startTime: Date
+    let calendar = Calendar.current
+    init(startTime: Date) {
+        self.startTime = startTime
+    }
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 0.1)) { timeline in
+            let diff = timeline.date.timeIntervalSince(startTime)
+            Text(
+                diff.minutesSecondsMilliseconds
+            )
+        }
+    }
+}
+
+extension TimeInterval {
+    var minutesSecondsMilliseconds: String {
+        let totalSeconds = Int(self)
+        let minutes = totalSeconds / 60
+        let seconds = totalSeconds % 60
+        let milliseconds = Int(truncatingRemainder(dividingBy: 1) * 10)
+
+        return String(format: "%02d:%02d.%01d", minutes, seconds, milliseconds)
     }
 }
