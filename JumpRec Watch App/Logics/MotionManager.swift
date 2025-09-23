@@ -11,6 +11,8 @@ import Foundation
 import Observation
 import WatchKit
 
+let csvHeader = "Timestamp,AX,AY,AZ,RX,RY,RZ\n"
+
 /// Manages motion detection and jump counting using device sensors
 @Observable
 class MotionManager: NSObject {
@@ -40,6 +42,7 @@ class MotionManager: NSObject {
     private let historySize = 50 // Keep last 50 samples for analysis
     private var peakDetectionWindow: [Double] = []
     private let windowSize = 10 // Samples for peak detection
+    private var motionRecording: [String] = []
 
     // MARK: - Calibration Properties
 
@@ -84,6 +87,7 @@ class MotionManager: NSObject {
         resetSession()
         isTracking = true
         sessionStartTime = Date()
+        motionRecording = [csvHeader]
 
         // Start device motion updates for more accurate data
         motionManager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
@@ -103,6 +107,8 @@ class MotionManager: NSObject {
         isTracking = false
         motionManager.stopDeviceMotionUpdates()
         motionManager.stopAccelerometerUpdates()
+        saveCSVtoICloud()
+        motionRecording.removeAll()
 
         // Calculate session statistics
         if let startTime = sessionStartTime {
@@ -112,12 +118,35 @@ class MotionManager: NSObject {
         }
     }
 
+    func saveCSVtoICloud(filename _: String = "motion.csv") {
+        let csvText = motionRecording.joined()
+        ConnectivityManager.shared.sendCSV(csvText, filename: "motion.csv")
+//        let fileManager = FileManager.default
+//
+//        guard let containerURL = fileManager.url(forUbiquityContainerIdentifier: "iCloud.com.kinn.JumpRec")?
+//            .appending(path: "Documents") else {
+//            print("iCloud container not available")
+//            return
+//        }
+//
+//        let fileURL = containerURL.appendingPathComponent(filename)
+//        let csvText = motionRecording.joined()
+//
+//        do {
+//            try csvText.write(to: fileURL, atomically: true, encoding: .utf8)
+//            print("Saved to iCloud: \(fileURL)")
+//        } catch {
+//            print("Error writing CSV: \(error)")
+//        }
+    }
+
     /// Reset the current session
     func resetSession() {
         jumpCount = 0
         jumpTimestamps.removeAll()
         accelerationHistory.removeAll()
         peakDetectionWindow.removeAll()
+        motionRecording.removeAll()
         lastJumpTimestamp = 0
     }
 
@@ -125,6 +154,7 @@ class MotionManager: NSObject {
     func startCalibration() {
         isCalibrating = true
         calibrationData.removeAll()
+        motionRecording.removeAll()
 
         // Collect baseline data for 3 seconds
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
@@ -137,6 +167,7 @@ class MotionManager: NSObject {
     private func processMotionData(_ motion: CMDeviceMotion) {
         // Use user acceleration (gravity removed) for better jump detection
         let userAcceleration = motion.userAcceleration
+        let userRotaion = motion.rotationRate
 
         // Calculate total acceleration magnitude
         let totalAcceleration = sqrt(
@@ -149,6 +180,11 @@ class MotionManager: NSObject {
         DispatchQueue.main.async { [weak self] in
             self?.currentAcceleration = totalAcceleration
         }
+
+        motionRecording
+            .append(
+                "\(motion.timestamp),\(totalAcceleration),\(userAcceleration.x),\(userAcceleration.y),\(userAcceleration.z),\(userRotaion.x),\(userRotaion.y),\(userRotaion.z)\n"
+            )
 
         // Process for jump detection
         detectJump(acceleration: totalAcceleration,

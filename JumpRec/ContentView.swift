@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var connectivityManager = ConnectivityManager.shared
     var body: some View {
         VStack {
             Image(systemName: "globe")

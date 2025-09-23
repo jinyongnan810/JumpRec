@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var connectivityMangaer = ConnectivityManager.shared
     var body: some View {
         JumpCountView()
     }
