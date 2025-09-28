@@ -11,7 +11,7 @@ import Foundation
 import Observation
 import WatchKit
 
-let csvHeader = "Timestamp,AX,AY,AZ,RX,RY,RZ\n"
+let csvHeader = "Timestamp,AX,AY,AZ,RX,RY,RZ,Jump\n"
 
 /// Manages motion detection and jump counting using device sensors
 @Observable
@@ -21,7 +21,7 @@ class MotionManager: NSObject {
     var isTracking = false
     var jumpCount = 0
     var currentAcceleration: Double = 0
-    var detectionSensitivity: Double = 1.5 // G-force threshold
+    var detectionSensitivity: Double = 1.0 // G-force threshold
     var isCalibrating = false
 
     // MARK: - Motion Components
@@ -38,10 +38,6 @@ class MotionManager: NSObject {
 
     // MARK: - Detection Algorithm Properties
 
-    private var accelerationHistory: [Double] = []
-    private let historySize = 50 // Keep last 50 samples for analysis
-    private var peakDetectionWindow: [Double] = []
-    private let windowSize = 10 // Samples for peak detection
     private var motionRecording: [String] = []
 
     // MARK: - Calibration Properties
@@ -120,32 +116,14 @@ class MotionManager: NSObject {
 
     func saveCSVtoICloud(filename _: String = "motion.csv") {
         let csvText = motionRecording.joined()
-        ConnectivityManager.shared.sendCSV(csvText, filename: "motion.csv")
-//        let fileManager = FileManager.default
-//
-//        guard let containerURL = fileManager.url(forUbiquityContainerIdentifier: "iCloud.com.kinn.JumpRec")?
-//            .appending(path: "Documents") else {
-//            print("iCloud container not available")
-//            return
-//        }
-//
-//        let fileURL = containerURL.appendingPathComponent(filename)
-//        let csvText = motionRecording.joined()
-//
-//        do {
-//            try csvText.write(to: fileURL, atomically: true, encoding: .utf8)
-//            print("Saved to iCloud: \(fileURL)")
-//        } catch {
-//            print("Error writing CSV: \(error)")
-//        }
+        ConnectivityManager.shared
+            .sendCSV(csvText, filename: "motion_\(Date().timeIntervalSince1970).csv")
     }
 
     /// Reset the current session
     func resetSession() {
         jumpCount = 0
         jumpTimestamps.removeAll()
-        accelerationHistory.removeAll()
-        peakDetectionWindow.removeAll()
         motionRecording.removeAll()
         lastJumpTimestamp = 0
     }
@@ -181,28 +159,15 @@ class MotionManager: NSObject {
             self?.currentAcceleration = totalAcceleration
         }
 
+        // Process for jump detection
+        let isJump = detectJump(acceleration: totalAcceleration,
+                                verticalAcceleration: userAcceleration.y,
+                                timestamp: motion.timestamp)
+
         motionRecording
             .append(
-                "\(motion.timestamp),\(totalAcceleration),\(userAcceleration.x),\(userAcceleration.y),\(userAcceleration.z),\(userRotaion.x),\(userRotaion.y),\(userRotaion.z)\n"
+                "\(motion.timestamp),\(userAcceleration.x),\(userAcceleration.y),\(userAcceleration.z),\(userRotaion.x),\(userRotaion.y),\(userRotaion.z),\(isJump)\n"
             )
-
-        // Process for jump detection
-        detectJump(acceleration: totalAcceleration,
-                   verticalAcceleration: userAcceleration.y,
-                   timestamp: motion.timestamp)
-//        print("total: \(totalAcceleration), y: \(userAcceleration.y)")
-//        let result = jumpDetectionAlgorithm
-//            .processAcceleration(
-//                AccelerationData(
-//                    totalAcceleration: totalAcceleration,
-//                    verticalAcceleration: userAcceleration.y,
-//                    horizontalAcceleration: userAcceleration.x,
-//                    timestamp: motion.timestamp
-//                )
-//            )
-//        if result.isJump {
-//            registerJump(timestamp: motion.timestamp)
-//        }
 
         // Collect calibration data if needed
         if isCalibrating {
@@ -229,31 +194,16 @@ class MotionManager: NSObject {
         )
     }
 
-    private func detectJump(acceleration: Double,
+    private func detectJump(acceleration _: Double,
                             verticalAcceleration: Double,
-                            timestamp: TimeInterval)
+                            timestamp: TimeInterval) -> Bool
     {
-        // Add to history
-        accelerationHistory.append(acceleration)
-        if accelerationHistory.count > historySize {
-            accelerationHistory.removeFirst()
-        }
-
-        // Add to peak detection window
-        peakDetectionWindow.append(acceleration)
-        if peakDetectionWindow.count > windowSize {
-            peakDetectionWindow.removeFirst()
-        }
-
-        // Check if we have enough data
-        guard peakDetectionWindow.count == windowSize else { return }
-
         // Detect jump using multiple criteria
-        if isJumpDetected(verticalAcceleration: verticalAcceleration, timestamp: timestamp) {
+        let result = isJumpDetected(verticalAcceleration: verticalAcceleration, timestamp: timestamp)
+        if result {
             registerJump(timestamp: timestamp)
-//            print("jump detected. peaks: \(peakDetectionWindow)")
-//            peakDetectionWindow.removeAll()
         }
+        return result
     }
 
     private func isJumpDetected(verticalAcceleration: Double,
@@ -264,26 +214,9 @@ class MotionManager: NSObject {
             return false
         }
 
-        // 2. Check if we have a peak in the window
-        guard let maxAccel = peakDetectionWindow.max(),
-              let maxIndex = peakDetectionWindow.firstIndex(of: maxAccel)
-        else {
-            return false
-        }
-
-        // 3. Peak should be in the middle of the window (not at edges)
-        let iscenteredPeak = maxIndex > 2 && maxIndex < windowSize - 2
-        guard iscenteredPeak else { return false }
-
-        // 4. Check if peak exceeds threshold
+        // 2. Check exceeds threshold
         let adjustedThreshold = detectionSensitivity - noiseFloor
-        guard maxAccel > adjustedThreshold else { return false }
-
-        // 5. Verify it's a vertical jump (not lateral movement)
-        // Vertical component should be significant
-        guard verticalAcceleration < adjustedThreshold * -0.7 else {
-            return false
-        }
+        guard verticalAcceleration > adjustedThreshold else { return false }
         return true
     }
 
