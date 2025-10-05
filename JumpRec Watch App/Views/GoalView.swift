@@ -64,4 +64,5 @@ struct TimeView: View {
 
 #Preview {
     GoalView()
+        .environment(JumpRecSettings())
 }

@@ -8,14 +8,12 @@
 import Combine
 import CoreMotion
 import Foundation
-import Observation
 import WatchKit
 
 let csvHeader = "Timestamp,AX,AY,AZ,RX,RY,RZ,Jump\n"
 
 /// Manages motion detection and jump counting using device sensors
-@Observable
-class MotionManager: NSObject {
+class MotionManager {
     // MARK: - Published Properties
 
     var isTracking = false
@@ -23,6 +21,8 @@ class MotionManager: NSObject {
     var currentAcceleration: Double = 0
     var detectionSensitivity: Double = 1.0 // G-force threshold
     var isCalibrating = false
+
+    var addJump: (Int) -> Void
 
     // MARK: - Motion Components
 
@@ -53,8 +53,8 @@ class MotionManager: NSObject {
 
     // MARK: - Initialization
 
-    override init() {
-        super.init()
+    init(addJump: @escaping (Int) -> Void) {
+        self.addJump = addJump
         setupMotionManager()
     }
 
@@ -155,9 +155,9 @@ class MotionManager: NSObject {
         )
 
         // Update on main thread for UI
-        DispatchQueue.main.async { [weak self] in
-            self?.currentAcceleration = totalAcceleration
-        }
+//        DispatchQueue.main.async { [weak self] in
+//            self?.currentAcceleration = totalAcceleration
+//        }
 
         // Process for jump detection
         let isJump = detectJump(acceleration: totalAcceleration,
@@ -236,17 +236,8 @@ class MotionManager: NSObject {
 
     private func registerJump(timestamp: TimeInterval) {
         lastJumpTimestamp = timestamp
-
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            jumpCount += 1
-            jumpTimestamps.append(Date())
-
-            // Trigger haptic feedback
-            if jumpCount % 100 == 0 {
-                WKInterfaceDevice.current().play(.success)
-            }
-        }
+        addJump(1)
+        jumpTimestamps.append(Date())
     }
 
     private func finishCalibration() {

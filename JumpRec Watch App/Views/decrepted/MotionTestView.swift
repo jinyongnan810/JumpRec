@@ -14,7 +14,7 @@ import Observation
 
 /// View for testing and visualizing motion detection
 struct MotionTestView: View {
-    @State private var motionManager = MotionManager()
+    @State private var motionManager = MotionManager(addJump: { _ in })
     @State private var calibrationManager = CalibrationManager()
     @State private var showingCalibration = false
     @State private var showingSettings = false

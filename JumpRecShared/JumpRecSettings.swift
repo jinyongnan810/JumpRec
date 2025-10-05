@@ -42,6 +42,13 @@ public class JumpRecSettings {
         }
     }
 
+    public var goalCount: Int {
+        Int(goalType == .count ?
+            jumpCount
+            : jumpTime
+        )
+    }
+
     public init() {
         goalType = store.string(forKey: "goalType") == GoalType.time.rawValue ? .time : .count
         jumpCount = store.longLong(forKey: "jumpCount") == 0 ? DefaultJumpCount : store.longLong(forKey: "jumpCount")

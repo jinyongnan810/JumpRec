@@ -40,6 +40,13 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         session.activate()
     }
 
+    func session(
+        _: WCSession,
+        didReceiveMessage message: [String: Any]
+    ) {
+        print("[WatchConnectivityManager] Received message: \(message)")
+    }
+
     func session(_: WCSession, didReceive file: WCSessionFile) {
         print("[WatchConnectivityManager] Received file from watch: \(file.fileURL.lastPathComponent)")
         do {
