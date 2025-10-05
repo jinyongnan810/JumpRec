@@ -51,6 +51,16 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    func sendMessage(_ message: [String: Any]) {
+        guard session.isReachable else {
+            print("[WatchConnectivityManager] Session not reachable or not paired")
+            return
+        }
+        session.sendMessage(message, replyHandler: nil, errorHandler: { error in
+            print("[WatchConnectivityManager] Failed to send message with error: \(error.localizedDescription)")
+        })
+    }
+
     func sessionReachabilityDidChange(_ session: WCSession) {
         print("[WatchConnectivityManager] Session reachability changed: \(session.isReachable)")
     }

@@ -198,6 +198,7 @@ class MotionManager {
                             verticalAcceleration: Double,
                             timestamp: TimeInterval) -> Bool
     {
+//        ConnectivityManager.shared.sendMessage(["watch app": "verticalAcceleration: \(verticalAcceleration)"])
         // Detect jump using multiple criteria
         let result = isJumpDetected(verticalAcceleration: verticalAcceleration, timestamp: timestamp)
         if result {
@@ -236,6 +237,7 @@ class MotionManager {
 
     private func registerJump(timestamp: TimeInterval) {
         lastJumpTimestamp = timestamp
+        ConnectivityManager.shared.sendMessage(["watch app": "Detect Jump"])
         addJump(1)
         jumpTimestamps.append(Date())
     }

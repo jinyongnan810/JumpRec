@@ -53,13 +53,17 @@ class JumpRecState {
         }
         startTime = Date()
         jumpState = .jumping
+        motionManager?.startTracking()
         WKInterfaceDevice.current().play(.start)
+        ConnectivityManager.shared.sendMessage(["watch app": "started"])
     }
 
     func end() {
+        motionManager?.stopTracking()
         endTime = Date()
         jumpState = .finished
         WKInterfaceDevice.current().play(.stop)
+        ConnectivityManager.shared.sendMessage(["watch app": "finished"])
     }
 
     func reset() {
