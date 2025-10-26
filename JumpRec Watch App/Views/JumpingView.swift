@@ -27,8 +27,13 @@ struct JumpingView: View {
                 HStack {
                     TimerView(startTime: appState.startTime ?? Date())
                     Spacer()
-                    Text("\(appState.heartrate)BPM")
-                        .font(.subheadline)
+                    if appState.heartrate == 0 {
+                        Text("Detecting...")
+                            .font(.subheadline)
+                    } else {
+                        Text("\(appState.heartrate) BPM")
+                            .font(.subheadline)
+                    }
                 }
             }
         }.onTapGesture {

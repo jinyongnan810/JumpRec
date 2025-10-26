@@ -33,6 +33,7 @@ class MotionManager: NSObject {
     private let healthStore = HKHealthStore()
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
+    private var heartRateQuery: HKAnchoredObjectQuery?
 
     // MARK: - Detection Parameters
 
@@ -119,6 +120,29 @@ class MotionManager: NSObject {
                 if let error {
                     print("Failed to start collecting health data: \(error)")
                 }
+
+                let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
+                let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: .strictStartDate)
+                self.heartRateQuery = HKAnchoredObjectQuery(
+                    type: heartRateType,
+                    predicate: predicate,
+                    anchor: nil,
+                    limit: HKObjectQueryNoLimit
+                ) { _, _, _, _, _ in
+                }
+
+                // Set updateHandler for live delivery
+                self.heartRateQuery?.updateHandler = { _, samples, _, _, _ in
+                    if let samples = samples as? [HKQuantitySample] {
+                        for sample in samples {
+                            let bpm = sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
+                            self.updateHeartRate(Int(bpm))
+                        }
+                    }
+                }
+                if let heartRateQuery = self.heartRateQuery {
+                    self.healthStore.execute(heartRateQuery)
+                }
             }
         } catch {
             print("Collecting health data failed")
@@ -166,6 +190,9 @@ class MotionManager: NSObject {
             self.builder?.finishWorkout { workout, _ in
                 print("workout finished: \(String(describing: workout))")
             }
+        }
+        if let heartRateQuery {
+            healthStore.stop(heartRateQuery)
         }
 
         saveCSVtoICloud()
@@ -254,29 +281,29 @@ extension MotionManager: HKWorkoutSessionDelegate {
 // MARK: - HKLiveWorkoutBuilderDelegate
 
 extension MotionManager: HKLiveWorkoutBuilderDelegate {
-    func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder,
+    func workoutBuilder(_: HKLiveWorkoutBuilder,
                         didCollectDataOf collectedTypes: Set<HKSampleType>)
     {
         print("1: collected health data types: \(collectedTypes)")
-        let statistics = workoutBuilder.statistics(for: .quantityType(forIdentifier: .heartRate)!)
-        let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-        if let value = statistics?.mostRecentQuantity()?.doubleValue(for: heartRateUnit) {
-            print("1: Live Heart Rate: \(value) BPM")
-            updateHeartRate(Int(value))
-        } else {
-            print("1: No heart rate available")
-        }
+//        let statistics = workoutBuilder.statistics(for: .quantityType(forIdentifier: .heartRate)!)
+//        let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+//        if let value = statistics?.mostRecentQuantity()?.doubleValue(for: heartRateUnit) {
+//            print("1: Live Heart Rate: \(value) BPM")
+//            updateHeartRate(Int(value))
+//        } else {
+//            print("1: No heart rate available")
+//        }
     }
 
     func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {
         print("2: collected health data: \(workoutBuilder)")
-        let statistics = workoutBuilder.statistics(for: .quantityType(forIdentifier: .heartRate)!)
-        let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-        if let value = statistics?.mostRecentQuantity()?.doubleValue(for: heartRateUnit) {
-            print("2: Live Heart Rate: \(value) BPM")
-            updateHeartRate(Int(value))
-        } else {
-            print("2: No heart rate available")
-        }
+//        let statistics = workoutBuilder.statistics(for: .quantityType(forIdentifier: .heartRate)!)
+//        let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+//        if let value = statistics?.mostRecentQuantity()?.doubleValue(for: heartRateUnit) {
+//            print("2: Live Heart Rate: \(value) BPM")
+//            updateHeartRate(Int(value))
+//        } else {
+//            print("2: No heart rate available")
+//        }
     }
 }
