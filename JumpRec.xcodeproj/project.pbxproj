@@ -509,6 +509,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "JumpRec-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = JumpRec.;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need your health information to get better understanding of the workout status.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need your health information to get better understanding of the workout status.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "JumpRec. want to use your motion data to detect jump motion.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kinn.JumpRec;
@@ -546,6 +548,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "JumpRec-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = JumpRec.;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need your health information to get better understanding of the workout status.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need your health information to get better understanding of the workout status.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "JumpRec. want to use your motion data to detect jump motion.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kinn.JumpRec;

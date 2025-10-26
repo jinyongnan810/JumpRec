@@ -8,23 +8,31 @@
 import Combine
 import CoreMotion
 import Foundation
+import HealthKit
 import WatchKit
 
 let csvHeader = "Timestamp,AX,AY,AZ,RX,RY,RZ,Jump\n"
 
 /// Manages motion detection and jump counting using device sensors
-class MotionManager {
+class MotionManager: NSObject {
     // MARK: - Published Properties
 
     var isTracking = false
     var jumpCount = 0
 
     var addJump: (Int) -> Void
+    var updateHeartRate: (Int) -> Void
 
     // MARK: - Motion Components
 
     private let motionManager = CMMotionManager()
     private let queue = OperationQueue()
+
+    // MARK: - HealthKit Related
+
+    private let healthStore = HKHealthStore()
+    private var session: HKWorkoutSession?
+    private var builder: HKLiveWorkoutBuilder?
 
     // MARK: - Detection Parameters
 
@@ -42,8 +50,11 @@ class MotionManager {
 
     // MARK: - Initialization
 
-    init(addJump: @escaping (Int) -> Void) {
+    init(addJump: @escaping (Int) -> Void, updateHeartRate: @escaping (Int) -> Void) {
         self.addJump = addJump
+        self.updateHeartRate = updateHeartRate
+        super.init()
+        requestHealthKitAuthorization()
         setupMotionManager()
     }
 
@@ -60,6 +71,26 @@ class MotionManager {
         queue.name = "MotionManagerQueue"
     }
 
+    /// Request permission for collecting health data
+    func requestHealthKitAuthorization() {
+        let typesToShare: Set = [
+            HKQuantityType.workoutType(),
+        ]
+
+        let typesToRead: Set = [
+            HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
+            HKQuantityType.quantityType(forIdentifier: .heartRate)!,
+            HKObjectType.activitySummaryType(),
+        ]
+
+        healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { success, error in
+            print("request permission: \(success)")
+            if let error {
+                print("permission request error: \(error)")
+            }
+        }
+    }
+
     // MARK: - Public Methods
 
     /// Start motion tracking and jump detection
@@ -68,7 +99,33 @@ class MotionManager {
             print("Device motion is not available")
             return
         }
+        // healthkit related
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .jumpRope
+        configuration.locationType = .outdoor
+        do {
+            session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
+            builder = session?.associatedWorkoutBuilder()
 
+            // Set up session delegate
+            session?.delegate = self
+            builder?.delegate = self
+
+            // Start the workout
+            let startDate = Date()
+            session?.startActivity(with: startDate)
+            builder?.beginCollection(withStart: startDate) { success, error in
+                print("Collecting health data started: \(success)")
+                if let error {
+                    print("Failed to start collecting health data: \(error)")
+                }
+            }
+        } catch {
+            print("Collecting health data failed")
+            return
+        }
+
+        // motion related
         resetSession()
         isTracking = true
         motionRecording = [csvHeader]
@@ -89,8 +146,28 @@ class MotionManager {
     /// Stop motion tracking
     func stopTracking() {
         isTracking = false
+        // motion related
         motionManager.stopDeviceMotionUpdates()
         motionManager.stopAccelerometerUpdates()
+        // healthkit related
+        if let quantityType = HKQuantityType.quantityType(forIdentifier: .stepCount) {
+            let quantity = HKQuantity(unit: .count(), doubleValue: Double(jumpCount))
+            let sample = HKQuantitySample(type: quantityType,
+                                          quantity: quantity,
+                                          start: Date(),
+                                          end: Date())
+
+            builder?.add([sample]) { _, _ in
+                print("added health data: \(sample)")
+            }
+        }
+        session?.end()
+        builder?.endCollection(withEnd: Date()) { _, _ in
+            self.builder?.finishWorkout { workout, _ in
+                print("workout finished: \(String(describing: workout))")
+            }
+        }
+
         saveCSVtoICloud()
         motionRecording.removeAll()
     }
@@ -145,5 +222,61 @@ class MotionManager {
         ConnectivityManager.shared.sendMessage(["watch app": "Detect Jump"])
         addJump(1)
         jumpTimestamps.append(Date())
+    }
+}
+
+// MARK: - HKWorkoutSessionDelegate
+
+extension MotionManager: HKWorkoutSessionDelegate {
+    func workoutSession(_: HKWorkoutSession,
+                        didChangeTo toState: HKWorkoutSessionState,
+                        from _: HKWorkoutSessionState,
+                        date _: Date)
+    {
+        // Handle state changes
+        switch toState {
+        case .running:
+            print("Workout started")
+        case .ended:
+            print("Workout ended")
+        default:
+            break
+        }
+    }
+
+    func workoutSession(_: HKWorkoutSession,
+                        didFailWithError error: Error)
+    {
+        print("workout session error: \(error.localizedDescription)")
+    }
+}
+
+// MARK: - HKLiveWorkoutBuilderDelegate
+
+extension MotionManager: HKLiveWorkoutBuilderDelegate {
+    func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder,
+                        didCollectDataOf collectedTypes: Set<HKSampleType>)
+    {
+        print("1: collected health data types: \(collectedTypes)")
+        let statistics = workoutBuilder.statistics(for: .quantityType(forIdentifier: .heartRate)!)
+        let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+        if let value = statistics?.mostRecentQuantity()?.doubleValue(for: heartRateUnit) {
+            print("1: Live Heart Rate: \(value) BPM")
+            updateHeartRate(Int(value))
+        } else {
+            print("1: No heart rate available")
+        }
+    }
+
+    func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {
+        print("2: collected health data: \(workoutBuilder)")
+        let statistics = workoutBuilder.statistics(for: .quantityType(forIdentifier: .heartRate)!)
+        let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+        if let value = statistics?.mostRecentQuantity()?.doubleValue(for: heartRateUnit) {
+            print("2: Live Heart Rate: \(value) BPM")
+            updateHeartRate(Int(value))
+        } else {
+            print("2: No heart rate available")
+        }
     }
 }

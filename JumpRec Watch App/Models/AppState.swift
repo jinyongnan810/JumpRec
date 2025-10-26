@@ -21,6 +21,7 @@ class JumpRecState {
     var startTime: Date?
     var endTime: Date?
     var jumpCount: Int = 0
+    var heartrate: Int = 0
     var goalType: GoalType = .count
     var goal: Int = 0
     var totalTime: String {
@@ -38,6 +39,8 @@ class JumpRecState {
     init() {
         motionManager = MotionManager(addJump: { by in
             self.addJump(by: by)
+        }, updateHeartRate: { with in
+            self.heartrate = with
         })
     }
 
@@ -71,6 +74,10 @@ class JumpRecState {
         jumpCount = 0
         endTime = nil
         startTime = nil
+    }
+
+    func updateHeartrate(_ heartrate: Int) {
+        self.heartrate = heartrate
     }
 
     func addJump(by: Int) {

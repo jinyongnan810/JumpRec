@@ -25,7 +25,7 @@ struct ResultView: View {
                     Button {
                         appState.reset()
                     } label: {
-                        Text("Close")
+                        Text("Close").padding()
                     }
                 }
             }
