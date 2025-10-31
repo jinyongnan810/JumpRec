@@ -22,14 +22,15 @@ class JumpRecState {
     var endTime: Date?
     var jumpCount: Int = 0
     var heartrate: Int = 0
+    var energyBurned: Int = 0
     var goalType: GoalType = .count
     var goal: Int = 0
     var totalTime: String {
-        guard let startTime, let endTime else { return "0:00" }
+        guard let startTime, let endTime else { return "00:00" }
         let timeInterval: TimeInterval = endTime.timeIntervalSince(startTime)
         let minutes = Int(timeInterval) / 60
         let seconds = Int(timeInterval).remainderReportingOverflow(dividingBy: 60).partialValue
-        return "\(minutes):\(seconds)"
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 
     let synthesizer = AVSpeechSynthesizer()
@@ -41,6 +42,8 @@ class JumpRecState {
             self.addJump(by: by)
         }, updateHeartRate: { with in
             self.heartrate = with
+        }, updateEnergyBurned: { with in
+            self.energyBurned = with
         })
     }
 
@@ -72,6 +75,8 @@ class JumpRecState {
     func reset() {
         jumpState = .idle
         jumpCount = 0
+        heartrate = 0
+        energyBurned = 0
         endTime = nil
         startTime = nil
     }

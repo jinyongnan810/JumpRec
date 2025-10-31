@@ -22,6 +22,7 @@ class MotionManager: NSObject {
 
     var addJump: (Int) -> Void
     var updateHeartRate: (Int) -> Void
+    var updateEnergyBurned: (Int) -> Void
 
     // MARK: - Motion Components
 
@@ -51,9 +52,10 @@ class MotionManager: NSObject {
 
     // MARK: - Initialization
 
-    init(addJump: @escaping (Int) -> Void, updateHeartRate: @escaping (Int) -> Void) {
+    init(addJump: @escaping (Int) -> Void, updateHeartRate: @escaping (Int) -> Void, updateEnergyBurned: @escaping (Int) -> Void) {
         self.addJump = addJump
         self.updateHeartRate = updateHeartRate
+        self.updateEnergyBurned = updateEnergyBurned
         super.init()
         requestHealthKitAuthorization()
         setupMotionManager()
@@ -76,6 +78,7 @@ class MotionManager: NSObject {
     func requestHealthKitAuthorization() {
         let typesToShare: Set = [
             HKQuantityType.workoutType(),
+            HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
         ]
 
         let typesToRead: Set = [
@@ -186,9 +189,26 @@ class MotionManager: NSObject {
             }
         }
         session?.end()
+
         builder?.endCollection(withEnd: Date()) { _, _ in
             self.builder?.finishWorkout { workout, _ in
                 print("workout finished: \(String(describing: workout))")
+                DispatchQueue.main.async {
+                    // update total calories burned
+                    if let activeEnergyType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned),
+                       let statistics = self.builder?.statistics(for: activeEnergyType)
+                    {
+                        let unit = HKUnit.kilocalorie()
+                        if let totalEnergy = statistics.sumQuantity()?.doubleValue(for: unit) {
+                            print("Total active energy burned: \(totalEnergy) kcal")
+                            self.updateEnergyBurned(Int(totalEnergy))
+                        } else {
+                            print("No active energy burned statistics available")
+                        }
+                    } else {
+                        print("Could not obtain activeEnergyBurned quantity type or statistics")
+                    }
+                }
             }
         }
         if let heartRateQuery {
