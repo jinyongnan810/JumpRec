@@ -82,7 +82,7 @@ class JumpRecState: NSObject {
         let duration = endTime!.timeIntervalSince(startTime!)
         scheduleNotification(
             title: "Session Finished",
-            body: "You've jumped \(jumpCount) times for \(Int(duration))!"
+            body: "You've jumped \(jumpCount) times in \(Int(duration)) seconds!"
         )
         ConnectivityManager.shared.sendMessage(["watch app": "finished"])
     }
