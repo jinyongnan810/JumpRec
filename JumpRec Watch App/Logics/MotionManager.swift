@@ -207,17 +207,6 @@ class MotionManager: NSObject {
         if let energyBurnedQuery {
             healthStore.stop(energyBurnedQuery)
         }
-        if let quantityType = HKQuantityType.quantityType(forIdentifier: .stepCount) {
-            let quantity = HKQuantity(unit: .count(), doubleValue: Double(jumpCount))
-            let sample = HKQuantitySample(type: quantityType,
-                                          quantity: quantity,
-                                          start: Date(),
-                                          end: Date())
-
-            builder?.add([sample]) { _, _ in
-                print("added health data: \(sample)")
-            }
-        }
         session?.end()
         builder?.endCollection(withEnd: Date()) {
             _,
@@ -231,7 +220,7 @@ class MotionManager: NSObject {
 
         // upload collected data
         // TODO: upload only on debug mode
-        saveCSVtoICloud()
+//        saveCSVtoICloud()
         motionRecording.removeAll()
     }
 

@@ -79,14 +79,19 @@ class JumpRecState: NSObject {
 
         motionManager?.stopTracking()
         endTime = Date()
+        DispatchQueue.main.async {
+//            WKInterfaceDevice.current().play(.stop)
+            let duration = self.endTime!.timeIntervalSince(self.startTime!)
+            self.speak(text: "Session Finished!", delay: 0.01)
+            self.scheduleNotification(
+                title: "Session Finished",
+                body: "You've jumped \(self.jumpCount) times in \(Int(duration)) seconds!"
+            )
+            ConnectivityManager.shared.sendMessage(["watch app": "finished"])
+        }
+
         jumpState = .finished
-//        WKInterfaceDevice.current().play(.stop)
-        let duration = endTime!.timeIntervalSince(startTime!)
-        scheduleNotification(
-            title: "Session Finished",
-            body: "You've jumped \(jumpCount) times in \(Int(duration)) seconds!"
-        )
-        ConnectivityManager.shared.sendMessage(["watch app": "finished"])
+        print("end finished")
     }
 
     func reset() {
@@ -139,8 +144,8 @@ class JumpRecState: NSObject {
         scheduleNotification(title: "Reached \(hundred) jumps!", body: "")
     }
 
-    func speak(text: String) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+    func speak(text: String, delay: Double = 1.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             let utterance = AVSpeechUtterance(string: text)
             utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
             self.synthesizer.speak(utterance)

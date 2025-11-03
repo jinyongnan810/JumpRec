@@ -29,7 +29,7 @@ struct MainView: View {
             case .jumping:
                 JumpingView(appState: $appState)
             }
-        }.onChange(of: appState) { _, newValue in
+        }.onChange(of: appState.jumpState) { _, newValue in
             print("current appState: \(newValue)")
         }
     }
