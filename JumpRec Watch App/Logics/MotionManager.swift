@@ -22,7 +22,7 @@ class MotionManager: NSObject {
 
     var addJump: (Int) -> Void
     var updateHeartRate: (Int) -> Void
-    var updateEnergyBurned: (Int) -> Void
+    var updateEnergyBurned: (Double) -> Void
 
     // MARK: - Motion Components
 
@@ -35,6 +35,7 @@ class MotionManager: NSObject {
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
     private var heartRateQuery: HKAnchoredObjectQuery?
+    private var energyBurnedQuery: HKAnchoredObjectQuery?
 
     // MARK: - Detection Parameters
 
@@ -52,7 +53,7 @@ class MotionManager: NSObject {
 
     // MARK: - Initialization
 
-    init(addJump: @escaping (Int) -> Void, updateHeartRate: @escaping (Int) -> Void, updateEnergyBurned: @escaping (Int) -> Void) {
+    init(addJump: @escaping (Int) -> Void, updateHeartRate: @escaping (Int) -> Void, updateEnergyBurned: @escaping (Double) -> Void) {
         self.addJump = addJump
         self.updateHeartRate = updateHeartRate
         self.updateEnergyBurned = updateEnergyBurned
@@ -134,17 +135,40 @@ class MotionManager: NSObject {
                 ) { _, _, _, _, _ in
                 }
 
+                let energyBurnedType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!
+                let energyBurnedPredicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: .strictStartDate)
+                self.energyBurnedQuery = HKAnchoredObjectQuery(
+                    type: energyBurnedType,
+                    predicate: energyBurnedPredicate,
+                    anchor: nil,
+                    limit: HKObjectQueryNoLimit
+                ) { _, _, _, _, _ in
+                }
+
                 // Set updateHandler for live delivery
                 self.heartRateQuery?.updateHandler = { _, samples, _, _, _ in
                     if let samples = samples as? [HKQuantitySample] {
                         for sample in samples {
                             let bpm = sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
+                            print("heartrate: \(bpm) bpm")
                             self.updateHeartRate(Int(bpm))
                         }
                     }
                 }
                 if let heartRateQuery = self.heartRateQuery {
                     self.healthStore.execute(heartRateQuery)
+                }
+                self.energyBurnedQuery?.updateHandler = { _, samples, _, _, _ in
+                    if let samples = samples as? [HKQuantitySample] {
+                        for sample in samples {
+                            let kcal = sample.quantity.doubleValue(for: HKUnit.kilocalorie())
+//                            print("eneryBurned: \(kcal)")
+                            self.updateEnergyBurned(kcal)
+                        }
+                    }
+                }
+                if let energyBurnedQuery = self.energyBurnedQuery {
+                    self.healthStore.execute(energyBurnedQuery)
                 }
             }
         } catch {
@@ -177,6 +201,12 @@ class MotionManager: NSObject {
         motionManager.stopDeviceMotionUpdates()
         motionManager.stopAccelerometerUpdates()
         // healthkit related
+        if let heartRateQuery {
+            healthStore.stop(heartRateQuery)
+        }
+        if let energyBurnedQuery {
+            healthStore.stop(energyBurnedQuery)
+        }
         if let quantityType = HKQuantityType.quantityType(forIdentifier: .stepCount) {
             let quantity = HKQuantity(unit: .count(), doubleValue: Double(jumpCount))
             let sample = HKQuantitySample(type: quantityType,
@@ -189,32 +219,18 @@ class MotionManager: NSObject {
             }
         }
         session?.end()
-
-        builder?.endCollection(withEnd: Date()) { _, _ in
-            self.builder?.finishWorkout { workout, _ in
+        builder?.endCollection(withEnd: Date()) {
+            _,
+                _ in
+            self.builder?.finishWorkout {
+                workout,
+                    _ in
                 print("workout finished: \(String(describing: workout))")
-                DispatchQueue.main.async {
-                    // update total calories burned
-                    if let activeEnergyType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned),
-                       let statistics = self.builder?.statistics(for: activeEnergyType)
-                    {
-                        let unit = HKUnit.kilocalorie()
-                        if let totalEnergy = statistics.sumQuantity()?.doubleValue(for: unit) {
-                            print("Total active energy burned: \(totalEnergy) kcal")
-                            self.updateEnergyBurned(Int(totalEnergy))
-                        } else {
-                            print("No active energy burned statistics available")
-                        }
-                    } else {
-                        print("Could not obtain activeEnergyBurned quantity type or statistics")
-                    }
-                }
             }
         }
-        if let heartRateQuery {
-            healthStore.stop(heartRateQuery)
-        }
 
+        // upload collected data
+        // TODO: upload only on debug mode
         saveCSVtoICloud()
         motionRecording.removeAll()
     }

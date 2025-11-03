@@ -24,7 +24,7 @@ struct ResultView: View {
     }
 
     var totalEnergy: AttributedString {
-        var str = AttributedString(String(appState.energyBurned))
+        var str = AttributedString(String(format: "%.2f", appState.energyBurned))
         str.foregroundColor = .blue
         str.font = .subheadline.bold()
         return str

@@ -23,7 +23,7 @@ class JumpRecState: NSObject {
     var endTime: Date?
     var jumpCount: Int = 0
     var heartrate: Int = 0
-    var energyBurned: Int = 0
+    var energyBurned: Double = 0
     var goalType: GoalType = .count
     var goal: Int = 0
     var totalTime: String {
@@ -75,6 +75,8 @@ class JumpRecState: NSObject {
     }
 
     func end() {
+        if jumpState == .finished { return }
+
         motionManager?.stopTracking()
         endTime = Date()
         jumpState = .finished
@@ -108,23 +110,25 @@ class JumpRecState: NSObject {
 
     // TODO: handle duration goal properly
     func checkLandmark(before: Int, after: Int) {
-        if before / 100 != after / 100 {
-            handleHundredJumpsLandmark(jumpCount: jumpCount)
-        }
         switch goalType {
         case .count:
             if jumpCount >= goal {
                 end()
+                return
             }
         case .time:
-            if let startTime, let endTime {
-                let duration: TimeInterval = endTime.timeIntervalSince(startTime)
+            if let startTime {
+                let duration = Date().timeIntervalSince(startTime)
                 if Int(duration) >= goal {
                     end()
+                    return
                 }
             }
         default:
             fatalError("Unhandled GoalType")
+        }
+        if before / 100 != after / 100 {
+            handleHundredJumpsLandmark(jumpCount: jumpCount)
         }
     }
 

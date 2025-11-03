@@ -13,20 +13,24 @@ struct MainView: View {
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
     var body: some View {
-        switch appState.jumpState {
-        case .idle:
-            StartView(
-                onStart: {
-                    appState
-                        .start(
-                            goalType: settings.goalType,
-                            goalCount: settings.goalCount
-                        )
-                })
-        case .finished:
-            ResultView(appState: $appState)
-        case .jumping:
-            JumpingView(appState: $appState)
+        ZStack {
+            switch appState.jumpState {
+            case .idle:
+                StartView(
+                    onStart: {
+                        appState
+                            .start(
+                                goalType: settings.goalType,
+                                goalCount: settings.goalCount
+                            )
+                    })
+            case .finished:
+                ResultView(appState: $appState)
+            case .jumping:
+                JumpingView(appState: $appState)
+            }
+        }.onChange(of: appState) { _, newValue in
+            print("current appState: \(newValue)")
         }
     }
 }
