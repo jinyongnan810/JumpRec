@@ -79,15 +79,18 @@ class JumpRecState: NSObject {
 
         motionManager?.stopTracking()
         endTime = Date()
+//        print("endTime: \(endTime!)")
         DispatchQueue.main.async {
+//            print("end action dispatch started: \(Date())")
 //            WKInterfaceDevice.current().play(.stop)
             let duration = self.endTime!.timeIntervalSince(self.startTime!)
-            self.speak(text: "Session Finished!", delay: 0.01)
+            self.speak(text: "Session Finished!", delay: 0.5)
             self.scheduleNotification(
                 title: "Session Finished",
                 body: "You've jumped \(self.jumpCount) times in \(Int(duration)) seconds!"
             )
             ConnectivityManager.shared.sendMessage(["watch app": "finished"])
+//            print("end action dispatch finished: \(Date())")
         }
 
         jumpState = .finished
@@ -169,7 +172,7 @@ class JumpRecState: NSObject {
         content.body = body
         content.sound = .default
 
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.01, repeats: false)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.5, repeats: false)
 
         let request = UNNotificationRequest(
             identifier: "jumprec-milestone",
@@ -185,8 +188,12 @@ class JumpRecState: NSObject {
     }
 
     func clearNotifications() {
-        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+        UNUserNotificationCenter
+            .current()
+            .removePendingNotificationRequests(withIdentifiers: ["jumprec-milestone"])
+        UNUserNotificationCenter
+            .current()
+            .removeDeliveredNotifications(withIdentifiers: ["jumprec-milestone"])
     }
 }
 
