@@ -9,6 +9,7 @@ import AVFoundation
 import Foundation
 import JumpRecShared
 import Observation
+import UserNotifications
 import WatchKit
 
 enum JumpState {
@@ -16,7 +17,7 @@ enum JumpState {
 }
 
 @Observable
-class JumpRecState {
+class JumpRecState: NSObject {
     var jumpState: JumpState = .idle
     var startTime: Date?
     var endTime: Date?
@@ -37,7 +38,16 @@ class JumpRecState {
 
     var motionManager: MotionManager?
 
-    init() {
+    let notificationCenter = UNUserNotificationCenter.current()
+
+    override init() {
+        super.init()
+        requestNotificationAuthorization()
+        notificationCenter.getNotificationSettings { settings in
+            print("Authorization status: \(settings.authorizationStatus.rawValue)")
+            print("Alert setting: \(settings.alertSetting.rawValue)")
+        }
+        notificationCenter.delegate = self
         motionManager = MotionManager(addJump: { by in
             self.addJump(by: by)
         }, updateHeartRate: { with in
@@ -68,7 +78,12 @@ class JumpRecState {
         motionManager?.stopTracking()
         endTime = Date()
         jumpState = .finished
-        WKInterfaceDevice.current().play(.stop)
+//        WKInterfaceDevice.current().play(.stop)
+        let duration = endTime!.timeIntervalSince(startTime!)
+        scheduleNotification(
+            title: "Session Finished",
+            body: "You've jumped \(jumpCount) times for \(Int(duration))!"
+        )
         ConnectivityManager.shared.sendMessage(["watch app": "finished"])
     }
 
@@ -91,6 +106,7 @@ class JumpRecState {
         checkLandmark(before: before, after: jumpCount)
     }
 
+    // TODO: handle duration goal properly
     func checkLandmark(before: Int, after: Int) {
         if before / 100 != after / 100 {
             handleHundredJumpsLandmark(jumpCount: jumpCount)
@@ -113,14 +129,64 @@ class JumpRecState {
     }
 
     func handleHundredJumpsLandmark(jumpCount: Int) {
-        WKInterfaceDevice.current().play(.success)
-        speak(text: (jumpCount / 100 * 100).description)
+//        WKInterfaceDevice.current().play(.success)
+        let hundred = jumpCount / 100 * 100
+        speak(text: "\(hundred) Jumps")
+        scheduleNotification(title: "Reached \(hundred) jumps!", body: "")
     }
 
     func speak(text: String) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             let utterance = AVSpeechUtterance(string: text)
+            utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
             self.synthesizer.speak(utterance)
         }
+    }
+
+    func requestNotificationAuthorization() {
+        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error {
+                print("Notification authorization error: \(error)")
+            }
+            print("Notification authorization granted: \(granted)")
+        }
+    }
+
+    func scheduleNotification(title: String, body: String) {
+        clearNotifications()
+
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.01, repeats: false)
+
+        let request = UNNotificationRequest(
+            identifier: "jumprec-milestone",
+            content: content,
+            trigger: trigger
+        )
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error {
+                print("Failed to schedule notification: \(error)")
+            }
+        }
+    }
+
+    func clearNotifications() {
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+    }
+}
+
+// Show foreground notifications
+extension JumpRecState: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_: UNUserNotificationCenter,
+                                willPresent _: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void)
+    {
+        completionHandler([.banner, .sound, .list]) // or appropriate options on watchOS
     }
 }
