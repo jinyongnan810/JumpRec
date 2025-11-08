@@ -39,7 +39,7 @@ class MotionManager: NSObject {
 
     // MARK: - Detection Parameters
 
-    private var updateInterval: TimeInterval = 0.01 // 100Hz sampling rate
+    private var updateInterval: TimeInterval = 0.05 // 20Hz sampling rate
     private var minTimeBetweenJumps: TimeInterval = 0.30 // Minimum 300ms between jumps
     private var lastJumpTimestamp: TimeInterval = 0
 
@@ -248,10 +248,10 @@ class MotionManager: NSObject {
         // Process for jump detection
         let isJump = detectJump(motion)
 
-        motionRecording
-            .append(
-                "\(motion.timestamp),\(userAcceleration.x),\(userAcceleration.y),\(userAcceleration.z),\(userRotaion.x),\(userRotaion.y),\(userRotaion.z),\(isJump)\n"
-            )
+//        motionRecording
+//            .append(
+//                "\(motion.timestamp),\(userAcceleration.x),\(userAcceleration.y),\(userAcceleration.z),\(userRotaion.x),\(userRotaion.y),\(userRotaion.z),\(isJump)\n"
+//            )
     }
 
     private func detectJump(_ motion: CMDeviceMotion) -> Bool {
@@ -271,9 +271,9 @@ class MotionManager: NSObject {
 
     private func registerJump(timestamp: TimeInterval) {
         lastJumpTimestamp = timestamp
-        ConnectivityManager.shared.sendMessage(["watch app": "Detect Jump"])
+//        ConnectivityManager.shared.sendMessage(["watch app": "Detect Jump"])
         addJump(1)
-        jumpTimestamps.append(Date())
+//        jumpTimestamps.append(Date())
     }
 }
 

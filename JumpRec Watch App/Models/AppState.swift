@@ -53,7 +53,7 @@ class JumpRecState: NSObject {
         }, updateHeartRate: { with in
             self.heartrate = with
         }, updateEnergyBurned: { with in
-            self.energyBurned = with
+            self.energyBurned = self.energyBurned + with
         })
     }
 
