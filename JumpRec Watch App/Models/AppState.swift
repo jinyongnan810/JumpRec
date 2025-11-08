@@ -37,6 +37,7 @@ class JumpRecState: NSObject {
     let synthesizer = AVSpeechSynthesizer()
 
     var motionManager: MotionManager?
+    var minuteTimer: Timer?
 
     let notificationCenter = UNUserNotificationCenter.current()
 
@@ -55,6 +56,16 @@ class JumpRecState: NSObject {
         }, updateEnergyBurned: { with in
             self.energyBurned = self.energyBurned + with
         })
+        configureAudioSession()
+        warmUpSpeechSynthesizer()
+    }
+
+    func warmUpSpeechSynthesizer() {
+        // first call to synthesizer.speak can be very heavy
+        let utterance = AVSpeechUtterance(string: "Hello")
+        utterance.volume = 0.0
+        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        synthesizer.speak(utterance)
     }
 
     func start(goalType: GoalType, goalCount: Int) {
@@ -67,15 +78,20 @@ class JumpRecState: NSObject {
         default:
             fatalError("Unhandled GoalType")
         }
+        motionManager?.startTracking()
         startTime = Date()
         jumpState = .jumping
-        motionManager?.startTracking()
-        WKInterfaceDevice.current().play(.start)
+        if goalType == .time {
+            startMinuteTimer()
+        }
+//        WKInterfaceDevice.current().play(.start)
+        speak(text: "Session Started!")
         ConnectivityManager.shared.sendMessage(["watch app": "started"])
     }
 
     func end() {
         if jumpState == .finished { return }
+        invalidateMinuteTimer()
 
         motionManager?.stopTracking()
         endTime = Date()
@@ -98,12 +114,22 @@ class JumpRecState: NSObject {
     }
 
     func reset() {
+        invalidateMinuteTimer()
         jumpState = .idle
         jumpCount = 0
         heartrate = 0
         energyBurned = 0
         endTime = nil
         startTime = nil
+    }
+
+    func configureAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Audio session config error: \(error)")
+        }
     }
 
     func updateHeartrate(_ heartrate: Int) {
@@ -113,27 +139,16 @@ class JumpRecState: NSObject {
     func addJump(by: Int) {
         let before = jumpCount
         jumpCount += by
-        checkLandmark(before: before, after: jumpCount)
+        checkJumpLandmark(before: before, after: jumpCount)
     }
 
-    // TODO: handle duration goal properly
-    func checkLandmark(before: Int, after: Int) {
-        switch goalType {
-        case .count:
-            if jumpCount >= goal {
-                end()
-                return
-            }
-        case .time:
-            if let startTime {
-                let duration = Date().timeIntervalSince(startTime)
-                if Int(duration) >= goal {
-                    end()
-                    return
-                }
-            }
-        default:
-            fatalError("Unhandled GoalType")
+    func checkJumpLandmark(before: Int, after: Int) {
+        if goalType == .time {
+            return
+        }
+        if jumpCount >= goal {
+            end()
+            return
         }
         if before / 100 != after / 100 {
             handleHundredJumpsLandmark(jumpCount: jumpCount)
@@ -147,8 +162,37 @@ class JumpRecState: NSObject {
         scheduleNotification(title: "Reached \(hundred) jumps!", body: "")
     }
 
-    func speak(text: String, delay: Double = 1.0) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+    // MARK: - Time goal minute landmarks
+
+    private func startMinuteTimer() {
+        invalidateMinuteTimer()
+        minuteTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(60), repeats: true) { [weak self] _ in
+            self?.handleMinuteLandmark()
+        }
+        RunLoop.current.add(minuteTimer!, forMode: .common)
+    }
+
+    private func invalidateMinuteTimer() {
+        minuteTimer?.invalidate()
+        minuteTimer = nil
+    }
+
+    private func handleMinuteLandmark() {
+        guard jumpState == .jumping, goalType == .time, let startTime else { return }
+        let minutesElapsed = Int(Date().timeIntervalSince(startTime)) / 60
+        if minutesElapsed <= 0 { return }
+        // If we've reached or exceeded the time goal in seconds, finish.
+        if minutesElapsed * 60 >= goal {
+            end()
+            return
+        }
+        let minuteText = minutesElapsed == 1 ? "1 minute" : "\(minutesElapsed) minutes"
+        speak(text: minuteText)
+        scheduleNotification(title: "Reached \(minuteText)", body: "")
+    }
+
+    func speak(text: String, delay: Double = 0.5) {
+        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + delay) {
             let utterance = AVSpeechUtterance(string: text)
             utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
             self.synthesizer.speak(utterance)
@@ -180,7 +224,7 @@ class JumpRecState: NSObject {
             trigger: trigger
         )
 
-        UNUserNotificationCenter.current().add(request) { error in
+        notificationCenter.add(request) { error in
             if let error {
                 print("Failed to schedule notification: \(error)")
             }
@@ -188,11 +232,9 @@ class JumpRecState: NSObject {
     }
 
     func clearNotifications() {
-        UNUserNotificationCenter
-            .current()
+        notificationCenter
             .removePendingNotificationRequests(withIdentifiers: ["jumprec-milestone"])
-        UNUserNotificationCenter
-            .current()
+        notificationCenter
             .removeDeliveredNotifications(withIdentifiers: ["jumprec-milestone"])
     }
 }
