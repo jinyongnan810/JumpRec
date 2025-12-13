@@ -99,7 +99,7 @@ class JumpRecState: NSObject {
         DispatchQueue.main.async {
 //            print("end action dispatch started: \(Date())")
 //            WKInterfaceDevice.current().play(.stop)
-            let duration = self.endTime!.timeIntervalSince(self.startTime!)
+//            let duration = self.endTime!.timeIntervalSince(self.startTime!)
             self.speak(text: "Session Finished!", delay: 0.5)
             WKInterfaceDevice.current().play(.stop)
 //            self.scheduleNotification(

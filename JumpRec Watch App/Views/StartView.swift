@@ -42,9 +42,7 @@ struct StartView: View {
                         Text("\(countdown, specifier: "%.0f")")
                             .font(.largeTitle)
                             .onReceive(timer.autoconnect()) { _ in
-                                withAnimation {
-                                    countdown -= 1
-                                }
+                                countdown -= 1
                             }
                         Circle()
                             .trim(from: 0, to: isAnimating ? 1 : 0)
@@ -54,6 +52,7 @@ struct StartView: View {
                                     lineCap: .round,
                                 )
                             ).foregroundStyle(.green)
+                            .rotationEffect(.degrees(-90))
                             .animation(.linear(
                                 duration: 3.0
                             ), value: isAnimating)
