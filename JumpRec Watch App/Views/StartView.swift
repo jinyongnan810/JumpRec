@@ -14,6 +14,7 @@ let MinuteString = "Minute"
 
 struct StartView: View {
     @State var isCountingDown: Bool = false
+    @State var isAnimating: Bool = false
     @State var countdown: Double = 3
     var timer = Timer.publish(every: 1, on: .main, in: .common)
     var onStart: () -> Void
@@ -37,14 +38,33 @@ struct StartView: View {
         NavigationStack {
             ZStack {
                 if isCountingDown {
-                    Text("\(countdown, specifier: "%.0f")")
-                        .font(.largeTitle)
-                        .onReceive(timer.autoconnect()) { _ in
-                            countdown -= 1
-                            if countdown < 1 {
-                                onStart()
+                    ZStack {
+                        Text("\(countdown, specifier: "%.0f")")
+                            .font(.largeTitle)
+                            .onReceive(timer.autoconnect()) { _ in
+                                withAnimation {
+                                    countdown -= 1
+                                }
                             }
+                        Circle()
+                            .trim(from: 0, to: isAnimating ? 1 : 0)
+                            .stroke(
+                                style: .init(
+                                    lineWidth: 10,
+                                    lineCap: .round,
+                                )
+                            ).foregroundStyle(.green)
+                            .animation(.linear(
+                                duration: 3.0
+                            ), value: isAnimating)
+                    }
+                    .onAppear {
+                        withAnimation {
+                            isAnimating = true
+                        } completion: {
+                            onStart()
                         }
+                    }
                 } else {
                     VStack {
                         Text("Start")
