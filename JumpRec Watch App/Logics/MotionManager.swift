@@ -242,11 +242,11 @@ class MotionManager: NSObject {
 
     private func processMotionData(_ motion: CMDeviceMotion) {
         // Use user acceleration (gravity removed) for better jump detection
-        let userAcceleration = motion.userAcceleration
-        let userRotaion = motion.rotationRate
+//        let userAcceleration = motion.userAcceleration
+//        let userRotaion = motion.rotationRate
 
         // Process for jump detection
-        let isJump = detectJump(motion)
+        let _ = detectJump(motion)
 
 //        motionRecording
 //            .append(

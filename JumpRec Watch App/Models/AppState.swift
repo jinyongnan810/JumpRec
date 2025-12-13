@@ -39,16 +39,16 @@ class JumpRecState: NSObject {
     var motionManager: MotionManager?
     var minuteTimer: Timer?
 
-    let notificationCenter = UNUserNotificationCenter.current()
+//    let notificationCenter = UNUserNotificationCenter.current()
 
     override init() {
         super.init()
-        requestNotificationAuthorization()
-        notificationCenter.getNotificationSettings { settings in
-            print("Authorization status: \(settings.authorizationStatus.rawValue)")
-            print("Alert setting: \(settings.alertSetting.rawValue)")
-        }
-        notificationCenter.delegate = self
+//        requestNotificationAuthorization()
+//        notificationCenter.getNotificationSettings { settings in
+//            print("Authorization status: \(settings.authorizationStatus.rawValue)")
+//            print("Alert setting: \(settings.alertSetting.rawValue)")
+//        }
+//        notificationCenter.delegate = self
         motionManager = MotionManager(addJump: { by in
             self.addJump(by: by)
         }, updateHeartRate: { with in
@@ -84,7 +84,7 @@ class JumpRecState: NSObject {
         if goalType == .time {
             startMinuteTimer()
         }
-//        WKInterfaceDevice.current().play(.start)
+        WKInterfaceDevice.current().play(.start)
         speak(text: "Session Started!")
         ConnectivityManager.shared.sendMessage(["watch app": "started"])
     }
@@ -101,10 +101,11 @@ class JumpRecState: NSObject {
 //            WKInterfaceDevice.current().play(.stop)
             let duration = self.endTime!.timeIntervalSince(self.startTime!)
             self.speak(text: "Session Finished!", delay: 0.5)
-            self.scheduleNotification(
-                title: "Session Finished",
-                body: "You've jumped \(self.jumpCount) times in \(Int(duration)) seconds!"
-            )
+            WKInterfaceDevice.current().play(.stop)
+//            self.scheduleNotification(
+//                title: "Session Finished",
+//                body: "You've jumped \(self.jumpCount) times in \(Int(duration)) seconds!"
+//            )
             ConnectivityManager.shared.sendMessage(["watch app": "finished"])
 //            print("end action dispatch finished: \(Date())")
         }
@@ -156,10 +157,10 @@ class JumpRecState: NSObject {
     }
 
     func handleHundredJumpsLandmark(jumpCount: Int) {
-//        WKInterfaceDevice.current().play(.success)
+        WKInterfaceDevice.current().play(.success)
         let hundred = jumpCount / 100 * 100
         speak(text: "\(hundred) Jumps")
-        scheduleNotification(title: "Reached \(hundred) jumps!", body: "")
+//        scheduleNotification(title: "Reached \(hundred) jumps!", body: "")
     }
 
     // MARK: - Time goal minute landmarks
@@ -188,7 +189,8 @@ class JumpRecState: NSObject {
         }
         let minuteText = minutesElapsed == 1 ? "1 minute" : "\(minutesElapsed) minutes"
         speak(text: minuteText)
-        scheduleNotification(title: "Reached \(minuteText)", body: "")
+        WKInterfaceDevice.current().play(.success)
+//        scheduleNotification(title: "Reached \(minuteText)", body: "")
     }
 
     func speak(text: String, delay: Double = 0.5) {
@@ -199,52 +201,52 @@ class JumpRecState: NSObject {
         }
     }
 
-    func requestNotificationAuthorization() {
-        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if let error {
-                print("Notification authorization error: \(error)")
-            }
-            print("Notification authorization granted: \(granted)")
-        }
-    }
-
-    func scheduleNotification(title: String, body: String) {
-        clearNotifications()
-
-        let content = UNMutableNotificationContent()
-        content.title = title
-        content.body = body
-        content.sound = .default
-
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.5, repeats: false)
-
-        let request = UNNotificationRequest(
-            identifier: "jumprec-milestone",
-            content: content,
-            trigger: trigger
-        )
-
-        notificationCenter.add(request) { error in
-            if let error {
-                print("Failed to schedule notification: \(error)")
-            }
-        }
-    }
-
-    func clearNotifications() {
-        notificationCenter
-            .removePendingNotificationRequests(withIdentifiers: ["jumprec-milestone"])
-        notificationCenter
-            .removeDeliveredNotifications(withIdentifiers: ["jumprec-milestone"])
-    }
+//    func requestNotificationAuthorization() {
+//        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+//            if let error {
+//                print("Notification authorization error: \(error)")
+//            }
+//            print("Notification authorization granted: \(granted)")
+//        }
+//    }
+//
+//    func scheduleNotification(title: String, body: String) {
+//        clearNotifications()
+//
+//        let content = UNMutableNotificationContent()
+//        content.title = title
+//        content.body = body
+//        content.sound = .default
+//
+//        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.5, repeats: false)
+//
+//        let request = UNNotificationRequest(
+//            identifier: "jumprec-milestone",
+//            content: content,
+//            trigger: trigger
+//        )
+//
+//        notificationCenter.add(request) { error in
+//            if let error {
+//                print("Failed to schedule notification: \(error)")
+//            }
+//        }
+//    }
+//
+//    func clearNotifications() {
+//        notificationCenter
+//            .removePendingNotificationRequests(withIdentifiers: ["jumprec-milestone"])
+//        notificationCenter
+//            .removeDeliveredNotifications(withIdentifiers: ["jumprec-milestone"])
+//    }
 }
 
 // Show foreground notifications
-extension JumpRecState: UNUserNotificationCenterDelegate {
-    func userNotificationCenter(_: UNUserNotificationCenter,
-                                willPresent _: UNNotification,
-                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void)
-    {
-        completionHandler([.banner, .sound, .list]) // or appropriate options on watchOS
-    }
-}
+// extension JumpRecState: UNUserNotificationCenterDelegate {
+//    func userNotificationCenter(_: UNUserNotificationCenter,
+//                                willPresent _: UNNotification,
+//                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void)
+//    {
+//        completionHandler([.banner, .sound, .list]) // or appropriate options on watchOS
+//    }
+// }
