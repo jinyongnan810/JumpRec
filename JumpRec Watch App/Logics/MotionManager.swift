@@ -89,7 +89,7 @@ class MotionManager: NSObject {
         ]
 
         healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { success, error in
-            print("request permission: \(success)")
+            print("request health permission: \(success)")
             if let error {
                 print("permission request error: \(error)")
             }
