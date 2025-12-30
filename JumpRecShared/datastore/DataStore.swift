@@ -18,17 +18,17 @@ extension ModelContainer {
     static func createContainer() throws -> ModelContainer {
         // Define the data models that will be stored
         let schema = Schema([
-            ListCategory.self,
-            ListItem.self,
+            JumpSession.self,
+            JumpSessionDetails.self,
         ])
 
         // Configure persistent storage with App Group and CloudKit
         let modelConfiguration = ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: false,  // Persist to disk
+            isStoredInMemoryOnly: false, // Persist to disk
             allowsSave: true,
-            groupContainer: .identifier("group.com.kinn.JumpRec"),  // Shared container for app extensions
-            cloudKitDatabase: .automatic  // Enable CloudKit sync across devices
+            groupContainer: .identifier("group.com.kinn.JumpRec"), // Shared container for app extensions
+            cloudKitDatabase: .automatic // Enable CloudKit sync across devices
         )
 
         return try ModelContainer(
@@ -78,6 +78,19 @@ public class MyDataStore {
             try modelContext.save()
         } catch {
             print("Failed to save context: \(error)")
+        }
+    }
+
+    public func addSession(session: JumpSession, details: JumpSessionDetails) {
+        modelContext.insert(session)
+        modelContext.insert(details)
+        do {
+            try modelContext.save()
+            print("inserted session and details")
+            print("session: \(session)")
+            print("details: \(details)")
+        } catch {
+            print("failed to save")
         }
     }
 }

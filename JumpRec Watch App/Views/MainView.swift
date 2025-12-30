@@ -6,12 +6,18 @@
 //
 
 import JumpRecShared
+import SwiftData
 import SwiftUI
 
 struct MainView: View {
     @State var appState = JumpRecState()
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
+
+    @Environment(MyDataStore.self) var myDataStore
+
+    // doesn't work
+    @Query(filter: nil, sort: [SortDescriptor(\JumpSession.startedAt)]) var jumpSessions: [JumpSession]
     var body: some View {
         ZStack {
             switch appState.jumpState {
@@ -31,6 +37,22 @@ struct MainView: View {
             }
         }.onChange(of: appState.jumpState) { _, newValue in
             print("current appState: \(newValue)")
+        }
+        .onChange(of: jumpSessions) { _, newValue in
+            print("🔥jumpSessions: \(newValue.count)")
+        }
+        .onAppear {
+            do {
+                let results = try myDataStore.modelContext.fetch(FetchDescriptor<JumpSession>())
+                for result in results {
+                    print(
+                        "⭐️fetched: \(result.startedAt),\(result.endedAt),\(result.jumpCount),\(result.caloriesBurned)"
+                    )
+                    print("details: \(result.details?.jumps)")
+                }
+            } catch {
+                print("failed to fetch: \(error)")
+            }
         }
     }
 }

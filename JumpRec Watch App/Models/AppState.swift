@@ -22,6 +22,7 @@ class JumpRecState: NSObject {
     var startTime: Date?
     var endTime: Date?
     var jumpCount: Int = 0
+    var jumps: [TimeInterval] = []
     var heartrate: Int = 0
     var energyBurned: Double = 0
     var goalType: GoalType = .count
@@ -33,6 +34,8 @@ class JumpRecState: NSObject {
         let seconds = Int(timeInterval).remainderReportingOverflow(dividingBy: 60).partialValue
         return String(format: "%02d:%02d", minutes, seconds)
     }
+
+    let dataStore = MyDataStore.shared
 
     let synthesizer = AVSpeechSynthesizer()
 
@@ -111,6 +114,20 @@ class JumpRecState: NSObject {
         }
 
         jumpState = .finished
+
+        // save data to database
+        guard let startTime, let endTime else { return }
+        let session = JumpSession(
+            startedAt: startTime,
+            endedAt: endTime,
+            jumpCount: jumpCount,
+            peakRate: 0,
+            caloriesBurned: energyBurned
+        )
+        let details = JumpSessionDetails(session: session, jumps: jumps)
+        session.details = details
+        dataStore.addSession(session: session, details: details)
+
         print("end finished")
     }
 
@@ -140,6 +157,7 @@ class JumpRecState: NSObject {
     func addJump(by: Int) {
         let before = jumpCount
         jumpCount += by
+        jumps.append(Date().timeIntervalSince(startTime!))
         checkJumpLandmark(before: before, after: jumpCount)
     }
 

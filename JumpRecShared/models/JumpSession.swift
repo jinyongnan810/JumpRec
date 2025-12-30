@@ -17,25 +17,25 @@ public final class JumpSession {
     public var id: UUID = UUID()
 
     /// Timestamp when the jump rope session started
-    public var startedAt: Date
+    public var startedAt: Date = Date()
 
     /// Timestamp when the jump rope session ended
-    public var endedAt: Date
+    public var endedAt: Date = Date()
 
     /// Total number of jumps completed during the session
-    public var jumpCount: Int
+    public var jumpCount: Int = 0
 
     /// Peak jump rate (jumps per minute) achieved during the session
     public var peakRate: Double?
 
     /// Estimated calories burned during the session
-    public var caloriesBurned: Double
+    public var caloriesBurned: Double = 0
 
     /// Number of small breaks taken during the session
-    public var smallBreaksCount: Int
+    public var smallBreaksCount: Int = 0
 
     /// Number of long breaks taken during the session
-    public var longBreaksCount: Int
+    public var longBreaksCount: Int = 0
 
     /// Relationship to detailed session data (individual jump timestamps and rate points)
     /// When this session is deleted, the related details are automatically deleted (cascade)

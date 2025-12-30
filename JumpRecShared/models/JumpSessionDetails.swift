@@ -29,7 +29,7 @@ public struct RatePoint: Codable {
 @Model
 public final class JumpSessionDetails {
     /// Reference to the parent session containing summary statistics
-    public var session: JumpSession
+    public var session: JumpSession?
 
     /// Array of timestamps for each individual jump, stored as TimeIntervals from session start
     /// This allows reconstruction of the complete jump sequence for analysis
@@ -65,7 +65,7 @@ public final class JumpSessionDetails {
     ///   - time: Absolute timestamp when the rate was measured
     ///   - rate: Jump rate at this time (jumps per minute)
     public func addRatePoint(at time: Date, rate: Double) {
-        let secondsFromStart = time.timeIntervalSince(session.startedAt)
+        let secondsFromStart = time.timeIntervalSince(session!.startedAt)
         var points = ratePoints
         points.append(RatePoint(secondsFromStart: secondsFromStart, rate: rate))
         ratePoints = points
