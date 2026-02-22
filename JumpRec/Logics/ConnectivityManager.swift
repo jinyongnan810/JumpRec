@@ -8,10 +8,17 @@
 import Foundation
 import WatchConnectivity
 
+@Observable
 final class ConnectivityManager: NSObject, WCSessionDelegate {
     static let shared = ConnectivityManager()
 
     private let session: WCSession = .default
+
+    var isSupported: Bool = WCSession.isSupported()
+    var isPaired: Bool = false
+    var isWatchAppInstalled: Bool = false
+    var isReachable: Bool = false
+    var activationState: WCSessionActivationState = .notActivated
 
     override private init() {
         super.init()
@@ -23,11 +30,34 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
     // MARK: - WCSessionDelegate
 
-    func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         if let error {
             print("[WatchConnectivityManager] Activation failed with error: \(error.localizedDescription)")
         } else {
             print("[WatchConnectivityManager] Activation completed with state: \(activationState.rawValue)")
+        }
+        DispatchQueue.main.async {
+            self.activationState = activationState
+            self.isPaired = session.isPaired
+            self.isWatchAppInstalled = session.isWatchAppInstalled
+            self.isReachable = session.isReachable
+        }
+    }
+
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        print("[WatchConnectivityManager] Session reachability changed: \(session.isReachable)")
+        DispatchQueue.main.async {
+            self.isReachable = session.isReachable
+        }
+    }
+
+    func sessionWatchStateDidChange(_ session: WCSession) {
+        print(
+            "[WatchConnectivityManager] Session state changed: isPaired(\(session.isPaired)), isWatchAppInstalled(\(session.isWatchAppInstalled))"
+        )
+        DispatchQueue.main.async {
+            self.isPaired = session.isPaired
+            self.isWatchAppInstalled = session.isWatchAppInstalled
         }
     }
 
@@ -124,9 +154,5 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         } catch {
             print("[WatchConnectivityManager] Error saving CSV to iCloud: \(error.localizedDescription)")
         }
-    }
-
-    func sessionReachabilityDidChange(_ session: WCSession) {
-        print("[WatchConnectivityManager] Session reachability changed: \(session.isReachable)")
     }
 }

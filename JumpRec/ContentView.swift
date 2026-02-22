@@ -12,6 +12,7 @@ import SwiftUI
 struct ContentView: View {
     @Environment(MyDataStore.self) var dataStore
     @State private var connectivityManager = ConnectivityManager.shared
+    @State private var headphoneManager = HeadphoneManager()
     // doesn't work
     @Query() var sessions: [JumpSession]
 
@@ -22,8 +23,18 @@ struct ContentView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
-            List(sessions) { session in
-                Text("start: \(session.startedAt), end: \(session.endedAt)")
+            VStack {
+                Text(
+                    verbatim: "Watch connected: \(connectivityManager.isPaired && connectivityManager.isWatchAppInstalled)"
+                )
+                Text(
+                    verbatim: "Headphones connected: \(headphoneManager.motionActive)"
+                )
+                List(sessions) { session in
+                    let startString = session.startedAt.formatted(date: .abbreviated, time: .shortened)
+                    let endString = session.endedAt.formatted(date: .abbreviated, time: .shortened)
+                    Text(verbatim: "start: \(startString), end: \(endString)")
+                }
             }
         }
         .onChange(of: sessions) { _, newValue in
@@ -42,7 +53,11 @@ struct ContentView: View {
             } catch {
                 print("failed to fetch: \(error)")
             }
+            headphoneManager.start()
         }
+        .onDisappear(perform: {
+            headphoneManager.stop()
+        })
         .padding()
     }
 }
