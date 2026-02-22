@@ -16,7 +16,6 @@ struct MainView: View {
 
     @Environment(MyDataStore.self) var myDataStore
 
-    // doesn't work
     @Query(filter: nil, sort: [SortDescriptor(\JumpSession.startedAt)]) var jumpSessions: [JumpSession]
     var body: some View {
         ZStack {

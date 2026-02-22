@@ -63,6 +63,7 @@ public class MyDataStore {
             // This works in conjunction with CloudKit to sync changes across devices
             modelContext.autosaveEnabled = true
 
+            print("container and context initialized")
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }

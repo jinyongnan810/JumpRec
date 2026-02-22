@@ -126,7 +126,10 @@ class JumpRecState: NSObject {
         )
         let details = JumpSessionDetails(session: session, jumps: jumps)
         session.details = details
-        dataStore.addSession(session: session, details: details)
+
+        Task { @MainActor in
+            dataStore.addSession(session: session, details: details)
+        }
 
         print("end finished")
     }

@@ -23,15 +23,16 @@ struct ContentView: View {
                 endPoint: .bottomTrailing
             )
             List(sessions) { session in
-                Text(String(describing: session))
+                Text("start: \(session.startedAt), end: \(session.endedAt)")
             }
         }
         .onChange(of: sessions) { _, newValue in
-            print("sessions: \(newValue)")
+            print("🔥sessions: \(newValue)")
         }
         .onAppear {
             do {
                 let results = try dataStore.modelContext.fetch(FetchDescriptor<JumpSession>())
+                print("⭐️fetched results count: \(results.count)")
                 for result in results {
                     print(
                         "⭐️fetched: \(result.startedAt),\(result.endedAt),\(result.jumpCount),\(result.caloriesBurned)"
