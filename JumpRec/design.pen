@@ -1042,36 +1042,115 @@
             },
             {
               "type": "frame",
-              "id": "BqqvZ",
-              "name": "deviceBadge",
-              "fill": "#1E293B",
-              "cornerRadius": 100,
-              "gap": 6,
-              "padding": [
-                8,
-                16
-              ],
+              "id": "fn7p6",
+              "name": "Device Selector",
+              "gap": 8,
               "alignItems": "center",
               "children": [
                 {
-                  "type": "icon_font",
-                  "id": "lbN0r",
-                  "name": "devIcon",
-                  "width": 14,
-                  "height": 14,
-                  "iconFontName": "smartphone",
-                  "iconFontFamily": "lucide",
-                  "fill": "#22D3EE"
+                  "type": "frame",
+                  "id": "zezVp",
+                  "name": "pill1",
+                  "fill": "#1E293B",
+                  "cornerRadius": 100,
+                  "gap": 6,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "q62aP",
+                      "name": "p1i",
+                      "width": 14,
+                      "height": 14,
+                      "iconFontName": "watch",
+                      "iconFontFamily": "lucide",
+                      "fill": "#94A3B8"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zA6Zj",
+                      "name": "p1t",
+                      "fill": "#94A3B8",
+                      "content": "Apple Watch",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
                 },
                 {
-                  "type": "text",
-                  "id": "7vWMR",
-                  "name": "devText",
+                  "type": "frame",
+                  "id": "WFQkG",
+                  "name": "pill2",
                   "fill": "#22D3EE",
-                  "content": "iPhone",
-                  "fontFamily": "Inter",
-                  "fontSize": 12,
-                  "fontWeight": "500"
+                  "cornerRadius": 100,
+                  "gap": 6,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "1pzLT",
+                      "name": "p2i",
+                      "width": 14,
+                      "height": 14,
+                      "iconFontName": "smartphone",
+                      "iconFontFamily": "lucide",
+                      "fill": "#0A0F1C"
+                    },
+                    {
+                      "type": "text",
+                      "id": "EO58C",
+                      "name": "p2t",
+                      "fill": "#0A0F1C",
+                      "content": "iPhone",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ICXNF",
+                  "name": "pill3",
+                  "fill": "#1E293B",
+                  "cornerRadius": 100,
+                  "gap": 6,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "aUXQc",
+                      "name": "p3i",
+                      "width": 14,
+                      "height": 14,
+                      "iconFontName": "headphones",
+                      "iconFontFamily": "lucide",
+                      "fill": "#94A3B8"
+                    },
+                    {
+                      "type": "text",
+                      "id": "VkySJ",
+                      "name": "p3t",
+                      "fill": "#94A3B8",
+                      "content": "AirPods",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "500"
+                    }
+                  ]
                 }
               ]
             },
@@ -1178,6 +1257,83 @@
                       "name": "rateVal",
                       "fill": "#22D3EE",
                       "content": "128/m",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 20,
+                      "fontWeight": "700"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "9tEop",
+              "name": "Stats Row 2",
+              "width": "fill_container",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "kKORY",
+                  "name": "Breaks Card",
+                  "width": "fill_container",
+                  "fill": "#1E293B",
+                  "cornerRadius": 12,
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": 14,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "25Rr6",
+                      "name": "brkL",
+                      "fill": "#64748B",
+                      "content": "BREAKS",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600",
+                      "letterSpacing": 2
+                    },
+                    {
+                      "type": "text",
+                      "id": "VbNnk",
+                      "name": "brkV",
+                      "fill": "#F59E0B",
+                      "content": "2/0",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 20,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "zNm4Q",
+                  "name": "Heart Rate Card",
+                  "width": "fill_container",
+                  "fill": "#1E293B",
+                  "cornerRadius": 12,
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": 14,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "IMO6v",
+                      "name": "hrL",
+                      "fill": "#64748B",
+                      "content": "HEART RATE",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600",
+                      "letterSpacing": 2
+                    },
+                    {
+                      "type": "text",
+                      "id": "LpQws",
+                      "name": "hrV",
+                      "fill": "#EF4444",
+                      "content": "78/96",
                       "fontFamily": "JetBrains Mono",
                       "fontSize": 20,
                       "fontWeight": "700"
