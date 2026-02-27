@@ -13,52 +13,33 @@ struct ContentView: View {
     @Environment(MyDataStore.self) var dataStore
     @State private var connectivityManager = ConnectivityManager.shared
     @State private var headphoneManager = HeadphoneManager()
-    // doesn't work
     @Query() var sessions: [JumpSession]
+
+    @State private var selectedTab: Tab = .home
+    @State private var settings = JumpRecSettings()
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [.cyan, .blue],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            VStack {
-                Text(
-                    verbatim: "Watch connected: \(connectivityManager.isPaired && connectivityManager.isWatchAppInstalled)"
-                )
-                Text(
-                    verbatim: "Headphones connected: \(headphoneManager.motionActive)"
-                )
-                List(sessions) { session in
-                    let startString = session.startedAt.formatted(date: .abbreviated, time: .shortened)
-                    let endString = session.endedAt.formatted(date: .abbreviated, time: .shortened)
-                    Text(verbatim: "start: \(startString), end: \(endString)")
+            AppColors.bgPrimary.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                Group {
+                    switch selectedTab {
+                    case .home:
+                        HomeView(settings: settings)
+                    case .history:
+                        Text("History")
+                            .foregroundStyle(.white)
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                TabBarView(selectedTab: $selectedTab)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
             }
         }
-        .onChange(of: sessions) { _, newValue in
-            print("🔥sessions: \(newValue)")
-        }
-        .onAppear {
-            do {
-                let results = try dataStore.modelContext.fetch(FetchDescriptor<JumpSession>())
-                print("⭐️fetched results count: \(results.count)")
-                for result in results {
-                    print(
-                        "⭐️fetched: \(result.startedAt),\(result.endedAt),\(result.jumpCount),\(result.caloriesBurned)"
-                    )
-                    print("details: \(result.details?.jumps)")
-                }
-            } catch {
-                print("failed to fetch: \(error)")
-            }
-            headphoneManager.start()
-        }
-        .onDisappear(perform: {
-            headphoneManager.stop()
-        })
-        .padding()
+        .preferredColorScheme(.dark)
     }
 }
 
