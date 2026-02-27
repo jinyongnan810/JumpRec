@@ -75,6 +75,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3F2440F62F524EF40026DA2C /* design.pen */ = {isa = PBXFileReference; lastKnownFileType = text; path = design.pen; sourceTree = "<group>"; };
 		3FCE40212E7589A8009C271D /* JumpRec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JumpRec.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FCE402E2E7589A9009C271D /* JumpRec Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "JumpRec Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FCE40492E758A82009C271D /* JumpRecShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JumpRecShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -164,6 +165,7 @@
 				3FCE404A2E758A82009C271D /* JumpRecShared */,
 				3FCE40572E758A98009C271D /* Frameworks */,
 				3FCE40222E7589A8009C271D /* Products */,
+				3F2440F62F524EF40026DA2C /* design.pen */,
 			);
 			sourceTree = "<group>";
 		};
