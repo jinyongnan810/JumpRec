@@ -9,9 +9,6 @@ import Combine
 import JumpRecShared
 import SwiftUI
 
-let TimeString = "Time"
-let MinuteString = "Minute"
-
 struct StartView: View {
     @State var isCountingDown: Bool = false
     @State var isAnimating: Bool = false
@@ -26,11 +23,11 @@ struct StartView: View {
     var goal: Text {
         switch settings.goalType {
         case .count:
-            return Text("^[\(settings.jumpCount) \(TimeString)](inflect: true)")
+            return Text("\(settings.jumpCount.formatted()) jumps")
         case .time:
-            return Text("^[\(settings.jumpTime) \(MinuteString)](inflect: true)")
+            return Text("\(settings.jumpTime) min")
         @unknown default:
-            return Text("^[\(settings.jumpCount) \(TimeString)](inflect: true)")
+            return Text("\(settings.jumpCount.formatted()) jumps")
         }
     }
 
@@ -40,7 +37,8 @@ struct StartView: View {
                 if isCountingDown {
                     ZStack {
                         Text("\(countdown, specifier: "%.0f")")
-                            .font(.largeTitle)
+                            .font(.system(size: 48, weight: .bold, design: .monospaced))
+                            .foregroundStyle(AppColors.textPrimary)
                             .onReceive(timer.autoconnect()) { _ in
                                 countdown -= 1
                             }
@@ -48,10 +46,11 @@ struct StartView: View {
                             .trim(from: 0, to: isAnimating ? 1 : 0)
                             .stroke(
                                 style: .init(
-                                    lineWidth: 10,
-                                    lineCap: .round,
+                                    lineWidth: 8,
+                                    lineCap: .round
                                 )
-                            ).foregroundStyle(.green)
+                            )
+                            .foregroundStyle(AppColors.accent)
                             .rotationEffect(.degrees(-90))
                             .animation(.linear(
                                 duration: 3.0
@@ -65,16 +64,30 @@ struct StartView: View {
                         }
                     }
                 } else {
-                    VStack {
-                        Text("Start")
-                            .font(.largeTitle)
+                    VStack(spacing: 12) {
+                        Text("START")
+                            .font(.system(size: 20, weight: .bold, design: .monospaced))
+                            .tracking(2)
+                            .foregroundStyle(AppColors.bgPrimary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(AppColors.accent)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                             .onTapGesture {
                                 withAnimation {
                                     isCountingDown.toggle()
                                 }
                             }
-                        goal
+
+                        HStack(spacing: 4) {
+                            Image(systemName: "target")
+                                .font(.system(size: 11))
+                            goal
+                                .font(.system(size: 12, weight: .medium))
+                        }
+                        .foregroundStyle(AppColors.textSecondary)
                     }
+                    .padding(.horizontal, 8)
                 }
             }
             .toolbar {
@@ -83,6 +96,7 @@ struct StartView: View {
                         showSettings.toggle()
                     }) {
                         Image(systemName: "gearshape.fill")
+                            .foregroundStyle(AppColors.textMuted)
                     }
                 }
             }

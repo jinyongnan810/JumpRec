@@ -5,11 +5,12 @@
 //  Created by Yuunan kin on 2025/10/05.
 //
 
+import JumpRecShared
 import SwiftUI
 
 struct TimerView: View {
     let startTime: Date
-    let calendar = Calendar.current
+
     init(startTime: Date) {
         self.startTime = startTime
     }
@@ -17,9 +18,9 @@ struct TimerView: View {
     var body: some View {
         TimelineView(.periodic(from: .now, by: 0.1)) { timeline in
             let diff = timeline.date.timeIntervalSince(startTime)
-            Text(
-                diff.minutesSecondsMilliseconds
-            )
+            Text(diff.minutesSecondsMilliseconds)
+                .font(.system(size: 14, weight: .medium, design: .monospaced))
+                .foregroundStyle(AppColors.textSecondary)
         }
     }
 }
