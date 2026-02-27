@@ -41,8 +41,7 @@ struct ContentView: View {
                                 sessionState = .active
                             }
                         case .history:
-                            Text("History")
-                                .foregroundStyle(.white)
+                            HistoryView()
                         }
                     }
                 }
