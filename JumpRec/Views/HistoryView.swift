@@ -34,6 +34,16 @@ struct HistoryView: View {
         Set(sessionsInMonth.map { calendar.component(.day, from: $0.startedAt) })
     }
 
+    /// Total jump count per day-of-month
+    private var jumpsByDay: [Int: Int] {
+        var result: [Int: Int] = [:]
+        for session in sessionsInMonth {
+            let day = calendar.component(.day, from: session.startedAt)
+            result[day, default: 0] += session.jumpCount
+        }
+        return result
+    }
+
     /// Total jumps for the displayed month
     private var totalJumps: Int {
         sessionsInMonth.reduce(0) { $0 + $1.jumpCount }
@@ -76,6 +86,7 @@ struct HistoryView: View {
                 CalendarGridView(
                     displayedMonth: displayedMonth,
                     sessionDays: sessionDays,
+                    jumpsByDay: jumpsByDay,
                     onPreviousMonth: {
                         displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth) ?? displayedMonth
                     },
@@ -138,6 +149,7 @@ struct HistoryView: View {
 private struct CalendarGridView: View {
     let displayedMonth: Date
     let sessionDays: Set<Int>
+    let jumpsByDay: [Int: Int]
     let onPreviousMonth: () -> Void
     let onNextMonth: () -> Void
 
@@ -231,13 +243,14 @@ private struct CalendarGridView: View {
                                 DayCellView(
                                     day: day,
                                     hasSession: sessionDays.contains(day),
+                                    jumpCount: jumpsByDay[day],
                                     isToday: todayDay == day,
                                     isFuture: isFutureDay(day)
                                 )
                                 .frame(maxWidth: .infinity)
                             } else {
                                 Color.clear
-                                    .frame(width: 36, height: 36)
+                                    .frame(width: 36, height: 48)
                                     .frame(maxWidth: .infinity)
                             }
                         }
@@ -262,30 +275,47 @@ private struct CalendarGridView: View {
 private struct DayCellView: View {
     let day: Int
     let hasSession: Bool
+    let jumpCount: Int?
     let isToday: Bool
     let isFuture: Bool
 
     var body: some View {
-        ZStack {
-            if hasSession, !isToday {
-                Circle()
-                    .fill(AppColors.accent)
-                    .frame(width: 36, height: 36)
-            } else if isToday {
-                Circle()
-                    .fill(Color(hex: 0x0F172A))
-                    .frame(width: 36, height: 36)
-                    .overlay(
-                        Circle()
-                            .stroke(AppColors.accent, lineWidth: 2)
-                    )
-            }
+        VStack(spacing: 2) {
+            ZStack {
+                if hasSession, !isToday {
+                    Circle()
+                        .fill(AppColors.accent)
+                        .frame(width: 36, height: 36)
+                } else if isToday {
+                    Circle()
+                        .fill(Color(hex: 0x0F172A))
+                        .frame(width: 36, height: 36)
+                        .overlay(
+                            Circle()
+                                .stroke(AppColors.accent, lineWidth: 2)
+                        )
+                }
 
-            Text("\(day)")
-                .font(.system(size: 12, weight: dayFontWeight, design: .monospaced))
-                .foregroundStyle(dayColor)
+                Text("\(day)")
+                    .font(.system(size: 12, weight: dayFontWeight, design: .monospaced))
+                    .foregroundStyle(dayColor)
+            }
+            .frame(width: 36, height: 36)
+
+            if let jumpCount {
+                Text(formatJumpCount(jumpCount))
+                    .font(.system(size: 8, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(AppColors.accent)
+            }
         }
-        .frame(width: 36, height: 36)
+        .frame(height: 48)
+    }
+
+    private func formatJumpCount(_ count: Int) -> String {
+        if count >= 1000 {
+            return String(format: "%.1fK", Double(count) / 1000.0)
+        }
+        return "\(count)"
     }
 
     private var dayColor: Color {
@@ -363,4 +393,45 @@ private struct SessionRowView: View {
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
+}
+
+// MARK: - Preview
+
+#Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: JumpSession.self, configurations: config)
+
+    let calendar = Calendar.current
+    let now = Date()
+
+    // Sample sessions spread across the current month
+    let sampleData: [(daysAgo: Int, jumps: Int, minutes: Int, calories: Double, peakRate: Double)] = [
+        (0, 847, 5, 156, 179),
+        (3, 1024, 7, 198, 186),
+        (5, 632, 4, 112, 165),
+        (8, 950, 6, 175, 172),
+        (10, 1200, 8, 210, 182),
+        (12, 780, 5, 140, 168),
+        (15, 500, 3, 95, 155),
+    ]
+
+    for data in sampleData {
+        let start = calendar.date(byAdding: .day, value: -data.daysAgo, to: now)!
+        let end = calendar.date(byAdding: .minute, value: data.minutes, to: start)!
+        let session = JumpSession(
+            startedAt: start,
+            endedAt: end,
+            jumpCount: data.jumps,
+            peakRate: data.peakRate,
+            caloriesBurned: data.calories,
+            smallBreaksCount: Int.random(in: 1 ... 4),
+            longBreaksCount: Int.random(in: 0 ... 2)
+        )
+        container.mainContext.insert(session)
+    }
+
+    return HistoryView()
+        .modelContainer(container)
+        .background(AppColors.bgPrimary)
+        .preferredColorScheme(.dark)
 }
