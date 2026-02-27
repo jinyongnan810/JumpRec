@@ -120,3 +120,9 @@ struct ActiveSessionView: View {
         .padding(.horizontal, 24)
     }
 }
+
+#Preview {
+    ActiveSessionView(settings: JumpRecSettings(), onStop: {})
+        .background(AppColors.bgPrimary)
+        .preferredColorScheme(.dark)
+}

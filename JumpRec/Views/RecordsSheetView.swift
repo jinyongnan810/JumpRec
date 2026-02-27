@@ -187,6 +187,38 @@ struct RecordsSheetView: View {
     }
 }
 
+// MARK: - Preview
+
+#Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: JumpSession.self, configurations: config)
+
+    let calendar = Calendar.current
+    let now = Date()
+    let sampleData: [(daysAgo: Int, jumps: Int, minutes: Int, calories: Double, peakRate: Double)] = [
+        (3, 2847, 15, 384, 186),
+        (10, 1500, 12, 280, 172),
+        (20, 900, 6, 150, 155),
+    ]
+    for data in sampleData {
+        let start = calendar.date(byAdding: .day, value: -data.daysAgo, to: now)!
+        let end = calendar.date(byAdding: .minute, value: data.minutes, to: start)!
+        let session = JumpSession(
+            startedAt: start,
+            endedAt: end,
+            jumpCount: data.jumps,
+            peakRate: data.peakRate,
+            caloriesBurned: data.calories
+        )
+        container.mainContext.insert(session)
+    }
+
+    return RecordsSheetView()
+        .modelContainer(container)
+        .presentationBackground(AppColors.cardSurface)
+        .preferredColorScheme(.dark)
+}
+
 // MARK: - Record Item Model
 
 private struct RecordItem: Identifiable {

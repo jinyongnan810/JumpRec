@@ -27,3 +27,14 @@ struct StatCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
+
+#Preview {
+    HStack(spacing: 10) {
+        StatCardView(label: "TIME", value: "04:32")
+        StatCardView(label: "CALORIES", value: "86")
+        StatCardView(label: "RATE", value: "128/m", valueColor: AppColors.accent)
+    }
+    .padding()
+    .background(AppColors.bgPrimary)
+    .preferredColorScheme(.dark)
+}

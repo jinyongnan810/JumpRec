@@ -37,3 +37,15 @@ struct HeroRingView: View {
         }
     }
 }
+
+#Preview("Ready State") {
+    HeroRingView(progress: 0, centerText: "Ready", subtitle: "Tap Start to begin")
+        .background(AppColors.bgPrimary)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("In Progress") {
+    HeroRingView(progress: 0.65, centerText: "432", subtitle: "/ 1,000 jumps")
+        .background(AppColors.bgPrimary)
+        .preferredColorScheme(.dark)
+}

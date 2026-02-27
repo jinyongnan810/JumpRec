@@ -4,6 +4,7 @@
 //
 
 import JumpRecShared
+import SwiftData
 import SwiftUI
 
 struct SessionDetailView: View {
@@ -243,6 +244,33 @@ private struct BreakdownRow<Content: View>: View {
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
+}
+
+// MARK: - Preview
+
+#Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: JumpSession.self, configurations: config)
+
+    let start = Calendar.current.date(byAdding: .minute, value: -7, to: Date())!
+    let end = Date()
+    let session = JumpSession(
+        startedAt: start,
+        endedAt: end,
+        jumpCount: 1024,
+        peakRate: 168,
+        caloriesBurned: 198,
+        smallBreaksCount: 3,
+        longBreaksCount: 1
+    )
+    container.mainContext.insert(session)
+
+    return NavigationStack {
+        SessionDetailView(session: session)
+    }
+    .modelContainer(container)
+    .background(AppColors.bgPrimary)
+    .preferredColorScheme(.dark)
 }
 
 // MARK: - CGFloat Clamped Helper

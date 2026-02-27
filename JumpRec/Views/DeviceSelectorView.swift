@@ -27,3 +27,10 @@ struct DeviceSelectorView: View {
         }
     }
 }
+
+#Preview {
+    DeviceSelectorView()
+        .padding()
+        .background(AppColors.bgPrimary)
+        .preferredColorScheme(.dark)
+}

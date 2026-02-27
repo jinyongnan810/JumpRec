@@ -109,6 +109,14 @@ struct SessionCompleteView: View {
 
 // MARK: - Summary Stat Card (slightly larger than ActiveSession stat cards)
 
+#Preview {
+    SessionCompleteView(onDone: {})
+        .background(AppColors.bgPrimary)
+        .preferredColorScheme(.dark)
+}
+
+// MARK: - Summary Stat Card (slightly larger than ActiveSession stat cards)
+
 private struct SummaryStatCard: View {
     let label: String
     let value: String

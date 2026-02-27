@@ -107,3 +107,21 @@ struct JumpingRateGraphView: View {
         }
     }
 }
+
+#Preview {
+    JumpingRateGraphView(
+        dataPoints: [
+            0.07, 0.15, 0.30, 0.35, 0.45, 0.60, 0.65, 0.80, 0.70, 0.50,
+            0.55, 0.65, 0.50, 0.30, 0.35, 0.45, 0.55, 0.65, 0.70, 0.50,
+        ],
+        yLabels: ["200", "150", "100"],
+        xLabels: ["0:00", "1:23", "2:46", "4:09", "5:32"]
+    )
+    .frame(height: 170)
+    .padding(16)
+    .background(AppColors.cardSurface)
+    .clipShape(RoundedRectangle(cornerRadius: 12))
+    .padding()
+    .background(AppColors.bgPrimary)
+    .preferredColorScheme(.dark)
+}

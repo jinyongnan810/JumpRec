@@ -69,3 +69,9 @@ struct HomeView: View {
         }
     }
 }
+
+#Preview {
+    HomeView(settings: JumpRecSettings(), onStart: {})
+        .background(AppColors.bgPrimary)
+        .preferredColorScheme(.dark)
+}

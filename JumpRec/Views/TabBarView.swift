@@ -33,6 +33,13 @@ struct TabBarView: View {
     }
 }
 
+#Preview {
+    TabBarView(selectedTab: .constant(.home))
+        .padding(.horizontal, 16)
+        .background(AppColors.bgPrimary)
+        .preferredColorScheme(.dark)
+}
+
 private struct TabBarItem: View {
     let icon: String
     let label: String

@@ -166,3 +166,9 @@ struct GoalSheetView: View {
         settings.goalType = selectedType
     }
 }
+
+#Preview {
+    GoalSheetView(settings: JumpRecSettings())
+        .presentationDetents([.medium])
+        .preferredColorScheme(.dark)
+}
