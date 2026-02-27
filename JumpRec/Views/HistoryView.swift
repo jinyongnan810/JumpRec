@@ -55,78 +55,84 @@ struct HistoryView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // Header Row
-                HStack {
-                    Text("History")
-                        .font(.system(size: 24, weight: .semibold))
-                        .foregroundStyle(AppColors.textPrimary)
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Header Row
+                    HStack {
+                        Text("History")
+                            .font(.system(size: 24, weight: .semibold))
+                            .foregroundStyle(AppColors.textPrimary)
 
-                    Spacer()
+                        Spacer()
 
-                    Button {
-                        showRecords = true
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "trophy.fill")
-                                .font(.system(size: 14))
-                            Text("Records")
-                                .font(.system(size: 12, weight: .medium))
+                        Button {
+                            showRecords = true
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: "trophy.fill")
+                                    .font(.system(size: 14))
+                                Text("Records")
+                                    .font(.system(size: 12, weight: .medium))
+                            }
+                            .foregroundStyle(AppColors.accent)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background(AppColors.cardSurface)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
-                        .foregroundStyle(AppColors.accent)
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 12)
-                        .background(AppColors.cardSurface)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
-                }
 
-                // Calendar Section
-                CalendarGridView(
-                    displayedMonth: displayedMonth,
-                    sessionDays: sessionDays,
-                    jumpsByDay: jumpsByDay,
-                    onPreviousMonth: {
-                        displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth) ?? displayedMonth
-                    },
-                    onNextMonth: {
-                        displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
+                    // Calendar Section
+                    CalendarGridView(
+                        displayedMonth: displayedMonth,
+                        sessionDays: sessionDays,
+                        jumpsByDay: jumpsByDay,
+                        onPreviousMonth: {
+                            displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth) ?? displayedMonth
+                        },
+                        onNextMonth: {
+                            displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
+                        }
+                    )
+
+                    // Monthly Summary
+                    HStack(spacing: 12) {
+                        StatCardView(label: "SESSIONS", value: "\(sessionsInMonth.count)", valueColor: AppColors.accent)
+                        StatCardView(label: "TOTAL JUMPS", value: formatCount(totalJumps))
+                        StatCardView(label: "CALORIES", value: formatCount(Int(totalCalories)))
                     }
-                )
 
-                // Monthly Summary
-                HStack(spacing: 12) {
-                    StatCardView(label: "SESSIONS", value: "\(sessionsInMonth.count)", valueColor: AppColors.accent)
-                    StatCardView(label: "TOTAL JUMPS", value: formatCount(totalJumps))
-                    StatCardView(label: "CALORIES", value: formatCount(Int(totalCalories)))
-                }
+                    // Recent Sessions
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("RECENT SESSIONS")
+                            .font(.system(size: 11, weight: .semibold))
+                            .tracking(2)
+                            .foregroundStyle(AppColors.textMuted)
 
-                // Recent Sessions
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("RECENT SESSIONS")
-                        .font(.system(size: 11, weight: .semibold))
-                        .tracking(2)
-                        .foregroundStyle(AppColors.textMuted)
-
-                    if sessions.isEmpty {
-                        Text("No sessions yet. Start jumping!")
-                            .font(.system(size: 14))
-                            .foregroundStyle(AppColors.textSecondary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.vertical, 24)
-                    } else {
-                        VStack(spacing: 8) {
-                            ForEach(sessions.prefix(10), id: \.id) { session in
-                                SessionRowView(session: session)
+                        if sessions.isEmpty {
+                            Text("No sessions yet. Start jumping!")
+                                .font(.system(size: 14))
+                                .foregroundStyle(AppColors.textSecondary)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding(.vertical, 24)
+                        } else {
+                            VStack(spacing: 8) {
+                                ForEach(sessions.prefix(10), id: \.id) { session in
+                                    NavigationLink(destination: SessionDetailView(session: session)) {
+                                        SessionRowView(session: session)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
                             }
                         }
                     }
                 }
+                .padding(.horizontal, 24)
             }
-            .padding(.horizontal, 24)
+            .scrollIndicators(.hidden)
+            .navigationBarHidden(true)
         }
-        .scrollIndicators(.hidden)
         .sheet(isPresented: $showRecords) {
             RecordsSheetView()
                 .presentationDetents([.large])
