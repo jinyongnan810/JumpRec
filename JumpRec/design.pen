@@ -761,7 +761,8 @@
                       "fill": "#94A3B8",
                       "content": "jumps",
                       "fontFamily": "Inter",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -1373,7 +1374,8 @@
                   "fill": "#94A3B8",
                   "content": "Great workout! Here are your results.",
                   "fontFamily": "Inter",
-                  "fontSize": 13
+                  "fontSize": 13,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -1506,7 +1508,7 @@
                     {
                       "type": "frame",
                       "id": "N01i9",
-                      "name": "Avg Rate Card",
+                      "name": "Rate Card",
                       "width": "fill_container",
                       "fill": "#1E293B",
                       "cornerRadius": 12,
@@ -1519,7 +1521,7 @@
                           "id": "V1Dp5",
                           "name": "lbl4",
                           "fill": "#64748B",
-                          "content": "AVG RATE",
+                          "content": "RATE",
                           "fontFamily": "Inter",
                           "fontSize": 11,
                           "fontWeight": "600",
@@ -1530,7 +1532,7 @@
                           "id": "J3heb",
                           "name": "val4",
                           "fill": "#FFFFFF",
-                          "content": "153/min",
+                          "content": "153/179",
                           "fontFamily": "JetBrains Mono",
                           "fontSize": 24,
                           "fontWeight": "700"
@@ -1549,7 +1551,7 @@
                     {
                       "type": "frame",
                       "id": "mk7YM",
-                      "name": "Small Breaks Card",
+                      "name": "Breaks Card",
                       "width": "fill_container",
                       "fill": "#1E293B",
                       "cornerRadius": 12,
@@ -1562,7 +1564,7 @@
                           "id": "OQy6E",
                           "name": "smLabel",
                           "fill": "#64748B",
-                          "content": "SM BREAKS",
+                          "content": "BREAKS",
                           "fontFamily": "Inter",
                           "fontSize": 11,
                           "fontWeight": "600",
@@ -1573,7 +1575,7 @@
                           "id": "p1sKN",
                           "name": "smValue",
                           "fill": "#F59E0B",
-                          "content": "3",
+                          "content": "3/1",
                           "fontFamily": "JetBrains Mono",
                           "fontSize": 24,
                           "fontWeight": "700"
@@ -1583,7 +1585,7 @@
                     {
                       "type": "frame",
                       "id": "blMBM",
-                      "name": "Long Breaks Card",
+                      "name": "Heart Rate Card",
                       "width": "fill_container",
                       "fill": "#1E293B",
                       "cornerRadius": 12,
@@ -1596,7 +1598,7 @@
                           "id": "zE9uE",
                           "name": "lgLabel",
                           "fill": "#64748B",
-                          "content": "LG BREAKS",
+                          "content": "HEART RATE",
                           "fontFamily": "Inter",
                           "fontSize": 11,
                           "fontWeight": "600",
@@ -1607,7 +1609,7 @@
                           "id": "VUbgn",
                           "name": "lgValue",
                           "fill": "#EF4444",
-                          "content": "1",
+                          "content": "82/104",
                           "fontFamily": "JetBrains Mono",
                           "fontSize": 24,
                           "fontWeight": "700"
@@ -4268,7 +4270,7 @@
                     {
                       "type": "frame",
                       "id": "c9nYT",
-                      "name": "sc4",
+                      "name": "Rate Card",
                       "width": "fill_container",
                       "fill": "#1E293B",
                       "cornerRadius": 12,
@@ -4281,7 +4283,7 @@
                           "id": "tBYmp",
                           "name": "sc4l",
                           "fill": "#64748B",
-                          "content": "AVG RATE",
+                          "content": "RATE",
                           "fontFamily": "Inter",
                           "fontSize": 10,
                           "fontWeight": "600",
@@ -4292,7 +4294,7 @@
                           "id": "noO6C",
                           "name": "sc4v",
                           "fill": "#FFFFFF",
-                          "content": "141/min",
+                          "content": "141/168",
                           "fontFamily": "JetBrains Mono",
                           "fontSize": 22,
                           "fontWeight": "700"
@@ -4311,7 +4313,7 @@
                     {
                       "type": "frame",
                       "id": "5VMmP",
-                      "name": "Small Breaks Card",
+                      "name": "Breaks Card",
                       "width": "fill_container",
                       "fill": "#1E293B",
                       "cornerRadius": 12,
@@ -4324,7 +4326,7 @@
                           "id": "NAZ8h",
                           "name": "sbLbl",
                           "fill": "#64748B",
-                          "content": "SM BREAKS",
+                          "content": "BREAKS",
                           "fontFamily": "Inter",
                           "fontSize": 10,
                           "fontWeight": "600",
@@ -4335,7 +4337,7 @@
                           "id": "zoOIf",
                           "name": "sbVal",
                           "fill": "#F59E0B",
-                          "content": "3",
+                          "content": "3/1",
                           "fontFamily": "JetBrains Mono",
                           "fontSize": 22,
                           "fontWeight": "700"
@@ -4345,7 +4347,7 @@
                     {
                       "type": "frame",
                       "id": "kQlp4",
-                      "name": "Long Breaks Card",
+                      "name": "Heart Rate Card",
                       "width": "fill_container",
                       "fill": "#1E293B",
                       "cornerRadius": 12,
@@ -4358,7 +4360,7 @@
                           "id": "dJpTA",
                           "name": "lbLbl",
                           "fill": "#64748B",
-                          "content": "LG BREAKS",
+                          "content": "HEART RATE",
                           "fontFamily": "Inter",
                           "fontSize": 10,
                           "fontWeight": "600",
@@ -4369,7 +4371,7 @@
                           "id": "CPfsG",
                           "name": "lbVal",
                           "fill": "#EF4444",
-                          "content": "1",
+                          "content": "82/104",
                           "fontFamily": "JetBrains Mono",
                           "fontSize": 22,
                           "fontWeight": "700"
