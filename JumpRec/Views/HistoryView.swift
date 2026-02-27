@@ -11,6 +11,7 @@ struct HistoryView: View {
     @Query(sort: \JumpSession.startedAt, order: .reverse) var sessions: [JumpSession]
 
     @State private var displayedMonth = Date()
+    @State private var showRecords = false
 
     private var calendar: Calendar { Calendar.current }
 
@@ -55,7 +56,7 @@ struct HistoryView: View {
                     Spacer()
 
                     Button {
-                        // Records action (not yet implemented)
+                        showRecords = true
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "trophy.fill")
@@ -115,6 +116,12 @@ struct HistoryView: View {
             .padding(.horizontal, 24)
         }
         .scrollIndicators(.hidden)
+        .sheet(isPresented: $showRecords) {
+            RecordsSheetView()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.hidden)
+                .presentationBackground(AppColors.cardSurface)
+        }
     }
 
     private func formatCount(_ value: Int) -> String {
