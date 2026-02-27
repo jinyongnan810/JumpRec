@@ -17,7 +17,7 @@ struct ContentView: View {
 
     @State private var selectedTab: Tab = .home
     @State private var settings = JumpRecSettings()
-    @State private var isSessionActive = false
+    @State private var sessionState: SessionState = .idle
 
     var body: some View {
         ZStack {
@@ -25,15 +25,20 @@ struct ContentView: View {
 
             VStack(spacing: 0) {
                 Group {
-                    if isSessionActive {
+                    switch sessionState {
+                    case .active:
                         ActiveSessionView(settings: settings) {
-                            isSessionActive = false
+                            sessionState = .complete
                         }
-                    } else {
+                    case .complete:
+                        SessionCompleteView {
+                            sessionState = .idle
+                        }
+                    case .idle:
                         switch selectedTab {
                         case .home:
                             HomeView(settings: settings) {
-                                isSessionActive = true
+                                sessionState = .active
                             }
                         case .history:
                             Text("History")
@@ -43,7 +48,7 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                if !isSessionActive {
+                if sessionState == .idle {
                     TabBarView(selectedTab: $selectedTab)
                         .padding(.horizontal, 16)
                         .padding(.bottom, 8)
