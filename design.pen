@@ -5192,6 +5192,574 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "jQ2mZ",
+      "x": -50,
+      "y": 3800,
+      "name": "Watch - Start",
+      "width": 198,
+      "height": 242,
+      "fill": "#0A0F1C",
+      "cornerRadius": 32,
+      "layout": "vertical",
+      "gap": 12,
+      "padding": [
+        36,
+        16,
+        16,
+        16
+      ],
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "0XNEi",
+          "name": "gearIcon",
+          "width": 16,
+          "height": 16,
+          "iconFontName": "settings",
+          "iconFontFamily": "lucide",
+          "fill": "#64748B"
+        },
+        {
+          "type": "frame",
+          "id": "1moLg",
+          "name": "startBtn",
+          "width": "fill_container",
+          "height": 44,
+          "fill": "#22D3EE",
+          "cornerRadius": 12,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "jRXHQ",
+              "name": "startLabel",
+              "fill": "#0A0F1C",
+              "content": "START",
+              "fontFamily": "Roboto Mono",
+              "fontSize": 20,
+              "fontWeight": "bold",
+              "letterSpacing": 2
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "CJ3ZN",
+          "name": "goalRow",
+          "gap": 4,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "QgAYL",
+              "name": "targetIcon",
+              "width": 11,
+              "height": 11,
+              "iconFontName": "target",
+              "iconFontFamily": "lucide",
+              "fill": "#94A3B8"
+            },
+            {
+              "type": "text",
+              "id": "vPE9N",
+              "name": "goalText",
+              "fill": "#94A3B8",
+              "content": "500 jumps",
+              "fontFamily": "Inter",
+              "fontSize": 12,
+              "fontWeight": "500"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "IeW9W",
+      "x": 198,
+      "y": 3800,
+      "name": "Watch - Countdown",
+      "width": 198,
+      "height": 242,
+      "fill": "#0A0F1C",
+      "cornerRadius": 32,
+      "layout": "none",
+      "children": [
+        {
+          "type": "text",
+          "id": "9YrUl",
+          "x": 80,
+          "y": 90,
+          "name": "countdownNum",
+          "fill": "#FFFFFF",
+          "content": "3",
+          "fontFamily": "Roboto Mono",
+          "fontSize": 48,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "ellipse",
+          "id": "wjLGx",
+          "x": 39,
+          "y": 61,
+          "name": "bgRing",
+          "innerRadius": 0.87,
+          "fill": "#22D3EE33",
+          "width": 120,
+          "height": 120
+        },
+        {
+          "type": "ellipse",
+          "id": "Qp6yQ",
+          "x": 39,
+          "y": 61,
+          "name": "progressRing",
+          "innerRadius": 0.87,
+          "startAngle": 90,
+          "sweepAngle": -252,
+          "fill": "#22D3EE",
+          "width": 120,
+          "height": 120
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "I0FvE",
+      "x": 446,
+      "y": 3800,
+      "name": "Watch - Jumping",
+      "width": 198,
+      "height": 242,
+      "fill": "#0A0F1C",
+      "cornerRadius": 32,
+      "layout": "vertical",
+      "gap": 4,
+      "padding": [
+        28,
+        16,
+        12,
+        16
+      ],
+      "children": [
+        {
+          "type": "text",
+          "id": "KW3Co",
+          "name": "jumpsLabel",
+          "fill": "#64748B",
+          "content": "JUMPS",
+          "textAlign": "center",
+          "fontFamily": "Roboto Mono",
+          "fontSize": 10,
+          "fontWeight": "600",
+          "letterSpacing": 2
+        },
+        {
+          "type": "text",
+          "id": "aEl7F",
+          "name": "jumpCount",
+          "fill": "#22D3EE",
+          "content": "142",
+          "textAlign": "center",
+          "fontFamily": "Roboto Mono",
+          "fontSize": 40,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "frame",
+          "id": "O45Ho",
+          "name": "spacer",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#00000000"
+        },
+        {
+          "type": "frame",
+          "id": "HtJc6",
+          "name": "bottomRow",
+          "width": "fill_container",
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "Dwa27",
+              "name": "timerText",
+              "fill": "#94A3B8",
+              "content": "02:34.5",
+              "fontFamily": "Roboto Mono",
+              "fontSize": 14,
+              "fontWeight": "500"
+            },
+            {
+              "type": "frame",
+              "id": "6GmTS",
+              "name": "hrRow",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "d0TcF",
+                  "name": "hrIcon",
+                  "width": 10,
+                  "height": 10,
+                  "iconFontName": "heart",
+                  "iconFontFamily": "lucide",
+                  "fill": "#EF4444"
+                },
+                {
+                  "type": "text",
+                  "id": "TqZeM",
+                  "name": "hrText",
+                  "fill": "#EF4444",
+                  "content": "128",
+                  "fontFamily": "Roboto Mono",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "GK84a",
+          "name": "stopBtn",
+          "width": "fill_container",
+          "height": 32,
+          "fill": "#FF4444",
+          "cornerRadius": 10,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "tARQH",
+              "name": "stopLabel",
+              "fill": "#FFFFFF",
+              "content": "STOP",
+              "fontFamily": "Roboto Mono",
+              "fontSize": 12,
+              "fontWeight": "bold",
+              "letterSpacing": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "x87k0",
+      "x": 694,
+      "y": 3800,
+      "name": "Watch - Result",
+      "width": 198,
+      "height": 242,
+      "fill": "#0A0F1C",
+      "cornerRadius": 32,
+      "layout": "vertical",
+      "gap": 4,
+      "padding": [
+        28,
+        16,
+        16,
+        16
+      ],
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "lGD1h",
+          "name": "closeIcon",
+          "width": 14,
+          "height": 14,
+          "iconFontName": "x",
+          "iconFontFamily": "lucide",
+          "fill": "#94A3B8"
+        },
+        {
+          "type": "text",
+          "id": "ACqdC",
+          "name": "sessionLabel",
+          "fill": "#64748B",
+          "content": "SESSION COMPLETE",
+          "textAlign": "center",
+          "fontFamily": "Roboto Mono",
+          "fontSize": 10,
+          "fontWeight": "600",
+          "letterSpacing": 2
+        },
+        {
+          "type": "text",
+          "id": "9Cngl",
+          "name": "resultCount",
+          "fill": "#22D3EE",
+          "content": "342",
+          "textAlign": "center",
+          "fontFamily": "Roboto Mono",
+          "fontSize": 36,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "text",
+          "id": "atxNg",
+          "name": "jumpsLabel2",
+          "fill": "#64748B",
+          "content": "JUMPS",
+          "textAlign": "center",
+          "fontFamily": "Roboto Mono",
+          "fontSize": 10,
+          "fontWeight": "600",
+          "letterSpacing": 2
+        },
+        {
+          "type": "rectangle",
+          "id": "RZ9bs",
+          "name": "divider",
+          "fill": "#64748B4D",
+          "width": "fill_container",
+          "height": 1
+        },
+        {
+          "type": "frame",
+          "id": "xjWpL",
+          "name": "statsRow",
+          "width": "fill_container",
+          "gap": 24,
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "V30Ih",
+              "name": "timeStat",
+              "layout": "vertical",
+              "gap": 2,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "6MlEA",
+                  "name": "timeIcon",
+                  "width": 10,
+                  "height": 10,
+                  "iconFontName": "clock-3",
+                  "iconFontFamily": "lucide",
+                  "fill": "#94A3B8"
+                },
+                {
+                  "type": "text",
+                  "id": "UXwvX",
+                  "name": "timeVal",
+                  "fill": "#FFFFFF",
+                  "content": "05:23",
+                  "fontFamily": "Roboto Mono",
+                  "fontSize": 14,
+                  "fontWeight": "bold"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "P0zYS",
+              "name": "calStat",
+              "layout": "vertical",
+              "gap": 2,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Pae6b",
+                  "name": "calIcon",
+                  "width": 10,
+                  "height": 10,
+                  "iconFontName": "flame",
+                  "iconFontFamily": "lucide",
+                  "fill": "#F59E0B"
+                },
+                {
+                  "type": "frame",
+                  "id": "WTMMe",
+                  "name": "calRow",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "DlRM3",
+                      "name": "calVal",
+                      "fill": "#FFFFFF",
+                      "content": "87",
+                      "fontFamily": "Roboto Mono",
+                      "fontSize": 14,
+                      "fontWeight": "bold"
+                    },
+                    {
+                      "type": "text",
+                      "id": "KJX4m",
+                      "name": "calUnit",
+                      "fill": "#94A3B8",
+                      "content": "kcal",
+                      "fontFamily": "Inter",
+                      "fontSize": 9,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "NTPub",
+      "x": 942,
+      "y": 3800,
+      "name": "Watch - Goal Settings",
+      "width": 198,
+      "height": 242,
+      "fill": "#0A0F1C",
+      "cornerRadius": 32,
+      "layout": "vertical",
+      "gap": 8,
+      "padding": [
+        32,
+        12,
+        12,
+        12
+      ],
+      "children": [
+        {
+          "type": "text",
+          "id": "LFWAZ",
+          "name": "goalTitle",
+          "fill": "#FFFFFF",
+          "content": "Goal",
+          "fontFamily": "Inter",
+          "fontSize": 17,
+          "fontWeight": "bold"
+        },
+        {
+          "type": "frame",
+          "id": "QlUgs",
+          "name": "countRow",
+          "width": "fill_container",
+          "height": 44,
+          "fill": "#1E293B",
+          "cornerRadius": 10,
+          "gap": 8,
+          "padding": [
+            0,
+            12
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "km1Nw",
+              "name": "countIcon",
+              "width": 12,
+              "height": 12,
+              "iconFontName": "hash",
+              "iconFontFamily": "lucide",
+              "fill": "#22D3EE"
+            },
+            {
+              "type": "text",
+              "id": "51XQs",
+              "name": "countLabel",
+              "fill": "#FFFFFF",
+              "content": "Count",
+              "fontFamily": "Inter",
+              "fontSize": 15,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "pg1xn",
+              "name": "countSpacer",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "#00000000"
+            },
+            {
+              "type": "icon_font",
+              "id": "NZ8Nw",
+              "name": "countChevron",
+              "width": 12,
+              "height": 12,
+              "iconFontName": "chevron-right",
+              "iconFontFamily": "lucide",
+              "fill": "#64748B"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "638Vt",
+          "name": "timeRow",
+          "width": "fill_container",
+          "height": 44,
+          "fill": "#1E293B",
+          "cornerRadius": 10,
+          "gap": 8,
+          "padding": [
+            0,
+            12
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "jCQ8L",
+              "name": "timeIcon",
+              "width": 12,
+              "height": 12,
+              "iconFontName": "timer",
+              "iconFontFamily": "lucide",
+              "fill": "#22D3EE"
+            },
+            {
+              "type": "text",
+              "id": "y3xij",
+              "name": "timeLabel",
+              "fill": "#FFFFFF",
+              "content": "Time",
+              "fontFamily": "Inter",
+              "fontSize": 15,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "6YaC9",
+              "name": "timeSpacer",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "#00000000"
+            },
+            {
+              "type": "icon_font",
+              "id": "Cq5S9",
+              "name": "timeChevron",
+              "width": 12,
+              "height": 12,
+              "iconFontName": "chevron-right",
+              "iconFontFamily": "lucide",
+              "fill": "#64748B"
+            }
+          ]
+        }
+      ]
     }
   ],
   "themes": {
