@@ -17,6 +17,7 @@ struct ContentView: View {
 
     @State private var selectedTab: Tab = .home
     @State private var settings = JumpRecSettings()
+    @State private var isSessionActive = false
 
     var body: some View {
         ZStack {
@@ -24,19 +25,29 @@ struct ContentView: View {
 
             VStack(spacing: 0) {
                 Group {
-                    switch selectedTab {
-                    case .home:
-                        HomeView(settings: settings)
-                    case .history:
-                        Text("History")
-                            .foregroundStyle(.white)
+                    if isSessionActive {
+                        ActiveSessionView(settings: settings) {
+                            isSessionActive = false
+                        }
+                    } else {
+                        switch selectedTab {
+                        case .home:
+                            HomeView(settings: settings) {
+                                isSessionActive = true
+                            }
+                        case .history:
+                            Text("History")
+                                .foregroundStyle(.white)
+                        }
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                TabBarView(selectedTab: $selectedTab)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
+                if !isSessionActive {
+                    TabBarView(selectedTab: $selectedTab)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 8)
+                }
             }
         }
         .preferredColorScheme(.dark)

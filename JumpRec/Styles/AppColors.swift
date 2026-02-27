@@ -25,4 +25,7 @@ enum AppColors {
     static let textSecondary = Color(hex: 0x94A3B8)
     static let textMuted = Color(hex: 0x64748B)
     static let tabInactive = Color(hex: 0x475569)
+    static let danger = Color(hex: 0xFF4444)
+    static let warning = Color(hex: 0xF59E0B)
+    static let heartRate = Color(hex: 0xEF4444)
 }

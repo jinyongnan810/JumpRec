@@ -8,6 +8,7 @@ import SwiftUI
 
 struct HomeView: View {
     @Bindable var settings: JumpRecSettings
+    var onStart: () -> Void
     @State private var showGoalSheet = false
 
     var goalText: String {
@@ -38,7 +39,7 @@ struct HomeView: View {
             DeviceSelectorView()
 
             // Start Button
-            Button(action: {}) {
+            Button(action: onStart) {
                 Text("START SESSION")
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(AppColors.bgPrimary)
