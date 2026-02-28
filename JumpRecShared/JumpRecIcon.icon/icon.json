@@ -1,12 +1,12 @@
 {
-  "fill" : "automatic",
+  "fill" : "system-dark",
   "groups" : [
     {
       "layers" : [
         {
-          "glass" : true,
-          "image-name" : "Layer-2.svg",
-          "name" : "Layer-2"
+          "blend-mode" : "darken",
+          "image-name" : "2 – Layer.png",
+          "name" : "2 – Layer"
         }
       ],
       "shadow" : {
@@ -21,8 +21,8 @@
     {
       "layers" : [
         {
-          "image-name" : "Layer-1 2.svg",
-          "name" : "Layer-1 2"
+          "image-name" : "1 – Layer.png",
+          "name" : "1 – Layer"
         }
       ],
       "shadow" : {

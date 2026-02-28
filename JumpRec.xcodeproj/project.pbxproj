@@ -82,14 +82,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3FCE40612E759589009C271D /* Exceptions for "JumpRecShared" folder in "JumpRec" target */ = {
+		3F2441A72F526D170026DA2C /* Exceptions for "JumpRecShared" folder in "JumpRec" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				JumpRecIcon.icon,
 			);
 			target = 3FCE40202E7589A8009C271D /* JumpRec */;
 		};
-		3FCE40622E759589009C271D /* Exceptions for "JumpRecShared" folder in "JumpRec Watch App" target */ = {
+		3F2441A92F526D210026DA2C /* Exceptions for "JumpRecShared" folder in "JumpRec Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				JumpRecIcon.icon,
@@ -122,8 +122,8 @@
 		3FCE404A2E758A82009C271D /* JumpRecShared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				3FCE40612E759589009C271D /* Exceptions for "JumpRecShared" folder in "JumpRec" target */,
-				3FCE40622E759589009C271D /* Exceptions for "JumpRecShared" folder in "JumpRec Watch App" target */,
+				3F2441A72F526D170026DA2C /* Exceptions for "JumpRecShared" folder in "JumpRec" target */,
+				3F2441A92F526D210026DA2C /* Exceptions for "JumpRecShared" folder in "JumpRec Watch App" target */,
 			);
 			path = JumpRecShared;
 			sourceTree = "<group>";
