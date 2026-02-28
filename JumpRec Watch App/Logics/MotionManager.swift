@@ -9,6 +9,7 @@ import Combine
 import CoreMotion
 import Foundation
 import HealthKit
+import JumpRecShared
 import WatchKit
 
 let csvHeader = "Timestamp,AX,AY,AZ,RX,RY,RZ,Jump\n"
@@ -37,19 +38,12 @@ class MotionManager: NSObject {
     private var heartRateQuery: HKAnchoredObjectQuery?
     private var energyBurnedQuery: HKAnchoredObjectQuery?
 
-    // MARK: - Detection Parameters
+    // MARK: - Detection
 
     private var updateInterval: TimeInterval = 0.05 // 20Hz sampling rate
-    private var minTimeBetweenJumps: TimeInterval = 0.30 // Minimum 300ms between jumps
-    private var lastJumpTimestamp: TimeInterval = 0
-
-    // MARK: - Detection Algorithm Properties
+    private let jumpDetector = JumpDetector()
 
     private var motionRecording: [String] = []
-
-    // MARK: - Statistics
-
-    private var jumpTimestamps: [Date] = []
 
     // MARK: - Initialization
 
@@ -233,47 +227,26 @@ class MotionManager: NSObject {
     /// Reset the current session
     func resetSession() {
         jumpCount = 0
-        jumpTimestamps.removeAll()
         motionRecording.removeAll()
-        lastJumpTimestamp = 0
+        jumpDetector.reset()
     }
 
     // MARK: - Private Methods
 
     private func processMotionData(_ motion: CMDeviceMotion) {
-        // Use user acceleration (gravity removed) for better jump detection
-//        let userAcceleration = motion.userAcceleration
-//        let userRotaion = motion.rotationRate
+        let sample = MotionSample(
+            userAccelerationX: motion.userAcceleration.x,
+            userAccelerationY: motion.userAcceleration.y,
+            userAccelerationZ: motion.userAcceleration.z,
+            rotationRateX: motion.rotationRate.x,
+            rotationRateY: motion.rotationRate.y,
+            rotationRateZ: motion.rotationRate.z,
+            timestamp: motion.timestamp
+        )
 
-        // Process for jump detection
-        let _ = detectJump(motion)
-
-//        motionRecording
-//            .append(
-//                "\(motion.timestamp),\(userAcceleration.x),\(userAcceleration.y),\(userAcceleration.z),\(userRotaion.x),\(userRotaion.y),\(userRotaion.z),\(isJump)\n"
-//            )
-    }
-
-    private func detectJump(_ motion: CMDeviceMotion) -> Bool {
-        // Detect jump using multiple criteria
-        // 1. Check minimum time between jumps
-        guard motion.timestamp - lastJumpTimestamp > minTimeBetweenJumps else {
-            return false
+        if jumpDetector.processMotionSample(sample) {
+            addJump(1)
         }
-        // 2. Check exceeds threshold
-        let result = motion.userAcceleration.y > 0.8 // && motion.rotationRate.x > 4
-
-        if result {
-            registerJump(timestamp: motion.timestamp)
-        }
-        return result
-    }
-
-    private func registerJump(timestamp: TimeInterval) {
-        lastJumpTimestamp = timestamp
-//        ConnectivityManager.shared.sendMessage(["watch app": "Detect Jump"])
-        addJump(1)
-//        jumpTimestamps.append(Date())
     }
 }
 

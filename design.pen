@@ -5802,20 +5802,6 @@
             "align": "inside",
             "thickness": 1
           },
-          "layout": "none"
-        },
-        {
-          "type": "frame",
-          "id": "kHaeh",
-          "x": 0,
-          "y": 0,
-          "name": "2 – Layer",
-          "width": 1024,
-          "height": 1024,
-          "stroke": {
-            "align": "inside",
-            "thickness": 1
-          },
           "layout": "none",
           "children": [
             {
@@ -5834,7 +5820,23 @@
                 "join": "round",
                 "cap": "round"
               }
-            },
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "kHaeh",
+          "x": 0,
+          "y": 0,
+          "name": "2 – Layer",
+          "width": 1024,
+          "height": 1024,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1
+          },
+          "layout": "none",
+          "children": [
             {
               "type": "path",
               "id": "cVbOF",
