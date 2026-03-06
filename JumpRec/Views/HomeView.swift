@@ -64,7 +64,7 @@ struct HomeView: View {
         .sheet(isPresented: $showGoalSheet) {
             GoalSheetView(settings: settings)
                 .presentationDetents([.medium])
-                .presentationDragIndicator(.hidden)
+                .presentationDragIndicator(.visible)
                 .presentationBackground(AppColors.cardSurface)
         }
     }

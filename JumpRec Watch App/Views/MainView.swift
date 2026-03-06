@@ -59,4 +59,5 @@ struct MainView: View {
 #Preview {
     MainView()
         .environment(JumpRecSettings())
+        .environment(MyDataStore.shared)
 }

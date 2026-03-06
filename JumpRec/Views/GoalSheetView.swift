@@ -16,12 +16,6 @@ struct GoalSheetView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            // Drag Handle
-            Capsule()
-                .fill(AppColors.tabInactive)
-                .frame(width: 40, height: 4)
-                .padding(.top, 16)
-
             // Title
             Text("Set Session Goal")
                 .font(.system(size: 15, weight: .semibold))
@@ -57,7 +51,7 @@ struct GoalSheetView: View {
             selectedType = settings.goalType
             countValue = settings.jumpCount
             timeValue = settings.jumpTime
-        }
+        }.padding()
     }
 
     // MARK: - Segmented Control
@@ -142,7 +136,10 @@ struct GoalSheetView: View {
     }
 
     private var unitLabel: String {
-        selectedType == .count ? "jumps" : "minutes"
+        if selectedType == .time, timeValue == 1 {
+            return "minute"
+        }
+        return selectedType == .count ? "jumps" : "minutes"
     }
 
     private var stepAmount: Int64 {

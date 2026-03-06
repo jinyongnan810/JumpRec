@@ -70,27 +70,11 @@ struct RecordsSheetView: View {
             ))
         }
 
-        // Longest Streak
-        let streak = computeLongestStreak()
-        if streak.days > 0 {
-            items.append(RecordItem(
-                icon: "calendar.badge.checkmark",
-                label: "Longest Streak",
-                value: "\(streak.days) days",
-                date: streak.dateLabel
-            ))
-        }
-
         return items
     }
 
     var body: some View {
         VStack(spacing: 20) {
-            // Drag handle
-            RoundedRectangle(cornerRadius: 2)
-                .fill(AppColors.tabInactive)
-                .frame(width: 40, height: 4)
-
             // Title
             Text("Personal Records")
                 .font(.system(size: 15, weight: .semibold))
@@ -123,67 +107,6 @@ struct RecordsSheetView: View {
         .padding(.top, 16)
         .padding(.horizontal, 24)
         .padding(.bottom, 32)
-    }
-
-    // MARK: - Streak calculation
-
-    private func computeLongestStreak() -> (days: Int, dateLabel: String) {
-        guard !sessions.isEmpty else { return (0, "") }
-
-        let calendar = Calendar.current
-
-        // Get unique session dates (day granularity), sorted ascending
-        let sessionDates: [Date] = Set(sessions.map {
-            calendar.startOfDay(for: $0.startedAt)
-        }).sorted()
-
-        guard !sessionDates.isEmpty else { return (0, "") }
-
-        var bestStart = sessionDates[0]
-        var bestLength = 1
-        var currentStart = sessionDates[0]
-        var currentLength = 1
-
-        for i in 1 ..< sessionDates.count {
-            let prev = sessionDates[i - 1]
-            let curr = sessionDates[i]
-            let daysBetween = calendar.dateComponents([.day], from: prev, to: curr).day ?? 0
-
-            if daysBetween == 1 {
-                currentLength += 1
-            } else {
-                currentStart = curr
-                currentLength = 1
-            }
-
-            if currentLength > bestLength {
-                bestLength = currentLength
-                bestStart = currentStart
-            }
-        }
-
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-        let startLabel = formatter.string(from: bestStart)
-
-        if bestLength == 1 {
-            return (1, startLabel)
-        }
-
-        guard let endDate = calendar.date(byAdding: .day, value: bestLength - 1, to: bestStart) else {
-            return (bestLength, startLabel)
-        }
-        let endLabel = formatter.string(from: endDate)
-
-        // If same month, compact format like "Feb 1-12"
-        let startMonth = calendar.component(.month, from: bestStart)
-        let endMonth = calendar.component(.month, from: endDate)
-        if startMonth == endMonth {
-            let endDay = calendar.component(.day, from: endDate)
-            return (bestLength, "\(startLabel)-\(endDay)")
-        }
-
-        return (bestLength, "\(startLabel)–\(endLabel)")
     }
 }
 

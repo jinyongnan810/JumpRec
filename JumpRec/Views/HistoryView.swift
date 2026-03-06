@@ -135,8 +135,8 @@ struct HistoryView: View {
         }
         .sheet(isPresented: $showRecords) {
             RecordsSheetView()
-                .presentationDetents([.large])
-                .presentationDragIndicator(.hidden)
+                .presentationDetents([.large, .medium])
+                .presentationDragIndicator(.visible)
                 .presentationBackground(AppColors.cardSurface)
         }
     }
