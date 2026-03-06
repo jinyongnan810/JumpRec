@@ -5,6 +5,7 @@
 
 import JumpRecShared
 import SwiftUI
+import UIKit
 
 struct GoalSheetView: View {
     @Bindable var settings: JumpRecSettings
@@ -25,7 +26,7 @@ struct GoalSheetView: View {
             segmentedControl
 
             // Value Stepper
-            stepperRow
+            stepperRow.animation(.easeInOut, value: selectedType)
 
             Spacer()
 
@@ -48,39 +49,27 @@ struct GoalSheetView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(AppColors.cardSurface)
         .onAppear {
+            configureSegmentedControlAppearance()
             selectedType = settings.goalType
             countValue = settings.jumpCount
             timeValue = settings.jumpTime
-        }.padding()
+        }.padding(.top, 20)
     }
 
     // MARK: - Segmented Control
 
     private var segmentedControl: some View {
-        HStack(spacing: 4) {
-            segmentButton(label: "Jump Count", type: .count)
-            segmentButton(label: "Jump Time", type: .time)
+        Picker("Goal Type", selection: $selectedType) {
+            Text("Jump Count")
+//                .font(.system(size: 15, weight: .semibold))
+                .tag(GoalType.count)
+            Text("Jump Time")
+//                .font(.system(size: 15, weight: .semibold))
+                .tag(GoalType.time)
         }
-        .padding(4)
-        .background(AppColors.bgPrimary)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-    }
-
-    private func segmentButton(label: String, type: GoalType) -> some View {
-        let isActive = selectedType == type
-        return Button {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                selectedType = type
-            }
-        } label: {
-            Text(label)
-                .font(.system(size: 13, weight: isActive ? .semibold : .medium))
-                .foregroundStyle(isActive ? AppColors.bgPrimary : AppColors.textSecondary)
-                .frame(maxWidth: .infinity)
-                .frame(height: 36)
-                .background(isActive ? AppColors.accent : Color.clear)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-        }
+        .pickerStyle(.segmented)
+        .controlSize(.large)
+//        .tint(AppColors.accent)
     }
 
     // MARK: - Stepper Row
@@ -161,6 +150,21 @@ struct GoalSheetView: View {
             settings.jumpTime = timeValue
         }
         settings.goalType = selectedType
+    }
+
+    private func configureSegmentedControlAppearance() {
+        let selectedTextAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor(AppColors.bgPrimary),
+            .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+        ]
+        let normalTextAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor(AppColors.textSecondary),
+            .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+        ]
+
+        UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(AppColors.accent)
+        UISegmentedControl.appearance().setTitleTextAttributes(normalTextAttributes, for: .normal)
+        UISegmentedControl.appearance().setTitleTextAttributes(selectedTextAttributes, for: .selected)
     }
 }
 

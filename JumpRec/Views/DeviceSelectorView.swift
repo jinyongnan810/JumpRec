@@ -4,27 +4,38 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct DeviceSelectorView: View {
     @State private var selected: DeviceSource = .iPhone
 
     var body: some View {
-        HStack(spacing: 8) {
+        Picker("Device", selection: $selected) {
             ForEach(DeviceSource.allCases, id: \.self) { source in
-                let isSelected = source == selected
-                Button {
-                    selected = source
-                } label: {
-                    Label(source.rawValue, systemImage: source.iconName)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(isSelected ? AppColors.bgPrimary : AppColors.textSecondary)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .background(isSelected ? AppColors.accent : AppColors.cardSurface)
-                        .clipShape(Capsule())
-                }
+                Label(source.rawValue, systemImage: source.iconName).tag(source)
             }
         }
+        .pickerStyle(.segmented)
+        .controlSize(.large)
+        .tint(AppColors.accent)
+        .onAppear {
+            configureSegmentedControlAppearance()
+        }
+    }
+
+    private func configureSegmentedControlAppearance() {
+        let selectedTextAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor(AppColors.bgPrimary),
+            .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+        ]
+        let normalTextAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor(AppColors.textSecondary),
+            .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+        ]
+
+        UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(AppColors.accent)
+        UISegmentedControl.appearance().setTitleTextAttributes(normalTextAttributes, for: .normal)
+        UISegmentedControl.appearance().setTitleTextAttributes(selectedTextAttributes, for: .selected)
     }
 }
 
