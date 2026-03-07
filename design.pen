@@ -118,7 +118,7 @@
                   "id": "PbZqh",
                   "name": "appSubtitle",
                   "fill": "#64748B",
-                  "content": "🎯 Goal: 1,000 jumps",
+                  "content": "Goal: 1,000 jumps",
                   "fontFamily": "Inter",
                   "fontSize": 12,
                   "fontWeight": "500"
@@ -574,11 +574,11 @@
               "type": "text",
               "id": "a9QCp",
               "name": "dimSub",
-              "fill": "#94A3B8",
-              "content": "Jump Rope Tracker",
+              "fill": "#64748B",
+              "content": "Goal: 1,000 jumps",
               "fontFamily": "Inter",
               "fontSize": 13,
-              "fontWeight": "normal"
+              "fontWeight": "500"
             },
             {
               "type": "ellipse",
@@ -3426,7 +3426,7 @@
               "id": "YjffN",
               "name": "recentHeader",
               "fill": "#64748B",
-              "content": "RECENT SESSIONS",
+              "content": "SESSIONS THIS MONTH",
               "fontFamily": "Inter",
               "fontSize": 11,
               "fontWeight": "600",
