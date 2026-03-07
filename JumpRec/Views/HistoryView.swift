@@ -78,22 +78,22 @@ struct HistoryView: View {
                         StatCardView(label: "CALORIES", value: formatCount(Int(totalCalories)))
                     }
 
-                    // Recent Sessions
+                    // Sessions in displayed month
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("RECENT SESSIONS")
+                        Text("SESSIONS THIS MONTH")
                             .font(.system(size: 11, weight: .semibold))
                             .tracking(2)
                             .foregroundStyle(AppColors.textMuted)
 
-                        if sessions.isEmpty {
-                            Text("No sessions yet. Start jumping!")
+                        if sessionsInMonth.isEmpty {
+                            Text("No sessions in this month.")
                                 .font(.system(size: 14))
                                 .foregroundStyle(AppColors.textSecondary)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding(.vertical, 24)
                         } else {
                             VStack(spacing: 8) {
-                                ForEach(sessions.prefix(10), id: \.id) { session in
+                                ForEach(sessionsInMonth, id: \.id) { session in
                                     NavigationLink(destination: SessionDetailView(session: session)) {
                                         SessionRowView(session: session)
                                     }
@@ -181,6 +181,7 @@ private struct CalendarGridView: View {
     }
 
     private let dayHeaders = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]
+    private let swipeThreshold: CGFloat = 50
 
     var body: some View {
         VStack(spacing: 12) {
@@ -258,6 +259,21 @@ private struct CalendarGridView: View {
         .padding(16)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .gesture(
+            DragGesture(minimumDistance: 20)
+                .onEnded { value in
+                    let horizontal = value.translation.width
+                    let vertical = value.translation.height
+
+                    guard abs(horizontal) > abs(vertical), abs(horizontal) > swipeThreshold else { return }
+
+                    if horizontal < 0 {
+                        onNextMonth()
+                    } else {
+                        onPreviousMonth()
+                    }
+                }
+        )
     }
 
     private var monthTitle: String {
