@@ -58,30 +58,6 @@ struct HistoryView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    // Header Row
-                    HStack {
-                        Text("History")
-                            .font(.system(size: 24, weight: .semibold))
-                            .foregroundStyle(AppColors.textPrimary)
-
-                        Spacer()
-
-                        Button {
-                            showRecords = true
-                        } label: {
-                            HStack(spacing: 6) {
-                                Image(systemName: "trophy.fill")
-                                    .font(.system(size: 14))
-                                Text("Records")
-                                    .font(.system(size: 12, weight: .medium))
-                            }
-                            .foregroundStyle(AppColors.accent)
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 12)
-                        }
-                        .appGlassButton(tint: AppColors.accent)
-                    }
-
                     // Calendar Section
                     CalendarGridView(
                         displayedMonth: displayedMonth,
@@ -130,7 +106,17 @@ struct HistoryView: View {
                 .padding(.horizontal, 24)
             }
             .scrollIndicators(.hidden)
-            .navigationBarHidden(true)
+            .navigationTitle("History")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showRecords = true
+                    } label: {
+                        Label("Records", systemImage: "trophy.fill")
+                    }
+                }
+            }
         }
         .sheet(isPresented: $showRecords) {
             RecordsSheetView()
@@ -207,6 +193,7 @@ private struct CalendarGridView: View {
                         .frame(width: 32, height: 32)
                 }
                 .appGlassButton()
+                .buttonBorderShape(.circle)
 
                 Spacer()
 
@@ -223,6 +210,7 @@ private struct CalendarGridView: View {
                         .frame(width: 32, height: 32)
                 }
                 .appGlassButton()
+                .buttonBorderShape(.circle)
             }
 
             // Day headers

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SessionDetailView: View {
     let session: JumpSession
-    @Environment(\.dismiss) private var dismiss
 
     private var dateText: String {
         let formatter = DateFormatter()
@@ -63,23 +62,6 @@ struct SessionDetailView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Nav Row
-                HStack(spacing: 12) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 18))
-                            .foregroundStyle(AppColors.textPrimary)
-                            .frame(width: 36, height: 36)
-                    }
-                    .appGlassButton()
-
-                    Text("Session Details")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(AppColors.textPrimary)
-
-                    Spacer()
-                }
-
                 // Date Row
                 HStack {
                     Text(dateText)
@@ -177,7 +159,8 @@ struct SessionDetailView: View {
             .padding(.horizontal, 24)
         }
         .scrollIndicators(.hidden)
-        .navigationBarHidden(true)
+        .navigationTitle("Session Details")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private var rateText: String {
