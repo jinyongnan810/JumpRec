@@ -45,9 +45,8 @@ struct HomeView: View {
                     .foregroundStyle(AppColors.bgPrimary)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(AppColors.accent)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
+            .appGlassButton(prominent: true, tint: AppColors.accent)
 
             // Set Goal Link
             Button {
@@ -56,7 +55,10 @@ struct HomeView: View {
                 Label("Set Goal", systemImage: "target")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(AppColors.accent)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
             }
+            .appGlassButton(tint: AppColors.accent)
 
             Spacer()
         }

@@ -70,9 +70,8 @@ struct SessionDetailView: View {
                             .font(.system(size: 18))
                             .foregroundStyle(AppColors.textPrimary)
                             .frame(width: 36, height: 36)
-                            .background(AppColors.cardSurface)
-                            .clipShape(Circle())
                     }
+                    .appGlassButton()
 
                     Text("Session Details")
                         .font(.system(size: 18, weight: .semibold))

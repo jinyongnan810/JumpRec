@@ -113,9 +113,8 @@ struct ActiveSessionView: View {
                 .foregroundStyle(AppColors.textPrimary)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .background(AppColors.danger)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
+            .appGlassButton(prominent: true, tint: AppColors.danger)
         }
         .padding(.horizontal, 24)
     }

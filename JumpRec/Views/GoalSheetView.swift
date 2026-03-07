@@ -40,9 +40,8 @@ struct GoalSheetView: View {
                     .foregroundStyle(AppColors.bgPrimary)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(AppColors.accent)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
             }
+            .appGlassButton(prominent: true, tint: AppColors.accent)
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 32)
@@ -84,9 +83,9 @@ struct GoalSheetView: View {
                     .font(.system(size: 22))
                     .foregroundStyle(AppColors.accent)
                     .frame(width: 48, height: 48)
-                    .background(AppColors.bgPrimary)
-                    .clipShape(Circle())
             }
+            .appGlassButton(tint: AppColors.accent)
+            .buttonBorderShape(.circle)
 
             // Value display
             VStack(spacing: 4) {
@@ -108,9 +107,9 @@ struct GoalSheetView: View {
                     .font(.system(size: 22))
                     .foregroundStyle(AppColors.accent)
                     .frame(width: 48, height: 48)
-                    .background(AppColors.bgPrimary)
-                    .clipShape(Circle())
             }
+            .appGlassButton(tint: AppColors.accent)
+            .buttonBorderShape(.circle)
         }
     }
 

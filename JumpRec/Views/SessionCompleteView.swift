@@ -99,9 +99,8 @@ struct SessionCompleteView: View {
                 .foregroundStyle(AppColors.bgPrimary)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .background(AppColors.accent)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
+            .appGlassButton(prominent: true, tint: AppColors.accent)
         }
         .padding(.horizontal, 24)
     }

@@ -78,9 +78,8 @@ struct HistoryView: View {
                             .foregroundStyle(AppColors.accent)
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)
-                            .background(AppColors.cardSurface)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
+                        .appGlassButton(tint: AppColors.accent)
                     }
 
                     // Calendar Section
@@ -205,7 +204,9 @@ private struct CalendarGridView: View {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 18))
                         .foregroundStyle(AppColors.textSecondary)
+                        .frame(width: 32, height: 32)
                 }
+                .appGlassButton()
 
                 Spacer()
 
@@ -219,7 +220,9 @@ private struct CalendarGridView: View {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 18))
                         .foregroundStyle(AppColors.textSecondary)
+                        .frame(width: 32, height: 32)
                 }
+                .appGlassButton()
             }
 
             // Day headers
