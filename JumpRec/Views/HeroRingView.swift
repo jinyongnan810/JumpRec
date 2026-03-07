@@ -14,21 +14,21 @@ struct HeroRingView: View {
         ZStack {
             // Background ring
             Circle()
-                .stroke(AppColors.cardSurface, lineWidth: 8)
+                .stroke(AppColors.cardSurface, lineWidth: 14)
                 .frame(width: 200, height: 200)
 
             // Foreground ring
             Circle()
                 .trim(from: 0, to: progress)
-                .stroke(AppColors.accent, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                .stroke(AppColors.accent, style: StrokeStyle(lineWidth: 14, lineCap: .round))
                 .frame(width: 200, height: 200)
                 .rotationEffect(.degrees(-90))
 
             // Center content
             VStack(spacing: 4) {
                 Text(centerText)
-                    .font(.system(size: 32, weight: .bold, design: .monospaced))
-                    .foregroundStyle(AppColors.textPrimary)
+                    .font(.system(size: 48, weight: .bold, design: .rounded))
+                    .foregroundStyle(AppColors.accent)
 
                 Text(subtitle)
                     .font(.system(size: 12, weight: .medium))

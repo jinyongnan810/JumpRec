@@ -93,7 +93,7 @@ struct SessionCompleteView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark")
                         .font(.system(size: 18))
-                    Text("Done")
+                    Text("DONE")
                         .font(.system(size: 15, weight: .semibold))
                 }
                 .foregroundStyle(AppColors.bgPrimary)

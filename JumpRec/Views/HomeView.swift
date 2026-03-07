@@ -10,6 +10,9 @@ struct HomeView: View {
     @Bindable var settings: JumpRecSettings
     var onStart: () -> Void
     @State private var showGoalSheet = false
+    @State private var countdownValue: Int?
+    @State private var countdownTask: Task<Void, Never>?
+    @State private var countdownProgress: Double = 1.0
 
     var goalText: String {
         if settings.goalType == .count {
@@ -32,21 +35,36 @@ struct HomeView: View {
                     .foregroundStyle(AppColors.textMuted)
             }
 
-            // Hero Ring
-            HeroRingView(progress: 0, centerText: "Ready", subtitle: "Tap Start to begin")
+            // Hero Ring / Countdown Ring
+            if isCountingDown {
+                HeroRingView(
+                    progress: countdownProgress,
+                    centerText: "\(countdownValue ?? 3)",
+                    subtitle: "Starting..."
+                )
+            } else {
+                HeroRingView(progress: 0, centerText: "Ready", subtitle: "Tap Start to begin")
+            }
 
             // Device Selector
             DeviceSelectorView()
+                .disabled(isCountingDown)
 
-            // Start Button
-            Button(action: onStart) {
-                Text("START SESSION")
+            // Start/Cancel Button
+            Button {
+                if isCountingDown {
+                    cancelCountdown()
+                } else {
+                    startWithCountdown()
+                }
+            } label: {
+                Text(primaryButtonTitle)
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(AppColors.bgPrimary)
+                    .foregroundStyle(primaryButtonTextColor)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
             }
-            .appGlassButton(prominent: true, tint: AppColors.accent)
+            .appGlassButton(prominent: true, tint: primaryButtonTint)
 
             // Set Goal Link
             Button {
@@ -59,6 +77,7 @@ struct HomeView: View {
                     .padding(.horizontal, 12)
             }
             .appGlassButton(tint: AppColors.accent)
+            .disabled(isCountingDown)
 
             Spacer()
         }
@@ -69,6 +88,64 @@ struct HomeView: View {
                 .presentationDragIndicator(.visible)
                 .presentationBackground(AppColors.cardSurface)
         }
+        .onDisappear {
+            countdownTask?.cancel()
+            countdownTask = nil
+            countdownValue = nil
+        }
+    }
+
+    private var isCountingDown: Bool {
+        countdownValue != nil
+    }
+
+    private var primaryButtonTitle: String {
+        isCountingDown ? "CANCEL" : "START SESSION"
+    }
+
+    private var primaryButtonTextColor: Color {
+        isCountingDown ? AppColors.textPrimary : AppColors.bgPrimary
+    }
+
+    private var primaryButtonTint: Color {
+        isCountingDown ? AppColors.danger : AppColors.accent
+    }
+
+    private func startWithCountdown() {
+        guard !isCountingDown else { return }
+
+        countdownTask = Task {
+            await MainActor.run {
+                countdownValue = 3
+                countdownProgress = 1
+                withAnimation(.linear(duration: 3.0)) {
+                    countdownProgress = 0
+                }
+            }
+
+            for value in stride(from: 3, through: 1, by: -1) {
+                if Task.isCancelled { return }
+                await MainActor.run {
+                    countdownValue = value
+                }
+                try? await Task.sleep(for: .seconds(1))
+            }
+
+            if Task.isCancelled { return }
+            await MainActor.run {
+                countdownValue = nil
+                countdownProgress = 1
+                countdownTask = nil
+                onStart()
+            }
+        }
+    }
+
+    private func cancelCountdown() {
+        countdownTask?.cancel()
+        countdownTask = nil
+        countdownValue = nil
+        countdownProgress = 1
     }
 }
 
