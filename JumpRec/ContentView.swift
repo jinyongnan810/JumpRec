@@ -41,14 +41,20 @@ struct ContentView: View {
             }
             .tint(AppColors.accent)
             .toolbarVisibility(sessionState == .idle ? .visible : .hidden, for: .tabBar)
-
-            if sessionState == .active {
-                ActiveSessionView(settings: settings) {
-                    sessionState = .complete
-                }
-            } else if sessionState == .complete {
-                SessionCompleteView {
-                    sessionState = .idle
+        }
+        .fullScreenCover(isPresented: isSessionFlowPresented) {
+            Group {
+                switch sessionState {
+                case .active:
+                    ActiveSessionView(settings: settings) {
+                        sessionState = .complete
+                    }
+                case .complete:
+                    SessionCompleteView {
+                        sessionState = .idle
+                    }
+                case .idle:
+                    EmptyView()
                 }
             }
         }
@@ -56,6 +62,17 @@ struct ContentView: View {
         .onAppear {
             configureTabBarAppearance()
         }
+    }
+
+    private var isSessionFlowPresented: Binding<Bool> {
+        Binding(
+            get: { sessionState != .idle },
+            set: { isPresented in
+                if !isPresented {
+                    sessionState = .idle
+                }
+            }
+        )
     }
 
     private func configureTabBarAppearance() {
