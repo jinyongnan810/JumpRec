@@ -126,7 +126,9 @@ struct HomeView: View {
             for value in stride(from: 3, through: 1, by: -1) {
                 if Task.isCancelled { return }
                 await MainActor.run {
-                    countdownValue = value
+                    withAnimation {
+                        countdownValue = value
+                    }
                 }
                 try? await Task.sleep(for: .seconds(1))
             }

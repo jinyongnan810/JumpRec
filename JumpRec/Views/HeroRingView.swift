@@ -29,6 +29,7 @@ struct HeroRingView: View {
                 Text(centerText)
                     .font(.system(size: 48, weight: .bold, design: .rounded))
                     .foregroundStyle(AppColors.accent)
+                    .contentTransition(.numericText())
 
                 Text(subtitle)
                     .font(.system(size: 12, weight: .medium))

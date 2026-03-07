@@ -20,6 +20,8 @@ struct JumpingView: View {
             Text("\(appState.jumpCount)")
                 .font(.system(size: 40, weight: .bold, design: .monospaced))
                 .foregroundStyle(AppColors.accent)
+                .contentTransition(.numericText())
+                .animation(.bouncy, value: appState.jumpCount)
 
             Spacer()
 

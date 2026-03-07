@@ -39,8 +39,11 @@ struct StartView: View {
                         Text("\(countdown, specifier: "%.0f")")
                             .font(.system(size: 48, weight: .bold, design: .monospaced))
                             .foregroundStyle(AppColors.textPrimary)
+                            .contentTransition(.numericText())
                             .onReceive(timer.autoconnect()) { _ in
-                                countdown -= 1
+                                withAnimation {
+                                    countdown -= 1
+                                }
                             }
                         Circle()
                             .trim(from: 0, to: isAnimating ? 1 : 0)
