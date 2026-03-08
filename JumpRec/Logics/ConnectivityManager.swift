@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import JumpRecShared
+import SwiftData
 import WatchConnectivity
 
 @Observable
@@ -93,6 +95,12 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
     func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
         print("[WatchConnectivityManager] Received userInfo: \(userInfo)")
+
+        if let type = userInfo["type"] as? String, type == "sessionComplete" {
+            handleCompletedSession(userInfo)
+            return
+        }
+
         guard let csvText = userInfo["csvText"] as? String,
               let filename = userInfo["filename"] as? String
         else {
@@ -100,6 +108,45 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             return
         }
         saveCSVtoICloud(csvText: csvText, filename: filename)
+    }
+
+    private func handleCompletedSession(_ userInfo: [String: Any]) {
+        guard let startedAtTimestamp = numberAsDouble(userInfo["startedAt"]),
+              let endedAtTimestamp = numberAsDouble(userInfo["endedAt"]),
+              let jumpCount = numberAsInt(userInfo["jumpCount"]),
+              let caloriesBurned = numberAsDouble(userInfo["caloriesBurned"]),
+              let jumpOffsets = (userInfo["jumpOffsets"] as? [Any])?.compactMap(numberAsDouble)
+        else {
+            print("[WatchConnectivityManager] Invalid completed session payload")
+            return
+        }
+
+        let startedAt = Date(timeIntervalSince1970: startedAtTimestamp)
+        let endedAt = Date(timeIntervalSince1970: endedAtTimestamp)
+
+        Task { @MainActor in
+            MyDataStore.shared.saveCompletedSession(
+                startedAt: startedAt,
+                endedAt: endedAt,
+                jumpCount: jumpCount,
+                caloriesBurned: caloriesBurned,
+                jumpOffsets: jumpOffsets
+            )
+        }
+
+        print("[WatchConnectivityManager] Saved completed session from watch: \(jumpCount) jumps")
+    }
+
+    private func numberAsDouble(_ value: Any?) -> Double? {
+        if let value = value as? Double { return value }
+        if let value = value as? NSNumber { return value.doubleValue }
+        return nil
+    }
+
+    private func numberAsInt(_ value: Any?) -> Int? {
+        if let value = value as? Int { return value }
+        if let value = value as? NSNumber { return value.intValue }
+        return nil
     }
 
     /// Saves CSV text to iCloud Drive in the specified container

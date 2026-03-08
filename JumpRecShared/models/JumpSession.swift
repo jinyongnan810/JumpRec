@@ -46,7 +46,7 @@ public final class JumpSession {
     /// Normalized rate samples for charting and analytics.
     /// When this session is deleted, related samples are automatically deleted.
     @Relationship(deleteRule: .cascade, inverse: \SessionRateSample.session)
-    public var rateSamples: [SessionRateSample] = []
+    public var rateSamples: [SessionRateSample]?
 
     /// Initializes a new jump rope session with summary statistics
     /// - Parameters:

@@ -127,6 +127,14 @@ class JumpRecState: NSObject {
             )
         }
 
+        ConnectivityManager.shared.sendCompletedSession(
+            startedAt: startTime,
+            endedAt: endTime,
+            jumpCount: jumpCount,
+            caloriesBurned: energyBurned,
+            jumpOffsets: jumps
+        )
+
         print("end finished")
     }
 

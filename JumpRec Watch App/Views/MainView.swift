@@ -47,7 +47,7 @@ struct MainView: View {
                     print(
                         "⭐️fetched: \(result.startedAt),\(result.endedAt),\(result.jumpCount),\(result.caloriesBurned)"
                     )
-                    print("rate samples: \(result.rateSamples.count)")
+                    print("rate samples: \(result.rateSamples?.count ?? 0)")
                 }
             } catch {
                 print("failed to fetch: \(error)")

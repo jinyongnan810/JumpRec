@@ -61,6 +61,25 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         })
     }
 
+    func sendCompletedSession(
+        startedAt: Date,
+        endedAt: Date,
+        jumpCount: Int,
+        caloriesBurned: Double,
+        jumpOffsets: [TimeInterval]
+    ) {
+        let payload: [String: Any] = [
+            "type": "sessionComplete",
+            "startedAt": startedAt.timeIntervalSince1970,
+            "endedAt": endedAt.timeIntervalSince1970,
+            "jumpCount": jumpCount,
+            "caloriesBurned": caloriesBurned,
+            "jumpOffsets": jumpOffsets,
+        ]
+        session.transferUserInfo(payload)
+        print("[WatchConnectivityManager] Queued completed session via transferUserInfo")
+    }
+
     func sessionReachabilityDidChange(_ session: WCSession) {
         print("[WatchConnectivityManager] Session reachability changed: \(session.isReachable)")
     }

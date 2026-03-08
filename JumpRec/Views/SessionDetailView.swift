@@ -41,7 +41,7 @@ struct SessionDetailView: View {
 
     /// Convert rate points to normalized graph data (0–1 for y-axis range 100–200)
     private var graphDataPoints: [CGFloat] {
-        let points = session.rateSamples.sorted { $0.secondOffset < $1.secondOffset }
+        let points = (session.rateSamples ?? []).sorted { $0.secondOffset < $1.secondOffset }
         guard points.count > 1 else {
             return sampleGraphPoints
         }

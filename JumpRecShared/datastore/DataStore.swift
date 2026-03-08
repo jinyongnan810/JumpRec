@@ -87,7 +87,10 @@ public class MyDataStore {
         modelContext.insert(session)
         for sample in rateSamples {
             sample.session = session
-            session.rateSamples.append(sample)
+            if session.rateSamples == nil {
+                session.rateSamples = []
+            }
+            session.rateSamples?.append(sample)
             modelContext.insert(sample)
         }
         do {
