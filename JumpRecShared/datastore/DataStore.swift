@@ -4,6 +4,7 @@
 //
 //  Created by Yuunan kin on 2025/09/06.
 //
+import Foundation
 import Observation
 import SwiftData
 import SwiftUI
@@ -19,7 +20,7 @@ extension ModelContainer {
         // Define the data models that will be stored
         let schema = Schema([
             JumpSession.self,
-            JumpSessionDetails.self,
+            SessionRateSample.self,
         ])
 
         // Configure persistent storage with App Group and CloudKit
@@ -82,16 +83,93 @@ public class MyDataStore {
         }
     }
 
-    public func addSession(session: JumpSession, details: JumpSessionDetails) {
+    public func addSession(session: JumpSession, rateSamples: [SessionRateSample] = []) {
         modelContext.insert(session)
-        modelContext.insert(details)
+        for sample in rateSamples {
+            sample.session = session
+            session.rateSamples.append(sample)
+            modelContext.insert(sample)
+        }
         do {
             try modelContext.save()
-            print("inserted session and details")
+            print("inserted session and rate samples")
             print("session: \(session)")
-            print("details: \(details)")
+            print("samples: \(rateSamples.count)")
         } catch {
             print("failed to save")
         }
+    }
+
+    /// Creates a finalized session record and persists it with normalized rate samples.
+    public func saveCompletedSession(
+        startedAt: Date,
+        endedAt: Date,
+        jumpCount: Int,
+        caloriesBurned: Double,
+        smallBreaksCount: Int = 0,
+        longBreaksCount: Int = 0,
+        jumpOffsets: [TimeInterval],
+        bucketSeconds: Int = 5,
+        rollingWindowSeconds: Int = 30
+    ) {
+        let session = JumpSession(
+            startedAt: startedAt,
+            endedAt: endedAt,
+            jumpCount: jumpCount,
+            peakRate: 0,
+            caloriesBurned: caloriesBurned,
+            smallBreaksCount: smallBreaksCount,
+            longBreaksCount: longBreaksCount
+        )
+
+        let rateSamples = buildRateSamples(
+            for: session,
+            jumpOffsets: jumpOffsets,
+            durationSeconds: session.durationSeconds,
+            bucketSeconds: bucketSeconds,
+            rollingWindowSeconds: rollingWindowSeconds
+        )
+
+        session.peakRate = rateSamples.map(\.rate).max()
+        if session.durationSeconds > 0 {
+            session.averageRate = Double(session.jumpCount) * 60.0 / Double(session.durationSeconds)
+        }
+
+        addSession(session: session, rateSamples: rateSamples)
+    }
+
+    /// Builds fixed-interval rolling jump-rate samples (jumps/minute).
+    private func buildRateSamples(
+        for session: JumpSession,
+        jumpOffsets: [TimeInterval],
+        durationSeconds: Int,
+        bucketSeconds: Int = 5,
+        rollingWindowSeconds: Int = 30
+    ) -> [SessionRateSample] {
+        guard durationSeconds > 0 else { return [] }
+
+        var samples: [SessionRateSample] = []
+        var left = 0
+        var right = 0
+        let sorted = jumpOffsets.sorted()
+
+        for second in stride(from: 0, through: durationSeconds, by: bucketSeconds) {
+            let upperBound = Double(second)
+            let lowerBound = Double(max(0, second - rollingWindowSeconds))
+
+            while left < sorted.count, sorted[left] <= lowerBound {
+                left += 1
+            }
+            while right < sorted.count, sorted[right] <= upperBound {
+                right += 1
+            }
+
+            let countInWindow = max(0, right - left)
+            let effectiveWindowSeconds = min(rollingWindowSeconds, max(1, second))
+            let rate = Double(countInWindow) * 60.0 / Double(effectiveWindowSeconds)
+            samples.append(SessionRateSample(session: session, secondOffset: second, rate: rate))
+        }
+
+        return samples
     }
 }

@@ -117,18 +117,14 @@ class JumpRecState: NSObject {
 
         // save data to database
         guard let startTime, let endTime else { return }
-        let session = JumpSession(
-            startedAt: startTime,
-            endedAt: endTime,
-            jumpCount: jumpCount,
-            peakRate: 0,
-            caloriesBurned: energyBurned
-        )
-        let details = JumpSessionDetails(session: session, jumps: jumps)
-        session.details = details
-
         Task { @MainActor in
-            dataStore.addSession(session: session, details: details)
+            dataStore.saveCompletedSession(
+                startedAt: startTime,
+                endedAt: endTime,
+                jumpCount: jumpCount,
+                caloriesBurned: energyBurned,
+                jumpOffsets: jumps
+            )
         }
 
         print("end finished")

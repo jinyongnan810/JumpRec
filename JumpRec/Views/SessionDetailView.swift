@@ -41,10 +41,7 @@ struct SessionDetailView: View {
 
     /// Convert rate points to normalized graph data (0–1 for y-axis range 100–200)
     private var graphDataPoints: [CGFloat] {
-        guard let details = session.details else {
-            return sampleGraphPoints
-        }
-        let points = details.ratePoints
+        let points = session.rateSamples.sorted { $0.secondOffset < $1.secondOffset }
         guard points.count > 1 else {
             return sampleGraphPoints
         }
@@ -111,9 +108,8 @@ struct SessionDetailView: View {
     }
 
     private var averageRateText: String {
-        guard let peak = session.peakRate else { return "–" }
-        let average = Int(peak * 0.8)
-        return "\(average)/min"
+        guard let average = session.averageRate else { return "–" }
+        return "\(Int(average))/min"
     }
 
     private var longestJumpStrikesText: String {
@@ -133,7 +129,11 @@ struct SessionDetailView: View {
 
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: JumpSession.self, configurations: config)
+    let container = try! ModelContainer(
+        for: JumpSession.self,
+        SessionRateSample.self,
+        configurations: config
+    )
 
     let start = Calendar.current.date(byAdding: .minute, value: -7, to: Date())!
     let end = Date()

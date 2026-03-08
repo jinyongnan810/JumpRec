@@ -412,7 +412,11 @@ private struct SessionRowView: View {
 
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: JumpSession.self, configurations: config)
+    let container = try! ModelContainer(
+        for: JumpSession.self,
+        SessionRateSample.self,
+        configurations: config
+    )
 
     let calendar = Calendar.current
     let now = Date()
