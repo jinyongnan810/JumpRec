@@ -109,70 +109,31 @@ public class MyDataStore {
         endedAt: Date,
         jumpCount: Int,
         caloriesBurned: Double,
-        smallBreaksCount: Int = 0,
-        longBreaksCount: Int = 0,
-        jumpOffsets: [TimeInterval],
-        bucketSeconds: Int = 5,
-        rollingWindowSeconds: Int = 30
+        jumpOffsets: [TimeInterval]
     ) {
+        let breakCounts = SessionMetricsCalculator.breakCounts(from: jumpOffsets)
         let session = JumpSession(
             startedAt: startedAt,
             endedAt: endedAt,
             jumpCount: jumpCount,
             peakRate: 0,
             caloriesBurned: caloriesBurned,
-            smallBreaksCount: smallBreaksCount,
-            longBreaksCount: longBreaksCount
+            smallBreaksCount: breakCounts.small,
+            longBreaksCount: breakCounts.long
         )
 
-        let rateSamples = buildRateSamples(
+        let rateSamples = SessionMetricsCalculator.makeRateSamples(
             for: session,
             jumpOffsets: jumpOffsets,
-            durationSeconds: session.durationSeconds,
-            bucketSeconds: bucketSeconds,
-            rollingWindowSeconds: rollingWindowSeconds
+            durationSeconds: session.durationSeconds
         )
 
-        session.peakRate = rateSamples.map(\.rate).max()
-        if session.durationSeconds > 0 {
-            session.averageRate = Double(session.jumpCount) * 60.0 / Double(session.durationSeconds)
-        }
+        session.peakRate = SessionMetricsCalculator.peakRate(from: rateSamples)
+        session.averageRate = SessionMetricsCalculator.averageRate(
+            jumpCount: session.jumpCount,
+            durationSeconds: session.durationSeconds
+        )
 
         addSession(session: session, rateSamples: rateSamples)
-    }
-
-    /// Builds fixed-interval rolling jump-rate samples (jumps/minute).
-    private func buildRateSamples(
-        for session: JumpSession,
-        jumpOffsets: [TimeInterval],
-        durationSeconds: Int,
-        bucketSeconds: Int = 5,
-        rollingWindowSeconds: Int = 30
-    ) -> [SessionRateSample] {
-        guard durationSeconds > 0 else { return [] }
-
-        var samples: [SessionRateSample] = []
-        var left = 0
-        var right = 0
-        let sorted = jumpOffsets.sorted()
-
-        for second in stride(from: 0, through: durationSeconds, by: bucketSeconds) {
-            let upperBound = Double(second)
-            let lowerBound = Double(max(0, second - rollingWindowSeconds))
-
-            while left < sorted.count, sorted[left] <= lowerBound {
-                left += 1
-            }
-            while right < sorted.count, sorted[right] <= upperBound {
-                right += 1
-            }
-
-            let countInWindow = max(0, right - left)
-            let effectiveWindowSeconds = min(rollingWindowSeconds, max(1, second))
-            let rate = Double(countInWindow) * 60.0 / Double(effectiveWindowSeconds)
-            samples.append(SessionRateSample(session: session, secondOffset: second, rate: rate))
-        }
-
-        return samples
     }
 }
