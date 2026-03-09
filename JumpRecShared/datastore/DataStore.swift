@@ -109,17 +109,22 @@ public class MyDataStore {
         endedAt: Date,
         jumpCount: Int,
         caloriesBurned: Double,
-        jumpOffsets: [TimeInterval]
+        jumpOffsets: [TimeInterval],
+        averageHeartRate: Int? = nil,
+        peakHeartRate: Int? = nil
     ) {
-        let breakCounts = SessionMetricsCalculator.breakCounts(from: jumpOffsets)
+        let breakMetrics = SessionMetricsCalculator.breakMetrics(from: jumpOffsets)
         let session = JumpSession(
             startedAt: startedAt,
             endedAt: endedAt,
             jumpCount: jumpCount,
             peakRate: 0,
             caloriesBurned: caloriesBurned,
-            smallBreaksCount: breakCounts.small,
-            longBreaksCount: breakCounts.long
+            smallBreaksCount: breakMetrics.small,
+            longBreaksCount: breakMetrics.long,
+            longestStreak: breakMetrics.longestStreak,
+            averageHeartRate: averageHeartRate,
+            peakHeartRate: peakHeartRate
         )
 
         let rateSamples = SessionMetricsCalculator.makeRateSamples(

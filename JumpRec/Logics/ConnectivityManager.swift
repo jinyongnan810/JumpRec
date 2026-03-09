@@ -123,6 +123,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
         let startedAt = Date(timeIntervalSince1970: startedAtTimestamp)
         let endedAt = Date(timeIntervalSince1970: endedAtTimestamp)
+        let averageHeartRate = numberAsInt(userInfo["averageHeartRate"])
+        let peakHeartRate = numberAsInt(userInfo["peakHeartRate"])
 
         Task { @MainActor in
             MyDataStore.shared.saveCompletedSession(
@@ -130,7 +132,9 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
                 endedAt: endedAt,
                 jumpCount: jumpCount,
                 caloriesBurned: caloriesBurned,
-                jumpOffsets: jumpOffsets
+                jumpOffsets: jumpOffsets,
+                averageHeartRate: averageHeartRate,
+                peakHeartRate: peakHeartRate
             )
         }
 

@@ -43,6 +43,15 @@ public final class JumpSession {
     /// Number of long breaks taken during the session
     public var longBreaksCount: Int = 0
 
+    /// Longest uninterrupted jump streak without a short or long break.
+    public var longestStreak: Int = 0
+
+    /// Average heart rate during the session in beats per minute.
+    public var averageHeartRate: Int?
+
+    /// Peak heart rate during the session in beats per minute.
+    public var peakHeartRate: Int?
+
     /// Normalized rate samples for charting and analytics.
     /// When this session is deleted, related samples are automatically deleted.
     @Relationship(deleteRule: .cascade, inverse: \SessionRateSample.session)
@@ -58,6 +67,9 @@ public final class JumpSession {
     ///   - caloriesBurned: Estimated calories burned
     ///   - smallBreaksCount: Number of small breaks (defaults to 0)
     ///   - longBreaksCount: Number of long breaks (defaults to 0)
+    ///   - longestStreak: Longest uninterrupted jump streak (defaults to 0)
+    ///   - averageHeartRate: Average heart rate in bpm
+    ///   - peakHeartRate: Peak heart rate in bpm
     public init(
         startedAt: Date,
         endedAt: Date,
@@ -66,7 +78,10 @@ public final class JumpSession {
         averageRate: Double? = nil,
         caloriesBurned: Double,
         smallBreaksCount: Int = 0,
-        longBreaksCount: Int = 0
+        longBreaksCount: Int = 0,
+        longestStreak: Int = 0,
+        averageHeartRate: Int? = nil,
+        peakHeartRate: Int? = nil
     ) {
         id = UUID()
         self.startedAt = startedAt
@@ -78,5 +93,8 @@ public final class JumpSession {
         durationSeconds = max(0, Int(endedAt.timeIntervalSince(startedAt)))
         self.smallBreaksCount = smallBreaksCount
         self.longBreaksCount = longBreaksCount
+        self.longestStreak = longestStreak
+        self.averageHeartRate = averageHeartRate
+        self.peakHeartRate = peakHeartRate
     }
 }

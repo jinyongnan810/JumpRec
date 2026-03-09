@@ -66,9 +66,11 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         endedAt: Date,
         jumpCount: Int,
         caloriesBurned: Double,
-        jumpOffsets: [TimeInterval]
+        jumpOffsets: [TimeInterval],
+        averageHeartRate: Int?,
+        peakHeartRate: Int?
     ) {
-        let payload: [String: Any] = [
+        var payload: [String: Any] = [
             "type": "sessionComplete",
             "startedAt": startedAt.timeIntervalSince1970,
             "endedAt": endedAt.timeIntervalSince1970,
@@ -76,6 +78,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             "caloriesBurned": caloriesBurned,
             "jumpOffsets": jumpOffsets,
         ]
+        payload["averageHeartRate"] = averageHeartRate
+        payload["peakHeartRate"] = peakHeartRate
         session.transferUserInfo(payload)
         print("[WatchConnectivityManager] Queued completed session via transferUserInfo")
     }

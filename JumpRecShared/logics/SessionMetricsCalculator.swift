@@ -54,22 +54,31 @@ public enum SessionMetricsCalculator {
         rateSamples.map(\.rate).max()
     }
 
-    public static func breakCounts(from jumpOffsets: [TimeInterval]) -> (small: Int, long: Int) {
-        guard jumpOffsets.count > 1 else { return (0, 0) }
+    public static func breakMetrics(from jumpOffsets: [TimeInterval]) -> (small: Int, long: Int, longestStreak: Int) {
+        guard !jumpOffsets.isEmpty else { return (0, 0, 0) }
+        guard jumpOffsets.count > 1 else { return (0, 0, 1) }
 
         var smallBreaksCount = 0
         var longBreaksCount = 0
+        var longestStreak = 1
+        var currentStreak = 1
 
         for index in 1 ..< jumpOffsets.count {
             let breakDuration = jumpOffsets[index] - jumpOffsets[index - 1]
 
             if breakDuration > longBreakLowerBound {
                 longBreaksCount += 1
+                longestStreak = max(longestStreak, currentStreak)
+                currentStreak = 1
             } else if breakDuration > smallBreakLowerBound {
                 smallBreaksCount += 1
+                longestStreak = max(longestStreak, currentStreak)
+                currentStreak = 1
+            } else {
+                currentStreak += 1
             }
         }
 
-        return (smallBreaksCount, longBreaksCount)
+        return (smallBreaksCount, longBreaksCount, max(longestStreak, currentStreak))
     }
 }

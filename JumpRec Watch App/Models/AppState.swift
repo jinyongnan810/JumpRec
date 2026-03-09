@@ -24,6 +24,9 @@ class JumpRecState: NSObject {
     var jumpCount: Int = 0
     var jumps: [TimeInterval] = []
     var heartrate: Int = 0
+    var heartRateSum: Int = 0
+    var heartRateSampleCount: Int = 0
+    var peakHeartRate: Int = 0
     var energyBurned: Double = 0
     var goalType: GoalType = .count
     var goal: Int = 0
@@ -56,6 +59,9 @@ class JumpRecState: NSObject {
             self.addJump(by: by)
         }, updateHeartRate: { with in
             self.heartrate = with
+            self.heartRateSum += with
+            self.heartRateSampleCount += 1
+            self.peakHeartRate = max(self.peakHeartRate, with)
         }, updateEnergyBurned: { with in
             self.energyBurned = self.energyBurned + with
         })
@@ -123,7 +129,9 @@ class JumpRecState: NSObject {
                 endedAt: endTime,
                 jumpCount: jumpCount,
                 caloriesBurned: energyBurned,
-                jumpOffsets: jumps
+                jumpOffsets: jumps,
+                averageHeartRate: averageHeartRate,
+                peakHeartRate: peakHeartRateValue
             )
         }
 
@@ -132,7 +140,9 @@ class JumpRecState: NSObject {
             endedAt: endTime,
             jumpCount: jumpCount,
             caloriesBurned: energyBurned,
-            jumpOffsets: jumps
+            jumpOffsets: jumps,
+            averageHeartRate: averageHeartRate,
+            peakHeartRate: peakHeartRateValue
         )
 
         print("end finished")
@@ -143,6 +153,9 @@ class JumpRecState: NSObject {
         jumpState = .idle
         jumpCount = 0
         heartrate = 0
+        heartRateSum = 0
+        heartRateSampleCount = 0
+        peakHeartRate = 0
         energyBurned = 0
         endTime = nil
         startTime = nil
@@ -159,6 +172,15 @@ class JumpRecState: NSObject {
 
     func updateHeartrate(_ heartrate: Int) {
         self.heartrate = heartrate
+    }
+
+    private var averageHeartRate: Int? {
+        guard heartRateSampleCount > 0 else { return nil }
+        return heartRateSum / heartRateSampleCount
+    }
+
+    private var peakHeartRateValue: Int? {
+        peakHeartRate > 0 ? peakHeartRate : nil
     }
 
     func addJump(by: Int) {
