@@ -10,16 +10,13 @@ import SwiftUI
 struct HistoryView: View {
     @Query(sort: \JumpSession.startedAt, order: .reverse) var sessions: [JumpSession]
 
+    @Environment(\.modelContext) private var modelContext
+
     @State private var displayedMonth = Date()
     @State private var showRecords = false
+    @State private var selectedSession: JumpSession?
 
     private var calendar: Calendar { Calendar.current }
-
-    private var monthTitle: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM yyyy"
-        return formatter.string(from: displayedMonth)
-    }
 
     /// Sessions that fall within the currently displayed month
     private var sessionsInMonth: [JumpSession] {
@@ -49,17 +46,18 @@ struct HistoryView: View {
         sessionsInMonth.reduce(0) { $0 + $1.jumpCount }
     }
 
-    /// Total calories for the displayed month
-    private var totalCalories: Double {
-        sessionsInMonth.reduce(0) { $0 + $1.caloriesBurned }
+    /// Total time for the displayed month
+    private var totalDuration: TimeInterval {
+        sessionsInMonth.reduce(0) { total, session in
+            total + session.endedAt.timeIntervalSince(session.startedAt)
+        }
     }
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Calendar Section
-                    CalendarGridView(
+            List {
+                Section {
+                    HistoryCalendarView(
                         displayedMonth: displayedMonth,
                         sessionDays: sessionDays,
                         jumpsByDay: jumpsByDay,
@@ -69,43 +67,55 @@ struct HistoryView: View {
                         onNextMonth: {
                             displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
                         }
-                    )
+                    ).listRowSeparator(.hidden)
+                }
 
-                    // Monthly Summary
+                Section {
                     HStack(spacing: 12) {
                         StatCardView(label: "SESSIONS", value: "\(sessionsInMonth.count)", valueColor: AppColors.accent)
-                        StatCardView(label: "TOTAL JUMPS", value: formatCount(totalJumps))
-                        StatCardView(label: "CALORIES", value: formatCount(Int(totalCalories)))
+                        StatCardView(label: "JUMPS", value: formatCount(totalJumps))
+                        StatCardView(label: "TIME", value: formatDuration(totalDuration))
                     }
-
-                    // Sessions in displayed month
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("SESSIONS THIS MONTH")
-                            .font(.system(size: 11, weight: .semibold))
-                            .tracking(2)
-                            .foregroundStyle(AppColors.textMuted)
-
-                        if sessionsInMonth.isEmpty {
-                            Text("No sessions in this month.")
-                                .font(.system(size: 14))
-                                .foregroundStyle(AppColors.textSecondary)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .padding(.vertical, 24)
-                        } else {
-                            VStack(spacing: 8) {
-                                ForEach(sessionsInMonth, id: \.id) { session in
-                                    NavigationLink(destination: SessionDetailView(session: session)) {
-                                        SessionRowView(session: session)
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                        }
-                    }
+                    .listRowSeparator(.hidden)
                 }
-                .padding(.horizontal, 24)
+
+                Section {
+                    if sessionsInMonth.isEmpty {
+                        Text("No sessions in this month.")
+                            .font(.system(size: 14))
+                            .foregroundStyle(AppColors.textSecondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 24)
+                            .listRowInsets(EdgeInsets(top: 0, leading: 24, bottom: 0, trailing: 24))
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                    } else {
+                        ForEach(sessionsInMonth, id: \.id) { session in
+                            Button {
+                                selectedSession = session
+                            } label: {
+                                SessionRowView(session: session)
+                            }
+                            .buttonStyle(.plain)
+                            .listRowInsets(EdgeInsets(top: 4, leading: 24, bottom: 4, trailing: 24))
+                            .listRowSeparator(.hidden)
+                        }
+                        .onDelete(perform: deleteSessions)
+                    }
+                } header: {
+                    Text("SESSIONS THIS MONTH")
+                        .font(.system(size: 11, weight: .semibold))
+                        .tracking(2)
+                        .foregroundStyle(AppColors.textMuted)
+                        .textCase(nil)
+                        .padding(.horizontal, 24)
+                }
             }
-            .scrollIndicators(.hidden)
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .navigationDestination(item: $selectedSession) { session in
+                SessionDetailView(session: session)
+            }
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -133,221 +143,23 @@ struct HistoryView: View {
         }
         return value.formatted()
     }
-}
 
-// MARK: - Calendar Grid
+    private func formatDuration(_ duration: TimeInterval) -> String {
+        let totalSeconds = Int(duration)
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
 
-private struct CalendarGridView: View {
-    let displayedMonth: Date
-    let sessionDays: Set<Int>
-    let jumpsByDay: [Int: Int]
-    let onPreviousMonth: () -> Void
-    let onNextMonth: () -> Void
-
-    private var calendar: Calendar { Calendar.current }
-
-    private var year: Int { calendar.component(.year, from: displayedMonth) }
-    private var month: Int { calendar.component(.month, from: displayedMonth) }
-
-    /// Day of week the month starts on (1 = Sunday)
-    private var firstWeekday: Int {
-        let comps = DateComponents(year: year, month: month, day: 1)
-        guard let date = calendar.date(from: comps) else { return 1 }
-        return calendar.component(.weekday, from: date)
-    }
-
-    /// Number of days in the month
-    private var daysInMonth: Int {
-        let comps = DateComponents(year: year, month: month)
-        guard let date = calendar.date(from: comps),
-              let range = calendar.range(of: .day, in: .month, for: date) else { return 30 }
-        return range.count
-    }
-
-    /// Today's day number if we're viewing the current month, otherwise nil
-    private var todayDay: Int? {
-        let now = Date()
-        let nowComps = calendar.dateComponents([.year, .month, .day], from: now)
-        if nowComps.year == year, nowComps.month == month {
-            return nowComps.day
+        if hours > 0 {
+            return String(format: "%dh %02dm", hours, minutes)
         }
-        return nil
+
+        return String(format: "%dm", minutes)
     }
 
-    /// Whether a given day is in the future
-    private func isFutureDay(_ day: Int) -> Bool {
-        guard let todayDay else { return false }
-        return day > todayDay
-    }
-
-    private let dayHeaders = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]
-    private let swipeThreshold: CGFloat = 50
-
-    var body: some View {
-        VStack(spacing: 12) {
-            // Month navigation
-            HStack {
-                Button(action: onPreviousMonth) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 18))
-                        .foregroundStyle(AppColors.textSecondary)
-                        .frame(width: 32, height: 32)
-                }
-                .appGlassButton()
-                .buttonBorderShape(.circle)
-
-                Spacer()
-
-                Text(monthTitle)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(AppColors.textPrimary)
-
-                Spacer()
-
-                Button(action: onNextMonth) {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 18))
-                        .foregroundStyle(AppColors.textSecondary)
-                        .frame(width: 32, height: 32)
-                }
-                .appGlassButton()
-                .buttonBorderShape(.circle)
-            }
-
-            // Day headers
-            HStack(spacing: 0) {
-                ForEach(dayHeaders, id: \.self) { header in
-                    Text(header)
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                        .tracking(1)
-                        .foregroundStyle(AppColors.tabInactive)
-                        .frame(maxWidth: .infinity)
-                }
-            }
-
-            // Day grid
-            let offset = firstWeekday - 1 // number of blank cells before day 1
-            let totalCells = offset + daysInMonth
-            let rows = (totalCells + 6) / 7
-
-            VStack(spacing: 4) {
-                ForEach(0 ..< rows, id: \.self) { row in
-                    HStack(spacing: 0) {
-                        ForEach(0 ..< 7, id: \.self) { col in
-                            let cellIndex = row * 7 + col
-                            let day = cellIndex - offset + 1
-
-                            if day >= 1, day <= daysInMonth {
-                                DayCellView(
-                                    day: day,
-                                    hasSession: sessionDays.contains(day),
-                                    jumpCount: jumpsByDay[day],
-                                    isToday: todayDay == day,
-                                    isFuture: isFutureDay(day)
-                                )
-                                .frame(maxWidth: .infinity)
-                            } else {
-                                Color.clear
-                                    .frame(width: 36, height: 48)
-                                    .frame(maxWidth: .infinity)
-                            }
-                        }
-                    }
-                }
-            }
+    private func deleteSessions(at offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(sessionsInMonth[index])
         }
-        .padding(16)
-        .background(AppColors.cardSurface)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .gesture(
-            DragGesture(minimumDistance: 20)
-                .onEnded { value in
-                    let horizontal = value.translation.width
-                    let vertical = value.translation.height
-
-                    guard abs(horizontal) > abs(vertical), abs(horizontal) > swipeThreshold else { return }
-
-                    if horizontal < 0 {
-                        onNextMonth()
-                    } else {
-                        onPreviousMonth()
-                    }
-                }
-        )
-    }
-
-    private var monthTitle: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM yyyy"
-        return formatter.string(from: displayedMonth)
-    }
-}
-
-// MARK: - Day Cell
-
-private struct DayCellView: View {
-    let day: Int
-    let hasSession: Bool
-    let jumpCount: Int?
-    let isToday: Bool
-    let isFuture: Bool
-
-    var body: some View {
-        VStack(spacing: 2) {
-            ZStack {
-                if hasSession, !isToday {
-                    Circle()
-                        .fill(AppColors.accent)
-                        .frame(width: 36, height: 36)
-                } else if isToday {
-                    Circle()
-                        .fill(Color(hex: 0x0F172A))
-                        .frame(width: 36, height: 36)
-                        .overlay(
-                            Circle()
-                                .stroke(AppColors.accent, lineWidth: 2)
-                        )
-                }
-
-                Text("\(day)")
-                    .font(.system(size: 12, weight: dayFontWeight, design: .monospaced))
-                    .foregroundStyle(dayColor)
-            }
-            .frame(width: 36, height: 36)
-
-            if let jumpCount {
-                Text(formatJumpCount(jumpCount))
-                    .font(.system(size: 8, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(AppColors.accent)
-            }
-        }
-        .frame(height: 48)
-    }
-
-    private func formatJumpCount(_ count: Int) -> String {
-        if count >= 1000 {
-            return String(format: "%.1fK", Double(count) / 1000.0)
-        }
-        return "\(count)"
-    }
-
-    private var dayColor: Color {
-        if hasSession, !isToday {
-            AppColors.bgPrimary
-        } else if isToday {
-            AppColors.accent
-        } else if isFuture {
-            AppColors.tabInactive
-        } else {
-            AppColors.textSecondary
-        }
-    }
-
-    private var dayFontWeight: Font.Weight {
-        if hasSession || isToday {
-            return .semibold
-        }
-        return .medium
     }
 }
 
