@@ -36,6 +36,13 @@
 			remoteGlobalIDString = 3FCE40482E758A82009C271D;
 			remoteInfo = JumpRecShared;
 		};
+		3FF03B032F604A5400D83A85 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3FCE40192E7589A8009C271D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3FCE40202E7589A8009C271D;
+			remoteInfo = JumpRec;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -79,6 +86,7 @@
 		3FCE40212E7589A8009C271D /* JumpRec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JumpRec.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FCE402E2E7589A9009C271D /* JumpRec Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "JumpRec Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FCE40492E758A82009C271D /* JumpRecShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JumpRecShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3FF03AFF2F604A5400D83A85 /* JumpRecTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JumpRecTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -128,6 +136,11 @@
 			path = JumpRecShared;
 			sourceTree = "<group>";
 		};
+		3FF03B002F604A5400D83A85 /* JumpRecTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = JumpRecTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +167,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3FF03AFC2F604A5400D83A85 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -163,6 +183,7 @@
 				3FCE40232E7589A8009C271D /* JumpRec */,
 				3FCE40322E7589A9009C271D /* JumpRec Watch App */,
 				3FCE404A2E758A82009C271D /* JumpRecShared */,
+				3FF03B002F604A5400D83A85 /* JumpRecTests */,
 				3FCE40572E758A98009C271D /* Frameworks */,
 				3FCE40222E7589A8009C271D /* Products */,
 				3F2440F62F524EF40026DA2C /* design.pen */,
@@ -175,6 +196,7 @@
 				3FCE40212E7589A8009C271D /* JumpRec.app */,
 				3FCE402E2E7589A9009C271D /* JumpRec Watch App.app */,
 				3FCE40492E758A82009C271D /* JumpRecShared.framework */,
+				3FF03AFF2F604A5400D83A85 /* JumpRecTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -272,6 +294,29 @@
 			productReference = 3FCE40492E758A82009C271D /* JumpRecShared.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		3FF03AFE2F604A5400D83A85 /* JumpRecTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3FF03B072F604A5400D83A85 /* Build configuration list for PBXNativeTarget "JumpRecTests" */;
+			buildPhases = (
+				3FF03AFB2F604A5400D83A85 /* Sources */,
+				3FF03AFC2F604A5400D83A85 /* Frameworks */,
+				3FF03AFD2F604A5400D83A85 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3FF03B042F604A5400D83A85 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				3FF03B002F604A5400D83A85 /* JumpRecTests */,
+			);
+			name = JumpRecTests;
+			packageProductDependencies = (
+			);
+			productName = JumpRecTests;
+			productReference = 3FF03AFF2F604A5400D83A85 /* JumpRecTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -279,7 +324,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2600;
+				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					3FCE40202E7589A8009C271D = {
@@ -290,6 +335,10 @@
 					};
 					3FCE40482E758A82009C271D = {
 						CreatedOnToolsVersion = 26.0;
+					};
+					3FF03AFE2F604A5400D83A85 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 3FCE40202E7589A8009C271D;
 					};
 				};
 			};
@@ -310,6 +359,7 @@
 				3FCE40202E7589A8009C271D /* JumpRec */,
 				3FCE402D2E7589A9009C271D /* JumpRec Watch App */,
 				3FCE40482E758A82009C271D /* JumpRecShared */,
+				3FF03AFE2F604A5400D83A85 /* JumpRecTests */,
 			);
 		};
 /* End PBXProject section */
@@ -330,6 +380,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		3FCE40472E758A82009C271D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3FF03AFD2F604A5400D83A85 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -360,6 +417,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3FF03AFB2F604A5400D83A85 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -377,6 +441,11 @@
 			isa = PBXTargetDependency;
 			target = 3FCE40482E758A82009C271D /* JumpRecShared */;
 			targetProxy = 3FCE405A2E758A98009C271D /* PBXContainerItemProxy */;
+		};
+		3FF03B042F604A5400D83A85 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3FCE40202E7589A8009C271D /* JumpRec */;
+			targetProxy = 3FF03B032F604A5400D83A85 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -773,6 +842,58 @@
 			};
 			name = Release;
 		};
+		3FF03B052F604A5400D83A85 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6W8B6G9KYD;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kinn.JumpRecTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/JumpRec.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/JumpRec";
+				XROS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Debug;
+		};
+		3FF03B062F604A5400D83A85 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6W8B6G9KYD;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kinn.JumpRecTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/JumpRec.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/JumpRec";
+				XROS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -808,6 +929,15 @@
 			buildConfigurations = (
 				3FCE40542E758A82009C271D /* Debug */,
 				3FCE40552E758A82009C271D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3FF03B072F604A5400D83A85 /* Build configuration list for PBXNativeTarget "JumpRecTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3FF03B052F604A5400D83A85 /* Debug */,
+				3FF03B062F604A5400D83A85 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

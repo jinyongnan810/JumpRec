@@ -21,11 +21,18 @@ public enum SessionMetricsCalculator {
     ) -> [SessionRateSample] {
         guard durationSeconds > 0 else { return [] }
 
+        guard !jumpOffsets.isEmpty else { return [] }
+
         var samples: [SessionRateSample] = []
         var left = 0
         var right = 0
+        var sampleSeconds = Array(stride(from: bucketSeconds, through: durationSeconds, by: bucketSeconds))
 
-        for second in stride(from: 0, through: durationSeconds, by: bucketSeconds) {
+        if sampleSeconds.isEmpty || sampleSeconds.last != durationSeconds {
+            sampleSeconds.append(durationSeconds)
+        }
+
+        for second in sampleSeconds {
             let upperBound = Double(second)
             let lowerBound = Double(max(0, second - rollingWindowSeconds))
 
