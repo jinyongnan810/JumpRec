@@ -9,7 +9,7 @@ import JumpRecShared
 import SwiftUI
 
 struct JumpingView: View {
-    @Binding var appState: JumpRecState
+    let appState: JumpRecState
     var body: some View {
         VStack(spacing: 4) {
             Text("JUMPS")
@@ -61,5 +61,5 @@ struct JumpingView: View {
 }
 
 #Preview {
-    JumpingView(appState: .constant(JumpRecState()))
+    JumpingView(appState: JumpRecState())
 }

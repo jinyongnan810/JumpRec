@@ -9,7 +9,6 @@ import AVFoundation
 import Foundation
 import JumpRecShared
 import Observation
-import UserNotifications
 import WatchKit
 
 enum JumpState {
@@ -17,15 +16,19 @@ enum JumpState {
 }
 
 @Observable
-class JumpRecState: NSObject {
+@MainActor
+class JumpRecState {
     var jumpState: JumpState = .idle
     var startTime: Date?
     var endTime: Date?
     var jumpCount: Int = 0
     var jumps: [TimeInterval] = []
     var heartrate: Int = 0
+    @ObservationIgnored
     var heartRateSum: Int = 0
+    @ObservationIgnored
     var heartRateSampleCount: Int = 0
+    @ObservationIgnored
     var peakHeartRate: Int = 0
     var energyBurned: Double = 0
     var goalType: GoalType = .count
@@ -38,32 +41,32 @@ class JumpRecState: NSObject {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
+    @ObservationIgnored
     let dataStore = MyDataStore.shared
 
+    @ObservationIgnored
     let synthesizer = AVSpeechSynthesizer()
 
+    @ObservationIgnored
     var motionManager: MotionManager?
+    @ObservationIgnored
     var minuteTimer: Timer?
 
 //    let notificationCenter = UNUserNotificationCenter.current()
 
-    override init() {
-        super.init()
-//        requestNotificationAuthorization()
-//        notificationCenter.getNotificationSettings { settings in
-//            print("Authorization status: \(settings.authorizationStatus.rawValue)")
-//            print("Alert setting: \(settings.alertSetting.rawValue)")
-//        }
-//        notificationCenter.delegate = self
+    init() {
         motionManager = MotionManager(addJump: { by in
-            self.addJump(by: by)
+            Task { @MainActor in
+                self.addJump(by: by)
+            }
         }, updateHeartRate: { with in
-            self.heartrate = with
-            self.heartRateSum += with
-            self.heartRateSampleCount += 1
-            self.peakHeartRate = max(self.peakHeartRate, with)
+            Task { @MainActor in
+                self.recordHeartRate(with)
+            }
         }, updateEnergyBurned: { with in
-            self.energyBurned = self.energyBurned + with
+            Task { @MainActor in
+                self.energyBurned += with
+            }
         })
         configureAudioSession()
         warmUpSpeechSynthesizer()
@@ -78,14 +81,15 @@ class JumpRecState: NSObject {
     }
 
     func start(goalType: GoalType, goalCount: Int) {
+        resetSessionMetrics()
         self.goalType = goalType
         switch goalType {
         case .count:
             goal = goalCount
         case .time:
             goal = goalCount * 60
-        default:
-            fatalError("Unhandled GoalType")
+        @unknown default:
+            goal = goalCount
         }
         motionManager?.startTracking()
         startTime = Date()
@@ -99,25 +103,14 @@ class JumpRecState: NSObject {
     }
 
     func end() {
-        if jumpState == .finished { return }
+        guard jumpState == .jumping else { return }
         invalidateMinuteTimer()
 
         motionManager?.stopTracking()
         endTime = Date()
-//        print("endTime: \(endTime!)")
-        DispatchQueue.main.async {
-//            print("end action dispatch started: \(Date())")
-//            WKInterfaceDevice.current().play(.stop)
-//            let duration = self.endTime!.timeIntervalSince(self.startTime!)
-            self.speak(text: "Session Finished!", delay: 0.5)
-            WKInterfaceDevice.current().play(.stop)
-//            self.scheduleNotification(
-//                title: "Session Finished",
-//                body: "You've jumped \(self.jumpCount) times in \(Int(duration)) seconds!"
-//            )
-            ConnectivityManager.shared.sendMessage(["watch app": "finished"])
-//            print("end action dispatch finished: \(Date())")
-        }
+        speak(text: "Session Finished!", delay: 0.5)
+        WKInterfaceDevice.current().play(.stop)
+        ConnectivityManager.shared.sendMessage(["watch app": "finished"])
 
         jumpState = .finished
 
@@ -150,15 +143,9 @@ class JumpRecState: NSObject {
 
     func reset() {
         invalidateMinuteTimer()
+        motionManager?.stopTracking()
+        resetSessionMetrics()
         jumpState = .idle
-        jumpCount = 0
-        heartrate = 0
-        heartRateSum = 0
-        heartRateSampleCount = 0
-        peakHeartRate = 0
-        energyBurned = 0
-        endTime = nil
-        startTime = nil
     }
 
     func configureAudioSession() {
@@ -174,6 +161,13 @@ class JumpRecState: NSObject {
         self.heartrate = heartrate
     }
 
+    private func recordHeartRate(_ heartRate: Int) {
+        heartrate = heartRate
+        heartRateSum += heartRate
+        heartRateSampleCount += 1
+        peakHeartRate = max(peakHeartRate, heartRate)
+    }
+
     private var averageHeartRate: Int? {
         guard heartRateSampleCount > 0 else { return nil }
         return heartRateSum / heartRateSampleCount
@@ -184,9 +178,10 @@ class JumpRecState: NSObject {
     }
 
     func addJump(by: Int) {
+        guard jumpState == .jumping, let startTime else { return }
         let before = jumpCount
         jumpCount += by
-        jumps.append(Date().timeIntervalSince(startTime!))
+        jumps.append(Date().timeIntervalSince(startTime))
         checkJumpLandmark(before: before, after: jumpCount)
     }
 
@@ -215,7 +210,9 @@ class JumpRecState: NSObject {
     private func startMinuteTimer() {
         invalidateMinuteTimer()
         minuteTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(60), repeats: true) { [weak self] _ in
-            self?.handleMinuteLandmark()
+            MainActor.assumeIsolated {
+                self?.handleMinuteLandmark()
+            }
         }
         RunLoop.current.add(minuteTimer!, forMode: .common)
     }
@@ -241,11 +238,23 @@ class JumpRecState: NSObject {
     }
 
     func speak(text: String, delay: Double = 0.5) {
-        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + delay) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             let utterance = AVSpeechUtterance(string: text)
             utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
             self.synthesizer.speak(utterance)
         }
+    }
+
+    private func resetSessionMetrics() {
+        jumpCount = 0
+        jumps.removeAll(keepingCapacity: true)
+        heartrate = 0
+        heartRateSum = 0
+        heartRateSampleCount = 0
+        peakHeartRate = 0
+        energyBurned = 0
+        endTime = nil
+        startTime = nil
     }
 
 //    func requestNotificationAuthorization() {

@@ -9,7 +9,7 @@ import JumpRecShared
 import SwiftUI
 
 struct ResultView: View {
-    @Binding var appState: JumpRecState
+    let appState: JumpRecState
 
     var body: some View {
         NavigationStack {
@@ -70,5 +70,5 @@ struct ResultView: View {
 }
 
 #Preview {
-    ResultView(appState: .constant(JumpRecState()))
+    ResultView(appState: JumpRecState())
 }

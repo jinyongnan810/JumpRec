@@ -30,9 +30,9 @@ struct MainView: View {
                             )
                     })
             case .finished:
-                ResultView(appState: $appState)
+                ResultView(appState: appState)
             case .jumping:
-                JumpingView(appState: $appState)
+                JumpingView(appState: appState)
             }
         }.onChange(of: appState.jumpState) { _, newValue in
             print("current appState: \(newValue)")
