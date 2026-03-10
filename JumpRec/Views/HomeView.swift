@@ -46,10 +46,6 @@ struct HomeView: View {
                 HeroRingView(progress: 0, centerText: "Ready", subtitle: "Tap Start to begin")
             }
 
-            // Device Selector
-            DeviceSelectorView()
-                .disabled(isCountingDown)
-
             // Start/Cancel Button
             Button {
                 if isCountingDown {

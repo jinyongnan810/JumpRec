@@ -76,9 +76,6 @@ struct ActiveSessionView: View {
                 subtitle: ringSubtitle
             )
 
-            // Device Selector (locked during session)
-            DeviceSelectorView()
-
             // Stats Row 1: TIME, CALORIES, RATE
             HStack(spacing: 10) {
                 StatCardView(label: "TIME", value: elapsedFormatted)

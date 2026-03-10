@@ -66,18 +66,6 @@ struct SessionDetailView: View {
                         .foregroundStyle(AppColors.textSecondary)
 
                     Spacer()
-
-                    HStack(spacing: 6) {
-                        Image(systemName: "iphone")
-                            .font(.system(size: 12))
-                        Text("iPhone")
-                            .font(.system(size: 11, weight: .medium))
-                    }
-                    .foregroundStyle(AppColors.accent)
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 12)
-                    .background(AppColors.cardSurface)
-                    .clipShape(Capsule())
                 }
 
                 SessionMetricsSummaryView(
