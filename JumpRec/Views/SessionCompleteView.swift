@@ -3,6 +3,7 @@
 //  JumpRec
 //
 
+import JumpRecShared
 import SwiftUI
 
 struct SessionCompleteView: View {
@@ -20,11 +21,27 @@ struct SessionCompleteView: View {
     private let heartRatePeak = 104
     private let longestJumpStrikes = "–"
 
-    // Placeholder graph data points (normalized 0–1 for y-axis range 100–200)
-    private let graphPoints: [CGFloat] = [
-        0.07, 0.15, 0.30, 0.35, 0.45, 0.60, 0.65, 0.80, 0.70, 0.50,
-        0.55, 0.65, 0.50, 0.30, 0.35, 0.45, 0.55, 0.65, 0.70, 0.50,
-    ]
+    private var rateSamples: [SessionRateSample] {
+        let durationSeconds = 5 * 60 + 32
+        let session = JumpSession(
+            startedAt: .now,
+            endedAt: .now.addingTimeInterval(TimeInterval(durationSeconds)),
+            jumpCount: jumps,
+            peakRate: Double(ratePeak),
+            averageRate: Double(rateAvg),
+            caloriesBurned: Double(calories),
+            smallBreaksCount: smallBreaks,
+            longBreaksCount: longBreaks,
+            averageHeartRate: heartRateAvg,
+            peakHeartRate: heartRatePeak
+        )
+        let values = [107, 115, 130, 135, 145, 160, 165, 180, 170, 150, 155, 165, 150, 130, 135, 145, 155, 165, 170, 150]
+        let step = durationSeconds / max(values.count - 1, 1)
+
+        return values.enumerated().map { index, value in
+            SessionRateSample(session: session, secondOffset: index * step, rate: Double(value))
+        }
+    }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -61,8 +78,7 @@ struct SessionCompleteView: View {
                         longBreaks: "\(longBreaks)",
                         averageHeartRate: "\(heartRateAvg)",
                         peakHeartRate: "\(heartRatePeak)",
-                        graphPoints: graphPoints,
-                        xLabels: ["0:00", "1:23", "2:46", "4:09", "5:32"]
+                        rateSamples: rateSamples
                     )
                 }
                 .padding(.horizontal, 24)

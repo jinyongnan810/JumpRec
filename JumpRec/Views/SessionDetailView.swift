@@ -23,38 +23,9 @@ struct SessionDetailView: View {
         return String(format: "%02d:%02d", m, s)
     }
 
-    private var durationSeconds: Int {
-        Int(session.endedAt.timeIntervalSince(session.startedAt))
+    private var rateSamples: [SessionRateSample] {
+        (session.rateSamples ?? []).sorted { $0.secondOffset < $1.secondOffset }
     }
-
-    /// Generate x-axis time labels evenly spaced across the session duration
-    private var xLabels: [String] {
-        let total = durationSeconds
-        guard total > 0 else { return ["0:00"] }
-        return (0 ..< 5).map { i in
-            let sec = total * i / 4
-            let m = sec / 60
-            let s = sec % 60
-            return String(format: "%d:%02d", m, s)
-        }
-    }
-
-    /// Convert rate points to normalized graph data (0–1 for y-axis range 100–200)
-    private var graphDataPoints: [CGFloat] {
-        let points = (session.rateSamples ?? []).sorted { $0.secondOffset < $1.secondOffset }
-        guard points.count > 1 else {
-            return sampleGraphPoints
-        }
-        return points.map { point in
-            CGFloat((point.rate - 100.0) / 100.0).clamped(to: 0 ... 1)
-        }
-    }
-
-    // Fallback sample graph data when no rate points are available
-    private let sampleGraphPoints: [CGFloat] = [
-        0.07, 0.15, 0.30, 0.35, 0.45, 0.60, 0.65, 0.80, 0.70, 0.50,
-        0.55, 0.65, 0.50, 0.30, 0.35, 0.45, 0.55, 0.65, 0.70, 0.50,
-    ]
 
     var body: some View {
         ScrollView {
@@ -79,8 +50,7 @@ struct SessionDetailView: View {
                     longBreaks: "\(session.longBreaksCount)",
                     averageHeartRate: averageHeartRateText,
                     peakHeartRate: peakHeartRateText,
-                    graphPoints: graphDataPoints,
-                    xLabels: xLabels
+                    rateSamples: rateSamples
                 )
             }
             .padding(.horizontal, 24)
@@ -142,12 +112,4 @@ struct SessionDetailView: View {
     .modelContainer(container)
     .background(AppColors.bgPrimary)
     .preferredColorScheme(.dark)
-}
-
-// MARK: - CGFloat Clamped Helper
-
-private extension CGFloat {
-    func clamped(to range: ClosedRange<CGFloat>) -> CGFloat {
-        Swift.min(Swift.max(self, range.lowerBound), range.upperBound)
-    }
 }

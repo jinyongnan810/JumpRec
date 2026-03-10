@@ -3,6 +3,7 @@
 //  JumpRec
 //
 
+import JumpRecShared
 import SwiftUI
 
 struct SessionMetricsSummaryView: View {
@@ -16,8 +17,7 @@ struct SessionMetricsSummaryView: View {
     let longBreaks: String
     let averageHeartRate: String
     let peakHeartRate: String
-    let graphPoints: [CGFloat]
-    let xLabels: [String]
+    let rateSamples: [SessionRateSample]
 
     var body: some View {
         VStack(spacing: 20) {
@@ -42,9 +42,7 @@ struct SessionMetricsSummaryView: View {
                     .foregroundStyle(AppColors.textMuted)
 
                 JumpingRateGraphView(
-                    dataPoints: graphPoints,
-                    yLabels: ["200", "150", "100"],
-                    xLabels: xLabels
+                    samples: rateSamples
                 )
                 .frame(height: 160)
             }
