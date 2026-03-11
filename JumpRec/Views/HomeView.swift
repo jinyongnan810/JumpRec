@@ -8,6 +8,7 @@ import SwiftUI
 
 struct HomeView: View {
     @Bindable var settings: JumpRecSettings
+    @Bindable var appState: JumpRecState
     var onStart: () -> Void
     @State private var showGoalSheet = false
     @State private var countdownValue: Int?
@@ -45,6 +46,12 @@ struct HomeView: View {
             } else {
                 HeroRingView(progress: 0, centerText: "Ready", subtitle: "Tap Start to begin")
             }
+
+            DeviceSelectorView(
+                activeSource: appState.activeMotionSource,
+                isPhoneMotionAvailable: appState.isPhoneMotionAvailable,
+                isHeadphoneMotionAvailable: appState.isHeadphoneMotionAvailable
+            )
 
             // Start/Cancel Button
             Button {
@@ -148,7 +155,7 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(settings: JumpRecSettings(), onStart: {})
+    HomeView(settings: JumpRecSettings(), appState: JumpRecState(), onStart: {})
         .background(AppColors.bgPrimary)
         .preferredColorScheme(.dark)
 }

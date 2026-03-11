@@ -7,40 +7,27 @@ import JumpRecShared
 import SwiftUI
 
 struct SessionCompleteView: View {
+    @Bindable var appState: JumpRecState
     var onDone: () -> Void
 
-    // Placeholder session results
-    private let duration = "05:32"
-    private let jumps = 847
-    private let calories = 156
-    private let rateAvg = 153
-    private let ratePeak = 179
-    private let smallBreaks = 3
-    private let longBreaks = 1
-    private let heartRateAvg = 82
-    private let heartRatePeak = 104
-    private let longestJumpStrikes = "–"
-
     private var rateSamples: [SessionRateSample] {
-        let durationSeconds = 5 * 60 + 32
+        let durationSeconds = max(appState.durationSeconds, 1)
         let session = JumpSession(
-            startedAt: .now,
-            endedAt: .now.addingTimeInterval(TimeInterval(durationSeconds)),
-            jumpCount: jumps,
-            peakRate: Double(ratePeak),
-            averageRate: Double(rateAvg),
-            caloriesBurned: Double(calories),
-            smallBreaksCount: smallBreaks,
-            longBreaksCount: longBreaks,
-            averageHeartRate: heartRateAvg,
-            peakHeartRate: heartRatePeak
+            startedAt: appState.startTime ?? .now,
+            endedAt: (appState.startTime ?? .now).addingTimeInterval(TimeInterval(durationSeconds)),
+            jumpCount: appState.jumpCount,
+            peakRate: 0,
+            averageRate: Double(appState.averageRate),
+            caloriesBurned: appState.caloriesBurned,
+            smallBreaksCount: appState.breakMetrics.small,
+            longBreaksCount: appState.breakMetrics.long,
+            longestStreak: appState.breakMetrics.longestStreak
         )
-        let values = [107, 115, 130, 135, 145, 160, 165, 180, 170, 150, 155, 165, 150, 130, 135, 145, 155, 165, 170, 150]
-        let step = durationSeconds / max(values.count - 1, 1)
-
-        return values.enumerated().map { index, value in
-            SessionRateSample(session: session, secondOffset: index * step, rate: Double(value))
-        }
+        return SessionMetricsCalculator.makeRateSamples(
+            for: session,
+            jumpOffsets: appState.jumps,
+            durationSeconds: durationSeconds
+        )
     }
 
     var body: some View {
@@ -68,16 +55,16 @@ struct SessionCompleteView: View {
                     }
 
                     SessionMetricsSummaryView(
-                        duration: duration,
-                        jumps: "\(jumps)",
-                        calories: "\(calories)",
-                        averageRate: "\(rateAvg)/min",
-                        peakRate: "\(ratePeak)/min",
-                        longestJumpStrikes: longestJumpStrikes,
-                        shortBreaks: "\(smallBreaks)",
-                        longBreaks: "\(longBreaks)",
-                        averageHeartRate: "\(heartRateAvg)",
-                        peakHeartRate: "\(heartRatePeak)",
+                        duration: appState.elapsedFormatted,
+                        jumps: "\(appState.jumpCount)",
+                        calories: "\(Int(appState.caloriesBurned.rounded()))",
+                        averageRate: "\(appState.averageRate)/min",
+                        peakRate: peakRateText,
+                        longestJumpStrikes: "\(appState.breakMetrics.longestStreak)",
+                        shortBreaks: "\(appState.breakMetrics.small)",
+                        longBreaks: "\(appState.breakMetrics.long)",
+                        averageHeartRate: "--",
+                        peakHeartRate: "--",
                         rateSamples: rateSamples
                     )
                 }
@@ -101,10 +88,17 @@ struct SessionCompleteView: View {
         }
         .padding(.horizontal, 24)
     }
+
+    private var peakRateText: String {
+        if let peakRate = SessionMetricsCalculator.peakRate(from: rateSamples) {
+            return "\(Int(peakRate.rounded()))/min"
+        }
+        return "--"
+    }
 }
 
 #Preview {
-    SessionCompleteView(onDone: {})
+    SessionCompleteView(appState: JumpRecState(), onDone: {})
         .background(AppColors.bgPrimary)
         .preferredColorScheme(.dark)
 }

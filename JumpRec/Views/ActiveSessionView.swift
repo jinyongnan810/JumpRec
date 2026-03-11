@@ -8,17 +8,10 @@ import SwiftUI
 
 struct ActiveSessionView: View {
     var settings: JumpRecSettings
+    @Bindable var appState: JumpRecState
     var onStop: () -> Void
 
-    // Placeholder values for UI-only implementation
-    @State private var jumpCount: Int = 432
-    @State private var elapsedSeconds: Int = 272 // 04:32
-    @State private var calories: Int = 86
-    @State private var rate: Int = 128
-    @State private var smallBreaks: Int = 2
-    @State private var longBreaks: Int = 0
-    @State private var heartRateAvg: Int = 78
-    @State private var heartRateCurrent: Int = 96
+    @State private var now = Date()
 
     private var goalValue: Int64 {
         settings.goalType == .count ? settings.jumpCount : settings.jumpTime
@@ -27,7 +20,7 @@ struct ActiveSessionView: View {
     private var progress: Double {
         guard goalValue > 0 else { return 0 }
         if settings.goalType == .count {
-            return min(1.0, Double(jumpCount) / Double(goalValue))
+            return min(1.0, Double(appState.jumpCount) / Double(goalValue))
         } else {
             let goalSeconds = goalValue * 60
             return min(1.0, Double(elapsedSeconds) / Double(goalSeconds))
@@ -56,6 +49,11 @@ struct ActiveSessionView: View {
         return String(format: "%02d:%02d", m, s)
     }
 
+    private var elapsedSeconds: Int {
+        guard let startTime = appState.startTime else { return 0 }
+        return max(0, Int(now.timeIntervalSince(startTime)))
+    }
+
     var body: some View {
         VStack(spacing: 28) {
             // Header
@@ -69,30 +67,36 @@ struct ActiveSessionView: View {
                     .foregroundStyle(AppColors.accent)
             }
 
+            DeviceSelectorView(
+                activeSource: appState.activeMotionSource,
+                isPhoneMotionAvailable: appState.isPhoneMotionAvailable,
+                isHeadphoneMotionAvailable: appState.isHeadphoneMotionAvailable
+            )
+
             // Hero Ring with progress
             HeroRingView(
                 progress: progress,
-                centerText: "\(jumpCount)",
+                centerText: "\(appState.jumpCount)",
                 subtitle: ringSubtitle
             )
 
             // Stats Row 1: TIME, CALORIES, RATE
             HStack(spacing: 10) {
                 StatCardView(label: "TIME", value: elapsedFormatted)
-                StatCardView(label: "CALORIES", value: "\(calories)")
-                StatCardView(label: "RATE", value: "\(rate)/m", valueColor: AppColors.accent)
+                StatCardView(label: "CALORIES", value: "\(Int(appState.caloriesBurned.rounded()))")
+                StatCardView(label: "RATE", value: "\(appState.averageRate)/m", valueColor: AppColors.accent)
             }
 
-            // Stats Row 2: BREAKS, HEART RATE
+            // Stats Row 2: BREAKS, SOURCE
             HStack(spacing: 10) {
                 StatCardView(
                     label: "BREAKS",
-                    value: "\(smallBreaks)/\(longBreaks)",
+                    value: "\(appState.breakMetrics.small)/\(appState.breakMetrics.long)",
                     valueColor: AppColors.warning
                 )
                 StatCardView(
-                    label: "HEART RATE",
-                    value: "\(heartRateAvg)/\(heartRateCurrent)",
+                    label: "SOURCE",
+                    value: sourceLabel,
                     valueColor: AppColors.heartRate
                 )
             }
@@ -114,11 +118,30 @@ struct ActiveSessionView: View {
             .appGlassButton(prominent: true, tint: AppColors.danger)
         }
         .padding(.horizontal, 24)
+        .task {
+            while !Task.isCancelled, appState.sessionState == .active {
+                now = Date()
+                try? await Task.sleep(for: .seconds(1))
+            }
+        }
+    }
+
+    private var sourceLabel: String {
+        switch appState.activeMotionSource {
+        case .airpods:
+            "Pods"
+        case .iPhone:
+            "Phone"
+        case .watch:
+            "Watch"
+        case nil:
+            "--"
+        }
     }
 }
 
 #Preview {
-    ActiveSessionView(settings: JumpRecSettings(), onStop: {})
+    ActiveSessionView(settings: JumpRecSettings(), appState: JumpRecState(), onStop: {})
         .background(AppColors.bgPrimary)
         .preferredColorScheme(.dark)
 }

@@ -13,20 +13,19 @@ import UIKit
 struct ContentView: View {
     @Environment(MyDataStore.self) var dataStore
     @State private var connectivityManager = ConnectivityManager.shared
-    @State private var headphoneManager = HeadphoneManager()
     @Query() var sessions: [JumpSession]
 
     @State private var selectedTab: Tab = .home
     @State private var settings = JumpRecSettings()
-    @State private var sessionState: SessionState = .idle
+    @State private var appState = JumpRecState()
 
     var body: some View {
         ZStack {
             AppColors.bgPrimary.ignoresSafeArea()
 
             TabView(selection: $selectedTab) {
-                HomeView(settings: settings) {
-                    sessionState = .active
+                HomeView(settings: settings, appState: appState) {
+                    appState.start()
                 }
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
@@ -40,18 +39,18 @@ struct ContentView: View {
                     .tag(Tab.history)
             }
             .tint(AppColors.accent)
-            .toolbarVisibility(sessionState == .idle ? .visible : .hidden, for: .tabBar)
+            .toolbarVisibility(appState.sessionState == .idle ? .visible : .hidden, for: .tabBar)
         }
         .fullScreenCover(isPresented: isSessionFlowPresented) {
             Group {
-                switch sessionState {
+                switch appState.sessionState {
                 case .active:
-                    ActiveSessionView(settings: settings) {
-                        sessionState = .complete
+                    ActiveSessionView(settings: settings, appState: appState) {
+                        appState.finish()
                     }
                 case .complete:
-                    SessionCompleteView {
-                        sessionState = .idle
+                    SessionCompleteView(appState: appState) {
+                        appState.reset()
                     }
                 case .idle:
                     EmptyView()
@@ -66,10 +65,10 @@ struct ContentView: View {
 
     private var isSessionFlowPresented: Binding<Bool> {
         Binding(
-            get: { sessionState != .idle },
+            get: { appState.sessionState != .idle },
             set: { isPresented in
                 if !isPresented {
-                    sessionState = .idle
+                    appState.reset()
                 }
             }
         )
