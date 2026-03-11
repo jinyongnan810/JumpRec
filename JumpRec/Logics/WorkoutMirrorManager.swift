@@ -14,6 +14,11 @@ final class WorkoutMirrorManager: NSObject {
     var onPayloadReceived: ((MirroredWorkoutPayload) -> Void)?
     var onMirroredSessionEnded: (() -> Void)?
 
+    // The iPhone must own an HKHealthStore to participate in HealthKit workout mirroring.
+    // This is separate from WatchConnectivity:
+    // - WCSession is for general app/watch messaging.
+    // - HKWorkoutSession mirroring is for an active HealthKit workout and lets the system
+    //   wake the companion iPhone app, attach a mirrored session, and deliver workout data.
     private let healthStore = HKHealthStore()
     private let decoder = JSONDecoder()
     private var mirroredSession: HKWorkoutSession?
@@ -26,6 +31,8 @@ final class WorkoutMirrorManager: NSObject {
     func activate() {
         guard HKHealthStore.isHealthDataAvailable() else { return }
 
+        // Register this as early as possible so the iPhone can receive a mirrored workout
+        // session started from Apple Watch, even if the iOS app is launched in background.
         healthStore.workoutSessionMirroringStartHandler = { [weak self] session in
             Task { @MainActor in
                 self?.attachMirroredSession(session)
@@ -36,6 +43,8 @@ final class WorkoutMirrorManager: NSObject {
     }
 
     private func requestAuthorization() {
+        // Read permission is still required on iPhone because the mirrored workout session is
+        // a HealthKit workflow, not just a transport channel for arbitrary watch messages.
         let readTypes: Set<HKObjectType> = [
             HKObjectType.workoutType(),
             HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
@@ -52,6 +61,8 @@ final class WorkoutMirrorManager: NSObject {
     }
 
     private func attachMirroredSession(_ session: HKWorkoutSession) {
+        // Keep a reference to the mirrored session so the iPhone can receive payloads sent with
+        // sendToRemoteWorkoutSession(data:) from the watch's primary HKWorkoutSession.
         mirroredSession = session
         mirroredSession?.delegate = self
     }
@@ -61,6 +72,8 @@ extension WorkoutMirrorManager: HKWorkoutSessionDelegate {
     nonisolated func workoutSession(_: HKWorkoutSession,
                                     didReceiveDataFromRemoteWorkoutSession data: [Data])
     {
+        // HealthKit may batch multiple payloads before delivering them to iPhone,
+        // especially when the iOS app was suspended in background.
         for payloadData in data {
             do {
                 let payload = try decoder.decode(MirroredWorkoutPayload.self, from: payloadData)
