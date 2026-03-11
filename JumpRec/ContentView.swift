@@ -24,7 +24,12 @@ struct ContentView: View {
             AppColors.bgPrimary.ignoresSafeArea()
 
             TabView(selection: $selectedTab) {
-                HomeView(settings: settings, appState: appState) {
+                HomeView(
+                    settings: settings,
+                    appState: appState,
+                    isWatchAvailable: connectivityManager.isPaired &&
+                        connectivityManager.isWatchAppInstalled
+                ) {
                     appState.start(goalType: settings.goalType, goalValue: settings.goalCount)
                 }
                 .tabItem {

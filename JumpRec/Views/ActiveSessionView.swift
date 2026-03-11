@@ -77,7 +77,8 @@ struct ActiveSessionView: View {
             DeviceSelectorView(
                 activeSource: appState.activeMotionSource,
                 isPhoneMotionAvailable: appState.isPhoneMotionAvailable,
-                isHeadphoneMotionAvailable: appState.isHeadphoneMotionAvailable
+                isHeadphoneMotionAvailable: appState.isHeadphoneMotionAvailable,
+                isWatchMotionAvailable: appState.activeMotionSource == .watch || appState.isMirroredWatchSession
             )
 
             // Hero Ring with progress
@@ -137,11 +138,11 @@ struct ActiveSessionView: View {
     private var sourceLabel: String {
         switch appState.activeMotionSource {
         case .airpods:
-            "Pods"
+            DeviceSource.airpods.shortName
         case .iPhone:
-            "Phone"
+            DeviceSource.iPhone.shortName
         case .watch:
-            "Watch"
+            DeviceSource.watch.shortName
         case nil:
             "--"
         }

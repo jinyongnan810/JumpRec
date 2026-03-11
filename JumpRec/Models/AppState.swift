@@ -358,11 +358,11 @@ final class JumpRecState {
     private var liveActivitySourceLabel: String {
         switch activeMotionSource {
         case .watch:
-            "Watch"
+            DeviceSource.watch.shortName
         case .iPhone:
-            "Phone"
+            DeviceSource.iPhone.shortName
         case .airpods:
-            "AirPods"
+            DeviceSource.airpods.shortName
         case nil:
             "--"
         }

@@ -10,6 +10,7 @@ struct DeviceSelectorView: View {
     let activeSource: DeviceSource?
     let isPhoneMotionAvailable: Bool
     let isHeadphoneMotionAvailable: Bool
+    let isWatchMotionAvailable: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -19,6 +20,7 @@ struct DeviceSelectorView: View {
                 .foregroundStyle(AppColors.textMuted)
 
             HStack(spacing: 10) {
+                sourceCard(for: .watch, isAvailable: isWatchMotionAvailable)
                 sourceCard(for: .iPhone, isAvailable: isPhoneMotionAvailable)
                 sourceCard(for: .airpods, isAvailable: isHeadphoneMotionAvailable)
             }
@@ -32,33 +34,32 @@ struct DeviceSelectorView: View {
     private func sourceCard(for source: DeviceSource, isAvailable: Bool) -> some View {
         let isActive = activeSource == source
 
-        VStack(alignment: .leading, spacing: 6) {
-            Label(source.rawValue, systemImage: source.iconName)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(AppColors.textPrimary)
-
-            Text(statusText(isAvailable: isAvailable, isActive: isActive))
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(isActive ? AppColors.accent : AppColors.textMuted)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(AppColors.cardSurface)
-        .overlay {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(isActive ? AppColors.accent : AppColors.cardSurface, lineWidth: 1.5)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        Image(systemName: source.iconName)
+            .font(.system(size: 24, weight: .semibold))
+            .foregroundStyle(isActive ? AppColors.accent : AppColors.textPrimary)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 14)
+            .background(AppColors.cardSurface)
+            .overlay {
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isActive ? AppColors.accent : AppColors.cardSurface, lineWidth: 1.5)
+            }
+            .opacity(cardOpacity(isAvailable: isAvailable, isActive: isActive))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(source.shortName)
+            .accessibilityValue(isActive ? "Active" : "Inactive")
     }
 
-    private func statusText(isAvailable: Bool, isActive: Bool) -> String {
+    private func cardOpacity(isAvailable: Bool, isActive: Bool) -> Double {
         if isActive {
-            return "Active"
+            return 1
         }
         if isAvailable {
-            return "Available"
+            return 0.72
         }
-        return "Unavailable"
+        return 0.35
     }
 
     private func configureSegmentedControlAppearance() {
@@ -78,8 +79,13 @@ struct DeviceSelectorView: View {
 }
 
 #Preview {
-    DeviceSelectorView(activeSource: .airpods, isPhoneMotionAvailable: true, isHeadphoneMotionAvailable: true)
-        .padding()
-        .background(AppColors.bgPrimary)
-        .preferredColorScheme(.dark)
+    DeviceSelectorView(
+        activeSource: .watch,
+        isPhoneMotionAvailable: true,
+        isHeadphoneMotionAvailable: true,
+        isWatchMotionAvailable: true
+    )
+    .padding()
+    .background(AppColors.bgPrimary)
+    .preferredColorScheme(.dark)
 }

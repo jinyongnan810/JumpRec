@@ -6,9 +6,13 @@
 import Foundation
 
 enum DeviceSource: String, CaseIterable {
-    case watch = "Apple Watch"
+    case watch = "Watch"
     case iPhone
-    case airpods = "AirPods"
+    case airpods = "Headphone"
+
+    var shortName: String {
+        rawValue
+    }
 
     var iconName: String {
         switch self {
