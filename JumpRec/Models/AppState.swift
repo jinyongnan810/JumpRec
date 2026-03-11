@@ -10,6 +10,8 @@ import Observation
 @Observable
 @MainActor
 final class JumpRecState {
+    private let isMotionCSVExportEnabled = true
+
     var sessionState: SessionState = .idle
     var startTime: Date?
     var endTime: Date?
@@ -25,6 +27,7 @@ final class JumpRecState {
     var activeMotionSource: DeviceSource?
     var isPhoneMotionAvailable = false
     var isHeadphoneMotionAvailable = false
+    var motionCSVShareURL: URL?
 
     @ObservationIgnored
     let dataStore = MyDataStore.shared
@@ -42,6 +45,7 @@ final class JumpRecState {
 
     init() {
         motionManager = MotionManager(
+            shouldRecordMotionSamples: isMotionCSVExportEnabled,
             onJumpDetected: { [weak self] source in
                 self?.addJump(from: source)
             },
@@ -142,6 +146,7 @@ final class JumpRecState {
         guard !isMirroredWatchSession else { return }
 
         motionManager?.stopTracking()
+        let motionSamples = motionManager?.consumeRecordedSamples() ?? []
         endTime = Date()
         sessionState = .complete
         syncLiveActivity()
@@ -154,6 +159,7 @@ final class JumpRecState {
                 caloriesBurned: caloriesBurned,
                 jumpOffsets: jumps
             )
+            exportMotionCSVIfNeeded(samples: motionSamples, startedAt: startTime, endedAt: endTime)
         }
     }
 
@@ -162,6 +168,7 @@ final class JumpRecState {
         sessionState = .idle
         resetLiveMetrics()
         activeMotionSource = nil
+        motionCSVShareURL = nil
         averageHeartRate = nil
         peakHeartRate = nil
         sessionGoalType = nil
@@ -377,5 +384,52 @@ final class JumpRecState {
         case nil:
             nil
         }
+    }
+
+    private func exportMotionCSVIfNeeded(samples: [MotionSample], startedAt: Date, endedAt: Date) {
+        guard isMotionCSVExportEnabled, !samples.isEmpty else {
+            motionCSVShareURL = nil
+            return
+        }
+
+        let csvText = makeMotionCSV(from: samples)
+        let filename = makeMotionCSVFilename(startedAt: startedAt, endedAt: endedAt)
+        motionCSVShareURL = ConnectivityManager.shared.saveCSVToLocalDocuments(csvText: csvText, filename: filename)
+        DispatchQueue.global(qos: .utility).async {
+            ConnectivityManager.shared.saveCSVtoICloud(csvText: csvText, filename: filename)
+        }
+    }
+
+    private func makeMotionCSV(from samples: [MotionSample]) -> String {
+        let baseTimestamp = samples.first?.timestamp ?? 0
+        let header = "time,AX,AY,AZ,RX,RY,RZ"
+
+        let rows = samples.map { sample in
+            String(
+                format: "%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f",
+                sample.timestamp - baseTimestamp,
+                sample.userAccelerationX,
+                sample.userAccelerationY,
+                sample.userAccelerationZ,
+                sample.rotationRateX,
+                sample.rotationRateY,
+                sample.rotationRateZ
+            )
+        }
+
+        return ([header] + rows).joined(separator: "\n")
+    }
+
+    private func makeMotionCSVFilename(startedAt: Date, endedAt: Date) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        let start = sanitizedFilenameTimestamp(from: formatter.string(from: startedAt))
+        let end = sanitizedFilenameTimestamp(from: formatter.string(from: endedAt))
+        return "motion-\(start)-\(end).csv"
+    }
+
+    private func sanitizedFilenameTimestamp(from value: String) -> String {
+        value.replacingOccurrences(of: ":", with: "-")
     }
 }

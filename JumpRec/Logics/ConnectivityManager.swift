@@ -260,4 +260,27 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             print("[WatchConnectivityManager] Error saving CSV to iCloud: \(error.localizedDescription)")
         }
     }
+
+    /// Saves CSV text to the app's local Documents directory.
+    /// - Parameters:
+    ///   - csvText: The CSV content as string
+    ///   - filename: The filename for the CSV file
+    @discardableResult
+    func saveCSVToLocalDocuments(csvText: String, filename: String) -> URL? {
+        do {
+            let documentsURL = try FileManager.default.url(
+                for: .documentDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+            )
+            let fileURL = documentsURL.appendingPathComponent(filename)
+            try csvText.write(to: fileURL, atomically: true, encoding: .utf8)
+            print("[WatchConnectivityManager] Saved CSV to local Documents at \(fileURL.path)")
+            return fileURL
+        } catch {
+            print("[WatchConnectivityManager] Error saving CSV to local Documents: \(error.localizedDescription)")
+            return nil
+        }
+    }
 }

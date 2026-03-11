@@ -72,19 +72,36 @@ struct SessionCompleteView: View {
             }
             .scrollIndicators(.hidden)
 
-            // Done Button
-            Button(action: onDone) {
-                HStack(spacing: 8) {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 18))
-                    Text("DONE")
-                        .font(.system(size: 15, weight: .semibold))
+            VStack(spacing: 12) {
+                if let motionCSVShareURL = appState.motionCSVShareURL {
+                    ShareLink(item: motionCSVShareURL) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "square.and.arrow.up")
+                                .font(.system(size: 18))
+                            Text("SHARE CSV")
+                                .font(.system(size: 15, weight: .semibold))
+                        }
+                        .foregroundStyle(AppColors.textPrimary)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                    }
+                    .appGlassButton(prominent: false)
                 }
-                .foregroundStyle(AppColors.bgPrimary)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
+
+                // Done Button
+                Button(action: onDone) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 18))
+                        Text("DONE")
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                    .foregroundStyle(AppColors.bgPrimary)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                }
+                .appGlassButton(prominent: true, tint: AppColors.accent)
             }
-            .appGlassButton(prominent: true, tint: AppColors.accent)
         }
         .padding(.horizontal, 24)
     }

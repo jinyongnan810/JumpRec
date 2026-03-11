@@ -24,6 +24,8 @@ final class MotionManager: NSObject {
 
     private let phoneDetector = JumpDetector()
     private let headphoneDetector = JumpDetector()
+    private let shouldRecordMotionSamples: Bool
+    private let recordedSamplesLock = NSLock()
 
     private let onJumpDetected: @MainActor (Source) -> Void
     private let onSourceChanged: @MainActor (Source?) -> Void
@@ -31,12 +33,15 @@ final class MotionManager: NSObject {
 
     private var lastPreferredSource: Source?
     private var isHeadphoneConnected = false
+    private var recordedSamples: [MotionSample] = []
 
     init(
+        shouldRecordMotionSamples: Bool = false,
         onJumpDetected: @escaping @MainActor (Source) -> Void,
         onSourceChanged: @escaping @MainActor (Source?) -> Void,
         onAvailabilityChanged: @escaping @MainActor (_ iPhoneAvailable: Bool, _ headphoneAvailable: Bool) -> Void
     ) {
+        self.shouldRecordMotionSamples = shouldRecordMotionSamples
         self.onJumpDetected = onJumpDetected
         self.onSourceChanged = onSourceChanged
         self.onAvailabilityChanged = onAvailabilityChanged
@@ -91,6 +96,7 @@ final class MotionManager: NSObject {
         isTracking = true
         phoneDetector.reset()
         headphoneDetector.reset()
+        resetRecordedSamples()
         isHeadphoneConnected = currentAudioRouteSupportsHeadphoneMotion()
 
         notifyAvailabilityChanged()
@@ -106,6 +112,17 @@ final class MotionManager: NSObject {
         phoneMotionManager.stopDeviceMotionUpdates()
         headphoneMotionManager.stopDeviceMotionUpdates()
         updatePreferredSourceIfNeeded(force: true)
+    }
+
+    func consumeRecordedSamples() -> [MotionSample] {
+        guard shouldRecordMotionSamples else { return [] }
+
+        recordedSamplesLock.lock()
+        defer { recordedSamplesLock.unlock() }
+
+        let samples = recordedSamples
+        recordedSamples.removeAll(keepingCapacity: false)
+        return samples
     }
 
     private func startPhoneMotionUpdatesIfAvailable() {
@@ -133,6 +150,7 @@ final class MotionManager: NSObject {
                 rotationRateZ: motion.rotationRate.z,
                 timestamp: motion.timestamp
             )
+            record(sample)
 
             if phoneDetector.processMotionSample(sample) {
                 Task { @MainActor in
@@ -163,6 +181,7 @@ final class MotionManager: NSObject {
                 rotationRateZ: motion.rotationRate.z,
                 timestamp: motion.timestamp
             )
+            record(sample)
 
             if headphoneDetector.processMotionSample(sample) {
                 Task { @MainActor in
@@ -186,6 +205,22 @@ final class MotionManager: NSObject {
         Task { @MainActor in
             onAvailabilityChanged(isPhoneMotionAvailable, isHeadphoneMotionAvailable)
         }
+    }
+
+    private func record(_ sample: MotionSample) {
+        guard shouldRecordMotionSamples else { return }
+
+        recordedSamplesLock.lock()
+        recordedSamples.append(sample)
+        recordedSamplesLock.unlock()
+    }
+
+    private func resetRecordedSamples() {
+        guard shouldRecordMotionSamples else { return }
+
+        recordedSamplesLock.lock()
+        recordedSamples.removeAll(keepingCapacity: true)
+        recordedSamplesLock.unlock()
     }
 
     private func currentAudioRouteSupportsHeadphoneMotion() -> Bool {
