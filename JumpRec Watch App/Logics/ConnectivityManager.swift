@@ -6,12 +6,14 @@
 //
 
 import Foundation
+import JumpRecShared
 import WatchConnectivity
 
 final class ConnectivityManager: NSObject, WCSessionDelegate {
     static let shared = ConnectivityManager()
 
     private let session: WCSession = .default
+    private let settingsStore = NSUbiquitousKeyValueStore.default
 
     override private init() {
         super.init()
@@ -29,6 +31,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         } else {
             print("[WatchConnectivityManager] Activation completed with state: \(activationState.rawValue)")
         }
+
+        applySettingsPayload(session.receivedApplicationContext)
     }
 
     /// Sends CSV text to iPhone via transferFile. Falls back to transferUserInfo if file creation fails.
@@ -86,5 +90,31 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
     func sessionReachabilityDidChange(_ session: WCSession) {
         print("[WatchConnectivityManager] Session reachability changed: \(session.isReachable)")
+    }
+
+    func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+        print("[WatchConnectivityManager] Received application context: \(applicationContext)")
+        applySettingsPayload(applicationContext)
+    }
+
+    private func applySettingsPayload(_ payload: [String: Any]) {
+        guard let type = payload["type"] as? String, type == "goalSettings" else {
+            return
+        }
+
+        guard let goalTypeRawValue = payload["goalType"] as? String,
+              let jumpCount = payload["jumpCount"] as? Int,
+              let jumpTime = payload["jumpTime"] as? Int
+        else {
+            print("[WatchConnectivityManager] Invalid goal settings payload")
+            return
+        }
+
+        settingsStore.set(goalTypeRawValue, forKey: "goalType")
+        settingsStore.set(Int64(jumpCount), forKey: "jumpCount")
+        settingsStore.set(Int64(jumpTime), forKey: "jumpTime")
+        settingsStore.synchronize()
+
+        NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)
     }
 }

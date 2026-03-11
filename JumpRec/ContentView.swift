@@ -60,6 +60,16 @@ struct ContentView: View {
         .preferredColorScheme(.dark)
         .onAppear {
             configureTabBarAppearance()
+            syncSettingsToWatch()
+        }
+        .onChange(of: settings.goalType) { _, _ in
+            syncSettingsToWatch()
+        }
+        .onChange(of: settings.jumpCount) { _, _ in
+            syncSettingsToWatch()
+        }
+        .onChange(of: settings.jumpTime) { _, _ in
+            syncSettingsToWatch()
         }
     }
 
@@ -94,6 +104,14 @@ struct ContentView: View {
 
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
+    }
+
+    private func syncSettingsToWatch() {
+        connectivityManager.syncSettings(
+            goalType: settings.goalType,
+            jumpCount: settings.jumpCount,
+            jumpTime: settings.jumpTime
+        )
     }
 }
 

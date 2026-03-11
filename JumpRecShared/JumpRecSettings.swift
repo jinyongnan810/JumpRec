@@ -12,15 +12,22 @@ public enum GoalType: String, Codable {
     case time
 }
 
+public extension Notification.Name {
+    static let jumpRecSettingsDidUpdate = Notification.Name("JumpRecSettingsDidUpdate")
+}
+
 public let DefaultJumpCount: Int64 = 1000
 public let DefaultJumpTime: Int64 = 10
 
 @Observable
 public class JumpRecSettings {
     public let store = NSUbiquitousKeyValueStore.default
+    @ObservationIgnored
+    private var isLoadingFromStore = false
 
     public var goalType: GoalType {
         didSet {
+            guard !isLoadingFromStore else { return }
             store.set(goalType.rawValue, forKey: "goalType")
             store.synchronize()
         }
@@ -28,7 +35,7 @@ public class JumpRecSettings {
 
     public var jumpCount: Int64 {
         didSet {
-            goalType = .count
+            guard !isLoadingFromStore else { return }
             store.set(jumpCount, forKey: "jumpCount")
             store.synchronize()
         }
@@ -36,7 +43,7 @@ public class JumpRecSettings {
 
     public var jumpTime: Int64 {
         didSet {
-            goalType = .time
+            guard !isLoadingFromStore else { return }
             store.set(jumpTime, forKey: "jumpTime")
             store.synchronize()
         }
@@ -50,9 +57,11 @@ public class JumpRecSettings {
     }
 
     public init() {
-        goalType = store.string(forKey: "goalType") == GoalType.time.rawValue ? .time : .count
-        jumpCount = store.longLong(forKey: "jumpCount") == 0 ? DefaultJumpCount : store.longLong(forKey: "jumpCount")
-        jumpTime = store.longLong(forKey: "jumpTime") == 0 ? DefaultJumpTime : store.longLong(forKey: "jumpTime")
+        store.synchronize()
+        goalType = .count
+        jumpCount = DefaultJumpCount
+        jumpTime = DefaultJumpTime
+        loadSettings()
 
         NotificationCenter.default.addObserver(
             forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
@@ -61,16 +70,30 @@ public class JumpRecSettings {
         ) { [weak self] _ in
             self?.loadSettings()
         }
+
+        NotificationCenter.default.addObserver(
+            forName: .jumpRecSettingsDidUpdate,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.loadSettings()
+        }
     }
 
     public func loadSettings() {
-        goalType = store
+        store.synchronize()
+
+        let storedGoalType: GoalType = store
             .string(
                 forKey: "goalType"
             ) == GoalType.time.rawValue ? .time : .count
-        jumpCount = store.longLong(forKey: "jumpCount")
-        jumpCount = jumpCount == 0 ? DefaultJumpCount : jumpCount
-        jumpTime = store.longLong(forKey: "jumpTime")
-        jumpTime = jumpTime == 0 ? DefaultJumpTime : jumpTime
+        let storedJumpCount = store.longLong(forKey: "jumpCount")
+        let storedJumpTime = store.longLong(forKey: "jumpTime")
+
+        isLoadingFromStore = true
+        goalType = storedGoalType
+        jumpCount = storedJumpCount == 0 ? DefaultJumpCount : storedJumpCount
+        jumpTime = storedJumpTime == 0 ? DefaultJumpTime : storedJumpTime
+        isLoadingFromStore = false
     }
 }

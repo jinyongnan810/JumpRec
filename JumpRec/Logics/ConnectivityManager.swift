@@ -22,6 +22,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     var isReachable: Bool = false
     var activationState: WCSessionActivationState = .notActivated
     var onCompletedSessionReceived: ((Date, Date, Int, Double, [TimeInterval], Int?, Int?) -> Void)?
+    private let settingsStore = NSUbiquitousKeyValueStore.default
 
     override private init() {
         super.init()
@@ -78,6 +79,11 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         didReceiveMessage message: [String: Any]
     ) {
         print("[WatchConnectivityManager] Received message: \(message)")
+    }
+
+    func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+        print("[WatchConnectivityManager] Received application context: \(applicationContext)")
+        applySettingsPayload(applicationContext)
     }
 
     func session(_: WCSession, didReceive file: WCSessionFile) {
@@ -162,6 +168,43 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         if let value = value as? Int { return value }
         if let value = value as? NSNumber { return value.intValue }
         return nil
+    }
+
+    func syncSettings(goalType: GoalType, jumpCount: Int64, jumpTime: Int64) {
+        let payload: [String: Any] = [
+            "type": "goalSettings",
+            "goalType": goalType.rawValue,
+            "jumpCount": jumpCount,
+            "jumpTime": jumpTime,
+        ]
+
+        do {
+            try session.updateApplicationContext(payload)
+            print("[WatchConnectivityManager] Updated application context with goal settings")
+        } catch {
+            print("[WatchConnectivityManager] Failed to update goal settings application context: \(error.localizedDescription)")
+        }
+    }
+
+    private func applySettingsPayload(_ payload: [String: Any]) {
+        guard let type = payload["type"] as? String, type == "goalSettings" else {
+            return
+        }
+
+        guard let goalTypeRawValue = payload["goalType"] as? String,
+              let jumpCount = numberAsInt(payload["jumpCount"]),
+              let jumpTime = numberAsInt(payload["jumpTime"])
+        else {
+            print("[WatchConnectivityManager] Invalid goal settings payload")
+            return
+        }
+
+        settingsStore.set(goalTypeRawValue, forKey: "goalType")
+        settingsStore.set(Int64(jumpCount), forKey: "jumpCount")
+        settingsStore.set(Int64(jumpTime), forKey: "jumpTime")
+        settingsStore.synchronize()
+
+        NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)
     }
 
     /// Saves CSV text to iCloud Drive in the specified container
