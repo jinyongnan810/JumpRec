@@ -29,6 +29,7 @@ final class MotionManager: NSObject {
     private let onAvailabilityChanged: @MainActor (_ iPhoneAvailable: Bool, _ headphoneAvailable: Bool) -> Void
 
     private var lastPreferredSource: Source?
+    private var isHeadphoneConnected = false
 
     init(
         onJumpDetected: @escaping @MainActor (Source) -> Void,
@@ -40,6 +41,7 @@ final class MotionManager: NSObject {
         self.onAvailabilityChanged = onAvailabilityChanged
         super.init()
         headphoneMotionManager.delegate = self
+        isHeadphoneConnected = headphoneMotionManager.isDeviceMotionAvailable
         queue.maxConcurrentOperationCount = 1
         queue.name = "JumpRec.iPhoneMotionManager"
         phoneMotionManager.deviceMotionUpdateInterval = updateInterval
@@ -55,7 +57,7 @@ final class MotionManager: NSObject {
 
     var preferredSource: Source? {
         // Headphone motion wins whenever it is actively producing samples.
-        if headphoneMotionManager.deviceMotion != nil {
+        if isHeadphoneConnected, headphoneMotionManager.deviceMotion != nil {
             return .headphones
         }
         // Fall back to iPhone motion when headphone data is unavailable.
@@ -66,6 +68,7 @@ final class MotionManager: NSObject {
     }
 
     func refreshAvailability() {
+        isHeadphoneConnected = headphoneMotionManager.isDeviceMotionAvailable
         notifyAvailabilityChanged()
         updatePreferredSourceIfNeeded(force: true)
     }
@@ -76,6 +79,7 @@ final class MotionManager: NSObject {
         isTracking = true
         phoneDetector.reset()
         headphoneDetector.reset()
+        isHeadphoneConnected = headphoneMotionManager.isDeviceMotionAvailable
 
         notifyAvailabilityChanged()
         startPhoneMotionUpdatesIfAvailable()
@@ -133,6 +137,7 @@ final class MotionManager: NSObject {
         headphoneMotionManager.startConnectionStatusUpdates()
         headphoneMotionManager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
             guard let self, let motion, isTracking else { return }
+            isHeadphoneConnected = true
 
             // Promote headphones immediately on the first live headphone sample.
             if lastPreferredSource != .headphones {
@@ -178,12 +183,14 @@ extension MotionManager: CMHeadphoneMotionManagerDelegate {
     func headphoneMotionManagerDidConnect(_: CMHeadphoneMotionManager) {
         // Connection callbacks refresh availability immediately, but actual promotion to
         // headphones still depends on receiving live motion samples.
+        isHeadphoneConnected = true
         notifyAvailabilityChanged()
         updatePreferredSourceIfNeeded(force: true)
     }
 
     func headphoneMotionManagerDidDisconnect(_: CMHeadphoneMotionManager) {
         // A disconnect invalidates headphone priority, so the preferred source is recomputed.
+        isHeadphoneConnected = false
         notifyAvailabilityChanged()
         updatePreferredSourceIfNeeded(force: true)
     }
