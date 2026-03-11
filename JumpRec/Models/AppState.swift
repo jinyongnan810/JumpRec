@@ -35,6 +35,8 @@ final class JumpRecState {
     private let workoutMirrorManager = WorkoutMirrorManager.shared
     @ObservationIgnored
     private let connectivityManager = ConnectivityManager.shared
+    @ObservationIgnored
+    private let liveActivityManager = LiveActivityManager.shared
 
     init() {
         motionManager = MotionManager(
@@ -101,6 +103,7 @@ final class JumpRecState {
         isMirroredWatchSession = false
         sessionState = .active
         motionManager?.startTracking()
+        syncLiveActivity()
     }
 
     func finish() {
@@ -110,6 +113,7 @@ final class JumpRecState {
         motionManager?.stopTracking()
         endTime = Date()
         sessionState = .complete
+        syncLiveActivity()
 
         if let endTime {
             dataStore.saveCompletedSession(
@@ -132,6 +136,9 @@ final class JumpRecState {
         sessionGoalType = nil
         sessionGoalValue = nil
         isMirroredWatchSession = false
+        Task {
+            await liveActivityManager.endIfNeeded()
+        }
     }
 
     private func addJump(from source: MotionManager.Source) {
@@ -145,6 +152,7 @@ final class JumpRecState {
         activeMotionSource = resolvedSource
         jumpCount += 1
         jumps.append(Date().timeIntervalSince(startTime))
+        syncLiveActivity()
     }
 
     private func resetLiveMetrics() {
@@ -165,6 +173,8 @@ final class JumpRecState {
             applyMirroredMetrics(payload)
         case .ended:
             applyMirroredEnding(payload)
+        @unknown default:
+            break
         }
     }
 
@@ -180,6 +190,7 @@ final class JumpRecState {
         sessionState = .active
         isMirroredWatchSession = true
         activeMotionSource = .watch
+        syncLiveActivity()
     }
 
     private func applyMirroredJump(_ payload: MirroredWorkoutPayload) {
@@ -195,6 +206,7 @@ final class JumpRecState {
                 jumps.append(jumpOffset)
             }
         }
+        syncLiveActivity()
     }
 
     private func applyMirroredMetrics(_ payload: MirroredWorkoutPayload) {
@@ -209,6 +221,7 @@ final class JumpRecState {
         if let peakHeartRate = payload.peakHeartRate {
             self.peakHeartRate = peakHeartRate
         }
+        syncLiveActivity()
     }
 
     private func applyMirroredEnding(_ payload: MirroredWorkoutPayload) {
@@ -225,12 +238,14 @@ final class JumpRecState {
             self.peakHeartRate = peakHeartRate
         }
         sessionState = .complete
+        syncLiveActivity()
     }
 
     private func handleMirroredSessionEnded() {
         guard isMirroredWatchSession, sessionState == .active else { return }
         endTime = endTime ?? Date()
         sessionState = .complete
+        syncLiveActivity()
     }
 
     private func applyCompletedWatchSession(
@@ -252,6 +267,72 @@ final class JumpRecState {
         self.averageHeartRate = averageHeartRate
         self.peakHeartRate = peakHeartRate
         sessionState = .complete
+        syncLiveActivity()
+    }
+
+    private func syncLiveActivity() {
+        let goalSummary = liveActivityGoalSummary
+        let sourceLabel = liveActivitySourceLabel
+
+        if sessionState == .idle {
+            Task {
+                await liveActivityManager.endIfNeeded()
+            }
+            return
+        }
+
+        if sessionState == .complete {
+            guard let endedAt = endTime else { return }
+            Task {
+                await liveActivityManager.end(
+                    startedAt: startTime,
+                    goalSummary: goalSummary,
+                    jumpCount: jumpCount,
+                    caloriesBurned: caloriesBurned,
+                    averageRate: averageRate,
+                    sourceLabel: sourceLabel,
+                    endedAt: endedAt
+                )
+            }
+            return
+        }
+
+        guard let startTime else { return }
+        Task {
+            await liveActivityManager.startOrUpdate(
+                startedAt: startTime,
+                goalSummary: goalSummary,
+                jumpCount: jumpCount,
+                caloriesBurned: caloriesBurned,
+                averageRate: averageRate,
+                sourceLabel: sourceLabel
+            )
+        }
+    }
+
+    private var liveActivityGoalSummary: String {
+        guard let goalType = sessionGoalType, let goalValue = sessionGoalValue else {
+            return "Session in progress"
+        }
+
+        if goalType == .count {
+            return "\(goalValue.formatted()) jumps"
+        }
+
+        return "\(goalValue / 60) min"
+    }
+
+    private var liveActivitySourceLabel: String {
+        switch activeMotionSource {
+        case .watch:
+            "Watch"
+        case .iPhone:
+            "Phone"
+        case .airpods:
+            "AirPods"
+        case nil:
+            "--"
+        }
     }
 
     private static func deviceSource(from source: MotionManager.Source?) -> DeviceSource? {
