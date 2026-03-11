@@ -52,8 +52,24 @@ struct GoalView: View {
 }
 
 struct CountView: View {
+    private static let minimumCount = 100.0
+    private static let maximumCount = 10000.0
+    private static let countStep = 100.0
+
     @Binding var count: Int64
     @Binding var goalType: GoalType
+
+    private var countBinding: Binding<Double> {
+        Binding(
+            get: { Double(count) },
+            set: { newValue in
+                let clampedValue = min(max(newValue, Self.minimumCount), Self.maximumCount)
+                let snappedValue = (clampedValue / Self.countStep).rounded() * Self.countStep
+                count = Int64(snappedValue)
+            }
+        )
+    }
+
     var body: some View {
         VStack(spacing: 8) {
             Text("\(count)")
@@ -66,16 +82,14 @@ struct CountView: View {
         }
         .focusable()
         .digitalCrownRotation(
-            Binding(
-                get: { Double(count) },
-                set: { count = Int64($0) }
-            ),
-            from: 100,
-            through: 10000,
-            by: 100
+            countBinding,
+            from: Self.minimumCount,
+            through: Self.maximumCount,
+            by: Self.countStep
         )
         .onAppear {
             goalType = .count
+            count = Int64(max(Self.minimumCount, (Double(count) / Self.countStep).rounded() * Self.countStep))
         }
     }
 }
