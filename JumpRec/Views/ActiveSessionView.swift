@@ -78,7 +78,8 @@ struct ActiveSessionView: View {
                 activeSource: appState.activeMotionSource,
                 isPhoneMotionAvailable: appState.isPhoneMotionAvailable,
                 isHeadphoneMotionAvailable: appState.isHeadphoneMotionAvailable,
-                isWatchMotionAvailable: appState.activeMotionSource == .watch || appState.isMirroredWatchSession
+                isWatchMotionAvailable: appState.activeMotionSource == .watch || appState.isMirroredWatchSession,
+                watchUnavailableReason: "Apple Watch is unavailable for this session."
             )
 
             // Hero Ring with progress
@@ -93,20 +94,6 @@ struct ActiveSessionView: View {
                 StatCardView(label: "TIME", value: elapsedFormatted)
                 StatCardView(label: "CALORIES", value: "\(Int(appState.caloriesBurned.rounded()))")
                 StatCardView(label: "RATE", value: "\(appState.averageRate)/m", valueColor: AppColors.accent)
-            }
-
-            // Stats Row 2: BREAKS, SOURCE
-            HStack(spacing: 10) {
-                StatCardView(
-                    label: "BREAKS",
-                    value: "\(appState.breakMetrics.small)/\(appState.breakMetrics.long)",
-                    valueColor: AppColors.warning
-                )
-                StatCardView(
-                    label: "SOURCE",
-                    value: sourceLabel,
-                    valueColor: AppColors.heartRate
-                )
             }
 
             Spacer()

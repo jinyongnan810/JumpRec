@@ -10,6 +10,7 @@ struct HomeView: View {
     @Bindable var settings: JumpRecSettings
     @Bindable var appState: JumpRecState
     let isWatchAvailable: Bool
+    let watchUnavailableReason: String
     var onStart: () -> Void
     @State private var showGoalSheet = false
     @State private var countdownValue: Int?
@@ -49,10 +50,11 @@ struct HomeView: View {
             }
 
             DeviceSelectorView(
-                activeSource: appState.activeMotionSource,
+                activeSource: displayedMotionSource,
                 isPhoneMotionAvailable: appState.isPhoneMotionAvailable,
                 isHeadphoneMotionAvailable: appState.isHeadphoneMotionAvailable,
-                isWatchMotionAvailable: isWatchAvailable
+                isWatchMotionAvailable: isWatchAvailable,
+                watchUnavailableReason: watchUnavailableReason
             )
 
             // Start/Cancel Button
@@ -102,6 +104,22 @@ struct HomeView: View {
 
     private var isCountingDown: Bool {
         countdownValue != nil
+    }
+
+    private var displayedMotionSource: DeviceSource? {
+        if let activeSource = appState.activeMotionSource {
+            return activeSource
+        }
+        if isWatchAvailable {
+            return .watch
+        }
+        if appState.isHeadphoneMotionAvailable {
+            return .airpods
+        }
+        if appState.isPhoneMotionAvailable {
+            return .iPhone
+        }
+        return nil
     }
 
     private var primaryButtonTitle: String {
@@ -157,7 +175,13 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(settings: JumpRecSettings(), appState: JumpRecState(), isWatchAvailable: true, onStart: {})
-        .background(AppColors.bgPrimary)
-        .preferredColorScheme(.dark)
+    HomeView(
+        settings: JumpRecSettings(),
+        appState: JumpRecState(),
+        isWatchAvailable: true,
+        watchUnavailableReason: "Apple Watch is ready.",
+        onStart: {}
+    )
+    .background(AppColors.bgPrimary)
+    .preferredColorScheme(.dark)
 }
