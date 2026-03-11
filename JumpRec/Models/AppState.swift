@@ -28,6 +28,8 @@ final class JumpRecState {
 
     @ObservationIgnored
     let dataStore = MyDataStore.shared
+    @ObservationIgnored
+    private var pendingMirroredStart = false
 
     @ObservationIgnored
     private var motionManager: MotionManager?
@@ -92,15 +94,44 @@ final class JumpRecState {
         SessionMetricsCalculator.breakMetrics(from: jumps)
     }
 
-    func start() {
+    func start(goalType: GoalType, goalValue: Int) {
+        sessionGoalType = goalType
+        sessionGoalValue = goalValue
+
+        if connectivityManager.isPaired, connectivityManager.isWatchAppInstalled {
+            pendingMirroredStart = true
+            connectivityManager.syncSettings(
+                goalType: goalType,
+                jumpCount: Int64(goalType == .count ? goalValue : 0),
+                jumpTime: Int64(goalType == .time ? goalValue : 0)
+            )
+
+            Task {
+                do {
+                    try await workoutMirrorManager.startCompanionWorkout()
+                } catch {
+                    await MainActor.run {
+                        self.pendingMirroredStart = false
+                        self.startLocalSession(goalType: goalType, goalValue: goalValue)
+                    }
+                }
+            }
+            return
+        }
+
+        startLocalSession(goalType: goalType, goalValue: goalValue)
+    }
+
+    private func startLocalSession(goalType: GoalType, goalValue: Int) {
         resetLiveMetrics()
         startTime = Date()
         endTime = nil
         averageHeartRate = nil
         peakHeartRate = nil
-        sessionGoalType = nil
-        sessionGoalValue = nil
+        sessionGoalType = goalType
+        sessionGoalValue = goalValue
         isMirroredWatchSession = false
+        pendingMirroredStart = false
         sessionState = .active
         motionManager?.startTracking()
         syncLiveActivity()
@@ -136,6 +167,7 @@ final class JumpRecState {
         sessionGoalType = nil
         sessionGoalValue = nil
         isMirroredWatchSession = false
+        pendingMirroredStart = false
         Task {
             await liveActivityManager.endIfNeeded()
         }
@@ -179,6 +211,7 @@ final class JumpRecState {
     }
 
     private func beginMirroredSession(_ payload: MirroredWorkoutPayload) {
+        pendingMirroredStart = false
         resetLiveMetrics()
         averageHeartRate = nil
         peakHeartRate = nil

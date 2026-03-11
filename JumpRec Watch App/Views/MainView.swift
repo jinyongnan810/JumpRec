@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 struct MainView: View {
-    @State var appState = JumpRecState()
+    @State var appState = JumpRecState.shared
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
 

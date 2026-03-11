@@ -28,6 +28,16 @@ final class WorkoutMirrorManager: NSObject {
         decoder.dateDecodingStrategy = .deferredToDate
     }
 
+    func startCompanionWorkout() async throws {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .jumpRope
+        configuration.locationType = .outdoor
+
+        try await healthStore.startWatchApp(toHandle: configuration)
+    }
+
     func activate() {
         guard HKHealthStore.isHealthDataAvailable() else { return }
 

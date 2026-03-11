@@ -25,7 +25,7 @@ struct ContentView: View {
 
             TabView(selection: $selectedTab) {
                 HomeView(settings: settings, appState: appState) {
-                    appState.start()
+                    appState.start(goalType: settings.goalType, goalValue: settings.goalCount)
                 }
                 .tabItem {
                     Label("Home", systemImage: "house.fill")

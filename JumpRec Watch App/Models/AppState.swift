@@ -18,6 +18,8 @@ enum JumpState {
 @Observable
 @MainActor
 class JumpRecState {
+    static let shared = JumpRecState()
+
     var jumpState: JumpState = .idle
     var startTime: Date?
     var endTime: Date?
@@ -102,6 +104,12 @@ class JumpRecState {
         WKInterfaceDevice.current().play(.start)
         speak(text: "Session Started!")
         ConnectivityManager.shared.sendMessage(["watch app": "started"])
+    }
+
+    func startFromCompanion() {
+        let settings = JumpRecSettings()
+        settings.loadSettings()
+        start(goalType: settings.goalType, goalCount: settings.goalCount)
     }
 
     func end() {
