@@ -4,6 +4,10 @@
 <dict>
 	<key>NSMotionUsageDescription</key>
 	<string>App need motion data to detect jumps</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>JumpRec reads workout data to mirror active Apple Watch sessions on iPhone.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>JumpRec saves workout sessions so your Apple Watch activity appears on iPhone.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

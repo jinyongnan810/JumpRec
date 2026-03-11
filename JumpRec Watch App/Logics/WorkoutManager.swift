@@ -7,6 +7,7 @@
 
 import Foundation
 import HealthKit
+import JumpRecShared
 
 /// Manages HealthKit workout sessions, heart rate, and energy burned tracking.
 class WorkoutManager: NSObject {
@@ -22,6 +23,11 @@ class WorkoutManager: NSObject {
     private var builder: HKLiveWorkoutBuilder?
     private var heartRateQuery: HKAnchoredObjectQuery?
     private var energyBurnedQuery: HKAnchoredObjectQuery?
+    private let encoder = JSONEncoder()
+    private var averageHeartRate: Int?
+    private var peakHeartRate: Int?
+    private var heartRateSum = 0
+    private var heartRateSamples = 0
 
     // MARK: - Initialization
 
@@ -56,7 +62,11 @@ class WorkoutManager: NSObject {
 
     // MARK: - Workout Session
 
-    func startWorkout() {
+    func startWorkout(startDate: Date, goalType: GoalType, goalValue: Int) {
+        averageHeartRate = nil
+        peakHeartRate = nil
+        heartRateSum = 0
+        heartRateSamples = 0
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .jumpRope
         configuration.locationType = .outdoor
@@ -67,7 +77,6 @@ class WorkoutManager: NSObject {
             session?.delegate = self
             builder?.delegate = self
 
-            let startDate = Date()
             session?.startActivity(with: startDate)
             builder?.beginCollection(withStart: startDate) { success, error in
                 print("Collecting health data started: \(success)")
@@ -75,6 +84,7 @@ class WorkoutManager: NSObject {
                     print("Failed to start collecting health data: \(error)")
                 }
 
+                self.startMirroring(startDate: startDate, goalType: goalType, goalValue: goalValue)
                 self.startHeartRateQuery()
                 self.startEnergyBurnedQuery()
             }
@@ -90,12 +100,31 @@ class WorkoutManager: NSObject {
         if let energyBurnedQuery {
             healthStore.stop(energyBurnedQuery)
         }
+        sendPayload(
+            MirroredWorkoutPayload(
+                kind: .ended,
+                endTime: Date(),
+                energyBurned: currentEnergyBurned,
+                averageHeartRate: averageHeartRate,
+                peakHeartRate: peakHeartRate
+            )
+        )
         session?.end()
         builder?.endCollection(withEnd: Date()) { _, _ in
             self.builder?.finishWorkout { workout, _ in
                 print("workout finished: \(String(describing: workout))")
             }
         }
+    }
+
+    func sendJumpUpdate(jumpCount: Int, jumpOffset: TimeInterval) {
+        sendPayload(
+            MirroredWorkoutPayload(
+                kind: .jump,
+                jumpCount: jumpCount,
+                jumpOffset: jumpOffset
+            )
+        )
     }
 
     // MARK: - Live Queries
@@ -116,7 +145,12 @@ class WorkoutManager: NSObject {
                 for sample in samples {
                     let bpm = sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
                     print("heartrate: \(bpm) bpm")
-                    self.updateHeartRate(Int(bpm))
+                    let heartRate = Int(bpm)
+                    self.heartRateSum += heartRate
+                    self.heartRateSamples += 1
+                    self.averageHeartRate = self.heartRateSum / self.heartRateSamples
+                    self.peakHeartRate = max(self.peakHeartRate ?? 0, heartRate)
+                    self.updateHeartRate(heartRate)
                 }
             }
         }
@@ -141,11 +175,67 @@ class WorkoutManager: NSObject {
                 for sample in samples {
                     let kcal = sample.quantity.doubleValue(for: HKUnit.kilocalorie())
                     self.updateEnergyBurned(kcal)
+                    self.sendPayload(
+                        MirroredWorkoutPayload(
+                            kind: .metrics,
+                            energyBurned: kcal,
+                            averageHeartRate: self.averageHeartRate,
+                            peakHeartRate: self.peakHeartRate
+                        )
+                    )
                 }
             }
         }
         if let energyBurnedQuery {
             healthStore.execute(energyBurnedQuery)
+        }
+    }
+
+    private var currentEnergyBurned: Double {
+        guard let energyType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned) else {
+            return 0
+        }
+
+        return builder?
+            .statistics(for: energyType)?
+            .sumQuantity()?
+            .doubleValue(for: .kilocalorie()) ?? 0
+    }
+
+    private func startMirroring(startDate: Date, goalType: GoalType, goalValue: Int) {
+        guard let session else { return }
+
+        Task {
+            do {
+                try await session.startMirroringToCompanionDevice()
+                sendPayload(
+                    MirroredWorkoutPayload(
+                        kind: .started,
+                        startTime: startDate,
+                        goalType: goalType,
+                        goalValue: goalValue
+                    )
+                )
+            } catch {
+                print("Failed to start workout mirroring: \(error)")
+            }
+        }
+    }
+
+    private func sendPayload(_ payload: MirroredWorkoutPayload) {
+        guard let session else { return }
+
+        do {
+            let data = try encoder.encode(payload)
+            session.sendToRemoteWorkoutSession(data: data) { success, error in
+                if let error {
+                    print("Failed to send mirrored workout payload: \(error)")
+                } else if !success {
+                    print("Mirrored workout payload was not delivered")
+                }
+            }
+        } catch {
+            print("Failed to encode mirrored workout payload: \(error)")
         }
     }
 }

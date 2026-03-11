@@ -14,12 +14,19 @@ struct ActiveSessionView: View {
     @State private var now = Date()
 
     private var goalValue: Int64 {
-        settings.goalType == .count ? settings.jumpCount : settings.jumpTime
+        if let mirroredGoalValue = appState.sessionGoalValue {
+            return Int64(appState.sessionGoalType == .count ? mirroredGoalValue : mirroredGoalValue / 60)
+        }
+        return settings.goalType == .count ? settings.jumpCount : settings.jumpTime
+    }
+
+    private var goalType: GoalType {
+        appState.sessionGoalType ?? settings.goalType
     }
 
     private var progress: Double {
         guard goalValue > 0 else { return 0 }
-        if settings.goalType == .count {
+        if goalType == .count {
             return min(1.0, Double(appState.jumpCount) / Double(goalValue))
         } else {
             let goalSeconds = goalValue * 60
@@ -28,18 +35,18 @@ struct ActiveSessionView: View {
     }
 
     private var goalText: String {
-        if settings.goalType == .count {
-            "Goal: \(settings.jumpCount.formatted()) jumps"
+        if goalType == .count {
+            "Goal: \(goalValue.formatted()) jumps"
         } else {
-            "Goal: \(settings.jumpTime) min"
+            "Goal: \(goalValue) min"
         }
     }
 
     private var ringSubtitle: String {
-        if settings.goalType == .count {
-            "/ \(settings.jumpCount.formatted()) jumps"
+        if goalType == .count {
+            "/ \(goalValue.formatted()) jumps"
         } else {
-            "/ \(settings.jumpTime) min"
+            "/ \(goalValue) min"
         }
     }
 
@@ -108,7 +115,7 @@ struct ActiveSessionView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "stop.fill")
                         .font(.system(size: 18))
-                    Text("STOP SESSION")
+                    Text(appState.isMirroredWatchSession ? "STOP ON WATCH" : "STOP SESSION")
                         .font(.system(size: 15, weight: .semibold))
                 }
                 .foregroundStyle(AppColors.textPrimary)
@@ -116,6 +123,7 @@ struct ActiveSessionView: View {
                 .frame(height: 56)
             }
             .appGlassButton(prominent: true, tint: AppColors.danger)
+            .disabled(appState.isMirroredWatchSession)
         }
         .padding(.horizontal, 24)
         .task {

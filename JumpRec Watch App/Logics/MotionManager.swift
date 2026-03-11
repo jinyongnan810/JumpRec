@@ -61,13 +61,13 @@ class MotionManager: NSObject {
     // MARK: - Public Methods
 
     /// Start motion tracking and jump detection
-    func startTracking() {
+    func startTracking(startDate: Date, goalType: GoalType, goalValue: Int) {
         guard motionManager.isDeviceMotionAvailable else {
             print("Device motion is not available")
             return
         }
 
-        workoutManager.startWorkout()
+        workoutManager.startWorkout(startDate: startDate, goalType: goalType, goalValue: goalValue)
 
         resetSession()
         isTracking = true
@@ -87,6 +87,10 @@ class MotionManager: NSObject {
         motionManager.stopAccelerometerUpdates()
         workoutManager.stopWorkout()
         motionRecording.removeAll()
+    }
+
+    func recordJump(jumpCount: Int, jumpOffset: TimeInterval) {
+        workoutManager.sendJumpUpdate(jumpCount: jumpCount, jumpOffset: jumpOffset)
     }
 
     func saveCSVtoICloud(filename _: String = "motion.csv") {

@@ -91,8 +91,10 @@ class JumpRecState {
         @unknown default:
             goal = goalCount
         }
-        motionManager?.startTracking()
         startTime = Date()
+        if let startTime {
+            motionManager?.startTracking(startDate: startTime, goalType: goalType, goalValue: goal)
+        }
         jumpState = .jumping
         if goalType == .time {
             startMinuteTimer()
@@ -181,7 +183,9 @@ class JumpRecState {
         guard jumpState == .jumping, let startTime else { return }
         let before = jumpCount
         jumpCount += by
-        jumps.append(Date().timeIntervalSince(startTime))
+        let jumpOffset = Date().timeIntervalSince(startTime)
+        jumps.append(jumpOffset)
+        motionManager?.recordJump(jumpCount: jumpCount, jumpOffset: jumpOffset)
         checkJumpLandmark(before: before, after: jumpCount)
     }
 

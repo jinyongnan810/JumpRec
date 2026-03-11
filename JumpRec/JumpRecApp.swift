@@ -12,6 +12,11 @@ import SwiftUI
 @main
 struct JumpRecApp: App {
     @State private var dataStore = MyDataStore.shared
+
+    init() {
+        WorkoutMirrorManager.shared.activate()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()

@@ -63,8 +63,8 @@ struct SessionCompleteView: View {
                         longestJumpStrikes: "\(appState.breakMetrics.longestStreak)",
                         shortBreaks: "\(appState.breakMetrics.small)",
                         longBreaks: "\(appState.breakMetrics.long)",
-                        averageHeartRate: "--",
-                        peakHeartRate: "--",
+                        averageHeartRate: heartRateText(appState.averageHeartRate),
+                        peakHeartRate: heartRateText(appState.peakHeartRate),
                         rateSamples: rateSamples
                     )
                 }
@@ -94,6 +94,11 @@ struct SessionCompleteView: View {
             return "\(Int(peakRate.rounded()))/min"
         }
         return "--"
+    }
+
+    private func heartRateText(_ value: Int?) -> String {
+        guard let value else { return "--" }
+        return "\(value) bpm"
     }
 }
 

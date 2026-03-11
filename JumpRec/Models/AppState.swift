@@ -16,6 +16,11 @@ final class JumpRecState {
     var jumpCount = 0
     var jumps: [TimeInterval] = []
     var caloriesBurned = 0.0
+    var averageHeartRate: Int?
+    var peakHeartRate: Int?
+    var sessionGoalType: GoalType?
+    var sessionGoalValue: Int?
+    var isMirroredWatchSession = false
 
     var activeMotionSource: DeviceSource?
     var isPhoneMotionAvailable = false
@@ -26,6 +31,10 @@ final class JumpRecState {
 
     @ObservationIgnored
     private var motionManager: MotionManager?
+    @ObservationIgnored
+    private let workoutMirrorManager = WorkoutMirrorManager.shared
+    @ObservationIgnored
+    private let connectivityManager = ConnectivityManager.shared
 
     init() {
         motionManager = MotionManager(
@@ -41,6 +50,23 @@ final class JumpRecState {
             }
         )
         motionManager?.refreshAvailability()
+        workoutMirrorManager.onPayloadReceived = { [weak self] payload in
+            self?.handleMirroredWorkoutPayload(payload)
+        }
+        workoutMirrorManager.onMirroredSessionEnded = { [weak self] in
+            self?.handleMirroredSessionEnded()
+        }
+        connectivityManager.onCompletedSessionReceived = { [weak self] startedAt, endedAt, jumpCount, caloriesBurned, jumpOffsets, averageHeartRate, peakHeartRate in
+            self?.applyCompletedWatchSession(
+                startedAt: startedAt,
+                endedAt: endedAt,
+                jumpCount: jumpCount,
+                caloriesBurned: caloriesBurned,
+                jumpOffsets: jumpOffsets,
+                averageHeartRate: averageHeartRate,
+                peakHeartRate: peakHeartRate
+            )
+        }
     }
 
     var durationSeconds: Int {
@@ -68,12 +94,18 @@ final class JumpRecState {
         resetLiveMetrics()
         startTime = Date()
         endTime = nil
+        averageHeartRate = nil
+        peakHeartRate = nil
+        sessionGoalType = nil
+        sessionGoalValue = nil
+        isMirroredWatchSession = false
         sessionState = .active
         motionManager?.startTracking()
     }
 
     func finish() {
         guard sessionState == .active, let startTime else { return }
+        guard !isMirroredWatchSession else { return }
 
         motionManager?.stopTracking()
         endTime = Date()
@@ -95,6 +127,11 @@ final class JumpRecState {
         sessionState = .idle
         resetLiveMetrics()
         activeMotionSource = nil
+        averageHeartRate = nil
+        peakHeartRate = nil
+        sessionGoalType = nil
+        sessionGoalValue = nil
+        isMirroredWatchSession = false
     }
 
     private func addJump(from source: MotionManager.Source) {
@@ -116,6 +153,105 @@ final class JumpRecState {
         caloriesBurned = 0
         startTime = nil
         endTime = nil
+    }
+
+    private func handleMirroredWorkoutPayload(_ payload: MirroredWorkoutPayload) {
+        switch payload.kind {
+        case .started:
+            beginMirroredSession(payload)
+        case .jump:
+            applyMirroredJump(payload)
+        case .metrics:
+            applyMirroredMetrics(payload)
+        case .ended:
+            applyMirroredEnding(payload)
+        }
+    }
+
+    private func beginMirroredSession(_ payload: MirroredWorkoutPayload) {
+        resetLiveMetrics()
+        averageHeartRate = nil
+        peakHeartRate = nil
+        startTime = payload.startTime ?? Date()
+        endTime = nil
+        jumpCount = payload.jumpCount ?? 0
+        sessionGoalType = payload.goalType
+        sessionGoalValue = payload.goalValue
+        sessionState = .active
+        isMirroredWatchSession = true
+        activeMotionSource = .watch
+    }
+
+    private func applyMirroredJump(_ payload: MirroredWorkoutPayload) {
+        guard isMirroredWatchSession else { return }
+
+        activeMotionSource = .watch
+        if let jumpCount = payload.jumpCount {
+            self.jumpCount = max(self.jumpCount, jumpCount)
+        }
+        if let jumpOffset = payload.jumpOffset {
+            let shouldAppend = jumps.last.map { jumpOffset > $0 } ?? true
+            if shouldAppend {
+                jumps.append(jumpOffset)
+            }
+        }
+    }
+
+    private func applyMirroredMetrics(_ payload: MirroredWorkoutPayload) {
+        guard isMirroredWatchSession else { return }
+
+        if let energyBurned = payload.energyBurned {
+            caloriesBurned = energyBurned
+        }
+        if let averageHeartRate = payload.averageHeartRate {
+            self.averageHeartRate = averageHeartRate
+        }
+        if let peakHeartRate = payload.peakHeartRate {
+            self.peakHeartRate = peakHeartRate
+        }
+    }
+
+    private func applyMirroredEnding(_ payload: MirroredWorkoutPayload) {
+        guard isMirroredWatchSession else { return }
+
+        endTime = payload.endTime ?? Date()
+        if let energyBurned = payload.energyBurned {
+            caloriesBurned = energyBurned
+        }
+        if let averageHeartRate = payload.averageHeartRate {
+            self.averageHeartRate = averageHeartRate
+        }
+        if let peakHeartRate = payload.peakHeartRate {
+            self.peakHeartRate = peakHeartRate
+        }
+        sessionState = .complete
+    }
+
+    private func handleMirroredSessionEnded() {
+        guard isMirroredWatchSession, sessionState == .active else { return }
+        endTime = endTime ?? Date()
+        sessionState = .complete
+    }
+
+    private func applyCompletedWatchSession(
+        startedAt: Date,
+        endedAt: Date,
+        jumpCount: Int,
+        caloriesBurned: Double,
+        jumpOffsets: [TimeInterval],
+        averageHeartRate: Int?,
+        peakHeartRate: Int?
+    ) {
+        guard isMirroredWatchSession else { return }
+
+        startTime = startedAt
+        endTime = endedAt
+        self.jumpCount = jumpCount
+        jumps = jumpOffsets
+        self.caloriesBurned = caloriesBurned
+        self.averageHeartRate = averageHeartRate
+        self.peakHeartRate = peakHeartRate
+        sessionState = .complete
     }
 
     private static func deviceSource(from source: MotionManager.Source?) -> DeviceSource? {
