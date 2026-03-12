@@ -12,7 +12,7 @@ import UIKit
 @Observable
 @MainActor
 final class JumpRecState {
-    private let isMotionCSVExportEnabled = true
+    private let isMotionCSVExportEnabled = false
 
     var sessionState: SessionState = .idle
     var startTime: Date?
@@ -222,6 +222,7 @@ final class JumpRecState {
         jumps.append(Date().timeIntervalSince(startTime))
         checkFeedbackLandmarks()
         syncLiveActivity()
+        finishIfGoalReached()
     }
 
     private func resetLiveMetrics() {
@@ -258,7 +259,7 @@ final class JumpRecState {
         endTime = nil
         jumpCount = payload.jumpCount ?? 0
         sessionGoalType = payload.goalType
-        sessionGoalValue = payload.goalValue
+        sessionGoalValue = normalizedGoalValue(payload.goalValue, for: payload.goalType)
         sessionState = .active
         isMirroredWatchSession = true
         activeMotionSource = .watch
@@ -396,7 +397,7 @@ final class JumpRecState {
             return "\(goalValue.formatted()) jumps"
         }
 
-        return "\(goalValue / 60) min"
+        return "\(goalValue) min"
     }
 
     private var liveActivitySourceLabel: String {
@@ -523,10 +524,53 @@ final class JumpRecState {
         let minutesElapsed = Int(Date().timeIntervalSince(startTime)) / 60
         guard minutesElapsed > 0 else { return }
 
+        if isGoalReached(referenceDate: Date()) {
+            finish()
+            return
+        }
+
         let minuteText = minutesElapsed == 1 ? "1 minute" : "\(minutesElapsed) minutes"
         notificationFeedbackGenerator.notificationOccurred(.success)
         notificationFeedbackGenerator.prepare()
         speak(text: minuteText)
+    }
+
+    private func finishIfGoalReached() {
+        guard isGoalReached(referenceDate: Date()) else { return }
+        finish()
+    }
+
+    private func isGoalReached(referenceDate: Date) -> Bool {
+        guard sessionState == .active,
+              !isMirroredWatchSession,
+              let goalType = sessionGoalType,
+              let goalValue = sessionGoalValue
+        else {
+            return false
+        }
+
+        switch goalType {
+        case .count:
+            return jumpCount >= goalValue
+        case .time:
+            guard let startTime else { return false }
+            return Int(referenceDate.timeIntervalSince(startTime)) >= goalValue * 60
+        @unknown default:
+            return false
+        }
+    }
+
+    private func normalizedGoalValue(_ goalValue: Int?, for goalType: GoalType?) -> Int? {
+        guard let goalValue, let goalType else { return goalValue }
+
+        switch goalType {
+        case .count:
+            return goalValue
+        case .time:
+            return goalValue / 60
+        @unknown default:
+            return goalValue
+        }
     }
 
     private func speak(text: String, delay: TimeInterval = 0.2) {

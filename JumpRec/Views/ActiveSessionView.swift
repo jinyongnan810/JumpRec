@@ -15,7 +15,7 @@ struct ActiveSessionView: View {
 
     private var goalValue: Int64 {
         if let mirroredGoalValue = appState.sessionGoalValue {
-            return Int64(appState.sessionGoalType == .count ? mirroredGoalValue : mirroredGoalValue / 60)
+            return Int64(mirroredGoalValue)
         }
         return settings.goalType == .count ? settings.jumpCount : settings.jumpTime
     }

@@ -57,6 +57,7 @@ public enum SessionAICommentGenerator {
                 Do not repeat raw stats back to the user.
                 Do not overpraise or sound overly excited.
                 Do not restate the numbers directly unless truly needed.
+                Do not use markdown, just plain texts.
                 Return only the text.
                 """
             )
@@ -80,6 +81,7 @@ public enum SessionAICommentGenerator {
     private static func prompt(for session: JumpSession) -> String {
         """
         Write a short highlight of the jump session. And a gental reflective question or a kind words of phrase.
+        Return just the main content. No introduction needed.
         Duration: \(session.durationText)
         Jumps: \(session.jumpCount)
         Calories: \(Int(session.caloriesBurned.rounded()))
