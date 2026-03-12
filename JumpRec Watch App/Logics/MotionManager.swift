@@ -31,8 +31,8 @@ class MotionManager: NSObject {
 
     // MARK: - Detection
 
-    private var updateInterval: TimeInterval = 0.05 // 20Hz sampling rate
-    private let jumpDetector = JumpDetector()
+    private var updateInterval: TimeInterval = 0.025 // 40Hz sampling rate when supported
+    private let jumpDetector = JumpDetector(profile: .watch)
 
     private var motionRecording: [String] = []
 

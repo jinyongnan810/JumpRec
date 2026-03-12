@@ -22,8 +22,8 @@ final class MotionManager: NSObject {
     private let queue = OperationQueue()
     private let updateInterval: TimeInterval = 0.05
 
-    private let phoneDetector = JumpDetector()
-    private let headphoneDetector = JumpDetector()
+    private let phoneDetector = JumpDetector(profile: .iPhonePocket)
+    private let headphoneDetector = JumpDetector(profile: .headphones)
     private let shouldRecordMotionSamples: Bool
     private let recordedSamplesLock = NSLock()
 
