@@ -22,6 +22,8 @@ final class MotionManager: NSObject {
     private let queue = OperationQueue()
     private let updateInterval: TimeInterval = 0.05
 
+    // The app keeps separate detector instances because iPhone-in-pocket motion and headphone motion
+    // have different signal characteristics and should not share internal state.
     private let phoneDetector = JumpDetector(profile: .iPhonePocket)
     private let headphoneDetector = JumpDetector(profile: .headphones)
     private let shouldRecordMotionSamples: Bool
@@ -74,6 +76,7 @@ final class MotionManager: NSObject {
 
     var preferredSource: Source? {
         // Headphone motion wins whenever it is actively producing samples.
+        // This avoids mixing two motion streams into one session count.
         if isHeadphoneConnected, headphoneMotionManager.deviceMotion != nil {
             return .headphones
         }
@@ -94,6 +97,7 @@ final class MotionManager: NSObject {
         guard !isTracking else { return }
 
         isTracking = true
+        // Reset detector state at session start so old peaks / cadence hints do not bleed into a new workout.
         phoneDetector.reset()
         headphoneDetector.reset()
         resetRecordedSamples()
@@ -152,6 +156,8 @@ final class MotionManager: NSObject {
             )
             record(sample)
 
+            // The shared detector operates on normalized `MotionSample` values, so this manager only
+            // adapts Core Motion data into that shared format and forwards accepted jumps to the UI layer.
             if phoneDetector.processMotionSample(sample) {
                 Task { @MainActor in
                     self.onJumpDetected(.iPhone)
@@ -183,6 +189,8 @@ final class MotionManager: NSObject {
             )
             record(sample)
 
+            // Headphone motion is treated as a first-class source rather than a tweak on top of phone motion,
+            // because real-world false positives and thresholds differ enough to justify a dedicated profile.
             if headphoneDetector.processMotionSample(sample) {
                 Task { @MainActor in
                     self.onJumpDetected(.headphones)

@@ -31,6 +31,7 @@ class MotionManager: NSObject {
 
     // MARK: - Detection
 
+    // The watch runs at a higher sample rate than the phone path because impact-style jump signals are brief.
     private var updateInterval: TimeInterval = 0.025 // 40Hz sampling rate when supported
     private let jumpDetector = JumpDetector(profile: .watch)
 
@@ -46,7 +47,8 @@ class MotionManager: NSObject {
     }
 
     private func setupMotionManager() {
-        // Configure motion manager
+        // Device motion provides both acceleration and gyro data in one stream, which is the only input
+        // the shared detector needs once it is converted into `MotionSample`.
         motionManager.deviceMotionUpdateInterval = updateInterval
         motionManager.accelerometerUpdateInterval = updateInterval
 
@@ -73,7 +75,7 @@ class MotionManager: NSObject {
         isTracking = true
         motionRecording = [csvHeader]
 
-        // Start device motion updates for more accurate data
+        // The watch forwards every sample into the shared detector and only owns workout/session plumbing.
         motionManager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
             guard let self, let motion else { return }
             processMotionData(motion)
@@ -119,6 +121,7 @@ class MotionManager: NSObject {
             timestamp: motion.timestamp
         )
 
+        // The detector returns a boolean event instead of a score so the watch UI can stay simple and update live.
         if jumpDetector.processMotionSample(sample) {
             addJump(1)
         }

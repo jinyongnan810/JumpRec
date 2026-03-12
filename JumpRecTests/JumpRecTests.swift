@@ -33,15 +33,14 @@ struct JumpRecTests {
         #expect(samples.map { "\($0.rate)" } == ["144.0", "150.0", "148.0", "150.0", "148.8", "150.0", "150.0", "150.0", "150.0", "150.0", "150.0", "150.0"])
     }
 
-    @Test func testPocketProfileCountsDominantAxisPeriodically() async throws {
+    @Test func testIPhoneProfileCountsOnlyPositiveYAboveThreshold() async throws {
         let detector = JumpDetector(profile: .iPhonePocket)
-        let samples = makePeriodicSamples(
-            duration: 6.0,
-            sampleRate: 40,
-            dominantAxis: \.z,
-            interval: 0.42,
-            amplitude: 1.15
-        )
+        let samples = [
+            makeSample(y: 1.19, timestamp: 0.00),
+            makeSample(y: 1.21, timestamp: 0.30),
+            makeSample(y: 1.30, timestamp: 0.60),
+            makeSample(y: 0.90, timestamp: 0.90),
+        ]
 
         let count = samples.reduce(into: 0) { partialResult, sample in
             if detector.processMotionSample(sample) {
@@ -49,165 +48,120 @@ struct JumpRecTests {
             }
         }
 
-        #expect(count >= 8)
-        #expect(detector.debugState.dominantAxis == .z)
-        #expect(detector.debugState.chosenPolarity != nil)
+        #expect(count == 2)
+        #expect(detector.debugState.dominantAxis == .y)
+        #expect(detector.debugState.chosenPolarity == .positivePeak)
     }
 
-    @Test func testHeadphoneProfileIgnoresIsolatedSpikesUntilRhythmLocks() async throws {
+    @Test func testHeadphoneProfileCountsOnlyNegativeZBelowThreshold() async throws {
         let detector = JumpDetector(profile: .headphones)
-        var samples = makeIdleSamples(duration: 1.0, sampleRate: 50)
-        samples += makeSpikeSamples(times: [1.15, 1.9], sampleRate: 50, axis: \.x, amplitude: 1.4)
-        samples += makePeriodicSamples(
-            duration: 4.0,
-            sampleRate: 50,
-            dominantAxis: \.x,
-            interval: 0.45,
-            amplitude: 1.1,
-            startTime: 2.0
-        )
+        let samples = [
+            makeSample(z: -1.10, timestamp: 0.00),
+            makeSample(z: -1.25, timestamp: 0.30),
+            makeSample(z: -1.35, timestamp: 0.61),
+            makeSample(z: -0.80, timestamp: 0.95),
+        ]
 
-        let timestamps = samples.compactMap { sample -> TimeInterval? in
-            detector.processMotionSample(sample) ? sample.timestamp : nil
+        let count = samples.reduce(into: 0) { partialResult, sample in
+            if detector.processMotionSample(sample) {
+                partialResult += 1
+            }
         }
 
-        #expect(timestamps.count >= 4)
-        #expect(timestamps.first ?? 0 > 3.5)
-        #expect(detector.debugState.rhythmLocked)
+        #expect(count == 2)
+        #expect(detector.debugState.dominantAxis == .z)
+        #expect(detector.debugState.chosenPolarity == .negativeTrough)
     }
 
-    @Test func testWatchProfileRequiresGyroAndAccelerationConfirmation() async throws {
-        let confirmedDetector = JumpDetector(profile: .watch)
-        let confirmedSamples = makeWatchSamples(duration: 5.0, sampleRate: 40, includeAccelerationConfirmation: true)
-        let confirmedCount = confirmedSamples.reduce(into: 0) { partialResult, sample in
-            if confirmedDetector.processMotionSample(sample) {
+    @Test func testWatchProfileCountsOnlyPositiveYAboveThreshold() async throws {
+        let detector = JumpDetector(profile: .watch)
+        let samples = [
+            makeSample(y: 0.79, timestamp: 0.00),
+            makeSample(y: 0.81, timestamp: 0.30),
+            makeSample(y: 1.00, timestamp: 0.62),
+            makeSample(y: 0.40, timestamp: 1.00),
+        ]
+
+        let count = samples.reduce(into: 0) { partialResult, sample in
+            if detector.processMotionSample(sample) {
                 partialResult += 1
             }
         }
 
-        let gyroOnlyDetector = JumpDetector(profile: .watch)
-        let gyroOnlySamples = makeWatchSamples(duration: 5.0, sampleRate: 40, includeAccelerationConfirmation: false)
-        let gyroOnlyCount = gyroOnlySamples.reduce(into: 0) { partialResult, sample in
-            if gyroOnlyDetector.processMotionSample(sample) {
+        #expect(count == 2)
+        #expect(detector.debugState.dominantAxis == .y)
+        #expect(detector.debugState.chosenPolarity == .positivePeak)
+    }
+
+    @Test func testAllProfilesUse250MillisecondMinimumInterval() async throws {
+        let iPhoneDetector = JumpDetector(profile: .iPhonePocket)
+        let headphoneDetector = JumpDetector(profile: .headphones)
+        let watchDetector = JumpDetector(profile: .watch)
+
+        let iPhoneCount = [
+            makeSample(y: 1.30, timestamp: 0.00),
+            makeSample(y: 1.35, timestamp: 0.10),
+            makeSample(y: 1.40, timestamp: 0.26),
+        ].reduce(into: 0) { partialResult, sample in
+            if iPhoneDetector.processMotionSample(sample) {
                 partialResult += 1
             }
         }
 
-        #expect(confirmedCount >= 6)
-        #expect(gyroOnlyCount == 0)
+        let headphoneCount = [
+            makeSample(z: -1.30, timestamp: 0.00),
+            makeSample(z: -1.40, timestamp: 0.12),
+            makeSample(z: -1.50, timestamp: 0.28),
+        ].reduce(into: 0) { partialResult, sample in
+            if headphoneDetector.processMotionSample(sample) {
+                partialResult += 1
+            }
+        }
+
+        let watchCount = [
+            makeSample(y: 0.90, timestamp: 0.00),
+            makeSample(y: 1.00, timestamp: 0.20),
+            makeSample(y: 1.10, timestamp: 0.30),
+        ].reduce(into: 0) { partialResult, sample in
+            if watchDetector.processMotionSample(sample) {
+                partialResult += 1
+            }
+        }
+
+        #expect(iPhoneCount == 2)
+        #expect(headphoneCount == 2)
+        #expect(watchCount == 2)
+    }
+
+    @Test func testResetClearsRefractoryState() async throws {
+        let detector = JumpDetector(profile: .watch)
+
+        #expect(detector.processMotionSample(makeSample(y: 0.90, timestamp: 0.00)))
+        #expect(!detector.processMotionSample(makeSample(y: 0.95, timestamp: 0.10)))
+
+        detector.reset()
+
+        #expect(detector.processMotionSample(makeSample(y: 0.95, timestamp: 0.10)))
+        #expect(detector.debugState.lastAcceptedJumpTimestamp == 0.10)
     }
 }
 
 private extension JumpRecTests {
-    typealias AxisKeyPath = WritableKeyPath<AxisComponents, Double>
-
-    struct AxisComponents {
-        var x: Double = 0
-        var y: Double = 0
-        var z: Double = 0
-    }
-
-    func makeIdleSamples(duration: TimeInterval, sampleRate: Double) -> [MotionSample] {
-        makePeriodicSamples(
-            duration: duration,
-            sampleRate: sampleRate,
-            dominantAxis: \.y,
-            interval: 10,
-            amplitude: 0,
-            startTime: 0
+    /// Produces a raw `MotionSample` with only the requested axes populated.
+    func makeSample(
+        x: Double = 0,
+        y: Double = 0,
+        z: Double = 0,
+        timestamp: TimeInterval
+    ) -> MotionSample {
+        MotionSample(
+            userAccelerationX: x,
+            userAccelerationY: y,
+            userAccelerationZ: z,
+            rotationRateX: 0,
+            rotationRateY: 0,
+            rotationRateZ: 0,
+            timestamp: timestamp
         )
-    }
-
-    func makeSpikeSamples(
-        times: [TimeInterval],
-        sampleRate: Double,
-        axis: AxisKeyPath,
-        amplitude: Double
-    ) -> [MotionSample] {
-        times.map { time in
-            var accel = AxisComponents()
-            accel[keyPath: axis] = amplitude
-            return MotionSample(
-                userAccelerationX: accel.x,
-                userAccelerationY: accel.y,
-                userAccelerationZ: accel.z,
-                rotationRateX: 0,
-                rotationRateY: 0,
-                rotationRateZ: 0,
-                timestamp: time
-            )
-        }.sorted { $0.timestamp < $1.timestamp }
-    }
-
-    func makePeriodicSamples(
-        duration: TimeInterval,
-        sampleRate: Double,
-        dominantAxis: AxisKeyPath,
-        interval: TimeInterval,
-        amplitude: Double,
-        startTime: TimeInterval = 0
-    ) -> [MotionSample] {
-        let dt = 1 / sampleRate
-        let endTime = startTime + duration
-        var samples: [MotionSample] = []
-        var time = startTime
-
-        while time <= endTime {
-            let phase = (time - startTime) / interval
-            let pulse = sin(phase * 2 * .pi)
-            var accel = AxisComponents()
-            accel[keyPath: dominantAxis] = amplitude * pulse
-            accel.x += 0.05 * sin(time * 1.7)
-            accel.y += 0.03 * cos(time * 1.3)
-            accel.z += 0.04 * sin(time * 0.9)
-
-            samples.append(
-                MotionSample(
-                    userAccelerationX: accel.x,
-                    userAccelerationY: accel.y,
-                    userAccelerationZ: accel.z,
-                    rotationRateX: 0,
-                    rotationRateY: 0,
-                    rotationRateZ: 0,
-                    timestamp: time
-                )
-            )
-            time += dt
-        }
-
-        return samples
-    }
-
-    func makeWatchSamples(
-        duration: TimeInterval,
-        sampleRate: Double,
-        includeAccelerationConfirmation: Bool
-    ) -> [MotionSample] {
-        let dt = 1 / sampleRate
-        let interval: TimeInterval = 0.42
-        var samples: [MotionSample] = []
-        var time: TimeInterval = 0
-
-        while time <= duration {
-            let phase = time / interval
-            let gyroPulse = sin(phase * 2 * .pi)
-            let accelPulsePhase = (time - 0.04) / interval
-            let accelPulse = includeAccelerationConfirmation ? sin(accelPulsePhase * 2 * .pi) : 0
-
-            samples.append(
-                MotionSample(
-                    userAccelerationX: 0.04 * sin(time * 0.8),
-                    userAccelerationY: 0.4 * accelPulse,
-                    userAccelerationZ: 0.03 * cos(time * 1.1),
-                    rotationRateX: 0.15 * gyroPulse,
-                    rotationRateY: 1.25 * gyroPulse,
-                    rotationRateZ: 0.12 * gyroPulse,
-                    timestamp: time
-                )
-            )
-            time += dt
-        }
-
-        return samples
     }
 }
