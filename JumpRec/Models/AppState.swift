@@ -3,9 +3,11 @@
 //  JumpRec
 //
 
+import AVFoundation
 import Foundation
 import JumpRecShared
 import Observation
+import UIKit
 
 @Observable
 @MainActor
@@ -43,6 +45,14 @@ final class JumpRecState {
     private let connectivityManager = ConnectivityManager.shared
     @ObservationIgnored
     private let liveActivityManager = LiveActivityManager.shared
+    @ObservationIgnored
+    private let synthesizer = AVSpeechSynthesizer()
+    // @ObservationIgnored
+    // private let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+    @ObservationIgnored
+    private let notificationFeedbackGenerator = UINotificationFeedbackGenerator()
+    @ObservationIgnored
+    private var minuteTimer: Timer?
 
     init() {
         motionManager = MotionManager(
@@ -77,6 +87,9 @@ final class JumpRecState {
                 session: session
             )
         }
+        configureAudioSession()
+        warmUpSpeechSynthesizer()
+        prepareHaptics()
     }
 
     var durationSeconds: Int {
@@ -129,6 +142,7 @@ final class JumpRecState {
     }
 
     private func startLocalSession(goalType: GoalType, goalValue: Int) {
+        invalidateMinuteTimer()
         resetLiveMetrics()
         completedSession = nil
         startTime = Date()
@@ -141,6 +155,11 @@ final class JumpRecState {
         pendingMirroredStart = false
         sessionState = .active
         motionManager?.startTracking()
+        if goalType == .time {
+            startMinuteTimer()
+        }
+        notificationFeedbackGenerator.notificationOccurred(.success)
+        speak(text: "Session Started!")
         syncLiveActivity()
     }
 
@@ -148,10 +167,13 @@ final class JumpRecState {
         guard sessionState == .active, let startTime else { return }
         guard !isMirroredWatchSession else { return }
 
+        invalidateMinuteTimer()
         motionManager?.stopTracking()
         let motionSamples = motionManager?.consumeRecordedSamples() ?? []
         endTime = Date()
         sessionState = .complete
+        notificationFeedbackGenerator.notificationOccurred(.success)
+        speak(text: "Session Finished!")
         syncLiveActivity()
 
         if let endTime {
@@ -167,6 +189,7 @@ final class JumpRecState {
     }
 
     func reset() {
+        invalidateMinuteTimer()
         motionManager?.stopTracking()
         sessionState = .idle
         resetLiveMetrics()
@@ -193,8 +216,11 @@ final class JumpRecState {
         }
 
         activeMotionSource = resolvedSource
+        // impactFeedbackGenerator.impactOccurred(intensity: 0.9)
+        // impactFeedbackGenerator.prepare()
         jumpCount += 1
         jumps.append(Date().timeIntervalSince(startTime))
+        checkFeedbackLandmarks()
         syncLiveActivity()
     }
 
@@ -222,6 +248,7 @@ final class JumpRecState {
     }
 
     private func beginMirroredSession(_ payload: MirroredWorkoutPayload) {
+        invalidateMinuteTimer()
         pendingMirroredStart = false
         resetLiveMetrics()
         averageHeartRate = nil
@@ -272,6 +299,7 @@ final class JumpRecState {
     private func applyMirroredEnding(_ payload: MirroredWorkoutPayload) {
         guard isMirroredWatchSession else { return }
 
+        invalidateMinuteTimer()
         endTime = payload.endTime ?? Date()
         if let energyBurned = payload.energyBurned {
             caloriesBurned = energyBurned
@@ -288,6 +316,7 @@ final class JumpRecState {
 
     private func handleMirroredSessionEnded() {
         guard isMirroredWatchSession, sessionState == .active else { return }
+        invalidateMinuteTimer()
         endTime = endTime ?? Date()
         sessionState = .complete
         syncLiveActivity()
@@ -305,6 +334,7 @@ final class JumpRecState {
     ) {
         guard isMirroredWatchSession else { return }
 
+        invalidateMinuteTimer()
         startTime = startedAt
         endTime = endedAt
         self.jumpCount = jumpCount
@@ -438,5 +468,72 @@ final class JumpRecState {
 
     private func sanitizedFilenameTimestamp(from value: String) -> String {
         value.replacingOccurrences(of: ":", with: "-")
+    }
+
+    private func configureAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Audio session config error: \(error)")
+        }
+    }
+
+    private func warmUpSpeechSynthesizer() {
+        let utterance = AVSpeechUtterance(string: "Hello")
+        utterance.volume = 0
+        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        synthesizer.speak(utterance)
+    }
+
+    private func prepareHaptics() {
+        // impactFeedbackGenerator.prepare()
+        notificationFeedbackGenerator.prepare()
+    }
+
+    private func checkFeedbackLandmarks() {
+        guard !isMirroredWatchSession else { return }
+
+        if sessionGoalType == .count, jumpCount > 0, jumpCount.isMultiple(of: 100) {
+            notificationFeedbackGenerator.notificationOccurred(.success)
+            notificationFeedbackGenerator.prepare()
+            speak(text: "\(jumpCount) Jumps")
+        }
+    }
+
+    private func startMinuteTimer() {
+        invalidateMinuteTimer()
+        minuteTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.handleMinuteLandmark()
+            }
+        }
+    }
+
+    private func invalidateMinuteTimer() {
+        minuteTimer?.invalidate()
+        minuteTimer = nil
+    }
+
+    private func handleMinuteLandmark() {
+        guard sessionState == .active, !isMirroredWatchSession, sessionGoalType == .time, let startTime else {
+            return
+        }
+
+        let minutesElapsed = Int(Date().timeIntervalSince(startTime)) / 60
+        guard minutesElapsed > 0 else { return }
+
+        let minuteText = minutesElapsed == 1 ? "1 minute" : "\(minutesElapsed) minutes"
+        notificationFeedbackGenerator.notificationOccurred(.success)
+        notificationFeedbackGenerator.prepare()
+        speak(text: minuteText)
+    }
+
+    private func speak(text: String, delay: TimeInterval = 0.2) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            let utterance = AVSpeechUtterance(string: text)
+            utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+            self.synthesizer.speak(utterance)
+        }
     }
 }
