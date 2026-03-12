@@ -4,7 +4,6 @@
 //
 
 import Charts
-import JumpRecShared
 import SwiftUI
 
 struct JumpingRateGraphView: View {

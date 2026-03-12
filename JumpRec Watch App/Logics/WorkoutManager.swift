@@ -7,7 +7,6 @@
 
 import Foundation
 import HealthKit
-import JumpRecShared
 
 /// Manages HealthKit workout sessions, heart rate, and energy burned tracking.
 class WorkoutManager: NSObject {

@@ -4,7 +4,6 @@
 //
 
 import ActivityKit
-import JumpRecShared
 import SwiftUI
 import WidgetKit
 

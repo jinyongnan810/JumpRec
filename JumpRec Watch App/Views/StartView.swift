@@ -6,7 +6,6 @@
 //
 
 import Combine
-import JumpRecShared
 import SwiftUI
 
 struct StartView: View {

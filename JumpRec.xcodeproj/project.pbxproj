@@ -10,13 +10,7 @@
 		3F2D44862F6164700063B4C3 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F2D44852F6164700063B4C3 /* WidgetKit.framework */; };
 		3F2D44882F6164700063B4C3 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F2D44872F6164700063B4C3 /* SwiftUI.framework */; };
 		3F2D44972F6164710063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3F2D44842F6164700063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		3F2D449D2F6164B20063B4C3 /* JumpRecShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FCE40492E758A82009C271D /* JumpRecShared.framework */; };
-		3F2D449E2F6164B20063B4C3 /* JumpRecShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3FCE40492E758A82009C271D /* JumpRecShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3FCE402F2E7589A9009C271D /* JumpRec Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3FCE402E2E7589A9009C271D /* JumpRec Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		3FCE40512E758A82009C271D /* JumpRecShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FCE40492E758A82009C271D /* JumpRecShared.framework */; };
-		3FCE40522E758A82009C271D /* JumpRecShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3FCE40492E758A82009C271D /* JumpRecShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		3FCE40582E758A98009C271D /* JumpRecShared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FCE40492E758A82009C271D /* JumpRecShared.framework */; };
-		3FCE40592E758A98009C271D /* JumpRecShared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3FCE40492E758A82009C271D /* JumpRecShared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,33 +21,12 @@
 			remoteGlobalIDString = 3F2D44832F6164700063B4C3;
 			remoteInfo = "Jump​Rec​Live​Activity​ExtensionExtension";
 		};
-		3F2D449F2F6164B20063B4C3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3FCE40192E7589A8009C271D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3FCE40482E758A82009C271D;
-			remoteInfo = JumpRecShared;
-		};
 		3FCE40302E7589A9009C271D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3FCE40192E7589A8009C271D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 3FCE402D2E7589A9009C271D;
 			remoteInfo = "JumpRec Watch App";
-		};
-		3FCE404F2E758A82009C271D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3FCE40192E7589A8009C271D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3FCE40482E758A82009C271D;
-			remoteInfo = JumpRecShared;
-		};
-		3FCE405A2E758A98009C271D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3FCE40192E7589A8009C271D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3FCE40482E758A82009C271D;
-			remoteInfo = JumpRecShared;
 		};
 		3FF03B032F604A5400D83A85 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -76,17 +49,6 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3F2D44A12F6164B20063B4C3 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				3F2D449E2F6164B20063B4C3 /* JumpRecShared.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		3FCE403E2E7589A9009C271D /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -96,28 +58,6 @@
 				3FCE402F2E7589A9009C271D /* JumpRec Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		3FCE40562E758A82009C271D /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				3FCE40522E758A82009C271D /* JumpRecShared.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		3FCE405C2E758A98009C271D /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				3FCE40592E758A98009C271D /* JumpRecShared.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -134,20 +74,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3F2441A72F526D170026DA2C /* Exceptions for "JumpRecShared" folder in "JumpRec" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				JumpRecIcon.icon,
-			);
-			target = 3FCE40202E7589A8009C271D /* JumpRec */;
-		};
-		3F2441A92F526D210026DA2C /* Exceptions for "JumpRecShared" folder in "JumpRec Watch App" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				JumpRecIcon.icon,
-			);
-			target = 3FCE402D2E7589A9009C271D /* JumpRec Watch App */;
-		};
 		3F2D449B2F6164710063B4C3 /* Exceptions for "Jump​Rec​Live​Activity​Extension" folder in "Jump​Rec​Live​Activity​ExtensionExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -188,10 +114,6 @@
 		};
 		3FCE404A2E758A82009C271D /* JumpRecShared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				3F2441A72F526D170026DA2C /* Exceptions for "JumpRecShared" folder in "JumpRec" target */,
-				3F2441A92F526D210026DA2C /* Exceptions for "JumpRecShared" folder in "JumpRec Watch App" target */,
-			);
 			path = JumpRecShared;
 			sourceTree = "<group>";
 		};
@@ -208,7 +130,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F2D44882F6164700063B4C3 /* SwiftUI.framework in Frameworks */,
-				3F2D449D2F6164B20063B4C3 /* JumpRecShared.framework in Frameworks */,
 				3F2D44862F6164700063B4C3 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -217,7 +138,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3FCE40512E758A82009C271D /* JumpRecShared.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -225,7 +145,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3FCE40582E758A98009C271D /* JumpRecShared.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,15 +220,14 @@
 				3F2D44802F6164700063B4C3 /* Sources */,
 				3F2D44812F6164700063B4C3 /* Frameworks */,
 				3F2D44822F6164700063B4C3 /* Resources */,
-				3F2D44A12F6164B20063B4C3 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				3F2D44A02F6164B20063B4C3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				3F2D44892F6164700063B4C3 /* Jump​Rec​Live​Activity​Extension */,
+				3FCE404A2E758A82009C271D /* JumpRecShared */,
 			);
 			name = "Jump​Rec​Live​Activity​ExtensionExtension";
 			packageProductDependencies = (
@@ -326,18 +244,17 @@
 				3FCE401E2E7589A8009C271D /* Frameworks */,
 				3FCE401F2E7589A8009C271D /* Resources */,
 				3FCE403E2E7589A9009C271D /* Embed Watch Content */,
-				3FCE40562E758A82009C271D /* Embed Frameworks */,
 				3F2D449C2F6164710063B4C3 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				3FCE40312E7589A9009C271D /* PBXTargetDependency */,
-				3FCE40502E758A82009C271D /* PBXTargetDependency */,
 				3F2D44962F6164710063B4C3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				3FCE40232E7589A8009C271D /* JumpRec */,
+				3FCE404A2E758A82009C271D /* JumpRecShared */,
 			);
 			name = JumpRec;
 			packageProductDependencies = (
@@ -353,15 +270,14 @@
 				3FCE402A2E7589A9009C271D /* Sources */,
 				3FCE402B2E7589A9009C271D /* Frameworks */,
 				3FCE402C2E7589A9009C271D /* Resources */,
-				3FCE405C2E758A98009C271D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				3FCE405B2E758A98009C271D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				3FCE40322E7589A9009C271D /* JumpRec Watch App */,
+				3FCE404A2E758A82009C271D /* JumpRecShared */,
 			);
 			name = "JumpRec Watch App";
 			packageProductDependencies = (
@@ -408,6 +324,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				3FF03B002F604A5400D83A85 /* JumpRecTests */,
+				3FCE404A2E758A82009C271D /* JumpRecShared */,
 			);
 			name = JumpRecTests;
 			packageProductDependencies = (
@@ -549,25 +466,10 @@
 			target = 3F2D44832F6164700063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension */;
 			targetProxy = 3F2D44952F6164710063B4C3 /* PBXContainerItemProxy */;
 		};
-		3F2D44A02F6164B20063B4C3 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3FCE40482E758A82009C271D /* JumpRecShared */;
-			targetProxy = 3F2D449F2F6164B20063B4C3 /* PBXContainerItemProxy */;
-		};
 		3FCE40312E7589A9009C271D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3FCE402D2E7589A9009C271D /* JumpRec Watch App */;
 			targetProxy = 3FCE40302E7589A9009C271D /* PBXContainerItemProxy */;
-		};
-		3FCE40502E758A82009C271D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3FCE40482E758A82009C271D /* JumpRecShared */;
-			targetProxy = 3FCE404F2E758A82009C271D /* PBXContainerItemProxy */;
-		};
-		3FCE405B2E758A98009C271D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3FCE40482E758A82009C271D /* JumpRecShared */;
-			targetProxy = 3FCE405A2E758A98009C271D /* PBXContainerItemProxy */;
 		};
 		3FF03B042F604A5400D83A85 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -870,7 +772,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kinn.JumpRec;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -914,7 +816,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kinn.JumpRec;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

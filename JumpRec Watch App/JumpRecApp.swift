@@ -6,7 +6,6 @@
 //
 
 import HealthKit
-import JumpRecShared
 import SwiftData
 import SwiftUI
 import WatchKit

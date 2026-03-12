@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import JumpRecShared
 import Testing
 
 struct JumpRecTests {

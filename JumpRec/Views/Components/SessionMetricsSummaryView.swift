@@ -3,7 +3,6 @@
 //  JumpRec
 //
 
-import JumpRecShared
 import SwiftUI
 
 struct SessionMetricsSummaryView: View {

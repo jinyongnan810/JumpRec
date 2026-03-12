@@ -5,7 +5,6 @@
 //  Created by Yuunan kin on 2025/09/13.
 //
 
-import JumpRecShared
 import SwiftData
 import SwiftUI
 

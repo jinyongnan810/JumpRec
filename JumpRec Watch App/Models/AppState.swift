@@ -7,7 +7,6 @@
 
 import AVFoundation
 import Foundation
-import JumpRecShared
 import Observation
 import WatchKit
 

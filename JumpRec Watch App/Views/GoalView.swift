@@ -5,7 +5,6 @@
 //  Created by Yuunan kin on 2025/09/15.
 //
 
-import JumpRecShared
 import SwiftUI
 
 struct GoalView: View {

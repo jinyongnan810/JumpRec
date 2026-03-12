@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import JumpRecShared
 import WatchConnectivity
 
 final class ConnectivityManager: NSObject, WCSessionDelegate {

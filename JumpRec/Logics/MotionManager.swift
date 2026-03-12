@@ -6,7 +6,6 @@
 import AVFAudio
 import CoreMotion
 import Foundation
-import JumpRecShared
 
 /// Manages jump detection on iPhone using both local device motion and supported headphone motion.
 final class MotionManager: NSObject {

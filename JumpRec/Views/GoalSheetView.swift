@@ -3,7 +3,6 @@
 //  JumpRec
 //
 
-import JumpRecShared
 import SwiftUI
 import UIKit
 

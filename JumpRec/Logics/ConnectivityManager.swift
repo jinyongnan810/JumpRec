@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import JumpRecShared
 import SwiftData
 import WatchConnectivity
 

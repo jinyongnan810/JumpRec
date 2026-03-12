@@ -5,7 +5,6 @@
 //  Created by Yuunan kin on 2025/10/05.
 //
 
-import JumpRecShared
 import SwiftUI
 
 struct JumpingView: View {

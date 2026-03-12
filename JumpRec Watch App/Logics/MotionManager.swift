@@ -7,7 +7,6 @@
 
 import CoreMotion
 import Foundation
-import JumpRecShared
 
 let csvHeader = "Timestamp,AX,AY,AZ,RX,RY,RZ,Jump\n"
 

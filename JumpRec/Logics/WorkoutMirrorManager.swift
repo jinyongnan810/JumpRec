@@ -5,7 +5,6 @@
 
 import Foundation
 import HealthKit
-import JumpRecShared
 
 @MainActor
 final class WorkoutMirrorManager: NSObject {
