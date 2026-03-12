@@ -12,8 +12,7 @@ struct DeviceSelectorView: View {
     let isWatchMotionAvailable: Bool
     let watchUnavailableReason: String
 
-    @State private var infoMessage: String?
-    @State private var dismissTask: Task<Void, Never>?
+    @State private var presentedInfoSource: DeviceSource?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -36,16 +35,6 @@ struct DeviceSelectorView: View {
                 }
             }
         }
-        .overlay(alignment: .center) {
-            if let infoMessage {
-                infoBanner(message: infoMessage)
-                    .padding(.horizontal, 8)
-                    .offset(y: 56)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                    .zIndex(1)
-            }
-        }
-        .animation(.easeInOut(duration: 0.2), value: infoMessage)
     }
 
     private var activeSourceCard: some View {
@@ -91,11 +80,26 @@ struct DeviceSelectorView: View {
                 badgeLabel(for: source, isAvailable: isAvailable, isActive: isActive)
             } else {
                 Button {
-                    showInfo(message)
+                    presentedInfoSource = source
                 } label: {
                     badgeLabel(for: source, isAvailable: isAvailable, isActive: isActive)
                 }
                 .buttonStyle(.plain)
+                .popover(
+                    isPresented: Binding(
+                        get: { presentedInfoSource == source },
+                        set: { isPresented in
+                            if !isPresented, presentedInfoSource == source {
+                                presentedInfoSource = nil
+                            }
+                        }
+                    ),
+                    attachmentAnchor: .rect(.bounds),
+                    arrowEdge: .bottom
+                ) {
+                    infoPopover(message: message)
+                        .presentationCompactAdaptation(.popover)
+                }
                 .accessibilityHint("Shows why this device is unavailable")
             }
         }
@@ -123,7 +127,7 @@ struct DeviceSelectorView: View {
         .accessibilityValue(badgeAccessibilityValue(isAvailable: isAvailable, isActive: isActive))
     }
 
-    private func infoBanner(message: String) -> some View {
+    private func infoPopover(message: String) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "info.circle.fill")
                 .font(.system(size: 14, weight: .semibold))
@@ -138,12 +142,7 @@ struct DeviceSelectorView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background(AppColors.cardSurface.opacity(0.92))
-        .overlay {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(AppColors.warning.opacity(0.35), lineWidth: 1)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .frame(maxWidth: 260, alignment: .leading)
     }
 
     private func badgeForeground(isAvailable: Bool, isActive: Bool) -> Color {
@@ -194,20 +193,6 @@ struct DeviceSelectorView: View {
             "iPhone motion is not available on this device."
         case .airpods:
             "Headphone motion is unavailable. Connect supported AirPods or Beats and allow motion access."
-        }
-    }
-
-    private func showInfo(_ message: String) {
-        dismissTask?.cancel()
-        infoMessage = message
-        dismissTask = Task {
-            try? await Task.sleep(for: .seconds(3))
-            guard !Task.isCancelled else { return }
-            await MainActor.run {
-                withAnimation {
-                    infoMessage = nil
-                }
-            }
         }
     }
 }
