@@ -15,6 +15,8 @@ struct HistoryView: View {
     @State private var displayedMonth = Date()
     @State private var showRecords = false
     @State private var selectedSession: JumpSession?
+    @State private var sessionsPendingDeletion: [JumpSession] = []
+    @State private var showingDeleteConfirmation = false
 
     private var calendar: Calendar { Calendar.current }
 
@@ -134,6 +136,11 @@ struct HistoryView: View {
                 .presentationDragIndicator(.visible)
                 .presentationBackground(AppColors.cardSurface)
         }
+        .deleteSessionAlert(
+            isPresented: $showingDeleteConfirmation,
+            sessionCount: sessionsPendingDeletion.count,
+            onDelete: confirmDeleteSessions
+        )
     }
 
     private func formatCount(_ value: Int) -> String {
@@ -157,8 +164,20 @@ struct HistoryView: View {
     }
 
     private func deleteSessions(at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(sessionsInMonth[index])
+        sessionsPendingDeletion = offsets.map { sessionsInMonth[$0] }
+        showingDeleteConfirmation = !sessionsPendingDeletion.isEmpty
+    }
+
+    private func confirmDeleteSessions() {
+        for session in sessionsPendingDeletion {
+            modelContext.delete(session)
+        }
+
+        do {
+            try modelContext.save()
+            sessionsPendingDeletion = []
+        } catch {
+            print("Failed to delete sessions: \(error)")
         }
     }
 }

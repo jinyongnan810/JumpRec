@@ -9,8 +9,11 @@ import SwiftUI
 
 struct SessionDetailView: View {
     @Environment(MyDataStore.self) private var dataStore
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
     let session: JumpSession
     @State private var isGeneratingComment = false
+    @State private var showingDeleteConfirmation = false
 
     private var dateText: String {
         let formatter = DateFormatter()
@@ -68,6 +71,16 @@ struct SessionDetailView: View {
         .scrollIndicators(.hidden)
         .navigationTitle("Session Details")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(role: .destructive) {
+                    showingDeleteConfirmation = true
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
+        }
+        .deleteSessionAlert(isPresented: $showingDeleteConfirmation, onDelete: deleteSession)
         .task(id: session.id) {
             await generateCommentIfNeeded()
         }
@@ -104,6 +117,17 @@ struct SessionDetailView: View {
         _ = await dataStore.generateAICommentIfNeeded(for: session)
         isGeneratingComment = false
     }
+
+    private func deleteSession() {
+        modelContext.delete(session)
+
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            print("Failed to delete session: \(error)")
+        }
+    }
 }
 
 // MARK: - Preview
@@ -123,16 +147,38 @@ struct SessionDetailView: View {
         endedAt: end,
         jumpCount: 1024,
         peakRate: 168,
+        averageRate: 142,
         caloriesBurned: 198,
         smallBreaksCount: 3,
-        longBreaksCount: 1
+        longBreaksCount: 1,
+        longestStreak: 186,
+        averageHeartRate: 144,
+        peakHeartRate: 172,
+        aiComment: "Strong mid-session pace with solid consistency. You held a high cadence and kept breaks under control."
     )
     container.mainContext.insert(session)
+
+    let sampleData: [(Int, Double)] = [
+        (0, 96), (30, 118), (60, 136), (90, 154),
+        (120, 168), (150, 162), (180, 148), (210, 140),
+        (240, 146), (270, 152), (300, 144), (330, 132),
+        (360, 124), (390, 116), (420, 108),
+    ]
+
+    for (secondOffset, rate) in sampleData {
+        let sample = SessionRateSample(session: session, secondOffset: secondOffset, rate: rate)
+        container.mainContext.insert(sample)
+        if session.rateSamples == nil {
+            session.rateSamples = []
+        }
+        session.rateSamples?.append(sample)
+    }
 
     return NavigationStack {
         SessionDetailView(session: session)
     }
     .modelContainer(container)
+    .environment(MyDataStore.shared)
     .background(AppColors.bgPrimary)
     .preferredColorScheme(.dark)
 }
