@@ -49,22 +49,26 @@ public enum SessionAICommentGenerator {
             let languageSession = LanguageModelSession(
                 model: model,
                 instructions: """
-                Write one short summary of the highlight of the jump rope session.
-                Keep it casual, gental, simple, and human.
-                Keep it about 40 words total.
-                Use at most one emoji, and only if it fits naturally.
+                Generate two short fields for a jump rope session recap.
+                Keep the tone casual, gentle, simple, and human.
+                The highlight should be one short sentence about the session's most notable point.
+                The phrase should be either a gentle reflective question or a kind supportive phrase.
+                Keep the combined output around 40 words total.
+                Use at most one emoji across both fields, and only if it fits naturally.
                 Do not guess or describe the user's emotions.
                 Do not repeat raw stats back to the user.
                 Do not overpraise or sound overly excited.
-                Do not restate the numbers directly unless truly needed.
-                Do not use markdown, just plain texts.
-                Return only the text.
+                Do not use markdown.
+                Do not assume this is the best record.
                 """
             )
 
             do {
-                let response = try await languageSession.respond(to: prompt(for: session))
-                let comment = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
+                let response = try await languageSession.respond(
+                    to: prompt(for: session),
+                    generating: SessionAICommentResponse.self
+                )
+                let comment = response.content.formattedComment
                 guard !comment.isEmpty else { return nil }
 
                 session.aiComment = comment
@@ -80,8 +84,8 @@ public enum SessionAICommentGenerator {
 
     private static func prompt(for session: JumpSession) -> String {
         """
-        Write a short highlight of the jump session. And a gental reflective question or a kind words of phrase.
-        Return just the main content. No introduction needed.
+        Create a short highlight and a short phrase for this jump rope session.
+        The phrase must be either a gentle reflective question or a kind supportive phrase.
         Duration: \(session.durationText)
         Jumps: \(session.jumpCount)
         Calories: \(Int(session.caloriesBurned.rounded()))
@@ -95,6 +99,25 @@ public enum SessionAICommentGenerator {
         """
     }
 }
+
+#if os(iOS) && canImport(FoundationModels)
+    @available(iOS 26.0, *)
+    @Generable(description: "A short recap of a jump rope session with a highlight and a phrase.")
+    private struct SessionAICommentResponse {
+        @Guide(description: "One short sentence describing the session highlight.")
+        let highlight: String
+
+        @Guide(description: "One short reflective question or kind supportive phrase.")
+        let phrase: String
+
+        var formattedComment: String {
+            [highlight, phrase]
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+                .joined(separator: "\n\n")
+        }
+    }
+#endif
 
 private extension JumpSession {
     var durationText: String {
