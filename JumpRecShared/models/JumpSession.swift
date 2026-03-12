@@ -52,6 +52,9 @@ public final class JumpSession {
     /// Peak heart rate during the session in beats per minute.
     public var peakHeartRate: Int?
 
+    /// Optional AI-generated recap for the session.
+    public var aiComment: String?
+
     /// Normalized rate samples for charting and analytics.
     /// When this session is deleted, related samples are automatically deleted.
     @Relationship(deleteRule: .cascade, inverse: \SessionRateSample.session)
@@ -81,7 +84,8 @@ public final class JumpSession {
         longBreaksCount: Int = 0,
         longestStreak: Int = 0,
         averageHeartRate: Int? = nil,
-        peakHeartRate: Int? = nil
+        peakHeartRate: Int? = nil,
+        aiComment: String? = nil
     ) {
         id = UUID()
         self.startedAt = startedAt
@@ -96,5 +100,6 @@ public final class JumpSession {
         self.longestStreak = longestStreak
         self.averageHeartRate = averageHeartRate
         self.peakHeartRate = peakHeartRate
+        self.aiComment = aiComment
     }
 }

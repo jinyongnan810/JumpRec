@@ -54,6 +54,15 @@ struct SessionCompleteView: View {
                             .foregroundStyle(AppColors.textSecondary)
                     }
 
+                    if let completedSession = appState.completedSession,
+                       SessionAICommentGenerator.shouldGenerate(for: completedSession)
+                    {
+                        AICommentCardView(
+                            comment: completedSession.aiComment,
+                            isLoading: completedSession.aiComment == nil && SessionAICommentGenerator.isAvailable
+                        )
+                    }
+
                     SessionMetricsSummaryView(
                         duration: appState.elapsedFormatted,
                         jumps: "\(appState.jumpCount)",

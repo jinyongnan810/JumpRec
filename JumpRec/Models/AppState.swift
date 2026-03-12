@@ -23,6 +23,7 @@ final class JumpRecState {
     var sessionGoalType: GoalType?
     var sessionGoalValue: Int?
     var isMirroredWatchSession = false
+    var completedSession: JumpSession?
 
     var activeMotionSource: DeviceSource?
     var isPhoneMotionAvailable = false
@@ -64,7 +65,7 @@ final class JumpRecState {
         workoutMirrorManager.onMirroredSessionEnded = { [weak self] in
             self?.handleMirroredSessionEnded()
         }
-        connectivityManager.onCompletedSessionReceived = { [weak self] startedAt, endedAt, jumpCount, caloriesBurned, jumpOffsets, averageHeartRate, peakHeartRate in
+        connectivityManager.onCompletedSessionReceived = { [weak self] startedAt, endedAt, jumpCount, caloriesBurned, jumpOffsets, averageHeartRate, peakHeartRate, session in
             self?.applyCompletedWatchSession(
                 startedAt: startedAt,
                 endedAt: endedAt,
@@ -72,7 +73,8 @@ final class JumpRecState {
                 caloriesBurned: caloriesBurned,
                 jumpOffsets: jumpOffsets,
                 averageHeartRate: averageHeartRate,
-                peakHeartRate: peakHeartRate
+                peakHeartRate: peakHeartRate,
+                session: session
             )
         }
     }
@@ -128,6 +130,7 @@ final class JumpRecState {
 
     private func startLocalSession(goalType: GoalType, goalValue: Int) {
         resetLiveMetrics()
+        completedSession = nil
         startTime = Date()
         endTime = nil
         averageHeartRate = nil
@@ -152,7 +155,7 @@ final class JumpRecState {
         syncLiveActivity()
 
         if let endTime {
-            dataStore.saveCompletedSession(
+            completedSession = dataStore.saveCompletedSession(
                 startedAt: startTime,
                 endedAt: endTime,
                 jumpCount: jumpCount,
@@ -174,6 +177,7 @@ final class JumpRecState {
         sessionGoalType = nil
         sessionGoalValue = nil
         isMirroredWatchSession = false
+        completedSession = nil
         pendingMirroredStart = false
         Task {
             await liveActivityManager.endIfNeeded()
@@ -222,6 +226,7 @@ final class JumpRecState {
         resetLiveMetrics()
         averageHeartRate = nil
         peakHeartRate = nil
+        completedSession = nil
         startTime = payload.startTime ?? Date()
         endTime = nil
         jumpCount = payload.jumpCount ?? 0
@@ -295,7 +300,8 @@ final class JumpRecState {
         caloriesBurned: Double,
         jumpOffsets: [TimeInterval],
         averageHeartRate: Int?,
-        peakHeartRate: Int?
+        peakHeartRate: Int?,
+        session: JumpSession
     ) {
         guard isMirroredWatchSession else { return }
 
@@ -306,6 +312,7 @@ final class JumpRecState {
         self.caloriesBurned = caloriesBurned
         self.averageHeartRate = averageHeartRate
         self.peakHeartRate = peakHeartRate
+        completedSession = session
         sessionState = .complete
         syncLiveActivity()
     }

@@ -21,7 +21,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     var isWatchAppInstalled: Bool = false
     var isReachable: Bool = false
     var activationState: WCSessionActivationState = .notActivated
-    var onCompletedSessionReceived: ((Date, Date, Int, Double, [TimeInterval], Int?, Int?) -> Void)?
+    var onCompletedSessionReceived: ((Date, Date, Int, Double, [TimeInterval], Int?, Int?, JumpSession) -> Void)?
     private let settingsStore = NSUbiquitousKeyValueStore.default
 
     override private init() {
@@ -134,17 +134,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         let peakHeartRate = numberAsInt(userInfo["peakHeartRate"])
 
         Task { @MainActor in
-            self.onCompletedSessionReceived?(
-                startedAt,
-                endedAt,
-                jumpCount,
-                caloriesBurned,
-                jumpOffsets,
-                averageHeartRate,
-                peakHeartRate
-            )
-
-            MyDataStore.shared.saveCompletedSession(
+            let session = MyDataStore.shared.saveCompletedSession(
                 startedAt: startedAt,
                 endedAt: endedAt,
                 jumpCount: jumpCount,
@@ -152,6 +142,17 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
                 jumpOffsets: jumpOffsets,
                 averageHeartRate: averageHeartRate,
                 peakHeartRate: peakHeartRate
+            )
+
+            self.onCompletedSessionReceived?(
+                startedAt,
+                endedAt,
+                jumpCount,
+                caloriesBurned,
+                jumpOffsets,
+                averageHeartRate,
+                peakHeartRate,
+                session
             )
         }
 

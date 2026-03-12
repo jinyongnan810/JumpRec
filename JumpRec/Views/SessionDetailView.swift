@@ -8,7 +8,9 @@ import SwiftData
 import SwiftUI
 
 struct SessionDetailView: View {
+    @Environment(MyDataStore.self) private var dataStore
     let session: JumpSession
+    @State private var isGeneratingComment = false
 
     private var dateText: String {
         let formatter = DateFormatter()
@@ -39,6 +41,14 @@ struct SessionDetailView: View {
                     Spacer()
                 }
 
+                if SessionAICommentGenerator.shouldGenerate(for: session) {
+                    if let aiComment = session.aiComment {
+                        AICommentCardView(comment: aiComment, isLoading: false)
+                    } else if isGeneratingComment {
+                        AICommentCardView(comment: nil, isLoading: true)
+                    }
+                }
+
                 SessionMetricsSummaryView(
                     duration: durationText,
                     jumps: session.jumpCount.formatted(),
@@ -58,6 +68,9 @@ struct SessionDetailView: View {
         .scrollIndicators(.hidden)
         .navigationTitle("Session Details")
         .navigationBarTitleDisplayMode(.inline)
+        .task(id: session.id) {
+            await generateCommentIfNeeded()
+        }
     }
 
     private var peakRateText: String {
@@ -80,6 +93,16 @@ struct SessionDetailView: View {
 
     private var peakHeartRateText: String {
         "–"
+    }
+
+    private func generateCommentIfNeeded() async {
+        guard SessionAICommentGenerator.shouldGenerate(for: session) else { return }
+        guard session.aiComment == nil else { return }
+        guard SessionAICommentGenerator.isAvailable else { return }
+
+        isGeneratingComment = true
+        _ = await dataStore.generateAICommentIfNeeded(for: session)
+        isGeneratingComment = false
     }
 }
 

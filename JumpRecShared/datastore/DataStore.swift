@@ -104,6 +104,7 @@ public class MyDataStore {
     }
 
     /// Creates a finalized session record and persists it with normalized rate samples.
+    @discardableResult
     public func saveCompletedSession(
         startedAt: Date,
         endedAt: Date,
@@ -112,7 +113,7 @@ public class MyDataStore {
         jumpOffsets: [TimeInterval],
         averageHeartRate: Int? = nil,
         peakHeartRate: Int? = nil
-    ) {
+    ) -> JumpSession {
         let breakMetrics = SessionMetricsCalculator.breakMetrics(from: jumpOffsets)
         let session = JumpSession(
             startedAt: startedAt,
@@ -140,5 +141,15 @@ public class MyDataStore {
         )
 
         addSession(session: session, rateSamples: rateSamples)
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            await SessionAICommentGenerator.generateIfNeeded(for: session, in: modelContext)
+        }
+        return session
+    }
+
+    @discardableResult
+    public func generateAICommentIfNeeded(for session: JumpSession) async -> String? {
+        await SessionAICommentGenerator.generateIfNeeded(for: session, in: modelContext)
     }
 }
