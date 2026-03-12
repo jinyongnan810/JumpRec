@@ -8,7 +8,7 @@ import SwiftData
 import SwiftUI
 
 struct RecordsSheetView: View {
-    @Query(sort: \JumpSession.startedAt, order: .reverse) var sessions: [JumpSession]
+    @Query(sort: \PersonalRecord.kindRawValue) private var records: [PersonalRecord]
     @Environment(\.dismiss) private var dismiss
 
     private static let dateFormatter: DateFormatter = {
@@ -17,60 +17,25 @@ struct RecordsSheetView: View {
         return f
     }()
 
-    private var records: [RecordItem] {
-        guard !sessions.isEmpty else { return [] }
+    private var displayRecords: [RecordItem] {
+        records
+            .compactMap { record in
+                guard
+                    let kindRawValue = record.kindRawValue,
+                    let kind = PersonalRecordKind(rawValue: kindRawValue),
+                    let value = record.displayValue,
+                    let achievedAt = record.achievedAt
+                else {
+                    return nil
+                }
 
-        var items: [RecordItem] = []
-
-        // Highest Jump Count
-        if let best = sessions.max(by: { $0.jumpCount < $1.jumpCount }) {
-            items.append(RecordItem(
-                icon: "trophy.fill",
-                label: "Highest Jump Count",
-                value: "\(best.jumpCount.formatted()) jumps",
-                date: Self.dateFormatter.string(from: best.startedAt)
-            ))
-        }
-
-        // Longest Session
-        if let best = sessions.max(by: {
-            $0.endedAt.timeIntervalSince($0.startedAt) < $1.endedAt.timeIntervalSince($1.startedAt)
-        }) {
-            let seconds = Int(best.endedAt.timeIntervalSince(best.startedAt))
-            let m = seconds / 60
-            let s = seconds % 60
-            items.append(RecordItem(
-                icon: "timer",
-                label: "Longest Session",
-                value: String(format: "%02d:%02d", m, s),
-                date: Self.dateFormatter.string(from: best.startedAt)
-            ))
-        }
-
-        // Most Calories
-        if let best = sessions.max(by: { $0.caloriesBurned < $1.caloriesBurned }) {
-            items.append(RecordItem(
-                icon: "flame.fill",
-                label: "Most Calories",
-                value: "\(Int(best.caloriesBurned)) cal",
-                date: Self.dateFormatter.string(from: best.startedAt)
-            ))
-        }
-
-        // Best Jump Rate
-        if let best = sessions.compactMap({ s -> (JumpSession, Double)? in
-            guard let rate = s.peakRate else { return nil }
-            return (s, rate)
-        }).max(by: { $0.1 < $1.1 }) {
-            items.append(RecordItem(
-                icon: "bolt.fill",
-                label: "Best Jump Rate",
-                value: "\(Int(best.1))/min",
-                date: Self.dateFormatter.string(from: best.0.startedAt)
-            ))
-        }
-
-        return items
+                return RecordItem(
+                    kind: kind,
+                    value: value,
+                    date: Self.dateFormatter.string(from: achievedAt)
+                )
+            }
+            .sorted { $0.kind.sortOrder < $1.kind.sortOrder }
     }
 
     var body: some View {
@@ -81,7 +46,6 @@ struct RecordsSheetView: View {
                 .foregroundStyle(AppColors.textPrimary)
 
             // Records list
-            let displayRecords = records
             if displayRecords.isEmpty {
                 VStack(spacing: 8) {
                     Spacer()
@@ -116,6 +80,7 @@ struct RecordsSheetView: View {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(
         for: JumpSession.self,
+        PersonalRecord.self,
         SessionRateSample.self,
         configurations: config
     )
@@ -140,6 +105,39 @@ struct RecordsSheetView: View {
         container.mainContext.insert(session)
     }
 
+    container.mainContext.insert(
+        PersonalRecord(
+            kind: .highestJumpCount,
+            metricValue: 2847,
+            displayValue: "2,847 jumps",
+            achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
+        )
+    )
+    container.mainContext.insert(
+        PersonalRecord(
+            kind: .longestSession,
+            metricValue: 900,
+            displayValue: "15:00",
+            achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
+        )
+    )
+    container.mainContext.insert(
+        PersonalRecord(
+            kind: .mostCalories,
+            metricValue: 384,
+            displayValue: "384 cal",
+            achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
+        )
+    )
+    container.mainContext.insert(
+        PersonalRecord(
+            kind: .bestJumpRate,
+            metricValue: 186,
+            displayValue: "186/min",
+            achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
+        )
+    )
+
     return RecordsSheetView()
         .modelContainer(container)
         .presentationBackground(AppColors.cardSurface)
@@ -150,8 +148,7 @@ struct RecordsSheetView: View {
 
 private struct RecordItem: Identifiable {
     let id = UUID()
-    let icon: String
-    let label: String
+    let kind: PersonalRecordKind
     let value: String
     let date: String
 }
@@ -165,13 +162,13 @@ private struct RecordCardView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: record.icon)
+            Image(systemName: record.kind.icon)
                 .font(.system(size: 24))
                 .foregroundStyle(AppColors.accent)
                 .frame(width: 24, height: 24)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(record.label)
+                Text(record.kind.title)
                     .font(.system(size: 14))
                     .foregroundStyle(AppColors.textPrimary)
 
@@ -191,5 +188,22 @@ private struct RecordCardView: View {
         .padding(16)
         .background(Self.cardBg)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+private extension PersonalRecordKind {
+    var sortOrder: Int {
+        switch self {
+        case .highestJumpCount:
+            0
+        case .longestSession:
+            1
+        case .mostCalories:
+            2
+        case .bestJumpRate:
+            3
+        @unknown default:
+            Int.max
+        }
     }
 }

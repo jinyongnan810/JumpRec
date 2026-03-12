@@ -20,6 +20,7 @@ extension ModelContainer {
         // Define the data models that will be stored
         let schema = Schema([
             JumpSession.self,
+            PersonalRecord.self,
             SessionRateSample.self,
         ])
 
@@ -63,6 +64,7 @@ public class MyDataStore {
             // Enable automatic saving when changes are made
             // This works in conjunction with CloudKit to sync changes across devices
             modelContext.autosaveEnabled = true
+            backfillPersonalRecordsIfNeeded()
 
             print("container and context initialized")
         } catch {
@@ -93,6 +95,7 @@ public class MyDataStore {
             session.rateSamples?.append(sample)
             modelContext.insert(sample)
         }
+        upsertPersonalRecords(for: session)
         do {
             try modelContext.save()
             print("inserted session and rate samples")
@@ -152,4 +155,104 @@ public class MyDataStore {
     public func generateAICommentIfNeeded(for session: JumpSession) async -> String? {
         await SessionAICommentGenerator.generateIfNeeded(for: session, in: modelContext)
     }
+
+    private func upsertPersonalRecords(for session: JumpSession) {
+        for candidate in personalRecordCandidates(for: session) {
+            let kindRawValue = candidate.kind.rawValue
+            let descriptor = FetchDescriptor<PersonalRecord>(
+                predicate: #Predicate { record in
+                    record.kindRawValue == kindRawValue
+                }
+            )
+
+            let existingRecord = try? modelContext.fetch(descriptor).first
+            let existingMetricValue = existingRecord?.metricValue
+            guard existingRecord == nil || existingMetricValue == nil || candidate.kind.comparison.isBetter(
+                newValue: candidate.metricValue,
+                than: existingMetricValue ?? candidate.metricValue
+            ) else {
+                continue
+            }
+
+            if let existingRecord {
+                existingRecord.metricValue = candidate.metricValue
+                existingRecord.displayValue = candidate.displayValue
+                existingRecord.achievedAt = candidate.achievedAt
+            } else {
+                modelContext.insert(
+                    PersonalRecord(
+                        kind: candidate.kind,
+                        metricValue: candidate.metricValue,
+                        displayValue: candidate.displayValue,
+                        achievedAt: candidate.achievedAt
+                    )
+                )
+            }
+        }
+    }
+
+    private func personalRecordCandidates(for session: JumpSession) -> [PersonalRecordCandidate] {
+        var candidates: [PersonalRecordCandidate] = [
+            PersonalRecordCandidate(
+                kind: .highestJumpCount,
+                metricValue: Double(session.jumpCount),
+                displayValue: "\(session.jumpCount.formatted()) jumps",
+                achievedAt: session.startedAt
+            ),
+            PersonalRecordCandidate(
+                kind: .longestSession,
+                metricValue: Double(session.durationSeconds),
+                displayValue: formattedDuration(seconds: session.durationSeconds),
+                achievedAt: session.startedAt
+            ),
+            PersonalRecordCandidate(
+                kind: .mostCalories,
+                metricValue: session.caloriesBurned,
+                displayValue: "\(Int(session.caloriesBurned.rounded())) cal",
+                achievedAt: session.startedAt
+            ),
+        ]
+
+        if let peakRate = session.peakRate {
+            candidates.append(
+                PersonalRecordCandidate(
+                    kind: .bestJumpRate,
+                    metricValue: peakRate,
+                    displayValue: "\(Int(peakRate.rounded()))/min",
+                    achievedAt: session.startedAt
+                )
+            )
+        }
+
+        return candidates
+    }
+
+    private func formattedDuration(seconds: Int) -> String {
+        let minutes = seconds / 60
+        let remainingSeconds = seconds % 60
+        return String(format: "%02d:%02d", minutes, remainingSeconds)
+    }
+
+    private func backfillPersonalRecordsIfNeeded() {
+        let recordDescriptor = FetchDescriptor<PersonalRecord>()
+        let existingRecords = (try? modelContext.fetch(recordDescriptor)) ?? []
+        guard existingRecords.isEmpty else { return }
+
+        let sessionDescriptor = FetchDescriptor<JumpSession>()
+        let sessions = (try? modelContext.fetch(sessionDescriptor)) ?? []
+        guard !sessions.isEmpty else { return }
+
+        for session in sessions {
+            upsertPersonalRecords(for: session)
+        }
+
+        save()
+    }
+}
+
+private struct PersonalRecordCandidate {
+    let kind: PersonalRecordKind
+    let metricValue: Double
+    let displayValue: String
+    let achievedAt: Date
 }
