@@ -135,7 +135,8 @@ public final class JumpDetector {
         }
 
         if let lastAcceptedJumpTimestamp,
-           sample.timestamp - lastAcceptedJumpTimestamp < config.minimumInterval {
+           sample.timestamp - lastAcceptedJumpTimestamp < config.minimumInterval
+        {
             syncDebugState()
             return false
         }

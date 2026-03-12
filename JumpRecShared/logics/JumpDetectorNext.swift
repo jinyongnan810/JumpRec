@@ -198,9 +198,9 @@ public final class JumpDetectorNext {
         // Choose the axis with the strongest short-window energy. This keeps the detector orientation-agnostic
         // for pockets/headphones without requiring a fixed "up" axis.
         let axes: [(JumpDetectorAxis, [Double])] = [
-            (.x, history.map { $0.accel.x }),
-            (.y, history.map { $0.accel.y }),
-            (.z, history.map { $0.accel.z }),
+            (.x, history.map(\.accel.x)),
+            (.y, history.map(\.accel.y)),
+            (.z, history.map(\.accel.z)),
         ]
 
         let energies = Dictionary(uniqueKeysWithValues: axes.map { axis, values in
@@ -221,7 +221,8 @@ public final class JumpDetectorNext {
            let currentEnergy = energies[currentAxis],
            currentEnergy > 0,
            strongestAxis != currentAxis,
-           strongestEnergy / currentEnergy < config.axisSwitchRatio {
+           strongestEnergy / currentEnergy < config.axisSwitchRatio
+        {
             // Keep the current axis unless the new one is clearly better.
         } else {
             dominantAxis = strongestAxis
@@ -245,7 +246,7 @@ public final class JumpDetectorNext {
         var positiveScore = 0.0
         var negativeScore = 0.0
 
-        for index in 1..<(values.count - 1) {
+        for index in 1 ..< (values.count - 1) {
             let previous = values[index - 1]
             let current = values[index]
             let next = values[index + 1]
