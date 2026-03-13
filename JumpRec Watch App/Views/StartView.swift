@@ -22,11 +22,26 @@ struct StartView: View {
     var goal: Text {
         switch settings.goalType {
         case .count:
-            return Text("\(settings.jumpCount.formatted()) jumps")
+            return Text(
+                String(
+                    format: String(localized: "%@ jumps"),
+                    settings.jumpCount.formatted()
+                )
+            )
         case .time:
-            return Text("\(settings.jumpTime) min")
+            return Text(
+                String(
+                    format: String(localized: "%lld min"),
+                    settings.jumpTime
+                )
+            )
         @unknown default:
-            return Text("\(settings.jumpCount.formatted()) jumps")
+            return Text(
+                String(
+                    format: String(localized: "%@ jumps"),
+                    settings.jumpCount.formatted()
+                )
+            )
         }
     }
 

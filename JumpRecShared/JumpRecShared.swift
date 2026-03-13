@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+public func localizedRateText(_ value: Int) -> String {
+    if Locale.preferredLanguages.first?.hasPrefix("ja") == true {
+        return "\(value)/分"
+    }
+    return "\(value)/min"
+}

@@ -47,11 +47,11 @@ struct DeviceSelectorView: View {
                 .frame(width: 32)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(source?.shortName ?? "Searching")
+                Text(source?.shortName ?? String(localized: "Searching"))
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(AppColors.textPrimary)
 
-                Text(source == nil ? "No motion source connected yet" : "Currently selected for motion data")
+                Text(source == nil ? String(localized: "No motion source connected yet") : String(localized: "Currently selected for motion data"))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(AppColors.textSecondary)
             }
@@ -66,8 +66,8 @@ struct DeviceSelectorView: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Active source")
-        .accessibilityValue(source?.shortName ?? "Searching")
+        .accessibilityLabel(String(localized: "Active source"))
+        .accessibilityValue(source?.shortName ?? String(localized: "Searching"))
     }
 
     @ViewBuilder
@@ -100,7 +100,7 @@ struct DeviceSelectorView: View {
                     infoPopover(message: message)
                         .presentationCompactAdaptation(.popover)
                 }
-                .accessibilityHint("Shows why this device is unavailable")
+                .accessibilityHint(String(localized: "Shows why this device is unavailable"))
             }
         }
     }
@@ -177,12 +177,12 @@ struct DeviceSelectorView: View {
 
     private func badgeAccessibilityValue(isAvailable: Bool, isActive: Bool) -> String {
         if isActive {
-            return "Active"
+            return String(localized: "Active")
         }
         if isAvailable {
-            return "Available"
+            return String(localized: "Available")
         }
-        return "Unavailable"
+        return String(localized: "Unavailable")
     }
 
     private func unavailableMessage(for source: DeviceSource) -> String {
@@ -190,9 +190,9 @@ struct DeviceSelectorView: View {
         case .watch:
             watchUnavailableReason
         case .iPhone:
-            "iPhone motion is not available on this device."
+            String(localized: "iPhone motion is not available on this device.")
         case .airpods:
-            "Headphone motion is unavailable. Connect supported AirPods or Beats and allow motion access."
+            String(localized: "Headphone motion is unavailable. Connect supported AirPods or Beats and allow motion access.")
         }
     }
 }

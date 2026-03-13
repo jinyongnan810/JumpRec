@@ -7,6 +7,19 @@ import ActivityKit
 import SwiftUI
 import WidgetKit
 
+private func localizedSourceLabel(for sourceLabel: String) -> String {
+    switch sourceLabel {
+    case "Watch":
+        String(localized: "Watch")
+    case "Headphone":
+        String(localized: "Headphone")
+    case "AirPods":
+        String(localized: "AirPods")
+    default:
+        String(localized: "iPhone")
+    }
+}
+
 struct JumpRecLiveActivityWidget: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: JumpRecLiveActivityAttributes.self) { context in
@@ -17,15 +30,15 @@ struct JumpRecLiveActivityWidget: Widget {
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
                     metricView(
-                        title: "Jumps",
+                        title: String(localized: "Jumps"),
                         value: "\(context.state.jumpCount)"
                     )
                 }
 
                 DynamicIslandExpandedRegion(.trailing) {
                     metricView(
-                        title: "Rate",
-                        value: "\(context.state.averageRate)/m"
+                        title: String(localized: "Rate"),
+                        value: localizedRateText(context.state.averageRate)
                     )
                 }
 
@@ -37,12 +50,12 @@ struct JumpRecLiveActivityWidget: Widget {
 
                         HStack(spacing: 16) {
                             metricView(
-                                title: "Calories",
+                                title: String(localized: "Calories"),
                                 value: "\(context.state.caloriesBurned)"
                             )
                             metricView(
-                                title: "Source",
-                                value: context.state.sourceLabel
+                                title: String(localized: "Source"),
+                                value: localizedSourceLabel(for: context.state.sourceLabel)
                             )
                         }
 
@@ -113,16 +126,16 @@ private struct JumpRecLiveActivityView: View {
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Label(context.state.sourceLabel, systemImage: iconName)
+                    Label(localizedSourceLabel(for: context.state.sourceLabel), systemImage: iconName)
                         .font(.caption.weight(.semibold))
                     durationView
                 }
             }
 
             HStack(spacing: 12) {
-                statCard(title: "Jumps", value: "\(context.state.jumpCount)")
-                statCard(title: "Calories", value: "\(context.state.caloriesBurned)")
-                statCard(title: "Rate", value: "\(context.state.averageRate)/m")
+                statCard(title: String(localized: "Jumps"), value: "\(context.state.jumpCount)")
+                statCard(title: String(localized: "Calories"), value: "\(context.state.caloriesBurned)")
+                statCard(title: String(localized: "Rate"), value: localizedRateText(context.state.averageRate))
             }
         }
         .padding(.vertical, 4)

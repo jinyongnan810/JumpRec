@@ -154,11 +154,18 @@ struct HistoryView: View {
         let totalSeconds = Int(duration)
         let hours = totalSeconds / 3600
         let minutes = (totalSeconds % 3600) / 60
+        let isJapanese = Locale.preferredLanguages.first?.hasPrefix("ja") == true
 
         if hours > 0 {
+            if isJapanese {
+                return "\(hours)時間\(minutes)分"
+            }
             return String(format: "%dh %02dm", hours, minutes)
         }
 
+        if isJapanese {
+            return "\(minutes)分"
+        }
         return String(format: "%dm", minutes)
     }
 

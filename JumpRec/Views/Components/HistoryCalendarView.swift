@@ -143,7 +143,8 @@ struct HistoryCalendarView: View {
 
     private var monthTitle: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM yyyy"
+        formatter.locale = .autoupdatingCurrent
+        formatter.setLocalizedDateFormatFromTemplate("yMMMM")
         return formatter.string(from: displayedMonth)
     }
 }

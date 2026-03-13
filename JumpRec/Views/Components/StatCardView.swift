@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct StatCardView: View {
-    let label: String
+    let label: LocalizedStringKey
     let value: String
     var valueColor: Color = AppColors.textPrimary
 

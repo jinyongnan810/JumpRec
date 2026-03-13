@@ -158,7 +158,7 @@ final class JumpRecState {
             startMinuteTimer()
         }
         notificationFeedbackGenerator.notificationOccurred(.success)
-        speak(text: "Session Started!")
+        speak(text: localizedSessionStartedAnnouncement)
         syncLiveActivity()
     }
 
@@ -172,7 +172,7 @@ final class JumpRecState {
         endTime = Date()
         sessionState = .complete
         notificationFeedbackGenerator.notificationOccurred(.success)
-        speak(text: "Session Finished!")
+        speak(text: localizedSessionFinishedAnnouncement)
         syncLiveActivity()
 
         if let endTime {
@@ -389,14 +389,20 @@ final class JumpRecState {
 
     private var liveActivityGoalSummary: String {
         guard let goalType = sessionGoalType, let goalValue = sessionGoalValue else {
-            return "Session in progress"
+            return String(localized: "Session in progress")
         }
 
         if goalType == .count {
-            return "\(goalValue.formatted()) jumps"
+            return String(
+                format: String(localized: "%@ jumps"),
+                goalValue.formatted()
+            )
         }
 
-        return "\(goalValue) min"
+        return String(
+            format: String(localized: "%lld min"),
+            goalValue
+        )
     }
 
     private var liveActivitySourceLabel: String {
@@ -480,9 +486,9 @@ final class JumpRecState {
     }
 
     private func warmUpSpeechSynthesizer() {
-        let utterance = AVSpeechUtterance(string: "Hello")
+        let utterance = AVSpeechUtterance(string: isJapanesePreferred ? "こんにちは" : "Hello")
         utterance.volume = 0
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        utterance.voice = AVSpeechSynthesisVoice(language: preferredSpeechLanguageCode)
         synthesizer.speak(utterance)
     }
 
@@ -497,7 +503,7 @@ final class JumpRecState {
         if sessionGoalType == .count, jumpCount > 0, jumpCount.isMultiple(of: 100) {
             notificationFeedbackGenerator.notificationOccurred(.success)
             notificationFeedbackGenerator.prepare()
-            speak(text: "\(jumpCount) Jumps")
+            speak(text: localizedJumpAnnouncement(for: jumpCount))
         }
     }
 
@@ -528,10 +534,9 @@ final class JumpRecState {
             return
         }
 
-        let minuteText = minutesElapsed == 1 ? "1 minute" : "\(minutesElapsed) minutes"
         notificationFeedbackGenerator.notificationOccurred(.success)
         notificationFeedbackGenerator.prepare()
-        speak(text: minuteText)
+        speak(text: localizedMinuteAnnouncement(for: minutesElapsed))
     }
 
     private func finishIfGoalReached() {
@@ -575,8 +580,38 @@ final class JumpRecState {
     private func speak(text: String, delay: TimeInterval = 0.2) {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             let utterance = AVSpeechUtterance(string: text)
-            utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+            utterance.voice = AVSpeechSynthesisVoice(language: self.preferredSpeechLanguageCode)
             self.synthesizer.speak(utterance)
         }
+    }
+
+    private var isJapanesePreferred: Bool {
+        Locale.preferredLanguages.first?.hasPrefix("ja") == true
+    }
+
+    private var preferredSpeechLanguageCode: String {
+        isJapanesePreferred ? "ja-JP" : "en-US"
+    }
+
+    private var localizedSessionStartedAnnouncement: String {
+        isJapanesePreferred ? "セッションを開始しました" : "Session Started!"
+    }
+
+    private var localizedSessionFinishedAnnouncement: String {
+        isJapanesePreferred ? "セッションを終了しました" : "Session Finished!"
+    }
+
+    private func localizedJumpAnnouncement(for jumpCount: Int) -> String {
+        if isJapanesePreferred {
+            return "\(jumpCount) 回"
+        }
+        return "\(jumpCount) Jumps"
+    }
+
+    private func localizedMinuteAnnouncement(for minutesElapsed: Int) -> String {
+        if isJapanesePreferred {
+            return "\(minutesElapsed) 分"
+        }
+        return minutesElapsed == 1 ? "1 minute" : "\(minutesElapsed) minutes"
     }
 }

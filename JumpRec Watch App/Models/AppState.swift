@@ -75,9 +75,9 @@ class JumpRecState {
 
     func warmUpSpeechSynthesizer() {
         // first call to synthesizer.speak can be very heavy
-        let utterance = AVSpeechUtterance(string: "Hello")
+        let utterance = AVSpeechUtterance(string: isJapanesePreferred ? "こんにちは" : "Hello")
         utterance.volume = 0.0
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        utterance.voice = AVSpeechSynthesisVoice(language: preferredSpeechLanguageCode)
         synthesizer.speak(utterance)
     }
 
@@ -101,7 +101,7 @@ class JumpRecState {
             startMinuteTimer()
         }
         WKInterfaceDevice.current().play(.start)
-        speak(text: "Session Started!")
+        speak(text: localizedSessionStartedAnnouncement)
         ConnectivityManager.shared.sendMessage(["watch app": "started"])
     }
 
@@ -117,7 +117,7 @@ class JumpRecState {
 
         motionManager?.stopTracking()
         endTime = Date()
-        speak(text: "Session Finished!", delay: 0.5)
+        speak(text: localizedSessionFinishedAnnouncement, delay: 0.5)
         WKInterfaceDevice.current().play(.stop)
         ConnectivityManager.shared.sendMessage(["watch app": "finished"])
 
@@ -212,7 +212,7 @@ class JumpRecState {
     func handleHundredJumpsLandmark(jumpCount: Int) {
         WKInterfaceDevice.current().play(.success)
         let hundred = jumpCount / 100 * 100
-        speak(text: "\(hundred) Jumps")
+        speak(text: localizedJumpAnnouncement(for: hundred))
 //        scheduleNotification(title: "Reached \(hundred) jumps!", body: "")
     }
 
@@ -242,8 +242,7 @@ class JumpRecState {
             end()
             return
         }
-        let minuteText = minutesElapsed == 1 ? "1 minute" : "\(minutesElapsed) minutes"
-        speak(text: minuteText)
+        speak(text: localizedMinuteAnnouncement(for: minutesElapsed))
         WKInterfaceDevice.current().play(.success)
 //        scheduleNotification(title: "Reached \(minuteText)", body: "")
     }
@@ -251,9 +250,39 @@ class JumpRecState {
     func speak(text: String, delay: Double = 0.5) {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             let utterance = AVSpeechUtterance(string: text)
-            utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+            utterance.voice = AVSpeechSynthesisVoice(language: self.preferredSpeechLanguageCode)
             self.synthesizer.speak(utterance)
         }
+    }
+
+    private var isJapanesePreferred: Bool {
+        Locale.preferredLanguages.first?.hasPrefix("ja") == true
+    }
+
+    private var preferredSpeechLanguageCode: String {
+        isJapanesePreferred ? "ja-JP" : "en-US"
+    }
+
+    private var localizedSessionStartedAnnouncement: String {
+        isJapanesePreferred ? "セッションを開始しました" : "Session Started!"
+    }
+
+    private var localizedSessionFinishedAnnouncement: String {
+        isJapanesePreferred ? "セッションを終了しました" : "Session Finished!"
+    }
+
+    private func localizedJumpAnnouncement(for jumpCount: Int) -> String {
+        if isJapanesePreferred {
+            return "\(jumpCount) 回"
+        }
+        return "\(jumpCount) Jumps"
+    }
+
+    private func localizedMinuteAnnouncement(for minutesElapsed: Int) -> String {
+        if isJapanesePreferred {
+            return "\(minutesElapsed) 分"
+        }
+        return minutesElapsed == 1 ? "1 minute" : "\(minutesElapsed) minutes"
     }
 
     private func resetSessionMetrics() {

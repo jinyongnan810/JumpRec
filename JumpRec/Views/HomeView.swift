@@ -18,9 +18,15 @@ struct HomeView: View {
 
     var goalText: String {
         if settings.goalType == .count {
-            "Goal: \(settings.jumpCount.formatted()) jumps"
+            String(
+                format: String(localized: "Goal: %@ jumps"),
+                settings.jumpCount.formatted()
+            )
         } else {
-            "Goal: \(settings.jumpTime) min"
+            String(
+                format: String(localized: "Goal: %lld min"),
+                settings.jumpTime
+            )
         }
     }
 
@@ -42,10 +48,14 @@ struct HomeView: View {
                 HeroRingView(
                     progress: countdownProgress,
                     centerText: "\(countdownValue ?? 3)",
-                    subtitle: "Starting..."
+                    subtitle: String(localized: "Starting...")
                 )
             } else {
-                HeroRingView(progress: 0, centerText: "Ready", subtitle: "Tap Start to begin")
+                HeroRingView(
+                    progress: 0,
+                    centerText: String(localized: "Ready?"),
+                    subtitle: String(localized: "Tap Start to begin")
+                )
             }
 
             DeviceSelectorView(
@@ -122,7 +132,7 @@ struct HomeView: View {
     }
 
     private var primaryButtonTitle: String {
-        isCountingDown ? "CANCEL" : "START SESSION"
+        isCountingDown ? String(localized: "CANCEL") : String(localized: "START SESSION")
     }
 
     private var primaryButtonTextColor: Color {

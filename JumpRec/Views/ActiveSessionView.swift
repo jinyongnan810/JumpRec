@@ -35,17 +35,29 @@ struct ActiveSessionView: View {
 
     private var goalText: String {
         if goalType == .count {
-            "Goal: \(goalValue.formatted()) jumps"
+            String(
+                format: String(localized: "Goal: %@ jumps"),
+                goalValue.formatted()
+            )
         } else {
-            "Goal: \(goalValue) min"
+            String(
+                format: String(localized: "Goal: %lld min"),
+                goalValue
+            )
         }
     }
 
     private var ringSubtitle: String {
         if goalType == .count {
-            "/ \(goalValue.formatted()) jumps"
+            String(
+                format: String(localized: "/ %@ jumps"),
+                goalValue.formatted()
+            )
         } else {
-            "/ \(goalValue) min"
+            String(
+                format: String(localized: "/ %lld min"),
+                goalValue
+            )
         }
     }
 
@@ -78,7 +90,7 @@ struct ActiveSessionView: View {
                 isPhoneMotionAvailable: appState.isPhoneMotionAvailable,
                 isHeadphoneMotionAvailable: appState.isHeadphoneMotionAvailable,
                 isWatchMotionAvailable: appState.activeMotionSource == .watch || appState.isMirroredWatchSession,
-                watchUnavailableReason: "Apple Watch is unavailable for this session."
+                watchUnavailableReason: String(localized: "Apple Watch is unavailable for this session.")
             )
 
             // Hero Ring with progress
@@ -92,7 +104,7 @@ struct ActiveSessionView: View {
             HStack(spacing: 10) {
                 StatCardView(label: "TIME", value: elapsedFormatted)
                 StatCardView(label: "CALORIES", value: "\(Int(appState.caloriesBurned.rounded()))")
-                StatCardView(label: "RATE", value: "\(appState.averageRate)/m", valueColor: AppColors.accent)
+                StatCardView(label: "RATE", value: localizedRateText(appState.averageRate), valueColor: AppColors.accent)
             }
 
             Spacer()

@@ -124,9 +124,9 @@ struct GoalSheetView: View {
 
     private var unitLabel: String {
         if selectedType == .time, timeValue == 1 {
-            return "minute"
+            return String(localized: "minute")
         }
-        return selectedType == .count ? "jumps" : "minutes"
+        return selectedType == .count ? String(localized: "jumps") : String(localized: "minutes")
     }
 
     private var stepAmount: Int64 {

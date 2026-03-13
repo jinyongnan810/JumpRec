@@ -87,24 +87,12 @@ struct SessionDetailView: View {
 
     private var peakRateText: String {
         guard let peak = session.peakRate else { return "–" }
-        return "\(Int(peak))/min"
+        return localizedRateText(Int(peak))
     }
 
     private var averageRateText: String {
         guard let average = session.averageRate else { return "–" }
-        return "\(Int(average))/min"
-    }
-
-    private var longestJumpStrikesText: String {
-        "–"
-    }
-
-    private var averageHeartRateText: String {
-        "–"
-    }
-
-    private var peakHeartRateText: String {
-        "–"
+        return localizedRateText(Int(average))
     }
 
     private func generateCommentIfNeeded() async {
@@ -126,6 +114,18 @@ struct SessionDetailView: View {
         } catch {
             print("Failed to delete session: \(error)")
         }
+    }
+
+    private var longestJumpStrikesText: String {
+        "–"
+    }
+
+    private var averageHeartRateText: String {
+        "–"
+    }
+
+    private var peakHeartRateText: String {
+        "–"
     }
 }
 

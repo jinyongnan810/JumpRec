@@ -48,7 +48,7 @@ struct SessionCompleteView: View {
                             .font(.system(size: 24, weight: .semibold))
                             .foregroundStyle(AppColors.textPrimary)
 
-                        Text("Great workout! Here are your results.")
+                        Text("Here are your results.")
                             .font(.system(size: 13))
                             .foregroundStyle(AppColors.textSecondary)
                     }
@@ -66,7 +66,7 @@ struct SessionCompleteView: View {
                         duration: appState.elapsedFormatted,
                         jumps: "\(appState.jumpCount)",
                         calories: "\(Int(appState.caloriesBurned.rounded()))",
-                        averageRate: "\(appState.averageRate)/min",
+                        averageRate: localizedRateText(appState.averageRate),
                         peakRate: peakRateText,
                         longestJumpStrikes: "\(appState.breakMetrics.longestStreak)",
                         shortBreaks: "\(appState.breakMetrics.small)",
@@ -116,7 +116,7 @@ struct SessionCompleteView: View {
 
     private var peakRateText: String {
         if let peakRate = SessionMetricsCalculator.peakRate(from: rateSamples) {
-            return "\(Int(peakRate.rounded()))/min"
+            return localizedRateText(Int(peakRate.rounded()))
         }
         return "--"
     }

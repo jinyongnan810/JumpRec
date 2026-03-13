@@ -196,7 +196,10 @@ public class MyDataStore {
             PersonalRecordCandidate(
                 kind: .highestJumpCount,
                 metricValue: Double(session.jumpCount),
-                displayValue: "\(session.jumpCount.formatted()) jumps",
+                displayValue: String(
+                    format: String(localized: "%@ jumps"),
+                    session.jumpCount.formatted()
+                ),
                 achievedAt: session.startedAt
             ),
             PersonalRecordCandidate(
@@ -208,7 +211,7 @@ public class MyDataStore {
             PersonalRecordCandidate(
                 kind: .mostCalories,
                 metricValue: session.caloriesBurned,
-                displayValue: "\(Int(session.caloriesBurned.rounded())) cal",
+                displayValue: "\(Int(session.caloriesBurned.rounded())) \(String(localized: "cal"))",
                 achievedAt: session.startedAt
             ),
         ]
@@ -218,7 +221,7 @@ public class MyDataStore {
                 PersonalRecordCandidate(
                     kind: .bestJumpRate,
                     metricValue: peakRate,
-                    displayValue: "\(Int(peakRate.rounded()))/min",
+                    displayValue: localizedRateText(Int(peakRate.rounded())),
                     achievedAt: session.startedAt
                 )
             )

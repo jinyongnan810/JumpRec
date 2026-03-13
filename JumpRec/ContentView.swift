@@ -91,12 +91,12 @@ struct ContentView: View {
 
     private var watchUnavailableReason: String {
         if !connectivityManager.isPaired {
-            return "Apple Watch is unavailable because no paired watch was found."
+            return String(localized: "Apple Watch is unavailable because no paired watch was found.")
         }
         if !connectivityManager.isWatchAppInstalled {
-            return "Apple Watch is unavailable because the JumpRec Watch app is not installed."
+            return String(localized: "Apple Watch is unavailable because the JumpRec Watch app is not installed.")
         }
-        return "Apple Watch is ready."
+        return String(localized: "Apple Watch is ready.")
     }
 
     private func configureTabBarAppearance() {

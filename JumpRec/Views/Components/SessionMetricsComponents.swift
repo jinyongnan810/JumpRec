@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct SessionMetricCard: View {
-    let label: String
+    let label: LocalizedStringKey
     let value: String
     var valueColor: Color = AppColors.textPrimary
 
@@ -29,7 +29,7 @@ struct SessionMetricCard: View {
 }
 
 struct SessionBreakdownRow<Content: View>: View {
-    let label: String
+    let label: LocalizedStringKey
     @ViewBuilder let content: Content
 
     var body: some View {

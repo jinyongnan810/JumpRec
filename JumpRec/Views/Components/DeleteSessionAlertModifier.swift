@@ -11,11 +11,11 @@ struct DeleteSessionAlertModifier: ViewModifier {
     let onDelete: () -> Void
 
     private var title: String {
-        sessionCount == 1 ? "Delete this session?" : "Delete these sessions?"
+        sessionCount == 1 ? String(localized: "Delete this session?") : String(localized: "Delete these sessions?")
     }
 
     private var deleteButtonTitle: String {
-        sessionCount == 1 ? "Delete Session" : "Delete Sessions"
+        sessionCount == 1 ? String(localized: "Delete Session") : String(localized: "Delete Sessions")
     }
 
     func body(content: Content) -> some View {

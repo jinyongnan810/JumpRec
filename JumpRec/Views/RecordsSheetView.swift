@@ -12,7 +12,8 @@ struct RecordsSheetView: View {
 
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "MMM d, yyyy"
+        f.locale = .autoupdatingCurrent
+        f.setLocalizedDateFormatFromTemplate("yMMMd")
         return f
     }()
 
@@ -22,7 +23,7 @@ struct RecordsSheetView: View {
                 guard
                     let kindRawValue = record.kindRawValue,
                     let kind = PersonalRecordKind(rawValue: kindRawValue),
-                    let value = record.displayValue,
+                    let metricValue = record.metricValue,
                     let achievedAt = record.achievedAt
                 else {
                     return nil
@@ -30,8 +31,8 @@ struct RecordsSheetView: View {
 
                 return RecordItem(
                     kind: kind,
-                    value: value,
-                    date: Self.dateFormatter.string(from: achievedAt)
+                    metricValue: metricValue,
+                    achievedAt: achievedAt
                 )
             }
             .sorted { $0.kind.sortOrder < $1.kind.sortOrder }
@@ -148,8 +149,8 @@ struct RecordsSheetView: View {
 private struct RecordItem: Identifiable {
     let id = UUID()
     let kind: PersonalRecordKind
-    let value: String
-    let date: String
+    let metricValue: Double
+    let achievedAt: Date
 }
 
 // MARK: - Record Card
@@ -167,18 +168,18 @@ private struct RecordCardView: View {
                 .frame(width: 24, height: 24)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(record.kind.title)
+                Text(LocalizedStringKey(record.kind.title))
                     .font(.system(size: 14))
                     .foregroundStyle(AppColors.textPrimary)
 
                 HStack {
-                    Text(record.value)
+                    Text(displayValue)
                         .font(.system(size: 18, weight: .bold, design: .monospaced))
                         .foregroundStyle(AppColors.accent)
 
                     Spacer()
 
-                    Text(record.date)
+                    Text(Self.dateFormatter.string(from: record.achievedAt))
                         .font(.system(size: 11, design: .monospaced))
                         .foregroundStyle(AppColors.textSecondary)
                 }
@@ -187,6 +188,37 @@ private struct RecordCardView: View {
         .padding(16)
         .background(Self.cardBg)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = .autoupdatingCurrent
+        formatter.setLocalizedDateFormatFromTemplate("yMMMd")
+        return formatter
+    }()
+
+    private var displayValue: String {
+        switch record.kind {
+        case .highestJumpCount:
+            return String(
+                format: String(localized: "%@ jumps"),
+                Int(record.metricValue.rounded()).formatted()
+            )
+        case .longestSession:
+            return formattedDuration(seconds: Int(record.metricValue.rounded()))
+        case .mostCalories:
+            return "\(Int(record.metricValue.rounded())) \(String(localized: "cal"))"
+        case .bestJumpRate:
+            return localizedRateText(Int(record.metricValue.rounded()))
+        @unknown default:
+            return record.metricValue.formatted()
+        }
+    }
+
+    private func formattedDuration(seconds: Int) -> String {
+        let minutes = max(seconds, 0) / 60
+        let remainingSeconds = max(seconds, 0) % 60
+        return String(format: "%02d:%02d", minutes, remainingSeconds)
     }
 }
 
