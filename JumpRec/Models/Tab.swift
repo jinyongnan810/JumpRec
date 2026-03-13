@@ -6,6 +6,6 @@
 import Foundation
 
 enum Tab: Int {
-    case home
+    case jump
     case history
 }

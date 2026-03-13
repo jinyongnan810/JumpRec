@@ -14,7 +14,7 @@ struct ContentView: View {
     @State private var connectivityManager = ConnectivityManager.shared
     @Query() var sessions: [JumpSession]
 
-    @State private var selectedTab: Tab = .home
+    @State private var selectedTab: Tab = .jump
     @State private var settings = JumpRecSettings()
     @State private var appState = JumpRecState()
 
@@ -33,9 +33,9 @@ struct ContentView: View {
                     appState.start(goalType: settings.goalType, goalValue: settings.goalCount)
                 }
                 .tabItem {
-                    Label("Home", systemImage: "house.fill")
+                    Label("Jump", systemImage: "figure.jumprope")
                 }
-                .tag(Tab.home)
+                .tag(Tab.jump)
 
                 HistoryView()
                     .tabItem {
@@ -64,7 +64,7 @@ struct ContentView: View {
         }
         .preferredColorScheme(.dark)
         .onAppear {
-            configureTabBarAppearance()
+//            configureTabBarAppearance()
             syncSettingsToWatch()
         }
         .onChange(of: settings.goalType) { _, _ in
@@ -99,27 +99,27 @@ struct ContentView: View {
         return String(localized: "Apple Watch is ready.")
     }
 
-    private func configureTabBarAppearance() {
-        let appearance = UITabBarAppearance()
-        appearance.configureWithDefaultBackground()
-
-        let normalAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 16, weight: .medium),
-        ]
-        let selectedAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-        ]
-
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttributes
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedAttributes
-        appearance.inlineLayoutAppearance.normal.titleTextAttributes = normalAttributes
-        appearance.inlineLayoutAppearance.selected.titleTextAttributes = selectedAttributes
-        appearance.compactInlineLayoutAppearance.normal.titleTextAttributes = normalAttributes
-        appearance.compactInlineLayoutAppearance.selected.titleTextAttributes = selectedAttributes
-
-        UITabBar.appearance().standardAppearance = appearance
-        UITabBar.appearance().scrollEdgeAppearance = appearance
-    }
+//    private func configureTabBarAppearance() {
+//        let appearance = UITabBarAppearance()
+//        appearance.configureWithDefaultBackground()
+//
+//        let normalAttributes: [NSAttributedString.Key: Any] = [
+//            .font: UIFont.systemFont(ofSize: 16, weight: .medium),
+//        ]
+//        let selectedAttributes: [NSAttributedString.Key: Any] = [
+//            .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
+//        ]
+//
+//        appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttributes
+//        appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedAttributes
+//        appearance.inlineLayoutAppearance.normal.titleTextAttributes = normalAttributes
+//        appearance.inlineLayoutAppearance.selected.titleTextAttributes = selectedAttributes
+//        appearance.compactInlineLayoutAppearance.normal.titleTextAttributes = normalAttributes
+//        appearance.compactInlineLayoutAppearance.selected.titleTextAttributes = selectedAttributes
+//
+//        UITabBar.appearance().standardAppearance = appearance
+//        UITabBar.appearance().scrollEdgeAppearance = appearance
+//    }
 
     private func syncSettingsToWatch() {
         connectivityManager.syncSettings(

@@ -409,6 +409,7 @@
       }
     },
     "Home" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -424,6 +425,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このデバイスでは iPhone のモーションを利用できません。"
+          }
+        }
+      }
+    },
+    "Jump" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ"
           }
         }
       }
