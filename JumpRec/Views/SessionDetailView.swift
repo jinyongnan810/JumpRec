@@ -117,15 +117,20 @@ struct SessionDetailView: View {
     }
 
     private var longestJumpStrikesText: String {
-        "–"
+        session.longestStreak.formatted()
     }
 
     private var averageHeartRateText: String {
-        "–"
+        heartRateText(session.averageHeartRate)
     }
 
     private var peakHeartRateText: String {
-        "–"
+        heartRateText(session.peakHeartRate)
+    }
+
+    private func heartRateText(_ value: Int?) -> String {
+        guard let value else { return "–" }
+        return "\(value) bpm"
     }
 }
 

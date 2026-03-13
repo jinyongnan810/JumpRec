@@ -9,7 +9,15 @@ struct SessionCompleteView: View {
     @Bindable var appState: JumpRecState
     var onDone: () -> Void
 
+    private var completedSession: JumpSession? {
+        appState.completedSession
+    }
+
     private var rateSamples: [SessionRateSample] {
+        if let completedSession {
+            return (completedSession.rateSamples ?? []).sorted { $0.secondOffset < $1.secondOffset }
+        }
+
         let durationSeconds = max(appState.durationSeconds, 1)
         let session = JumpSession(
             startedAt: appState.startTime ?? .now,
@@ -53,7 +61,7 @@ struct SessionCompleteView: View {
                             .foregroundStyle(AppColors.textSecondary)
                     }
 
-                    if let completedSession = appState.completedSession,
+                    if let completedSession,
                        SessionAICommentGenerator.shouldGenerate(for: completedSession)
                     {
                         AICommentCardView(
@@ -63,16 +71,16 @@ struct SessionCompleteView: View {
                     }
 
                     SessionMetricsSummaryView(
-                        duration: appState.elapsedFormatted,
-                        jumps: "\(appState.jumpCount)",
-                        calories: "\(Int(appState.caloriesBurned.rounded()))",
-                        averageRate: localizedRateText(appState.averageRate),
+                        duration: durationText,
+                        jumps: jumpCountText,
+                        calories: caloriesText,
+                        averageRate: averageRateText,
                         peakRate: peakRateText,
-                        longestJumpStrikes: "\(appState.breakMetrics.longestStreak)",
-                        shortBreaks: "\(appState.breakMetrics.small)",
-                        longBreaks: "\(appState.breakMetrics.long)",
-                        averageHeartRate: heartRateText(appState.averageHeartRate),
-                        peakHeartRate: heartRateText(appState.peakHeartRate),
+                        longestJumpStrikes: longestStreakText,
+                        shortBreaks: shortBreaksText,
+                        longBreaks: longBreaksText,
+                        averageHeartRate: averageHeartRateText,
+                        peakHeartRate: peakHeartRateText,
                         rateSamples: rateSamples
                     )
                 }
@@ -114,11 +122,73 @@ struct SessionCompleteView: View {
         .padding(.horizontal, 24)
     }
 
+    private var durationText: String {
+        if let completedSession {
+            let minutes = completedSession.durationSeconds / 60
+            let seconds = completedSession.durationSeconds % 60
+            return String(format: "%02d:%02d", minutes, seconds)
+        }
+        return appState.elapsedFormatted
+    }
+
+    private var jumpCountText: String {
+        if let completedSession {
+            return completedSession.jumpCount.formatted()
+        }
+        return appState.jumpCount.formatted()
+    }
+
+    private var caloriesText: String {
+        if let completedSession {
+            return "\(Int(completedSession.caloriesBurned.rounded()))"
+        }
+        return "\(Int(appState.caloriesBurned.rounded()))"
+    }
+
+    private var averageRateText: String {
+        if let averageRate = completedSession?.averageRate {
+            return localizedRateText(Int(averageRate.rounded()))
+        }
+        return localizedRateText(appState.averageRate)
+    }
+
     private var peakRateText: String {
+        if let peakRate = completedSession?.peakRate {
+            return localizedRateText(Int(peakRate.rounded()))
+        }
         if let peakRate = SessionMetricsCalculator.peakRate(from: rateSamples) {
             return localizedRateText(Int(peakRate.rounded()))
         }
         return "--"
+    }
+
+    private var longestStreakText: String {
+        if let completedSession {
+            return completedSession.longestStreak.formatted()
+        }
+        return appState.breakMetrics.longestStreak.formatted()
+    }
+
+    private var shortBreaksText: String {
+        if let completedSession {
+            return completedSession.smallBreaksCount.formatted()
+        }
+        return appState.breakMetrics.small.formatted()
+    }
+
+    private var longBreaksText: String {
+        if let completedSession {
+            return completedSession.longBreaksCount.formatted()
+        }
+        return appState.breakMetrics.long.formatted()
+    }
+
+    private var averageHeartRateText: String {
+        heartRateText(completedSession?.averageHeartRate ?? appState.averageHeartRate)
+    }
+
+    private var peakHeartRateText: String {
+        heartRateText(completedSession?.peakHeartRate ?? appState.peakHeartRate)
     }
 
     private func heartRateText(_ value: Int?) -> String {
