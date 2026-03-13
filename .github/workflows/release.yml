@@ -21,10 +21,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout develop
+      - name: Checkout main
         uses: actions/checkout@v6
         with:
-          ref: develop
+          ref: main
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -53,14 +53,14 @@ jobs:
         run: |
           git add JumpRec.xcodeproj/project.pbxproj
           git commit -m "chore: bump version to ${{ steps.bump.outputs.new_version }}"
-          git push origin develop
-
-      - name: Fast-forward merge develop → main
-        run: |
-          git fetch origin main
-          git checkout main
-          git merge --ff-only origin/develop
           git push origin main
+
+      - name: Fast-forward merge main → production
+        run: |
+          git fetch origin production
+          git checkout production
+          git merge --ff-only origin/main
+          git push origin production
 
       - name: Resolve tag name
         id: tag
