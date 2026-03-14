@@ -5,18 +5,22 @@
 //  Created by Yuunan kin on 2025/09/13.
 //
 
+import StoreKit
 import SwiftData
 import SwiftUI
 import UIKit
 
 struct ContentView: View {
     @Environment(MyDataStore.self) var dataStore
+    @Environment(\.requestReview) private var requestReview
+    @AppStorage("hasRequestedReviewAfterTenSessions") private var hasRequestedReviewAfterTenSessions = false
     @State private var connectivityManager = ConnectivityManager.shared
     @Query() var sessions: [JumpSession]
 
     @State private var selectedTab: Tab = .jump
     @State private var settings = JumpRecSettings()
     @State private var appState = JumpRecState()
+    @State private var pendingReviewTask: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -76,6 +80,12 @@ struct ContentView: View {
         .onChange(of: settings.jumpTime) { _, _ in
             syncSettingsToWatch()
         }
+        .onChange(of: appState.completedSession?.id) { _, _ in
+            scheduleReviewRequestIfNeeded()
+        }
+        .onChange(of: sessions.count) { _, _ in
+            scheduleReviewRequestIfNeeded()
+        }
     }
 
     private var isSessionFlowPresented: Binding<Bool> {
@@ -127,6 +137,27 @@ struct ContentView: View {
             jumpCount: settings.jumpCount,
             jumpTime: settings.jumpTime
         )
+    }
+
+    private func scheduleReviewRequestIfNeeded() {
+        guard appState.sessionState == .complete,
+              appState.completedSession != nil,
+              sessions.count >= 10,
+              !hasRequestedReviewAfterTenSessions
+        else {
+            pendingReviewTask?.cancel()
+            pendingReviewTask = nil
+            return
+        }
+
+        pendingReviewTask?.cancel()
+        pendingReviewTask = Task {
+            try? await Task.sleep(for: .seconds(3))
+            guard !Task.isCancelled, appState.sessionState == .complete else { return }
+            await requestReview()
+            hasRequestedReviewAfterTenSessions = true
+            pendingReviewTask = nil
+        }
     }
 }
 
