@@ -38,56 +38,56 @@ struct SessionCompleteView: View {
     }
 
     var body: some View {
-        VStack(spacing: 16) {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Header
-                    VStack(spacing: 12) {
-                        ZStack {
-                            Circle()
-                                .fill(AppColors.accent)
-                                .frame(width: 64, height: 64)
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 28, weight: .bold))
-                                .foregroundStyle(AppColors.bgPrimary)
-                        }
-
-                        Text("Session Complete!")
-                            .font(.system(size: 24, weight: .semibold))
-                            .foregroundStyle(AppColors.textPrimary)
-
-                        Text("Here are your results.")
-                            .font(.system(size: 13))
-                            .foregroundStyle(AppColors.textSecondary)
+        ScrollView {
+            VStack(spacing: 20) {
+                // Header
+                VStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(AppColors.accent)
+                            .frame(width: 64, height: 64)
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundStyle(AppColors.bgPrimary)
                     }
 
-                    if let completedSession,
-                       SessionAICommentGenerator.shouldGenerate(for: completedSession)
-                    {
-                        AICommentCardView(
-                            comment: completedSession.aiComment,
-                            isLoading: completedSession.aiComment == nil && SessionAICommentGenerator.isAvailable
-                        )
-                    }
+                    Text("Session Complete!")
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundStyle(AppColors.textPrimary)
 
-                    SessionMetricsSummaryView(
-                        duration: durationText,
-                        jumps: jumpCountText,
-                        calories: caloriesText,
-                        averageRate: averageRateText,
-                        peakRate: peakRateText,
-                        longestJumpStrikes: longestStreakText,
-                        shortBreaks: shortBreaksText,
-                        longBreaks: longBreaksText,
-                        averageHeartRate: averageHeartRateText,
-                        peakHeartRate: peakHeartRateText,
-                        rateSamples: rateSamples
+                    Text("Here are your results.")
+                        .font(.system(size: 13))
+                        .foregroundStyle(AppColors.textSecondary)
+                }
+
+                if let completedSession,
+                   SessionAICommentGenerator.shouldGenerate(for: completedSession)
+                {
+                    AICommentCardView(
+                        comment: completedSession.aiComment,
+                        isLoading: completedSession.aiComment == nil && SessionAICommentGenerator.isAvailable
                     )
                 }
-                .padding(.horizontal, 24)
-            }
-            .scrollIndicators(.hidden)
 
+                SessionMetricsSummaryView(
+                    duration: durationText,
+                    jumps: jumpCountText,
+                    calories: caloriesText,
+                    averageRate: averageRateText,
+                    peakRate: peakRateText,
+                    longestJumpStrikes: longestStreakText,
+                    shortBreaks: shortBreaksText,
+                    longBreaks: longBreaksText,
+                    averageHeartRate: averageHeartRateText,
+                    peakHeartRate: peakHeartRateText,
+                    rateSamples: rateSamples
+                )
+            }
+            .padding(.horizontal, 24)
+        }
+        .scrollIndicators(.hidden)
+        .padding(.horizontal, 24)
+        .safeAreaInset(edge: .bottom) {
             VStack(spacing: 12) {
                 if let motionCSVShareURL = appState.motionCSVShareURL {
                     ShareLink(item: motionCSVShareURL) {
@@ -116,10 +116,12 @@ struct SessionCompleteView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
                 }
-                .appGlassButton(prominent: true, tint: AppColors.accent)
-            }
+                .appGlassButton(
+                    prominent: true,
+                    tint: AppColors.accent
+                )
+            }.padding(.horizontal, 24)
         }
-        .padding(.horizontal, 24)
     }
 
     private var durationText: String {
