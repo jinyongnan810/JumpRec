@@ -125,17 +125,15 @@ class JumpRecState {
 
         // save data to database
         guard let startTime, let endTime else { return }
-        Task { @MainActor in
-            dataStore.saveCompletedSession(
-                startedAt: startTime,
-                endedAt: endTime,
-                jumpCount: jumpCount,
-                caloriesBurned: energyBurned,
-                jumpOffsets: jumps,
-                averageHeartRate: averageHeartRate,
-                peakHeartRate: peakHeartRateValue
-            )
-        }
+        dataStore.saveCompletedSession(
+            startedAt: startTime,
+            endedAt: endTime,
+            jumpCount: jumpCount,
+            caloriesBurned: energyBurned,
+            jumpOffsets: jumps,
+            averageHeartRate: averageHeartRate,
+            peakHeartRate: peakHeartRateValue
+        )
 
         ConnectivityManager.shared.sendCompletedSession(
             startedAt: startTime,

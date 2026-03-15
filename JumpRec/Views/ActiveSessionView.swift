@@ -66,9 +66,9 @@ struct ActiveSessionView: View {
 
     private var ringCenterText: String {
         if goalType == .count {
-            return "\(appState.jumpCount)"
+            "\(appState.jumpCount)"
         } else {
-            return "\(elapsedSeconds / 60)"
+            "\(elapsedSeconds / 60)"
         }
     }
 

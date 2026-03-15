@@ -43,7 +43,7 @@ final class WorkoutMirrorManager: NSObject {
         // Register this as early as possible so the iPhone can receive a mirrored workout
         // session started from Apple Watch, even if the iOS app is launched in background.
         healthStore.workoutSessionMirroringStartHandler = { [weak self] session in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 self?.attachMirroredSession(session)
             }
         }
@@ -84,13 +84,15 @@ extension WorkoutMirrorManager: HKWorkoutSessionDelegate {
         // HealthKit may batch multiple payloads before delivering them to iPhone,
         // especially when the iOS app was suspended in background.
         for payloadData in data {
-            do {
-                let payload = try decoder.decode(MirroredWorkoutPayload.self, from: payloadData)
-                Task { @MainActor in
-                    self.onPayloadReceived?(payload)
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+
+                do {
+                    let payload = try decoder.decode(MirroredWorkoutPayload.self, from: payloadData)
+                    onPayloadReceived?(payload)
+                } catch {
+                    print("[WorkoutMirrorManager] Failed to decode mirrored payload: \(error)")
                 }
-            } catch {
-                print("[WorkoutMirrorManager] Failed to decode mirrored payload: \(error)")
             }
         }
     }

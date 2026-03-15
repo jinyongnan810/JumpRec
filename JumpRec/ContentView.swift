@@ -159,7 +159,7 @@ struct ContentView: View {
         pendingReviewTask = Task {
             try? await Task.sleep(for: .seconds(3))
             guard !Task.isCancelled, appState.sessionState == .complete else { return }
-            await requestReview()
+            requestReview()
             hasRequestedReviewAfterTenSessions = true
             pendingReviewTask = nil
         }

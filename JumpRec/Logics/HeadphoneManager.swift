@@ -24,7 +24,7 @@ final class HeadphoneManager: NSObject, CMHeadphoneMotionManagerDelegate {
         print("starting device motion updates")
         manager.startConnectionStatusUpdates()
         // sometimes(most of times) not firing
-        manager.startDeviceMotionUpdates(to: .main) { [weak self] motion, error in
+        manager.startDeviceMotionUpdates(to: .main) { motion, error in
             print("getting device motion: motion: \(String(describing: motion)), error: \(String(describing: error))")
 //            self?.motionActive = (motion != nil && error == nil)
         }

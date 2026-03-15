@@ -7,7 +7,7 @@
 import Foundation
 import Observation
 
-public enum GoalType: String, Codable {
+public enum GoalType: String, Codable, Sendable {
     case count
     case time
 }
