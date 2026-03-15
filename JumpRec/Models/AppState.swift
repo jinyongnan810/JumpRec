@@ -34,6 +34,8 @@ final class JumpRecState {
     @ObservationIgnored
     let dataStore = MyDataStore.shared
     @ObservationIgnored
+    private var isSceneActive = false
+    @ObservationIgnored
     private var pendingMirroredStart = false
 
     @ObservationIgnored
@@ -157,6 +159,7 @@ final class JumpRecState {
         if goalType == .time {
             startMinuteTimer()
         }
+        syncIdleTimer()
         notificationFeedbackGenerator.notificationOccurred(.success)
         speak(text: localizedSessionStartedAnnouncement)
         syncLiveActivity()
@@ -171,6 +174,7 @@ final class JumpRecState {
         let motionSamples = motionManager?.consumeRecordedSamples() ?? []
         endTime = Date()
         sessionState = .complete
+        syncIdleTimer()
         notificationFeedbackGenerator.notificationOccurred(.success)
         speak(text: localizedSessionFinishedAnnouncement)
         syncLiveActivity()
@@ -187,6 +191,11 @@ final class JumpRecState {
         }
     }
 
+    func updateSceneActive(_ isActive: Bool) {
+        isSceneActive = isActive
+        syncIdleTimer()
+    }
+
     func reset() {
         invalidateMinuteTimer()
         motionManager?.stopTracking()
@@ -201,6 +210,7 @@ final class JumpRecState {
         isMirroredWatchSession = false
         completedSession = nil
         pendingMirroredStart = false
+        syncIdleTimer()
         Task {
             await liveActivityManager.endIfNeeded()
         }
@@ -262,6 +272,7 @@ final class JumpRecState {
         sessionState = .active
         isMirroredWatchSession = true
         activeMotionSource = .watch
+        syncIdleTimer()
         syncLiveActivity()
     }
 
@@ -311,6 +322,7 @@ final class JumpRecState {
             self.peakHeartRate = peakHeartRate
         }
         sessionState = .complete
+        syncIdleTimer()
         syncLiveActivity()
     }
 
@@ -319,6 +331,7 @@ final class JumpRecState {
         invalidateMinuteTimer()
         endTime = endTime ?? Date()
         sessionState = .complete
+        syncIdleTimer()
         syncLiveActivity()
     }
 
@@ -344,6 +357,7 @@ final class JumpRecState {
         self.peakHeartRate = peakHeartRate
         completedSession = session
         sessionState = .complete
+        syncIdleTimer()
         syncLiveActivity()
     }
 
@@ -384,6 +398,13 @@ final class JumpRecState {
                 averageRate: averageRate,
                 sourceLabel: sourceLabel
             )
+        }
+    }
+
+    private func syncIdleTimer() {
+        let shouldDisableIdleTimer = sessionState == .active && isSceneActive
+        if UIApplication.shared.isIdleTimerDisabled != shouldDisableIdleTimer {
+            UIApplication.shared.isIdleTimerDisabled = shouldDisableIdleTimer
         }
     }
 

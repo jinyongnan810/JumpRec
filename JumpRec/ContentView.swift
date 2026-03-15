@@ -13,6 +13,7 @@ import UIKit
 struct ContentView: View {
     @Environment(MyDataStore.self) var dataStore
     @Environment(\.requestReview) private var requestReview
+    @Environment(\.scenePhase) private var scenePhase
     @AppStorage("hasRequestedReviewAfterTenSessions") private var hasRequestedReviewAfterTenSessions = false
     @State private var connectivityManager = ConnectivityManager.shared
     @Query() var sessions: [JumpSession]
@@ -69,7 +70,11 @@ struct ContentView: View {
         .preferredColorScheme(.dark)
         .onAppear {
 //            configureTabBarAppearance()
+            appState.updateSceneActive(scenePhase == .active)
             syncSettingsToWatch()
+        }
+        .onChange(of: scenePhase) { _, newValue in
+            appState.updateSceneActive(newValue == .active)
         }
         .onChange(of: settings.goalType) { _, _ in
             syncSettingsToWatch()
