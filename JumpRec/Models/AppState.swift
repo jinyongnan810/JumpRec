@@ -5,6 +5,7 @@
 
 import AVFoundation
 import Foundation
+import HealthKit
 import Observation
 import UIKit
 
@@ -42,6 +43,8 @@ final class JumpRecState {
     private var motionManager: MotionManager?
     @ObservationIgnored
     private let workoutMirrorManager = WorkoutMirrorManager.shared
+    @ObservationIgnored
+    private let phoneWorkoutManager = PhoneWorkoutManager.shared
     @ObservationIgnored
     private let connectivityManager = ConnectivityManager.shared
     @ObservationIgnored
@@ -143,10 +146,11 @@ final class JumpRecState {
     }
 
     private func startLocalSession(goalType: GoalType, goalValue: Int) {
+        let sessionStartDate = Date()
         invalidateMinuteTimer()
         resetLiveMetrics()
         completedSession = nil
-        startTime = Date()
+        startTime = sessionStartDate
         endTime = nil
         averageHeartRate = nil
         peakHeartRate = nil
@@ -163,6 +167,13 @@ final class JumpRecState {
         notificationFeedbackGenerator.notificationOccurred(.success)
         speak(text: localizedSessionStartedAnnouncement)
         syncLiveActivity()
+        Task {
+            do {
+                try await phoneWorkoutManager.startWorkout(at: sessionStartDate)
+            } catch {
+                print("[JumpRecState] Failed to start iPhone workout session: \(error)")
+            }
+        }
     }
 
     func finish() {
@@ -173,6 +184,11 @@ final class JumpRecState {
         motionManager?.stopTracking()
         let motionSamples = motionManager?.consumeRecordedSamples() ?? []
         endTime = Date()
+        if let endTime {
+            Task {
+                await phoneWorkoutManager.endWorkout(at: endTime)
+            }
+        }
         sessionState = .complete
         syncIdleTimer()
         notificationFeedbackGenerator.notificationOccurred(.success)
@@ -199,6 +215,7 @@ final class JumpRecState {
     func reset() {
         invalidateMinuteTimer()
         motionManager?.stopTracking()
+        phoneWorkoutManager.discardWorkout()
         sessionState = .idle
         resetLiveMetrics()
         activeMotionSource = nil

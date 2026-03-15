@@ -13,6 +13,7 @@ struct JumpRecApp: App {
     @State private var dataStore = MyDataStore.shared
 
     init() {
+        PhoneWorkoutManager.shared.activate()
         WorkoutMirrorManager.shared.activate()
     }
 

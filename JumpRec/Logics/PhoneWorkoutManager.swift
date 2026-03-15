@@ -1,0 +1,202 @@
+//
+//  PhoneWorkoutManager.swift
+//  JumpRec
+//
+
+import Foundation
+import HealthKit
+
+@MainActor
+final class PhoneWorkoutManager: NSObject {
+    private enum AuthorizationError: LocalizedError {
+        case workoutWriteDenied
+
+        var errorDescription: String? {
+            switch self {
+            case .workoutWriteDenied:
+                "Workout write permission is not granted."
+            }
+        }
+    }
+
+    static let shared = PhoneWorkoutManager()
+
+    private let healthStore = HKHealthStore()
+    private var workoutStore: AnyObject?
+    private var authorizationTask: Task<Void, Error>?
+
+    override private init() {
+        super.init()
+    }
+
+    func activate() {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+        authorizationTask = Task {
+            try await ensureAuthorization()
+        }
+    }
+
+    func startWorkout(at startDate: Date) async throws {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+        guard #available(iOS 26.0, *) else {
+            print("[PhoneWorkoutManager] iPhone workout sessions require iOS 26 or newer.")
+            return
+        }
+
+        print("[PhoneWorkoutManager] Starting workout at \(startDate)")
+        try await ensureAuthorization()
+        print("[PhoneWorkoutManager] Authorization ready for workout start.")
+
+        if workoutStore == nil {
+            workoutStore = PhoneWorkoutStore(healthStore: healthStore)
+        }
+        try await (workoutStore as? PhoneWorkoutStore)?.startWorkout(at: startDate)
+        print("[PhoneWorkoutManager] Workout start request completed.")
+    }
+
+    func endWorkout(at endDate: Date) async {
+        guard #available(iOS 26.0, *) else { return }
+        print("[PhoneWorkoutManager] Ending workout at \(endDate)")
+        await (workoutStore as? PhoneWorkoutStore)?.endWorkout(at: endDate)
+        workoutStore = nil
+        print("[PhoneWorkoutManager] Workout finish request completed.")
+    }
+
+    func discardWorkout() {
+        guard #available(iOS 26.0, *) else { return }
+        print("[PhoneWorkoutManager] Discarding active workout.")
+        (workoutStore as? PhoneWorkoutStore)?.discardWorkout()
+        workoutStore = nil
+    }
+
+    private func ensureAuthorization() async throws {
+        if let authorizationTask {
+            try await authorizationTask.value
+            return
+        }
+
+        let task = Task {
+            try await requestAuthorizationIfNeeded()
+        }
+        authorizationTask = task
+
+        do {
+            try await task.value
+        } catch {
+            authorizationTask = nil
+            throw error
+        }
+    }
+
+    private func requestAuthorizationIfNeeded() async throws {
+        if healthStore.authorizationStatus(for: HKObjectType.workoutType()) == .sharingAuthorized {
+            return
+        }
+
+        let typesToShare: Set = [
+            HKQuantityType.workoutType(),
+        ]
+
+        let typesToRead: Set = [
+            HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
+            HKQuantityType.quantityType(forIdentifier: .heartRate)!,
+            HKObjectType.activitySummaryType(),
+        ]
+
+        try await healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead)
+
+        let status = healthStore.authorizationStatus(for: HKObjectType.workoutType())
+        guard status == .sharingAuthorized else {
+            print("[PhoneWorkoutManager] Workout write authorization status: \(status.rawValue)")
+            throw AuthorizationError.workoutWriteDenied
+        }
+
+        print("[PhoneWorkoutManager] Workout write authorization granted.")
+    }
+}
+
+@available(iOS 26.0, *)
+private final class PhoneWorkoutStore: NSObject {
+    private let healthStore: HKHealthStore
+    private var session: HKWorkoutSession?
+    private var builder: HKLiveWorkoutBuilder?
+
+    init(healthStore: HKHealthStore) {
+        self.healthStore = healthStore
+    }
+
+    func startWorkout(at startDate: Date) async throws {
+        if session != nil {
+            print("[PhoneWorkoutManager] Existing workout detected. Ending it before starting a new one.")
+            await endWorkout(at: Date())
+        }
+
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .jumpRope
+        configuration.locationType = .outdoor
+
+        let session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
+        let builder = session.associatedWorkoutBuilder()
+        builder.dataSource = HKLiveWorkoutDataSource(
+            healthStore: healthStore,
+            workoutConfiguration: configuration
+        )
+
+        session.delegate = self
+        builder.delegate = self
+
+        self.session = session
+        self.builder = builder
+
+        session.startActivity(with: startDate)
+        try await builder.beginCollection(at: startDate)
+        print("[PhoneWorkoutManager] HKWorkoutSession and builder started.")
+    }
+
+    func endWorkout(at endDate: Date) async {
+        guard let session, let builder else { return }
+
+        session.end()
+
+        do {
+            try await builder.endCollection(at: endDate)
+            _ = try await builder.finishWorkout()
+            print("[PhoneWorkoutManager] HKWorkoutSession finished and workout saved.")
+        } catch {
+            print("[PhoneWorkoutManager] Failed to finish workout: \(error)")
+        }
+
+        if self.session === session {
+            self.session = nil
+        }
+        if self.builder === builder {
+            self.builder = nil
+        }
+    }
+
+    func discardWorkout() {
+        session?.end()
+        session = nil
+        builder = nil
+    }
+}
+
+@available(iOS 26.0, *)
+extension PhoneWorkoutStore: HKWorkoutSessionDelegate {
+    nonisolated func workoutSession(_: HKWorkoutSession,
+                                    didChangeTo _: HKWorkoutSessionState,
+                                    from _: HKWorkoutSessionState,
+                                    date _: Date)
+    {}
+
+    nonisolated func workoutSession(_: HKWorkoutSession, didFailWithError error: Error) {
+        print("[PhoneWorkoutManager] Workout session error: \(error)")
+    }
+}
+
+@available(iOS 26.0, *)
+extension PhoneWorkoutStore: HKLiveWorkoutBuilderDelegate {
+    nonisolated func workoutBuilder(_: HKLiveWorkoutBuilder, didCollectDataOf _: Set<HKSampleType>) {}
+
+    nonisolated func workoutBuilderDidCollectEvent(_: HKLiveWorkoutBuilder) {}
+}
