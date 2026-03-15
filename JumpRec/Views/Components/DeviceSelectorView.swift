@@ -5,15 +5,25 @@
 
 import SwiftUI
 
+/// Displays the active motion source and availability of each supported device.
 struct DeviceSelectorView: View {
+    /// The motion source currently being used.
     let activeSource: DeviceSource?
+    /// Indicates whether iPhone motion is available.
     let isPhoneMotionAvailable: Bool
+    /// Indicates whether headphone motion is available.
     let isHeadphoneMotionAvailable: Bool
+    /// Indicates whether watch motion is available.
     let isWatchMotionAvailable: Bool
+    /// Explains why watch motion is unavailable.
     let watchUnavailableReason: String
 
+    /// Tracks the unavailable source whose info popover is being shown.
     @State private var presentedInfoSource: DeviceSource?
 
+    // MARK: - View
+
+    /// Renders the active-source summary and availability badges.
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("ACTIVE SOURCE")
@@ -37,6 +47,9 @@ struct DeviceSelectorView: View {
         }
     }
 
+    // MARK: - Subviews
+
+    /// Displays the currently selected motion source.
     private var activeSourceCard: some View {
         let source = activeSource
 
@@ -70,6 +83,7 @@ struct DeviceSelectorView: View {
         .accessibilityValue(source?.shortName ?? String(localized: "Searching"))
     }
 
+    /// Displays a badge for a specific source and optionally explains unavailable states.
     @ViewBuilder
     private func availabilityBadge(for source: DeviceSource, isAvailable: Bool) -> some View {
         let isActive = activeSource == source
@@ -105,6 +119,7 @@ struct DeviceSelectorView: View {
         }
     }
 
+    /// Builds the shared badge label styling for a source.
     private func badgeLabel(for source: DeviceSource, isAvailable: Bool, isActive: Bool) -> some View {
         HStack(spacing: 6) {
             Image(systemName: source.iconName)
@@ -127,6 +142,7 @@ struct DeviceSelectorView: View {
         .accessibilityValue(badgeAccessibilityValue(isAvailable: isAvailable, isActive: isActive))
     }
 
+    /// Builds the informational popover shown for unavailable devices.
     private func infoPopover(message: String) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "info.circle.fill")
@@ -145,6 +161,7 @@ struct DeviceSelectorView: View {
         .frame(maxWidth: 260, alignment: .leading)
     }
 
+    /// Returns the foreground color for a source badge.
     private func badgeForeground(isAvailable: Bool, isActive: Bool) -> Color {
         if isActive {
             return AppColors.bgPrimary
@@ -155,6 +172,7 @@ struct DeviceSelectorView: View {
         return AppColors.textMuted
     }
 
+    /// Returns the background color for a source badge.
     private func badgeBackground(isAvailable: Bool, isActive: Bool) -> Color {
         if isActive {
             return AppColors.accent
@@ -165,6 +183,7 @@ struct DeviceSelectorView: View {
         return AppColors.cardSurface.opacity(0.45)
     }
 
+    /// Returns the outline color for a source badge.
     private func badgeStroke(isAvailable: Bool, isActive: Bool) -> Color {
         if isActive {
             return AppColors.accent
@@ -175,6 +194,7 @@ struct DeviceSelectorView: View {
         return AppColors.textMuted.opacity(0.2)
     }
 
+    /// Returns the accessibility value describing a badge state.
     private func badgeAccessibilityValue(isAvailable: Bool, isActive: Bool) -> String {
         if isActive {
             return String(localized: "Active")
@@ -185,6 +205,7 @@ struct DeviceSelectorView: View {
         return String(localized: "Unavailable")
     }
 
+    /// Returns the explanatory message for an unavailable source.
     private func unavailableMessage(for source: DeviceSource) -> String {
         switch source {
         case .watch:

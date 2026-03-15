@@ -8,14 +8,19 @@ import Foundation
 #if canImport(ActivityKit)
     import ActivityKit
 
+    /// Owns the app's live-activity lifecycle for active jump sessions.
     @MainActor
     final class LiveActivityManager {
+        /// Shared singleton used by app state.
         static let shared = LiveActivityManager()
 
+        /// Tracks the currently displayed live activity, if any.
         private var currentActivity: Activity<JumpRecLiveActivityAttributes>?
 
+        /// Restricts creation to the shared singleton.
         private init() {}
 
+        /// Starts a live activity or updates the current one with fresh metrics.
         func startOrUpdate(
             startedAt: Date,
             goalSummary: String,
@@ -58,6 +63,7 @@ import Foundation
             }
         }
 
+        /// Ends the current live activity with final metrics.
         func end(
             startedAt _: Date?,
             goalSummary _: String,
@@ -85,6 +91,7 @@ import Foundation
             currentActivity = nil
         }
 
+        /// Immediately ends any live activity still associated with the app.
         func endIfNeeded() async {
             for activity in Activity<JumpRecLiveActivityAttributes>.activities {
                 await activity.end(nil, dismissalPolicy: .immediate)
@@ -92,6 +99,7 @@ import Foundation
             currentActivity = nil
         }
 
+        /// Returns the cached activity or resolves the current one from the system.
         private var resolvedActivity: Activity<JumpRecLiveActivityAttributes>? {
             if let currentActivity {
                 return currentActivity
@@ -102,12 +110,16 @@ import Foundation
         }
     }
 #else
+    /// Fallback live-activity manager used when ActivityKit is unavailable.
     @MainActor
     final class LiveActivityManager {
+        /// Shared singleton used by app state.
         static let shared = LiveActivityManager()
 
+        /// Restricts creation to the shared singleton.
         private init() {}
 
+        /// No-op fallback when ActivityKit is unavailable.
         func startOrUpdate(
             startedAt _: Date,
             goalSummary _: String,
@@ -117,6 +129,7 @@ import Foundation
             sourceLabel _: String
         ) async {}
 
+        /// No-op fallback when ActivityKit is unavailable.
         func end(
             startedAt _: Date?,
             goalSummary _: String,
@@ -127,6 +140,7 @@ import Foundation
             endedAt _: Date
         ) async {}
 
+        /// No-op fallback when ActivityKit is unavailable.
         func endIfNeeded() async {}
     }
 #endif

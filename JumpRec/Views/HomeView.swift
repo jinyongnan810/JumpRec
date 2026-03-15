@@ -5,17 +5,30 @@
 
 import SwiftUI
 
+/// Displays the pre-session start screen and countdown flow.
 struct HomeView: View {
+    /// The persisted goal settings displayed on the home screen.
     @Bindable var settings: JumpRecSettings
+    /// The observable app state used to display device availability.
     @Bindable var appState: JumpRecState
+    /// Indicates whether the watch path is available for this session.
     let isWatchAvailable: Bool
+    /// Explains why the watch path is unavailable.
     let watchUnavailableReason: String
+    /// Starts a new session after the countdown completes.
     var onStart: () -> Void
+    /// Controls presentation of the goal sheet.
     @State private var showGoalSheet = false
+    /// Tracks the active countdown value, or `nil` when idle.
     @State private var countdownValue: Int?
+    /// Holds the asynchronous countdown task so it can be cancelled.
     @State private var countdownTask: Task<Void, Never>?
+    /// Animates the countdown ring progress.
     @State private var countdownProgress: Double = 1.0
 
+    // MARK: - Derived Values
+
+    /// Returns the formatted goal summary shown under the app title.
     var goalText: String {
         if settings.goalType == .count {
             String(
@@ -30,6 +43,9 @@ struct HomeView: View {
         }
     }
 
+    // MARK: - View
+
+    /// Renders the home screen and session-start controls.
     var body: some View {
         VStack(spacing: 32) {
             // Header
@@ -111,10 +127,14 @@ struct HomeView: View {
         }
     }
 
+    // MARK: - Helpers
+
+    /// Returns whether the countdown is currently active.
     private var isCountingDown: Bool {
         countdownValue != nil
     }
 
+    /// Chooses the best source to display before a session starts.
     private var displayedMotionSource: DeviceSource? {
         if let activeSource = appState.activeMotionSource {
             return activeSource
@@ -131,18 +151,22 @@ struct HomeView: View {
         return nil
     }
 
+    /// Returns the title for the primary button.
     private var primaryButtonTitle: String {
         isCountingDown ? String(localized: "CANCEL") : String(localized: "START SESSION")
     }
 
+    /// Returns the text color for the primary button.
     private var primaryButtonTextColor: Color {
         isCountingDown ? AppColors.textPrimary : AppColors.bgPrimary
     }
 
+    /// Returns the tint color for the primary button.
     private var primaryButtonTint: Color {
         isCountingDown ? AppColors.danger : AppColors.accent
     }
 
+    /// Starts the animated pre-session countdown.
     private func startWithCountdown() {
         guard !isCountingDown else { return }
 
@@ -175,6 +199,7 @@ struct HomeView: View {
         }
     }
 
+    /// Cancels the active countdown and resets its UI state.
     private func cancelCountdown() {
         countdownTask?.cancel()
         countdownTask = nil

@@ -5,11 +5,18 @@
 
 import SwiftUI
 
+/// Displays the large circular progress ring used on the home and active-session screens.
 struct HeroRingView: View {
-    var progress: Double // 0.0 to 1.0
+    /// The normalized progress value from `0.0` to `1.0`.
+    var progress: Double
+    /// The primary text shown in the center of the ring.
     var centerText: String
+    /// The supporting label shown below the center text.
     var subtitle: String
 
+    // MARK: - View
+
+    /// Renders the ring, progress stroke, and center content.
     var body: some View {
         ZStack {
             // Background ring

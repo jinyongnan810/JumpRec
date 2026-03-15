@@ -7,13 +7,18 @@
 import CoreMotion
 import Observation
 
+/// Wraps `CMHeadphoneMotionManager` to track headphone motion availability.
 @Observable
 final class HeadphoneManager: NSObject, CMHeadphoneMotionManagerDelegate {
+    /// The underlying Core Motion manager for headphone updates.
     private let manager = CMHeadphoneMotionManager()
 
+    /// Indicates whether motion access has been authorized.
     var motionAuthorized: Bool = CMHeadphoneMotionManager.authorizationStatus() == .authorized
+    /// Indicates whether headphone motion updates are currently active.
     var motionActive: Bool = false
 
+    /// Starts listening for connection and motion updates from supported headphones.
     func start() {
         print("authorization: \(motionAuthorized)")
         guard manager.isDeviceMotionAvailable else {
@@ -30,17 +35,20 @@ final class HeadphoneManager: NSObject, CMHeadphoneMotionManagerDelegate {
         }
     }
 
+    /// Stops all headphone connection and motion updates.
     func stop() {
         manager.stopConnectionStatusUpdates()
         manager.stopDeviceMotionUpdates()
     }
 
     // sometimes(most of times) not firing
+    /// Marks motion as active when supported headphones connect.
     func headphoneMotionManagerDidConnect(_: CMHeadphoneMotionManager) {
         print("headphone connected")
         motionActive = true
     }
 
+    /// Marks motion as inactive when supported headphones disconnect.
     func headphoneMotionManagerDidDisconnect(
         _: CMHeadphoneMotionManager
     ) {

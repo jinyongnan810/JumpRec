@@ -9,11 +9,15 @@ import Foundation
 import WatchConnectivity
 
 final class ConnectivityManager: NSObject, WCSessionDelegate {
+    /// Shared singleton used by the watch app.
     static let shared = ConnectivityManager()
 
+    /// The active WatchConnectivity session.
     private let session: WCSession = .default
+    /// Persists synced settings received from the phone.
     private let settingsStore = NSUbiquitousKeyValueStore.default
 
+    /// Configures and activates the shared connectivity session.
     override private init() {
         super.init()
         if WCSession.isSupported() {
@@ -24,6 +28,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
     // MARK: - WCSessionDelegate
 
+    /// Handles activation completion and applies any queued settings payload.
     func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         if let error {
             print("[WatchConnectivityManager] Activation failed with error: \(error.localizedDescription)")
@@ -38,6 +43,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     /// - Parameters:
     ///   - csvText: The CSV content as string
     ///   - filename: The filename for the CSV file
+    /// Transfers a CSV export to the iPhone companion app.
     func sendCSV(_ csvText: String, filename: String) {
         guard session.isReachable else {
             print("[WatchConnectivityManager] Session not reachable or not paired")
@@ -54,6 +60,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    /// Sends a reachable message directly to the iPhone app.
     func sendMessage(_ message: [String: Any]) {
         guard session.isReachable else {
             print("[WatchConnectivityManager] Session not reachable or not paired")
@@ -64,6 +71,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         })
     }
 
+    /// Queues a completed workout payload for delivery to the iPhone app.
     func sendCompletedSession(
         startedAt: Date,
         endedAt: Date,
@@ -87,15 +95,18 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         print("[WatchConnectivityManager] Queued completed session via transferUserInfo")
     }
 
+    /// Logs changes to reachability with the iPhone app.
     func sessionReachabilityDidChange(_ session: WCSession) {
         print("[WatchConnectivityManager] Session reachability changed: \(session.isReachable)")
     }
 
+    /// Applies updated goal settings received from the iPhone app.
     func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         print("[WatchConnectivityManager] Received application context: \(applicationContext)")
         applySettingsPayload(applicationContext)
     }
 
+    /// Validates and persists a settings payload from the iPhone app.
     private func applySettingsPayload(_ payload: [String: Any]) {
         guard let type = payload["type"] as? String, type == "goalSettings" else {
             return

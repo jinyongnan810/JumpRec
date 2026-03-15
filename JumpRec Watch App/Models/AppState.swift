@@ -11,29 +11,49 @@ import Observation
 import WatchKit
 
 enum JumpState {
+    /// No workout is running.
     case idle, jumping, finished
 }
 
+/// Owns the watch app's session lifecycle, motion tracking, and mirrored workout updates.
 @Observable
 @MainActor
 class JumpRecState {
+    // MARK: - Shared Instance
+
+    /// Provides the single shared app state used across watch views.
     static let shared = JumpRecState()
 
+    // MARK: - Session State
+
+    /// Tracks the current watch-side session state.
     var jumpState: JumpState = .idle
+    /// Stores when the current or last session started.
     var startTime: Date?
+    /// Stores when the current or last session ended.
     var endTime: Date?
+    /// Stores the total jump count for the session.
     var jumpCount: Int = 0
+    /// Stores jump offsets relative to `startTime`.
     var jumps: [TimeInterval] = []
+    /// Stores the latest heart-rate sample.
     var heartrate: Int = 0
+    /// Accumulates heart-rate samples for average calculation.
     @ObservationIgnored
     var heartRateSum: Int = 0
+    /// Counts heart-rate samples used for averaging.
     @ObservationIgnored
     var heartRateSampleCount: Int = 0
+    /// Stores the highest observed heart rate.
     @ObservationIgnored
     var peakHeartRate: Int = 0
+    /// Stores the latest calorie estimate from HealthKit.
     var energyBurned: Double = 0
+    /// Stores the active goal type for the session.
     var goalType: GoalType = .count
+    /// Stores the active goal value, in jumps or seconds depending on `goalType`.
     var goal: Int = 0
+    /// Returns the finished session duration formatted as `mm:ss`.
     var totalTime: String {
         guard let startTime, let endTime else { return "00:00" }
         let timeInterval: TimeInterval = endTime.timeIntervalSince(startTime)
@@ -42,19 +62,26 @@ class JumpRecState {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
+    /// Provides shared persistence helpers.
     @ObservationIgnored
     let dataStore = MyDataStore.shared
 
+    /// Speaks workout announcements on Apple Watch.
     @ObservationIgnored
     let synthesizer = AVSpeechSynthesizer()
 
+    /// Detects watch motion and jump events.
     @ObservationIgnored
     var motionManager: MotionManager?
+    /// Announces minute milestones during time-based sessions.
     @ObservationIgnored
     var minuteTimer: Timer?
 
 //    let notificationCenter = UNUserNotificationCenter.current()
 
+    // MARK: - Initialization
+
+    /// Configures motion tracking and speech for the watch app.
     init() {
         motionManager = MotionManager(addJump: { by in
             Task { @MainActor in
@@ -73,6 +100,9 @@ class JumpRecState {
         warmUpSpeechSynthesizer()
     }
 
+    // MARK: - Session Lifecycle
+
+    /// Pre-warms speech synthesis to avoid a heavy first utterance.
     func warmUpSpeechSynthesizer() {
         // first call to synthesizer.speak can be very heavy
         let utterance = AVSpeechUtterance(string: isJapanesePreferred ? "こんにちは" : "Hello")
@@ -81,6 +111,7 @@ class JumpRecState {
         synthesizer.speak(utterance)
     }
 
+    /// Starts a new watch-tracked workout session.
     func start(goalType: GoalType, goalCount: Int) {
         resetSessionMetrics()
         self.goalType = goalType
@@ -105,12 +136,14 @@ class JumpRecState {
         ConnectivityManager.shared.sendMessage(["watch app": "started"])
     }
 
+    /// Starts a workout using settings received from the companion iPhone app.
     func startFromCompanion() {
         let settings = JumpRecSettings()
         settings.loadSettings()
         start(goalType: settings.goalType, goalCount: settings.goalCount)
     }
 
+    /// Ends the current watch workout, saves it, and sends results to the phone.
     func end() {
         guard jumpState == .jumping else { return }
         invalidateMinuteTimer()
@@ -148,6 +181,7 @@ class JumpRecState {
         print("end finished")
     }
 
+    /// Resets the watch app back to the idle state.
     func reset() {
         invalidateMinuteTimer()
         motionManager?.stopTracking()
@@ -155,6 +189,9 @@ class JumpRecState {
         jumpState = .idle
     }
 
+    // MARK: - Audio
+
+    /// Configures audio so speech prompts can play during the session.
     func configureAudioSession() {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
@@ -164,10 +201,14 @@ class JumpRecState {
         }
     }
 
+    // MARK: - Metrics
+
+    /// Updates the latest visible heart-rate sample.
     func updateHeartrate(_ heartrate: Int) {
         self.heartrate = heartrate
     }
 
+    /// Records heart-rate data for average and peak tracking.
     private func recordHeartRate(_ heartRate: Int) {
         heartrate = heartRate
         heartRateSum += heartRate
@@ -175,15 +216,18 @@ class JumpRecState {
         peakHeartRate = max(peakHeartRate, heartRate)
     }
 
+    /// Returns the average heart rate for the current session.
     private var averageHeartRate: Int? {
         guard heartRateSampleCount > 0 else { return nil }
         return heartRateSum / heartRateSampleCount
     }
 
+    /// Returns the peak heart rate only when one has been recorded.
     private var peakHeartRateValue: Int? {
         peakHeartRate > 0 ? peakHeartRate : nil
     }
 
+    /// Adds newly detected jumps to the active session.
     func addJump(by: Int) {
         guard jumpState == .jumping, let startTime else { return }
         let before = jumpCount
@@ -194,6 +238,7 @@ class JumpRecState {
         checkJumpLandmark(before: before, after: jumpCount)
     }
 
+    /// Handles count-based milestones and goal completion.
     func checkJumpLandmark(before: Int, after: Int) {
         if goalType == .time {
             return
@@ -207,6 +252,7 @@ class JumpRecState {
         }
     }
 
+    /// Announces each 100-jump landmark during count-based sessions.
     func handleHundredJumpsLandmark(jumpCount: Int) {
         WKInterfaceDevice.current().play(.success)
         let hundred = jumpCount / 100 * 100
@@ -216,6 +262,7 @@ class JumpRecState {
 
     // MARK: - Time goal minute landmarks
 
+    /// Starts the timer used for minute-based announcements.
     private func startMinuteTimer() {
         invalidateMinuteTimer()
         minuteTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(60), repeats: true) { [weak self] _ in
@@ -226,11 +273,13 @@ class JumpRecState {
         RunLoop.current.add(minuteTimer!, forMode: .common)
     }
 
+    /// Invalidates the active minute timer.
     private func invalidateMinuteTimer() {
         minuteTimer?.invalidate()
         minuteTimer = nil
     }
 
+    /// Announces elapsed minutes and ends the session when the time goal is met.
     private func handleMinuteLandmark() {
         guard jumpState == .jumping, goalType == .time, let startTime else { return }
         let minutesElapsed = Int(Date().timeIntervalSince(startTime)) / 60
@@ -245,6 +294,9 @@ class JumpRecState {
 //        scheduleNotification(title: "Reached \(minuteText)", body: "")
     }
 
+    // MARK: - Speech
+
+    /// Speaks a localized prompt after an optional delay.
     func speak(text: String, delay: Double = 0.5) {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             let utterance = AVSpeechUtterance(string: text)
@@ -253,22 +305,27 @@ class JumpRecState {
         }
     }
 
+    /// Returns whether Japanese is the preferred language.
     private var isJapanesePreferred: Bool {
         Locale.preferredLanguages.first?.hasPrefix("ja") == true
     }
 
+    /// Returns the speech language code used for announcements.
     private var preferredSpeechLanguageCode: String {
         isJapanesePreferred ? "ja-JP" : "en-US"
     }
 
+    /// Returns the localized spoken phrase for session start.
     private var localizedSessionStartedAnnouncement: String {
         isJapanesePreferred ? "セッションを開始しました" : "Session Started!"
     }
 
+    /// Returns the localized spoken phrase for session finish.
     private var localizedSessionFinishedAnnouncement: String {
         isJapanesePreferred ? "セッションを終了しました" : "Session Finished!"
     }
 
+    /// Returns the localized spoken phrase for jump milestones.
     private func localizedJumpAnnouncement(for jumpCount: Int) -> String {
         if isJapanesePreferred {
             return "\(jumpCount) 回"
@@ -276,6 +333,7 @@ class JumpRecState {
         return "\(jumpCount) Jumps"
     }
 
+    /// Returns the localized spoken phrase for minute milestones.
     private func localizedMinuteAnnouncement(for minutesElapsed: Int) -> String {
         if isJapanesePreferred {
             return "\(minutesElapsed) 分"
@@ -283,6 +341,9 @@ class JumpRecState {
         return minutesElapsed == 1 ? "1 minute" : "\(minutesElapsed) minutes"
     }
 
+    // MARK: - Reset
+
+    /// Clears the live metrics stored for the current session.
     private func resetSessionMetrics() {
         jumpCount = 0
         jumps.removeAll(keepingCapacity: true)

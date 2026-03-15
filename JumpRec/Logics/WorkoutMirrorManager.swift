@@ -6,11 +6,15 @@
 import Foundation
 import HealthKit
 
+/// Manages HealthKit workout mirroring between Apple Watch and iPhone.
 @MainActor
 final class WorkoutMirrorManager: NSObject {
+    /// Shared singleton used by app state.
     static let shared = WorkoutMirrorManager()
 
+    /// Delivers decoded mirrored payloads to app state.
     var onPayloadReceived: ((MirroredWorkoutPayload) -> Void)?
+    /// Notifies app state when the mirrored session ends.
     var onMirroredSessionEnded: (() -> Void)?
 
     // The iPhone must own an HKHealthStore to participate in HealthKit workout mirroring.
@@ -18,15 +22,20 @@ final class WorkoutMirrorManager: NSObject {
     // - WCSession is for general app/watch messaging.
     // - HKWorkoutSession mirroring is for an active HealthKit workout and lets the system
     //   wake the companion iPhone app, attach a mirrored session, and deliver workout data.
+    /// The HealthKit store used for mirroring registration.
     private let healthStore = HKHealthStore()
+    /// Decodes mirrored payloads coming from the watch.
     private let decoder = JSONDecoder()
+    /// Tracks the currently attached mirrored workout session.
     private var mirroredSession: HKWorkoutSession?
 
+    /// Restricts creation to the shared singleton.
     override private init() {
         super.init()
         decoder.dateDecodingStrategy = .deferredToDate
     }
 
+    /// Requests the system to launch the companion watch workout.
     func startCompanionWorkout() async throws {
         guard HKHealthStore.isHealthDataAvailable() else { return }
 
@@ -37,6 +46,7 @@ final class WorkoutMirrorManager: NSObject {
         try await healthStore.startWatchApp(toHandle: configuration)
     }
 
+    /// Registers mirroring callbacks and requests HealthKit authorization.
     func activate() {
         guard HKHealthStore.isHealthDataAvailable() else { return }
 
@@ -51,6 +61,7 @@ final class WorkoutMirrorManager: NSObject {
         requestAuthorization()
     }
 
+    /// Requests the HealthKit permissions required for workout mirroring.
     private func requestAuthorization() {
         // Read permission is still required on iPhone because the mirrored workout session is
         // a HealthKit workflow, not just a transport channel for arbitrary watch messages.
@@ -69,6 +80,7 @@ final class WorkoutMirrorManager: NSObject {
         }
     }
 
+    /// Attaches the mirrored workout session so payloads can be received.
     private func attachMirroredSession(_ session: HKWorkoutSession) {
         // Keep a reference to the mirrored session so the iPhone can receive payloads sent with
         // sendToRemoteWorkoutSession(data:) from the watch's primary HKWorkoutSession.
@@ -78,6 +90,7 @@ final class WorkoutMirrorManager: NSObject {
 }
 
 extension WorkoutMirrorManager: HKWorkoutSessionDelegate {
+    /// Decodes mirrored workout payloads received from Apple Watch.
     nonisolated func workoutSession(_: HKWorkoutSession,
                                     didReceiveDataFromRemoteWorkoutSession data: [Data])
     {
@@ -97,6 +110,7 @@ extension WorkoutMirrorManager: HKWorkoutSessionDelegate {
         }
     }
 
+    /// Clears mirrored-session state when the watch workout ends.
     nonisolated func workoutSession(_ workoutSession: HKWorkoutSession,
                                     didChangeTo toState: HKWorkoutSessionState,
                                     from _: HKWorkoutSessionState,
@@ -112,6 +126,7 @@ extension WorkoutMirrorManager: HKWorkoutSessionDelegate {
         }
     }
 
+    /// Logs HealthKit mirroring failures.
     nonisolated func workoutSession(_: HKWorkoutSession, didFailWithError error: Error) {
         print("[WorkoutMirrorManager] Mirrored session error: \(error)")
     }

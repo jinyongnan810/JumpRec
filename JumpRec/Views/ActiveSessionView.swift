@@ -5,16 +5,29 @@
 
 import SwiftUI
 
+/// Shows live progress, metrics, and controls while a session is running.
 struct ActiveSessionView: View {
+    /// The persisted app settings used as a fallback for goal display.
     var settings: JumpRecSettings
+    /// The observable app state driving live session updates.
     @Bindable var appState: JumpRecState
+    /// Stops the current local session.
     var onStop: () -> Void
 
+    // MARK: - View State
+
+    /// Tracks the current time for live elapsed-time updates.
     @State private var now = Date()
+    /// Animates the progress ring fill.
     @State private var animatedProgress: Double = 0
+    /// Animates the primary ring text.
     @State private var animatedCenterText = "0"
+    /// Animates the ring subtitle text.
     @State private var animatedRingSubtitle = ""
 
+    // MARK: - Derived Values
+
+    /// Returns the active goal value for the current session.
     private var goalValue: Int64 {
         if let mirroredGoalValue = appState.sessionGoalValue {
             return Int64(mirroredGoalValue)
@@ -22,10 +35,12 @@ struct ActiveSessionView: View {
         return settings.goalType == .count ? settings.jumpCount : settings.jumpTime
     }
 
+    /// Returns the active goal type for the current session.
     private var goalType: GoalType {
         appState.sessionGoalType ?? settings.goalType
     }
 
+    /// Returns normalized progress toward the session goal.
     private var progress: Double {
         guard goalValue > 0 else { return 0 }
         if goalType == .count {
@@ -36,6 +51,7 @@ struct ActiveSessionView: View {
         }
     }
 
+    /// Returns the formatted goal text for the header.
     private var goalText: String {
         if goalType == .count {
             String(
@@ -50,6 +66,7 @@ struct ActiveSessionView: View {
         }
     }
 
+    /// Returns the subtitle shown below the hero-ring value.
     private var ringSubtitle: String {
         if goalType == .count {
             String(
@@ -64,6 +81,7 @@ struct ActiveSessionView: View {
         }
     }
 
+    /// Returns the main value shown in the hero ring.
     private var ringCenterText: String {
         if goalType == .count {
             "\(appState.jumpCount)"
@@ -72,25 +90,32 @@ struct ActiveSessionView: View {
         }
     }
 
+    /// Returns the leading stat label based on the goal type.
     private var leadingStatLabel: LocalizedStringKey {
         goalType == .count ? "TIME" : "JUMPS"
     }
 
+    /// Returns the leading stat value based on the goal type.
     private var leadingStatValue: String {
         goalType == .count ? elapsedFormatted : appState.jumpCount.formatted()
     }
 
+    /// Returns the live elapsed time formatted as `mm:ss`.
     private var elapsedFormatted: String {
         let m = elapsedSeconds / 60
         let s = elapsedSeconds % 60
         return String(format: "%02d:%02d", m, s)
     }
 
+    /// Returns the live elapsed time in seconds.
     private var elapsedSeconds: Int {
         guard let startTime = appState.startTime else { return 0 }
         return max(0, Int(now.timeIntervalSince(startTime)))
     }
 
+    // MARK: - View
+
+    /// Renders the active-session layout and live-updating metrics.
     var body: some View {
         VStack(spacing: 28) {
             // Header
@@ -167,6 +192,9 @@ struct ActiveSessionView: View {
         }
     }
 
+    // MARK: - Helpers
+
+    /// Returns the short label for the currently active motion source.
     private var sourceLabel: String {
         switch appState.activeMotionSource {
         case .airpods:
@@ -180,6 +208,7 @@ struct ActiveSessionView: View {
         }
     }
 
+    /// Synchronizes the displayed hero-ring values with the latest session state.
     private func syncHeroRing(animated: Bool = true) {
         let updates = {
             animatedProgress = progress

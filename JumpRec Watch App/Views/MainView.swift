@@ -8,14 +8,20 @@
 import SwiftData
 import SwiftUI
 
+/// Chooses the correct watch screen based on the current session state.
 struct MainView: View {
+    /// Holds the shared watch app state.
     @State var appState = JumpRecState.shared
+    /// Provides persisted goal settings.
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
 
+    /// Provides access to the shared data store.
     @Environment(MyDataStore.self) var myDataStore
 
+    /// Observes saved sessions for debugging and refresh verification.
     @Query(filter: nil, sort: [SortDescriptor(\JumpSession.startedAt)]) var jumpSessions: [JumpSession]
+    /// Renders the current watch screen for the session lifecycle.
     var body: some View {
         ZStack {
             switch appState.jumpState {

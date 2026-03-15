@@ -6,13 +6,21 @@
 import Charts
 import SwiftUI
 
+/// Plots jump-rate samples over time for completed sessions.
 struct JumpingRateGraphView: View {
+    /// The rate samples used to render the chart.
     let samples: [SessionRateSample]
 
+    /// The color used for chart grid lines.
     private let gridLineColor = Color(hex: 0x0F172A)
+    /// The number of major steps used on the y-axis.
     private let yAxisStepCount = 3
+    /// The number of major steps used on the x-axis.
     private let xAxisStepCount = 4
 
+    // MARK: - View
+
+    /// Renders the chart or an empty placeholder when no samples are available.
     var body: some View {
         Group {
             if chartPoints.isEmpty {
@@ -92,6 +100,9 @@ struct JumpingRateGraphView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
+    // MARK: - Derived Values
+
+    /// Converts stored session samples into chart points.
     private var chartPoints: [ChartPoint] {
         samples
             .sorted { $0.secondOffset < $1.secondOffset }
@@ -100,11 +111,13 @@ struct JumpingRateGraphView: View {
             }
     }
 
+    /// Returns the x-axis domain for the chart.
     private var chartXDomain: ClosedRange<Int> {
         let upperBound = max(chartPoints.map(\.elapsedSeconds).max() ?? 0, 1)
         return 0 ... upperBound
     }
 
+    /// Returns the y-axis domain for the chart.
     private var chartYDomain: ClosedRange<Double> {
         let values = chartPoints.map(\.value)
         guard let minValue = values.min(), let maxValue = values.max() else {
@@ -119,6 +132,7 @@ struct JumpingRateGraphView: View {
         return 0 ... maxValue
     }
 
+    /// Returns the x-axis positions used for labels.
     private var xAxisMarks: [Int] {
         let durationSeconds = chartXDomain.upperBound
         guard durationSeconds > 0 else { return [0] }
@@ -128,12 +142,14 @@ struct JumpingRateGraphView: View {
         }
     }
 
+    /// Maps x-axis positions to their formatted labels.
     private var xAxisLabelMap: [Int: String] {
         Dictionary(uniqueKeysWithValues: xAxisMarks.map { seconds in
             (seconds, formattedElapsedTime(seconds))
         })
     }
 
+    /// Returns the labeled y-axis marks used by the chart.
     private var yAxisMarks: [ChartAxisLabel] {
         let lowerBound = chartYDomain.lowerBound
         let upperBound = chartYDomain.upperBound
@@ -155,10 +171,12 @@ struct JumpingRateGraphView: View {
         }
     }
 
+    /// Formats y-axis values without fractional digits.
     private func formattedYAxisValue(_ value: Double) -> String {
         value.formatted(.number.precision(.fractionLength(0)))
     }
 
+    /// Formats elapsed seconds as `m:ss`.
     private func formattedElapsedTime(_ totalSeconds: Int) -> String {
         let minutes = totalSeconds / 60
         let seconds = totalSeconds % 60
@@ -166,15 +184,22 @@ struct JumpingRateGraphView: View {
     }
 }
 
+/// Represents one plotted point in the jump-rate chart.
 private struct ChartPoint: Identifiable {
+    /// The elapsed second associated with the point.
     let elapsedSeconds: Int
+    /// The jump-rate value at that second.
     let value: Double
 
+    /// Uses elapsed seconds as a stable identifier.
     var id: Int { elapsedSeconds }
 }
 
+/// Represents a labeled y-axis tick for the chart.
 private struct ChartAxisLabel {
+    /// The numeric axis value.
     let value: Double
+    /// The formatted label shown for the axis value.
     let label: String
 }
 

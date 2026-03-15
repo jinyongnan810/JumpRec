@@ -9,20 +9,31 @@ import Foundation
 import SwiftData
 import WatchConnectivity
 
+/// Manages WatchConnectivity session state, settings sync, and completed-session transfers.
 @Observable
 final class ConnectivityManager: NSObject, WCSessionDelegate {
+    /// Shared singleton used across the iPhone app.
     static let shared = ConnectivityManager()
 
+    /// The active WatchConnectivity session.
     private let session: WCSession = .default
 
+    /// Indicates whether WatchConnectivity is supported on this device.
     var isSupported: Bool = WCSession.isSupported()
+    /// Indicates whether an Apple Watch is paired.
     var isPaired: Bool = false
+    /// Indicates whether the watch app is installed.
     var isWatchAppInstalled: Bool = false
+    /// Indicates whether the companion watch app is reachable.
     var isReachable: Bool = false
+    /// Stores the latest WatchConnectivity activation state.
     var activationState: WCSessionActivationState = .notActivated
+    /// Delivers fully reconstructed sessions received from Apple Watch.
     var onCompletedSessionReceived: ((Date, Date, Int, Double, [TimeInterval], Int?, Int?, JumpSession) -> Void)?
+    /// Persists synced settings in the shared ubiquitous key-value store.
     private let settingsStore = NSUbiquitousKeyValueStore.default
 
+    /// Configures and activates the shared connectivity session.
     override private init() {
         super.init()
         if WCSession.isSupported() {
@@ -33,6 +44,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
     // MARK: - WCSessionDelegate
 
+    /// Handles WatchConnectivity activation completion and refreshes local session flags.
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         if let error {
             print("[WatchConnectivityManager] Activation failed with error: \(error.localizedDescription)")
@@ -47,6 +59,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    /// Updates reachability when the watch app becomes reachable or unreachable.
     func sessionReachabilityDidChange(_ session: WCSession) {
         print("[WatchConnectivityManager] Session reachability changed: \(session.isReachable)")
         DispatchQueue.main.async {
@@ -54,6 +67,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    /// Updates pairing and install state when watch state changes.
     func sessionWatchStateDidChange(_ session: WCSession) {
         print(
             "[WatchConnectivityManager] Session state changed: isPaired(\(session.isPaired)), isWatchAppInstalled(\(session.isWatchAppInstalled))"
@@ -64,15 +78,18 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    /// Logs when the current session becomes inactive.
     func sessionDidBecomeInactive(_: WCSession) {
         print("[WatchConnectivityManager] Session did become inactive")
     }
 
+    /// Reactivates the session after deactivation.
     func sessionDidDeactivate(_ session: WCSession) {
         print("[WatchConnectivityManager] Session did deactivate")
         session.activate()
     }
 
+    /// Logs incoming direct messages from the watch app.
     func session(
         _: WCSession,
         didReceiveMessage message: [String: Any]
@@ -80,11 +97,13 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         print("[WatchConnectivityManager] Received message: \(message)")
     }
 
+    /// Applies settings synced via application context.
     func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         print("[WatchConnectivityManager] Received application context: \(applicationContext)")
         applySettingsPayload(applicationContext)
     }
 
+    /// Handles incoming files transferred from the watch app.
     func session(_: WCSession, didReceive file: WCSessionFile) {
         print("[WatchConnectivityManager] Received file from watch: \(file.fileURL.lastPathComponent)")
         do {
@@ -99,6 +118,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    /// Handles user-info transfers for sessions and CSV fallbacks.
     func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
         print("[WatchConnectivityManager] Received userInfo: \(userInfo)")
 
@@ -116,6 +136,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         saveCSVtoICloud(csvText: csvText, filename: filename)
     }
 
+    /// Rebuilds and persists a completed session received from Apple Watch.
     private func handleCompletedSession(_ userInfo: [String: Any]) {
         guard let startedAtTimestamp = numberAsDouble(userInfo["startedAt"]),
               let endedAtTimestamp = numberAsDouble(userInfo["endedAt"]),
@@ -158,18 +179,21 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         print("[WatchConnectivityManager] Saved completed session from watch: \(jumpCount) jumps")
     }
 
+    /// Converts a numeric payload value into `Double`.
     private func numberAsDouble(_ value: Any?) -> Double? {
         if let value = value as? Double { return value }
         if let value = value as? NSNumber { return value.doubleValue }
         return nil
     }
 
+    /// Converts a numeric payload value into `Int`.
     private func numberAsInt(_ value: Any?) -> Int? {
         if let value = value as? Int { return value }
         if let value = value as? NSNumber { return value.intValue }
         return nil
     }
 
+    /// Syncs the selected workout settings to Apple Watch.
     func syncSettings(goalType: GoalType, jumpCount: Int64, jumpTime: Int64) {
         let payload: [String: Any] = [
             "type": "goalSettings",
@@ -186,6 +210,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    /// Validates and applies a goal-settings payload from the watch session.
     private func applySettingsPayload(_ payload: [String: Any]) {
         guard let type = payload["type"] as? String, type == "goalSettings" else {
             return

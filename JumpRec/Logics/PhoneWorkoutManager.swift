@@ -6,11 +6,14 @@
 import Foundation
 import HealthKit
 
+/// Manages the iPhone-side HealthKit workout session used for local tracking.
 @MainActor
 final class PhoneWorkoutManager: NSObject {
+    /// Errors thrown when workout authorization is missing.
     private enum AuthorizationError: LocalizedError {
         case workoutWriteDenied
 
+        /// Returns a user-facing description for the authorization failure.
         var errorDescription: String? {
             switch self {
             case .workoutWriteDenied:
@@ -19,16 +22,22 @@ final class PhoneWorkoutManager: NSObject {
         }
     }
 
+    /// Shared singleton used by app state.
     static let shared = PhoneWorkoutManager()
 
+    /// The HealthKit store used for authorization and workout creation.
     private let healthStore = HKHealthStore()
+    /// Holds the active iOS 26 workout implementation when available.
     private var workoutStore: AnyObject?
+    /// Deduplicates in-flight authorization requests.
     private var authorizationTask: Task<Void, Error>?
 
+    /// Restricts creation to the shared singleton.
     override private init() {
         super.init()
     }
 
+    /// Primes workout authorization early in the app lifecycle.
     func activate() {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         authorizationTask = Task {
@@ -36,6 +45,7 @@ final class PhoneWorkoutManager: NSObject {
         }
     }
 
+    /// Starts a HealthKit workout session at the provided time.
     func startWorkout(at startDate: Date) async throws {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         guard #available(iOS 26.0, *) else {
@@ -54,6 +64,7 @@ final class PhoneWorkoutManager: NSObject {
         print("[PhoneWorkoutManager] Workout start request completed.")
     }
 
+    /// Ends the active HealthKit workout session.
     func endWorkout(at endDate: Date) async {
         guard #available(iOS 26.0, *) else { return }
         print("[PhoneWorkoutManager] Ending workout at \(endDate)")
@@ -62,6 +73,7 @@ final class PhoneWorkoutManager: NSObject {
         print("[PhoneWorkoutManager] Workout finish request completed.")
     }
 
+    /// Discards the active workout without saving it.
     func discardWorkout() {
         guard #available(iOS 26.0, *) else { return }
         print("[PhoneWorkoutManager] Discarding active workout.")
@@ -69,6 +81,7 @@ final class PhoneWorkoutManager: NSObject {
         workoutStore = nil
     }
 
+    /// Ensures workout authorization has completed before continuing.
     private func ensureAuthorization() async throws {
         if let authorizationTask {
             try await authorizationTask.value
@@ -88,6 +101,7 @@ final class PhoneWorkoutManager: NSObject {
         }
     }
 
+    /// Requests HealthKit authorization if workout write access is missing.
     private func requestAuthorizationIfNeeded() async throws {
         if healthStore.authorizationStatus(for: HKObjectType.workoutType()) == .sharingAuthorized {
             return

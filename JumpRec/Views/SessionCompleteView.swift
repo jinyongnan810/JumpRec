@@ -5,14 +5,21 @@
 
 import SwiftUI
 
+/// Displays the summary screen after a session finishes.
 struct SessionCompleteView: View {
+    /// The app state containing the just-completed session details.
     @Bindable var appState: JumpRecState
+    /// Resets the flow back to the idle state.
     var onDone: () -> Void
 
+    // MARK: - Derived Values
+
+    /// Returns the saved session object when one is available.
     private var completedSession: JumpSession? {
         appState.completedSession
     }
 
+    /// Returns rate samples for the saved session or generates temporary ones from live data.
     private var rateSamples: [SessionRateSample] {
         if let completedSession {
             return (completedSession.rateSamples ?? []).sorted { $0.secondOffset < $1.secondOffset }
@@ -37,6 +44,9 @@ struct SessionCompleteView: View {
         )
     }
 
+    // MARK: - View
+
+    /// Renders the post-session summary, chart, and actions.
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -124,6 +134,9 @@ struct SessionCompleteView: View {
         }
     }
 
+    // MARK: - Formatting
+
+    /// Returns the completed session duration text.
     private var durationText: String {
         if let completedSession {
             let minutes = completedSession.durationSeconds / 60
@@ -133,6 +146,7 @@ struct SessionCompleteView: View {
         return appState.elapsedFormatted
     }
 
+    /// Returns the formatted jump-count text.
     private var jumpCountText: String {
         if let completedSession {
             return completedSession.jumpCount.formatted()
@@ -140,6 +154,7 @@ struct SessionCompleteView: View {
         return appState.jumpCount.formatted()
     }
 
+    /// Returns the formatted calories text.
     private var caloriesText: String {
         if let completedSession {
             return "\(Int(completedSession.caloriesBurned.rounded()))"
@@ -147,6 +162,7 @@ struct SessionCompleteView: View {
         return "\(Int(appState.caloriesBurned.rounded()))"
     }
 
+    /// Returns the formatted average-rate text.
     private var averageRateText: String {
         if let averageRate = completedSession?.averageRate {
             return localizedRateText(Int(averageRate.rounded()))
@@ -154,6 +170,7 @@ struct SessionCompleteView: View {
         return localizedRateText(appState.averageRate)
     }
 
+    /// Returns the formatted peak-rate text.
     private var peakRateText: String {
         if let peakRate = completedSession?.peakRate {
             return localizedRateText(Int(peakRate.rounded()))
@@ -164,6 +181,7 @@ struct SessionCompleteView: View {
         return "--"
     }
 
+    /// Returns the formatted longest-streak text.
     private var longestStreakText: String {
         if let completedSession {
             return completedSession.longestStreak.formatted()
@@ -171,6 +189,7 @@ struct SessionCompleteView: View {
         return appState.breakMetrics.longestStreak.formatted()
     }
 
+    /// Returns the formatted short-break count.
     private var shortBreaksText: String {
         if let completedSession {
             return completedSession.smallBreaksCount.formatted()
@@ -178,6 +197,7 @@ struct SessionCompleteView: View {
         return appState.breakMetrics.small.formatted()
     }
 
+    /// Returns the formatted long-break count.
     private var longBreaksText: String {
         if let completedSession {
             return completedSession.longBreaksCount.formatted()
@@ -185,14 +205,17 @@ struct SessionCompleteView: View {
         return appState.breakMetrics.long.formatted()
     }
 
+    /// Returns the formatted average heart-rate text.
     private var averageHeartRateText: String {
         heartRateText(completedSession?.averageHeartRate ?? appState.averageHeartRate)
     }
 
+    /// Returns the formatted peak heart-rate text.
     private var peakHeartRateText: String {
         heartRateText(completedSession?.peakHeartRate ?? appState.peakHeartRate)
     }
 
+    /// Formats an optional heart-rate value for display.
     private func heartRateText(_ value: Int?) -> String {
         guard let value else { return "--" }
         return "\(value) bpm"

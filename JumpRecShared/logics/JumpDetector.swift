@@ -58,6 +58,8 @@ public struct JumpDetectorDebugState: Sendable {
 }
 
 public final class JumpDetector {
+    // MARK: - Configuration
+
     /// A tiny profile config for the intentionally simple detector.
     private struct Config {
         /// The device profile this config belongs to.
@@ -101,6 +103,8 @@ public final class JumpDetector {
         }
     }
 
+    // MARK: - Public State
+
     /// The public profile exposed to callers and debug tooling.
     public let profile: JumpDeviceProfile
     /// Optional console logging for debugging live sessions.
@@ -108,11 +112,16 @@ public final class JumpDetector {
     /// Snapshot of the detector state used by debugging and inspection.
     public private(set) var debugState: JumpDetectorDebugState
 
+    // MARK: - Private State
+
     /// The fixed threshold rule used by this detector instance.
     private let config: Config
     /// Timestamp of the last jump that passed threshold and refractory checks.
     private var lastAcceptedJumpTimestamp: TimeInterval?
 
+    // MARK: - Initialization
+
+    /// Creates a detector configured for the specified device profile.
     public init(profile: JumpDeviceProfile = .iPhonePocket) {
         self.profile = profile
         config = .profile(profile)
@@ -122,6 +131,8 @@ public final class JumpDetector {
             chosenPolarity: config.polarity
         )
     }
+
+    // MARK: - Public Methods
 
     /// Processes one raw motion sample.
     /// The detector only inspects the configured raw acceleration axis and threshold for the profile.
@@ -159,6 +170,8 @@ public final class JumpDetector {
         lastAcceptedJumpTimestamp = nil
         syncDebugState()
     }
+
+    // MARK: - Private Helpers
 
     /// Reads the requested raw acceleration axis from a sample.
     private func axisValue(from sample: MotionSample, axis: JumpDetectorAxis) -> Double {

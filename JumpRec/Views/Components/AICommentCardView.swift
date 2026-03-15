@@ -5,10 +5,16 @@
 
 import SwiftUI
 
+/// Displays the optional AI-generated recap for a completed session.
 struct AICommentCardView: View {
+    /// The generated comment text to display when available.
     let comment: String?
+    /// Indicates whether a comment is currently being generated.
     let isLoading: Bool
 
+    // MARK: - View
+
+    /// Renders either the finished comment or a loading placeholder.
     var body: some View {
         if let comment {
             card {
@@ -37,6 +43,7 @@ struct AICommentCardView: View {
         }
     }
 
+    /// Wraps comment content in the shared card styling.
     @ViewBuilder
     private func card(@ViewBuilder content: () -> some View) -> some View {
         content()

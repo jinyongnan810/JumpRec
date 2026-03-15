@@ -7,24 +7,38 @@
 import Foundation
 import Observation
 
+/// Defines the kinds of workout goals users can choose from.
 public enum GoalType: String, Codable, Sendable {
+    /// A jump-count-based goal.
     case count
+    /// A time-based goal.
     case time
 }
 
 public extension Notification.Name {
+    /// Posted when settings synced from the paired device change.
     static let jumpRecSettingsDidUpdate = Notification.Name("JumpRecSettingsDidUpdate")
 }
 
+/// Default jump-count goal used for new installs and resets.
 public let DefaultJumpCount: Int64 = 1000
+/// Default time goal used for new installs and resets.
 public let DefaultJumpTime: Int64 = 10
 
+/// Stores and synchronizes user-selected workout settings across devices.
 @Observable
 public class JumpRecSettings {
+    // MARK: - Dependencies
+
+    /// The iCloud-backed key-value store used for persistence and sync.
     public let store = NSUbiquitousKeyValueStore.default
+    /// Prevents save loops while values are being reloaded from storage.
     @ObservationIgnored
     private var isLoadingFromStore = false
 
+    // MARK: - Persisted Settings
+
+    /// The active goal type selected by the user.
     public var goalType: GoalType {
         didSet {
             guard !isLoadingFromStore else { return }
@@ -33,6 +47,7 @@ public class JumpRecSettings {
         }
     }
 
+    /// The saved jump-count goal value.
     public var jumpCount: Int64 {
         didSet {
             guard !isLoadingFromStore else { return }
@@ -41,6 +56,7 @@ public class JumpRecSettings {
         }
     }
 
+    /// The saved time goal value in minutes.
     public var jumpTime: Int64 {
         didSet {
             guard !isLoadingFromStore else { return }
@@ -49,6 +65,9 @@ public class JumpRecSettings {
         }
     }
 
+    // MARK: - Derived Values
+
+    /// Returns the currently active goal value as an `Int`.
     public var goalCount: Int {
         Int(goalType == .count ?
             jumpCount
@@ -56,6 +75,9 @@ public class JumpRecSettings {
         )
     }
 
+    // MARK: - Initialization
+
+    /// Loads the initial settings and starts observing sync updates.
     public init() {
         store.synchronize()
         goalType = .count
@@ -80,6 +102,9 @@ public class JumpRecSettings {
         }
     }
 
+    // MARK: - Loading
+
+    /// Reloads settings from the shared store without triggering write-back loops.
     public func loadSettings() {
         store.synchronize()
 

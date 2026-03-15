@@ -5,16 +5,25 @@
 
 import SwiftUI
 
+/// Displays the month grid used on the history screen.
 struct HistoryCalendarView: View {
+    /// The month currently being displayed.
     let displayedMonth: Date
+    /// The set of day numbers that contain sessions.
     let sessionDays: Set<Int>
+    /// Maps day numbers to total jump counts.
     let jumpsByDay: [Int: Int]
+    /// Moves the calendar to the previous month.
     let onPreviousMonth: () -> Void
+    /// Moves the calendar to the next month.
     let onNextMonth: () -> Void
 
+    /// Provides the calendar used for date calculations.
     private var calendar: Calendar { Calendar.current }
 
+    /// Returns the displayed year component.
     private var year: Int { calendar.component(.year, from: displayedMonth) }
+    /// Returns the displayed month component.
     private var month: Int { calendar.component(.month, from: displayedMonth) }
 
     /// Day of week the month starts on (1 = Sunday)
@@ -48,9 +57,14 @@ struct HistoryCalendarView: View {
         return day > todayDay
     }
 
+    /// The day-of-week headers shown above the grid.
     private let dayHeaders = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]
+    /// The minimum horizontal drag distance used to change months.
     private let swipeThreshold: CGFloat = 50
 
+    // MARK: - View
+
+    /// Renders the month header and day grid.
     var body: some View {
         VStack(spacing: 12) {
             HStack {
@@ -141,6 +155,9 @@ struct HistoryCalendarView: View {
         )
     }
 
+    // MARK: - Formatting
+
+    /// Returns the localized month title shown in the header.
     private var monthTitle: String {
         let formatter = DateFormatter()
         formatter.locale = .autoupdatingCurrent
@@ -149,13 +166,22 @@ struct HistoryCalendarView: View {
     }
 }
 
+/// Displays one day cell inside the history calendar grid.
 private struct HistoryCalendarDayCellView: View {
+    /// The day number shown in the cell.
     let day: Int
+    /// Indicates whether the day contains at least one session.
     let hasSession: Bool
+    /// The total jumps recorded for the day, if any.
     let jumpCount: Int?
+    /// Indicates whether the day is today.
     let isToday: Bool
+    /// Indicates whether the day is in the future.
     let isFuture: Bool
 
+    // MARK: - View
+
+    /// Renders the calendar day cell.
     var body: some View {
         VStack(spacing: 2) {
             ZStack {
@@ -188,6 +214,9 @@ private struct HistoryCalendarDayCellView: View {
         .frame(height: 48)
     }
 
+    // MARK: - Formatting
+
+    /// Shortens large jump counts for the compact calendar layout.
     private func formatJumpCount(_ count: Int) -> String {
         if count >= 1000 {
             return String(format: "%.1fK", Double(count) / 1000.0)
@@ -195,6 +224,7 @@ private struct HistoryCalendarDayCellView: View {
         return "\(count)"
     }
 
+    /// Returns the text color for the day number.
     private var dayColor: Color {
         if hasSession, !isToday {
             AppColors.bgPrimary
@@ -207,6 +237,7 @@ private struct HistoryCalendarDayCellView: View {
         }
     }
 
+    /// Returns the font weight for the day number.
     private var dayFontWeight: Font.Weight {
         if hasSession || isToday {
             return .semibold

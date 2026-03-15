@@ -5,11 +5,18 @@
 
 import SwiftUI
 
+/// Displays a compact stat card used in live session and history summaries.
 struct StatCardView: View {
+    /// The metric label shown above the value.
     let label: LocalizedStringKey
+    /// The formatted metric value.
     let value: String
+    /// The color applied to the value text.
     var valueColor: Color = AppColors.textPrimary
 
+    // MARK: - View
+
+    /// Renders the compact stat card.
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label)

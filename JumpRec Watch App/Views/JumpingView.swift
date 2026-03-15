@@ -7,8 +7,11 @@
 
 import SwiftUI
 
+/// Displays the live jumping screen on Apple Watch.
 struct JumpingView: View {
+    /// The watch app state providing live workout values.
     let appState: JumpRecState
+    /// Renders the active workout metrics and stop control.
     var body: some View {
         VStack(spacing: 4) {
             Text("JUMPS")

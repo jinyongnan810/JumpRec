@@ -7,9 +7,12 @@
 
 import SwiftUI
 
+/// Displays the watch goal selection menu.
 struct GoalView: View {
+    /// Provides the persisted settings being edited.
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
+    /// Renders the watch goal selection navigation.
     var body: some View {
         @Bindable var bindableSettings = settings
         NavigationStack {
@@ -50,14 +53,21 @@ struct GoalView: View {
     }
 }
 
+/// Lets the user edit a count-based goal with the Digital Crown.
 struct CountView: View {
+    /// The minimum selectable jump count.
     private static let minimumCount = 100.0
+    /// The maximum selectable jump count.
     private static let maximumCount = 10000.0
+    /// The step size used when rotating the crown.
     private static let countStep = 100.0
 
+    /// Binds the selected jump-count goal.
     @Binding var count: Int64
+    /// Binds the selected goal type.
     @Binding var goalType: GoalType
 
+    /// Converts the integer count binding into a crown-friendly double binding.
     private var countBinding: Binding<Double> {
         Binding(
             get: { Double(count) },
@@ -69,6 +79,7 @@ struct CountView: View {
         )
     }
 
+    /// Renders the count-goal picker.
     var body: some View {
         VStack(spacing: 8) {
             Text("\(count)")
@@ -93,9 +104,13 @@ struct CountView: View {
     }
 }
 
+/// Lets the user edit a time-based goal with the Digital Crown.
 struct TimeView: View {
+    /// Binds the selected time goal in minutes.
     @Binding var time: Int64
+    /// Binds the selected goal type.
     @Binding var goalType: GoalType
+    /// Renders the time-goal picker.
     var body: some View {
         VStack(spacing: 8) {
             Text("\(time)")

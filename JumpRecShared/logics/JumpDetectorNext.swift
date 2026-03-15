@@ -9,6 +9,8 @@
 import Foundation
 
 public final class JumpDetectorNext {
+    // MARK: - Configuration
+
     /// Tunable values are intentionally profile-specific, but the detector flow stays the same:
     /// 1) filter raw motion into short-window signals,
     /// 2) choose the most useful signal for the device profile,
@@ -96,6 +98,8 @@ public final class JumpDetectorNext {
         }
     }
 
+    // MARK: - Sample Model
+
     /// One filtered sample held inside the rolling analysis window.
     private struct FilteredSample {
         /// Monotonic timestamp copied from `MotionSample`.
@@ -108,12 +112,16 @@ public final class JumpDetectorNext {
         let accelMagnitude: Double
     }
 
+    // MARK: - Public State
+
     /// Public profile selected for this detector instance.
     public let profile: JumpDeviceProfile
     /// Enables verbose console logging while tuning the detector.
     public var debugLoggingEnabled = false
     /// Exposes the current detector interpretation for debugging UIs and logs.
     public private(set) var debugState: JumpDetectorDebugState
+
+    // MARK: - Private State
 
     /// Stores all per-profile constants used by this detector instance.
     private let config: Config
@@ -140,12 +148,18 @@ public final class JumpDetectorNext {
     /// EWMA of recently accepted intervals, kept only for debugging.
     private var expectedInterval: TimeInterval?
 
+    // MARK: - Initialization
+
+    /// Creates an experimental detector configured for the specified device profile.
     public init(profile: JumpDeviceProfile = .iPhonePocket) {
         self.profile = profile
         config = .profile(profile)
         debugState = JumpDetectorDebugState(profile: profile)
     }
 
+    // MARK: - Public Methods
+
+    /// Processes one motion sample through the experimental detector pipeline.
     public func processMotionSample(_ sample: MotionSample) -> Bool {
         let filteredSample = filter(sample)
         history.append(filteredSample)
@@ -180,6 +194,7 @@ public final class JumpDetectorNext {
         }
     }
 
+    /// Resets all rolling state so the detector starts fresh for a new session.
     public func reset() {
         history.removeAll(keepingCapacity: true)
         accelBaseline = .zero
@@ -194,6 +209,9 @@ public final class JumpDetectorNext {
         debugState = JumpDetectorDebugState(profile: profile)
     }
 
+    // MARK: - Pattern Detection
+
+    /// Re-evaluates the dominant acceleration axis and polarity for phone-style sources.
     private func updateAccelerationPattern() {
         // Choose the axis with the strongest short-window energy. This keeps the detector orientation-agnostic
         // for pockets/headphones without requiring a fixed "up" axis.
@@ -237,6 +255,7 @@ public final class JumpDetectorNext {
         chosenPolarity = selectPolarity(values: values)
     }
 
+    /// Chooses whether positive peaks or negative troughs best match recent motion.
     private func selectPolarity(values: [Double]) -> JumpDetectorPolarity? {
         guard values.count >= 3 else { return nil }
 
@@ -263,6 +282,7 @@ public final class JumpDetectorNext {
         return positiveScore >= negativeScore ? .positivePeak : .negativeTrough
     }
 
+    /// Locates the timestamp of the latest accepted acceleration extremum candidate.
     private func accelerationCandidateTimestamp(
         for axis: JumpDetectorAxis,
         polarity: JumpDetectorPolarity
@@ -288,6 +308,7 @@ public final class JumpDetectorNext {
         )
     }
 
+    /// Evaluates the most recent samples for a qualifying extremum candidate.
     private func extremumCandidateTimestamp(
         values: [Double],
         timestamps: [TimeInterval],
@@ -332,6 +353,7 @@ public final class JumpDetectorNext {
         return candidateTimestamp
     }
 
+    /// Detects the latest watch-specific acceleration impact candidate.
     private func watchAccelerationCandidateTimestamp() -> TimeInterval? {
         let values = history.map(\.accelMagnitude)
         let timestamps = history.map(\.timestamp)
@@ -354,6 +376,9 @@ public final class JumpDetectorNext {
         return timestamps[timestamps.count - 2]
     }
 
+    // MARK: - Acceptance
+
+    /// Applies phone/headphone acceptance rules to a candidate timestamp.
     private func acceptJump(at timestamp: TimeInterval) -> Bool {
         guard isPastRefractory(timestamp) else {
             syncDebugState()
@@ -371,6 +396,7 @@ public final class JumpDetectorNext {
         return true
     }
 
+    /// Applies watch acceptance rules to a candidate timestamp.
     private func acceptWatchJump(at timestamp: TimeInterval) -> Bool {
         guard isPastRefractory(timestamp) else {
             syncDebugState()
@@ -383,11 +409,13 @@ public final class JumpDetectorNext {
         return true
     }
 
+    /// Returns whether the candidate is outside the detector's refractory window.
     private func isPastRefractory(_ timestamp: TimeInterval) -> Bool {
         guard let lastAcceptedJumpTimestamp else { return true }
         return timestamp - lastAcceptedJumpTimestamp >= config.refractoryInterval
     }
 
+    /// Records an accepted jump and updates debug-only cadence information.
     private func registerAcceptedJump(at timestamp: TimeInterval) {
         if let lastAcceptedJumpTimestamp {
             let interval = timestamp - lastAcceptedJumpTimestamp
@@ -414,6 +442,9 @@ public final class JumpDetectorNext {
         }
     }
 
+    // MARK: - Filtering
+
+    /// Filters a raw motion sample into the rolling representation used for analysis.
     private func filter(_ sample: MotionSample) -> FilteredSample {
         let timestamp = sample.timestamp
         let dt = max(0.001, timestamp - (lastSampleTimestamp ?? timestamp))
@@ -453,11 +484,13 @@ public final class JumpDetectorNext {
         )
     }
 
+    /// Removes stale filtered samples that fall outside the rolling analysis window.
     private func trimHistory(around timestamp: TimeInterval) {
         let cutoff = timestamp - config.rollingWindowDuration
         history.removeAll { $0.timestamp < cutoff }
     }
 
+    /// Requires nearby overall acceleration support before accepting phone-style candidates.
     private func hasAccelerationMagnitudeSupport(around timestamp: TimeInterval) -> Bool {
         let values = history.map(\.accelMagnitude)
         let timestamps = history.map(\.timestamp)
@@ -471,6 +504,9 @@ public final class JumpDetectorNext {
         }
     }
 
+    // MARK: - Debug State
+
+    /// Synchronizes the exported debug state with the detector's current internals.
     private func syncDebugState() {
         debugState = JumpDetectorDebugState(
             profile: profile,
@@ -482,6 +518,9 @@ public final class JumpDetectorNext {
         )
     }
 
+    // MARK: - Math Helpers
+
+    /// Builds an adaptive threshold from the median absolute deviation of recent values.
     private func adaptiveThreshold(for values: [Double]) -> Double {
         let magnitudes = values.map(abs)
         let medianMagnitude = median(of: magnitudes)
@@ -490,11 +529,13 @@ public final class JumpDetectorNext {
         return max(config.minimumThreshold, medianMagnitude + (mad * config.thresholdMultiplier))
     }
 
+    /// Converts a smoothing time constant into an exponential moving-average factor.
     private func smoothingAlpha(dt: TimeInterval, timeConstant: TimeInterval) -> Double {
         guard timeConstant > 0 else { return 1 }
         return min(1, dt / (timeConstant + dt))
     }
 
+    /// Returns the root-mean-square energy of the supplied values.
     private func rms(_ values: [Double]) -> Double {
         guard !values.isEmpty else { return 0 }
         let sumSquares = values.reduce(0) { partialResult, value in
@@ -503,6 +544,7 @@ public final class JumpDetectorNext {
         return sqrt(sumSquares / Double(values.count))
     }
 
+    /// Returns the median of the supplied values.
     private func median(of values: [Double]) -> Double {
         guard !values.isEmpty else { return 0 }
         let sorted = values.sorted()
@@ -513,6 +555,7 @@ public final class JumpDetectorNext {
         return sorted[middle]
     }
 
+    /// Returns the magnitude of a 3D vector.
     private func magnitude(_ value: SIMD3<Double>) -> Double {
         sqrt((value.x * value.x) + (value.y * value.y) + (value.z * value.z))
     }

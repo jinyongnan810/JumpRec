@@ -14,9 +14,12 @@ let csvHeader = "Timestamp,AX,AY,AZ,RX,RY,RZ,Jump\n"
 class MotionManager: NSObject {
     // MARK: - Published Properties
 
+    /// Indicates whether motion tracking is currently active.
     var isTracking = false
+    /// Stores the local jump count used by the watch detector.
     var jumpCount = 0
 
+    /// Delivers accepted jumps back to app state.
     var addJump: (Int) -> Void
 
     // MARK: - Motion Components
@@ -26,18 +29,23 @@ class MotionManager: NSObject {
 
     // MARK: - HealthKit
 
+    /// Provides HealthKit workout and mirroring integration.
     private let workoutManager: WorkoutManager
 
     // MARK: - Detection
 
     // The watch runs at a higher sample rate than the phone path because impact-style jump signals are brief.
+    /// Defines the motion sample interval used by the watch detector.
     private var updateInterval: TimeInterval = 0.025 // 40Hz sampling rate when supported
+    /// Shared jump detector configured for watch motion data.
     private let jumpDetector = JumpDetector(profile: .watch)
 
+    /// Stores CSV rows when motion recording is enabled.
     private var motionRecording: [String] = []
 
     // MARK: - Initialization
 
+    /// Configures the watch motion manager and workout callbacks.
     init(addJump: @escaping (Int) -> Void, updateHeartRate: @escaping (Int) -> Void, updateEnergyBurned: @escaping (Double) -> Void) {
         self.addJump = addJump
         workoutManager = WorkoutManager(updateHeartRate: updateHeartRate, updateEnergyBurned: updateEnergyBurned)
@@ -45,6 +53,7 @@ class MotionManager: NSObject {
         setupMotionManager()
     }
 
+    /// Sets up Core Motion update intervals and processing queue configuration.
     private func setupMotionManager() {
         // Device motion provides both acceleration and gyro data in one stream, which is the only input
         // the shared detector needs once it is converted into `MotionSample`.
@@ -90,10 +99,12 @@ class MotionManager: NSObject {
         motionRecording.removeAll()
     }
 
+    /// Sends jump progress updates to the mirrored workout session.
     func recordJump(jumpCount: Int, jumpOffset: TimeInterval) {
         workoutManager.sendJumpUpdate(jumpCount: jumpCount, jumpOffset: jumpOffset)
     }
 
+    /// Sends the recorded motion CSV to the iPhone companion app.
     func saveCSVtoICloud(filename _: String = "motion.csv") {
         let csvText = motionRecording.joined()
         ConnectivityManager.shared
@@ -109,6 +120,7 @@ class MotionManager: NSObject {
 
     // MARK: - Private Methods
 
+    /// Converts raw device motion into normalized samples for the jump detector.
     private func processMotionData(_ motion: CMDeviceMotion) {
         let sample = MotionSample(
             userAccelerationX: motion.userAcceleration.x,

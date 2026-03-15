@@ -5,11 +5,18 @@
 
 import SwiftUI
 
+/// Displays a labeled value card inside session summary screens.
 struct SessionMetricCard: View {
+    /// The metric label shown above the value.
     let label: LocalizedStringKey
+    /// The formatted metric value.
     let value: String
+    /// The accent color applied to the value text.
     var valueColor: Color = AppColors.textPrimary
 
+    // MARK: - View
+
+    /// Renders the metric card layout.
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label)
@@ -28,10 +35,16 @@ struct SessionMetricCard: View {
     }
 }
 
+/// Displays a labeled row for detailed session breakdown values.
 struct SessionBreakdownRow<Content: View>: View {
+    /// The row label shown on the leading side.
     let label: LocalizedStringKey
+    /// The trailing custom content for the row.
     @ViewBuilder let content: Content
 
+    // MARK: - View
+
+    /// Renders the breakdown row container.
     var body: some View {
         HStack {
             Text(label)

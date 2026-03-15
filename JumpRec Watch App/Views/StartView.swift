@@ -8,17 +8,26 @@
 import Combine
 import SwiftUI
 
+/// Displays the watch start screen and pre-session countdown.
 struct StartView: View {
+    /// Indicates whether the countdown is currently showing.
     @State var isCountingDown: Bool = false
+    /// Drives the countdown ring animation.
     @State var isAnimating: Bool = false
+    /// Stores the current countdown value.
     @State var countdown: Double = 3
+    /// Publishes countdown ticks once per second.
     var timer = Timer.publish(every: 1, on: .main, in: .common)
+    /// Starts the workout when the countdown finishes.
     var onStart: () -> Void
 
+    /// Provides the currently selected workout goal.
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
+    /// Controls navigation to the goal settings screen.
     @State var showSettings: Bool = false
 
+    /// Returns the formatted goal text shown under the start button.
     var goal: Text {
         switch settings.goalType {
         case .count:
@@ -45,6 +54,7 @@ struct StartView: View {
         }
     }
 
+    /// Renders the start screen or active countdown.
     var body: some View {
         NavigationStack {
             ZStack {

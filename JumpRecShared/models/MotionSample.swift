@@ -11,6 +11,8 @@ import Foundation
 /// Works with data from Apple Watch (CMMotionManager), iPhone (CMMotionManager),
 /// and AirPods (CMHeadphoneMotionManager).
 public struct MotionSample {
+    // MARK: - Stored Properties
+
     /// User acceleration with gravity removed (in g's), per axis.
     public let userAccelerationX: Double
     public let userAccelerationY: Double
@@ -26,6 +28,9 @@ public struct MotionSample {
     /// For AirPods you may use `ProcessInfo.processInfo.systemUptime` or similar.
     public let timestamp: TimeInterval
 
+    // MARK: - Initialization
+
+    /// Creates a normalized motion sample from raw motion sensor values.
     public init(
         userAccelerationX: Double,
         userAccelerationY: Double,

@@ -5,19 +5,34 @@
 
 import SwiftUI
 
+/// Displays the full metrics summary for a completed session.
 struct SessionMetricsSummaryView: View {
+    /// The formatted session duration.
     let duration: String
+    /// The formatted jump count.
     let jumps: String
+    /// The formatted calories value.
     let calories: String
+    /// The formatted average jump rate.
     let averageRate: String
+    /// The formatted peak jump rate.
     let peakRate: String
+    /// The formatted longest streak value.
     let longestJumpStrikes: String
+    /// The formatted short-break count.
     let shortBreaks: String
+    /// The formatted long-break count.
     let longBreaks: String
+    /// The formatted average heart-rate value.
     let averageHeartRate: String
+    /// The formatted peak heart-rate value.
     let peakHeartRate: String
+    /// The rate samples plotted in the chart.
     let rateSamples: [SessionRateSample]
 
+    // MARK: - View
+
+    /// Renders the stats grid, rate chart, and breakdown rows.
     var body: some View {
         VStack(spacing: 20) {
             // Stats Grid

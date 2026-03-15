@@ -9,9 +9,13 @@ import HealthKit
 import Observation
 import UIKit
 
+/// Owns the iPhone app's session lifecycle, live metrics, and companion-device coordination.
 @Observable
 @MainActor
 final class JumpRecState {
+    // MARK: - Configuration
+
+    /// Enables CSV motion export for debug builds.
     private let isMotionCSVExportEnabled = {
         #if DEBUG
             true
@@ -20,50 +24,86 @@ final class JumpRecState {
         #endif
     }()
 
+    // MARK: - Session State
+
+    /// Tracks the current lifecycle state of the session UI.
     var sessionState: SessionState = .idle
+    /// Stores when the current or last session started.
     var startTime: Date?
+    /// Stores when the current or last session ended.
     var endTime: Date?
+    /// Stores the total number of detected jumps in the active session.
     var jumpCount = 0
+    /// Stores jump offsets relative to `startTime`.
     var jumps: [TimeInterval] = []
+    /// Stores the latest calorie estimate for the session.
     var caloriesBurned = 0.0
+    /// Stores the average heart rate for the completed session when available.
     var averageHeartRate: Int?
+    /// Stores the peak heart rate for the completed session when available.
     var peakHeartRate: Int?
+    /// Stores the selected goal type for the active session.
     var sessionGoalType: GoalType?
+    /// Stores the selected goal value for the active session.
     var sessionGoalValue: Int?
+    /// Indicates whether the current session is being mirrored from Apple Watch.
     var isMirroredWatchSession = false
+    /// Stores the saved session shown on the completion screen.
     var completedSession: JumpSession?
 
+    // MARK: - Motion State
+
+    /// Indicates which device is currently providing motion data.
     var activeMotionSource: DeviceSource?
+    /// Indicates whether iPhone motion is currently available.
     var isPhoneMotionAvailable = false
+    /// Indicates whether headphone motion is currently available.
     var isHeadphoneMotionAvailable = false
+    /// Stores the exported motion CSV URL when debug export is enabled.
     var motionCSVShareURL: URL?
 
+    /// Provides shared persistence and session-generation helpers.
     @ObservationIgnored
     let dataStore = MyDataStore.shared
+    /// Tracks whether the scene is active for idle-timer management.
     @ObservationIgnored
     private var isSceneActive = false
+    /// Remembers when a mirrored start request is waiting for watch confirmation.
     @ObservationIgnored
     private var pendingMirroredStart = false
 
+    // MARK: - Dependencies
+
+    /// Detects local motion data and jump events.
     @ObservationIgnored
     private var motionManager: MotionManager?
+    /// Coordinates HealthKit workout mirroring from Apple Watch.
     @ObservationIgnored
     private let workoutMirrorManager = WorkoutMirrorManager.shared
+    /// Manages iPhone HealthKit workouts.
     @ObservationIgnored
     private let phoneWorkoutManager = PhoneWorkoutManager.shared
+    /// Manages watch connectivity and file transfer.
     @ObservationIgnored
     private let connectivityManager = ConnectivityManager.shared
+    /// Manages live-activity presentation and updates.
     @ObservationIgnored
     private let liveActivityManager = LiveActivityManager.shared
+    /// Speaks audible session prompts and milestones.
     @ObservationIgnored
     private let synthesizer = AVSpeechSynthesizer()
     // @ObservationIgnored
     // private let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+    /// Emits haptic feedback for session events.
     @ObservationIgnored
     private let notificationFeedbackGenerator = UINotificationFeedbackGenerator()
+    /// Announces minute milestones during time-based sessions.
     @ObservationIgnored
     private var minuteTimer: Timer?
 
+    // MARK: - Initialization
+
+    /// Configures managers, callback wiring, audio, and haptics.
     init() {
         motionManager = MotionManager(
             shouldRecordMotionSamples: isMotionCSVExportEnabled,
@@ -102,27 +142,36 @@ final class JumpRecState {
         prepareHaptics()
     }
 
+    // MARK: - Derived Values
+
+    /// Returns the current session duration in seconds.
     var durationSeconds: Int {
         guard let startTime else { return 0 }
         let end = endTime ?? Date()
         return max(0, Int(end.timeIntervalSince(startTime)))
     }
 
+    /// Returns the current session duration formatted as `mm:ss`.
     var elapsedFormatted: String {
         let minutes = durationSeconds / 60
         let seconds = durationSeconds % 60
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
+    /// Returns the current average jump rate in jumps per minute.
     var averageRate: Int {
         guard durationSeconds > 0 else { return 0 }
         return Int((Double(jumpCount) * 60.0 / Double(durationSeconds)).rounded())
     }
 
+    /// Returns the derived break metrics for the current session.
     var breakMetrics: (small: Int, long: Int, longestStreak: Int) {
         SessionMetricsCalculator.breakMetrics(from: jumps)
     }
 
+    // MARK: - Session Lifecycle
+
+    /// Starts a session locally or requests a mirrored watch session when available.
     func start(goalType: GoalType, goalValue: Int) {
         sessionGoalType = goalType
         sessionGoalValue = goalValue
@@ -151,6 +200,7 @@ final class JumpRecState {
         startLocalSession(goalType: goalType, goalValue: goalValue)
     }
 
+    /// Starts a session that is tracked directly on the iPhone.
     private func startLocalSession(goalType: GoalType, goalValue: Int) {
         let sessionStartDate = Date()
         invalidateMinuteTimer()
@@ -182,6 +232,7 @@ final class JumpRecState {
         }
     }
 
+    /// Finishes the active local session and persists its results.
     func finish() {
         guard sessionState == .active, let startTime else { return }
         guard !isMirroredWatchSession else { return }
@@ -213,11 +264,13 @@ final class JumpRecState {
         }
     }
 
+    /// Updates scene activity to keep the idle timer in sync.
     func updateSceneActive(_ isActive: Bool) {
         isSceneActive = isActive
         syncIdleTimer()
     }
 
+    /// Resets the app back to its idle state and clears active session data.
     func reset() {
         invalidateMinuteTimer()
         motionManager?.stopTracking()
@@ -239,6 +292,9 @@ final class JumpRecState {
         }
     }
 
+    // MARK: - Live Metrics
+
+    /// Applies a newly detected jump from the local motion manager.
     private func addJump(from source: MotionManager.Source) {
         guard sessionState == .active, let startTime else { return }
 
@@ -257,6 +313,7 @@ final class JumpRecState {
         finishIfGoalReached()
     }
 
+    /// Clears the live metrics used by the active session UI.
     private func resetLiveMetrics() {
         jumpCount = 0
         jumps.removeAll(keepingCapacity: true)
@@ -265,6 +322,9 @@ final class JumpRecState {
         endTime = nil
     }
 
+    // MARK: - Mirrored Workout Handling
+
+    /// Routes an incoming mirrored payload to the correct handler.
     private func handleMirroredWorkoutPayload(_ payload: MirroredWorkoutPayload) {
         switch payload.kind {
         case .started:
@@ -280,6 +340,7 @@ final class JumpRecState {
         }
     }
 
+    /// Initializes local mirrored-session state from a watch payload.
     private func beginMirroredSession(_ payload: MirroredWorkoutPayload) {
         invalidateMinuteTimer()
         pendingMirroredStart = false
@@ -299,6 +360,7 @@ final class JumpRecState {
         syncLiveActivity()
     }
 
+    /// Applies mirrored jump updates from Apple Watch.
     private func applyMirroredJump(_ payload: MirroredWorkoutPayload) {
         guard isMirroredWatchSession else { return }
 
@@ -315,6 +377,7 @@ final class JumpRecState {
         syncLiveActivity()
     }
 
+    /// Applies mirrored heart-rate and calorie updates from Apple Watch.
     private func applyMirroredMetrics(_ payload: MirroredWorkoutPayload) {
         guard isMirroredWatchSession else { return }
 
@@ -330,6 +393,7 @@ final class JumpRecState {
         syncLiveActivity()
     }
 
+    /// Applies the mirrored workout end state from Apple Watch.
     private func applyMirroredEnding(_ payload: MirroredWorkoutPayload) {
         guard isMirroredWatchSession else { return }
 
@@ -349,6 +413,7 @@ final class JumpRecState {
         syncLiveActivity()
     }
 
+    /// Handles the mirrored session ending without a final payload.
     private func handleMirroredSessionEnded() {
         guard isMirroredWatchSession, sessionState == .active else { return }
         invalidateMinuteTimer()
@@ -358,6 +423,7 @@ final class JumpRecState {
         syncLiveActivity()
     }
 
+    /// Applies a fully completed session received from the watch app.
     private func applyCompletedWatchSession(
         startedAt: Date,
         endedAt: Date,
@@ -384,6 +450,9 @@ final class JumpRecState {
         syncLiveActivity()
     }
 
+    // MARK: - Live Activity And Idle Timer
+
+    /// Starts, updates, or ends the live activity to match session state.
     private func syncLiveActivity() {
         let goalSummary = liveActivityGoalSummary
         let sourceLabel = liveActivitySourceLabel
@@ -424,6 +493,7 @@ final class JumpRecState {
         }
     }
 
+    /// Keeps the system idle timer aligned with session and scene state.
     private func syncIdleTimer() {
         let shouldDisableIdleTimer = sessionState == .active && isSceneActive
         if UIApplication.shared.isIdleTimerDisabled != shouldDisableIdleTimer {
@@ -431,6 +501,7 @@ final class JumpRecState {
         }
     }
 
+    /// Returns the goal summary shown in the live activity.
     private var liveActivityGoalSummary: String {
         guard let goalType = sessionGoalType, let goalValue = sessionGoalValue else {
             return String(localized: "Session in progress")
@@ -449,6 +520,7 @@ final class JumpRecState {
         )
     }
 
+    /// Returns the source label shown in the live activity.
     private var liveActivitySourceLabel: String {
         switch activeMotionSource {
         case .watch:
@@ -462,6 +534,7 @@ final class JumpRecState {
         }
     }
 
+    /// Converts a motion-manager source into a shared display source.
     private static func deviceSource(from source: MotionManager.Source?) -> DeviceSource? {
         switch source {
         case .iPhone:
@@ -473,6 +546,9 @@ final class JumpRecState {
         }
     }
 
+    // MARK: - Motion Export
+
+    /// Exports recorded motion samples to local storage and iCloud when enabled.
     private func exportMotionCSVIfNeeded(samples: [MotionSample], startedAt: Date, endedAt: Date) {
         guard isMotionCSVExportEnabled, !samples.isEmpty else {
             motionCSVShareURL = nil
@@ -487,6 +563,7 @@ final class JumpRecState {
         }
     }
 
+    /// Converts recorded motion samples into CSV text.
     private func makeMotionCSV(from samples: [MotionSample]) -> String {
         let baseTimestamp = samples.first?.timestamp ?? 0
         let header = "time,AX,AY,AZ,RX,RY,RZ"
@@ -507,6 +584,7 @@ final class JumpRecState {
         return ([header] + rows).joined(separator: "\n")
     }
 
+    /// Builds a stable filename for an exported motion CSV.
     private func makeMotionCSVFilename(startedAt: Date, endedAt: Date) -> String {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -516,10 +594,14 @@ final class JumpRecState {
         return "motion-\(start)-\(end).csv"
     }
 
+    /// Sanitizes a timestamp string for safe filename use.
     private func sanitizedFilenameTimestamp(from value: String) -> String {
         value.replacingOccurrences(of: ":", with: "-")
     }
 
+    // MARK: - Audio And Haptics
+
+    /// Configures audio so spoken feedback can play over other audio.
     private func configureAudioSession() {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
@@ -529,6 +611,7 @@ final class JumpRecState {
         }
     }
 
+    /// Pre-warms speech synthesis to avoid a long first utterance.
     private func warmUpSpeechSynthesizer() {
         let utterance = AVSpeechUtterance(string: isJapanesePreferred ? "こんにちは" : "Hello")
         utterance.volume = 0
@@ -536,11 +619,15 @@ final class JumpRecState {
         synthesizer.speak(utterance)
     }
 
+    /// Prepares haptic generators used during the session.
     private func prepareHaptics() {
         // impactFeedbackGenerator.prepare()
         notificationFeedbackGenerator.prepare()
     }
 
+    // MARK: - Goal Feedback
+
+    /// Announces major jump milestones for local sessions.
     private func checkFeedbackLandmarks() {
         guard !isMirroredWatchSession else { return }
 
@@ -551,6 +638,7 @@ final class JumpRecState {
         }
     }
 
+    /// Starts the timer used for time-based goal announcements.
     private func startMinuteTimer() {
         invalidateMinuteTimer()
         minuteTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
@@ -560,11 +648,13 @@ final class JumpRecState {
         }
     }
 
+    /// Invalidates the active minute timer.
     private func invalidateMinuteTimer() {
         minuteTimer?.invalidate()
         minuteTimer = nil
     }
 
+    /// Announces a minute milestone and ends the session if the time goal is reached.
     private func handleMinuteLandmark() {
         guard sessionState == .active, !isMirroredWatchSession, sessionGoalType == .time, let startTime else {
             return
@@ -583,11 +673,13 @@ final class JumpRecState {
         speak(text: localizedMinuteAnnouncement(for: minutesElapsed))
     }
 
+    /// Finishes the session immediately when the goal is satisfied.
     private func finishIfGoalReached() {
         guard isGoalReached(referenceDate: Date()) else { return }
         finish()
     }
 
+    /// Returns whether the active goal has been reached at the given time.
     private func isGoalReached(referenceDate: Date) -> Bool {
         guard sessionState == .active,
               !isMirroredWatchSession,
@@ -608,6 +700,7 @@ final class JumpRecState {
         }
     }
 
+    /// Converts mirrored goal values into the units expected by the iPhone UI.
     private func normalizedGoalValue(_ goalValue: Int?, for goalType: GoalType?) -> Int? {
         guard let goalValue, let goalType else { return goalValue }
 
@@ -621,6 +714,9 @@ final class JumpRecState {
         }
     }
 
+    // MARK: - Speech
+
+    /// Speaks a localized prompt after an optional delay.
     private func speak(text: String, delay: TimeInterval = 0.2) {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             let utterance = AVSpeechUtterance(string: text)
@@ -629,22 +725,27 @@ final class JumpRecState {
         }
     }
 
+    /// Returns whether Japanese is the preferred system language.
     private var isJapanesePreferred: Bool {
         Locale.preferredLanguages.first?.hasPrefix("ja") == true
     }
 
+    /// Returns the language code used for speech synthesis.
     private var preferredSpeechLanguageCode: String {
         isJapanesePreferred ? "ja-JP" : "en-US"
     }
 
+    /// Returns the localized spoken phrase for session start.
     private var localizedSessionStartedAnnouncement: String {
         isJapanesePreferred ? "セッションを開始しました" : "Session Started!"
     }
 
+    /// Returns the localized spoken phrase for session end.
     private var localizedSessionFinishedAnnouncement: String {
         isJapanesePreferred ? "セッションを終了しました" : "Session Finished!"
     }
 
+    /// Returns the localized spoken phrase for jump milestones.
     private func localizedJumpAnnouncement(for jumpCount: Int) -> String {
         if isJapanesePreferred {
             return "\(jumpCount) 回"
@@ -652,6 +753,7 @@ final class JumpRecState {
         return "\(jumpCount) Jumps"
     }
 
+    /// Returns the localized spoken phrase for minute milestones.
     private func localizedMinuteAnnouncement(for minutesElapsed: Int) -> String {
         if isJapanesePreferred {
             return "\(minutesElapsed) 分"

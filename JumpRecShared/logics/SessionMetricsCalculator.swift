@@ -9,11 +9,20 @@ import Foundation
 
 /// Shared calculation helpers for session summary metrics and rate samples.
 public enum SessionMetricsCalculator {
+    // MARK: - Constants
+
+    /// The spacing between generated chart samples in seconds.
     private static let bucketSeconds = 5
+    /// The rolling window used to compute jump-rate samples.
     private static let rollingWindowSeconds = 30
+    /// The minimum gap that counts as a short break.
     private static let smallBreakLowerBound: TimeInterval = 5
+    /// The minimum gap that counts as a long break.
     private static let longBreakLowerBound: TimeInterval = 15
 
+    // MARK: - Rate Metrics
+
+    /// Generates normalized rate samples for charting a completed session.
     public static func makeRateSamples(
         for session: JumpSession,
         jumpOffsets: [TimeInterval],
@@ -52,15 +61,20 @@ public enum SessionMetricsCalculator {
         return samples
     }
 
+    /// Returns the average jump rate for a session when duration is valid.
     public static func averageRate(jumpCount: Int, durationSeconds: Int) -> Double? {
         guard durationSeconds > 0 else { return nil }
         return Double(jumpCount) * 60.0 / Double(durationSeconds)
     }
 
+    /// Returns the highest jump rate found in a sample series.
     public static func peakRate(from rateSamples: [SessionRateSample]) -> Double? {
         rateSamples.map(\.rate).max()
     }
 
+    // MARK: - Break Metrics
+
+    /// Derives short-break, long-break, and longest-streak metrics from jump offsets.
     public static func breakMetrics(from jumpOffsets: [TimeInterval]) -> (small: Int, long: Int, longestStreak: Int) {
         guard !jumpOffsets.isEmpty else { return (0, 0, 0) }
         guard jumpOffsets.count > 1 else { return (0, 0, 1) }

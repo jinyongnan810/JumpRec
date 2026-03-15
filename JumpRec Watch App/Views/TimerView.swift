@@ -7,13 +7,17 @@
 
 import SwiftUI
 
+/// Displays a high-frequency timer for the active watch workout.
 struct TimerView: View {
+    /// The time when the current session started.
     let startTime: Date
 
+    /// Creates a timer view anchored to a specific start time.
     init(startTime: Date) {
         self.startTime = startTime
     }
 
+    /// Renders the continuously updating elapsed time.
     var body: some View {
         TimelineView(.periodic(from: .now, by: 0.1)) { timeline in
             let diff = timeline.date.timeIntervalSince(startTime)
@@ -25,6 +29,7 @@ struct TimerView: View {
 }
 
 extension TimeInterval {
+    /// Formats a time interval as `mm:ss.d` for live display.
     var minutesSecondsMilliseconds: String {
         let totalSeconds = Int(self)
         let minutes = totalSeconds / 60

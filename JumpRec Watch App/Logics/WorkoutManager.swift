@@ -12,24 +12,37 @@ import HealthKit
 class WorkoutManager: NSObject {
     // MARK: - Callbacks
 
+    /// Delivers heart-rate updates back to app state.
     var updateHeartRate: (Int) -> Void
+    /// Delivers energy-burned updates back to app state.
     var updateEnergyBurned: (Double) -> Void
 
     // MARK: - HealthKit State
 
+    /// Provides HealthKit authorization and workout access.
     private let healthStore = HKHealthStore()
+    /// Tracks the active HealthKit workout session.
     private var session: HKWorkoutSession?
+    /// Tracks the active live workout builder.
     private var builder: HKLiveWorkoutBuilder?
+    /// Streams live heart-rate samples during the workout.
     private var heartRateQuery: HKAnchoredObjectQuery?
+    /// Streams active-energy samples during the workout.
     private var energyBurnedQuery: HKAnchoredObjectQuery?
+    /// Encodes mirrored payloads sent to the iPhone app.
     private let encoder = JSONEncoder()
+    /// Stores the current average heart rate for mirrored updates.
     private var averageHeartRate: Int?
+    /// Stores the current peak heart rate for mirrored updates.
     private var peakHeartRate: Int?
+    /// Accumulates heart-rate values for averaging.
     private var heartRateSum = 0
+    /// Counts heart-rate samples for averaging.
     private var heartRateSamples = 0
 
     // MARK: - Initialization
 
+    /// Requests authorization and stores callbacks for workout metrics.
     init(updateHeartRate: @escaping (Int) -> Void, updateEnergyBurned: @escaping (Double) -> Void) {
         self.updateHeartRate = updateHeartRate
         self.updateEnergyBurned = updateEnergyBurned
@@ -39,6 +52,7 @@ class WorkoutManager: NSObject {
 
     // MARK: - Authorization
 
+    /// Requests the HealthKit permissions required by the watch workout.
     func requestAuthorization() {
         let typesToShare: Set = [
             HKQuantityType.workoutType(),
@@ -61,6 +75,7 @@ class WorkoutManager: NSObject {
 
     // MARK: - Workout Session
 
+    /// Starts a jump-rope workout and begins mirroring it to the iPhone app.
     func startWorkout(startDate: Date, goalType: GoalType, goalValue: Int) {
         averageHeartRate = nil
         peakHeartRate = nil
@@ -92,6 +107,7 @@ class WorkoutManager: NSObject {
         }
     }
 
+    /// Ends the workout, sends final mirrored metrics, and saves it to HealthKit.
     func stopWorkout() {
         if let heartRateQuery {
             healthStore.stop(heartRateQuery)
@@ -116,6 +132,7 @@ class WorkoutManager: NSObject {
         }
     }
 
+    /// Sends a mirrored jump update to the iPhone companion app.
     func sendJumpUpdate(jumpCount: Int, jumpOffset: TimeInterval) {
         sendPayload(
             MirroredWorkoutPayload(
@@ -128,6 +145,7 @@ class WorkoutManager: NSObject {
 
     // MARK: - Live Queries
 
+    /// Starts the live heart-rate query for the active workout.
     private func startHeartRateQuery() {
         let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
         let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: .strictStartDate)
@@ -158,6 +176,7 @@ class WorkoutManager: NSObject {
         }
     }
 
+    /// Starts the live energy-burned query for the active workout.
     private func startEnergyBurnedQuery() {
         let energyBurnedType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!
         let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: .strictStartDate)
@@ -190,6 +209,7 @@ class WorkoutManager: NSObject {
         }
     }
 
+    /// Returns the total active energy burned so far in the workout.
     private var currentEnergyBurned: Double {
         guard let energyType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned) else {
             return 0
@@ -201,6 +221,7 @@ class WorkoutManager: NSObject {
             .doubleValue(for: .kilocalorie()) ?? 0
     }
 
+    /// Starts HealthKit workout mirroring and sends the initial payload to iPhone.
     private func startMirroring(startDate: Date, goalType: GoalType, goalValue: Int) {
         guard let session else { return }
 
@@ -221,6 +242,7 @@ class WorkoutManager: NSObject {
         }
     }
 
+    /// Encodes and sends a mirrored workout payload to the iPhone app.
     private func sendPayload(_ payload: MirroredWorkoutPayload) {
         guard let session else { return }
 

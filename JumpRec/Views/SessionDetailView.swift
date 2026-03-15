@@ -6,20 +6,31 @@
 import SwiftData
 import SwiftUI
 
+/// Displays the details for a saved session from history.
 struct SessionDetailView: View {
+    /// Provides model-layer helpers such as AI comment generation.
     @Environment(MyDataStore.self) private var dataStore
+    /// Dismisses the detail view after deletion.
     @Environment(\.dismiss) private var dismiss
+    /// Provides write access to the SwiftData context.
     @Environment(\.modelContext) private var modelContext
+    /// The saved session being displayed.
     let session: JumpSession
+    /// Indicates whether the AI comment is currently being generated.
     @State private var isGeneratingComment = false
+    /// Controls the delete confirmation alert.
     @State private var showingDeleteConfirmation = false
 
+    // MARK: - Derived Values
+
+    /// Returns the formatted date and start time of the session.
     private var dateText: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d, yyyy, h:mm a"
         return formatter.string(from: session.startedAt)
     }
 
+    /// Returns the session duration formatted as `mm:ss`.
     private var durationText: String {
         let seconds = Int(session.endedAt.timeIntervalSince(session.startedAt))
         let m = seconds / 60
@@ -27,10 +38,14 @@ struct SessionDetailView: View {
         return String(format: "%02d:%02d", m, s)
     }
 
+    /// Returns the saved rate samples sorted by elapsed time.
     private var rateSamples: [SessionRateSample] {
         (session.rateSamples ?? []).sorted { $0.secondOffset < $1.secondOffset }
     }
 
+    // MARK: - View
+
+    /// Renders the saved-session summary, AI comment, and delete action.
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -85,16 +100,23 @@ struct SessionDetailView: View {
         }
     }
 
+    // MARK: - Formatting
+
+    /// Returns the formatted peak-rate text.
     private var peakRateText: String {
         guard let peak = session.peakRate else { return "–" }
         return localizedRateText(Int(peak))
     }
 
+    /// Returns the formatted average-rate text.
     private var averageRateText: String {
         guard let average = session.averageRate else { return "–" }
         return localizedRateText(Int(average))
     }
 
+    // MARK: - Actions
+
+    /// Generates an AI comment if the session qualifies and no comment exists yet.
     private func generateCommentIfNeeded() async {
         guard SessionAICommentGenerator.shouldGenerate(for: session) else { return }
         guard session.aiComment == nil else { return }
@@ -105,6 +127,7 @@ struct SessionDetailView: View {
         isGeneratingComment = false
     }
 
+    /// Deletes the current session from persistent storage.
     private func deleteSession() {
         modelContext.delete(session)
 
@@ -116,18 +139,22 @@ struct SessionDetailView: View {
         }
     }
 
+    /// Returns the formatted longest-streak text.
     private var longestJumpStrikesText: String {
         session.longestStreak.formatted()
     }
 
+    /// Returns the formatted average heart-rate text.
     private var averageHeartRateText: String {
         heartRateText(session.averageHeartRate)
     }
 
+    /// Returns the formatted peak heart-rate text.
     private var peakHeartRateText: String {
         heartRateText(session.peakHeartRate)
     }
 
+    /// Formats an optional heart-rate value for display.
     private func heartRateText(_ value: Int?) -> String {
         guard let value else { return "–" }
         return "\(value) bpm"

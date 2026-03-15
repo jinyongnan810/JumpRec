@@ -7,9 +7,12 @@
 
 import SwiftUI
 
+/// Displays the watch-side session summary after a workout ends.
 struct ResultView: View {
+    /// The watch app state containing the finished session values.
     let appState: JumpRecState
 
+    /// Renders the compact results layout.
     var body: some View {
         NavigationStack {
             VStack(spacing: 8) {
