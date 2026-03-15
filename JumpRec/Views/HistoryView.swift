@@ -8,6 +8,7 @@ import SwiftUI
 
 struct HistoryView: View {
     @Query(sort: \JumpSession.startedAt, order: .reverse) var sessions: [JumpSession]
+    @Query(sort: \PersonalRecord.kindRawValue) private var personalRecords: [PersonalRecord]
 
     @Environment(\.modelContext) private var modelContext
 
@@ -16,6 +17,7 @@ struct HistoryView: View {
     @State private var selectedSession: JumpSession?
     @State private var sessionsPendingDeletion: [JumpSession] = []
     @State private var showingDeleteConfirmation = false
+    @State private var isDeletingAllSessions = false
 
     private var calendar: Calendar { Calendar.current }
 
@@ -127,6 +129,16 @@ struct HistoryView: View {
                         Label("Records", systemImage: "trophy.fill")
                     }
                 }
+                #if DEBUG
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button(role: .destructive) {
+                            promptDeleteAllSessions()
+                        } label: {
+                            Label("Delete All", systemImage: "trash")
+                        }
+                        .disabled(sessions.isEmpty)
+                    }
+                #endif
             }
         }
         .sheet(isPresented: $showRecords) {
@@ -170,21 +182,38 @@ struct HistoryView: View {
     }
 
     private func deleteSessions(at offsets: IndexSet) {
+        isDeletingAllSessions = false
         sessionsPendingDeletion = offsets.map { sessionsInMonth[$0] }
         showingDeleteConfirmation = !sessionsPendingDeletion.isEmpty
     }
 
     private func confirmDeleteSessions() {
+        let shouldDeletePersonalRecords = isDeletingAllSessions
+
         for session in sessionsPendingDeletion {
             modelContext.delete(session)
+        }
+
+        if shouldDeletePersonalRecords {
+            for record in personalRecords {
+                modelContext.delete(record)
+            }
         }
 
         do {
             try modelContext.save()
             sessionsPendingDeletion = []
+            isDeletingAllSessions = false
         } catch {
             print("Failed to delete sessions: \(error)")
         }
+    }
+
+    private func promptDeleteAllSessions() {
+        guard !sessions.isEmpty else { return }
+        isDeletingAllSessions = true
+        sessionsPendingDeletion = sessions
+        showingDeleteConfirmation = true
     }
 }
 

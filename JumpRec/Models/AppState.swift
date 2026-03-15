@@ -12,7 +12,13 @@ import UIKit
 @Observable
 @MainActor
 final class JumpRecState {
-    private let isMotionCSVExportEnabled = false
+    private let isMotionCSVExportEnabled = {
+        #if DEBUG
+            true
+        #else
+            false
+        #endif
+    }()
 
     var sessionState: SessionState = .idle
     var startTime: Date?

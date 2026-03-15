@@ -256,6 +256,9 @@
         }
       }
     },
+    "Delete All" : {
+
+    },
     "Delete Session" : {
       "localizations" : {
         "ja" : {
