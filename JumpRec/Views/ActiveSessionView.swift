@@ -11,6 +11,9 @@ struct ActiveSessionView: View {
     var onStop: () -> Void
 
     @State private var now = Date()
+    @State private var animatedProgress: Double = 0
+    @State private var animatedCenterText = "0"
+    @State private var animatedRingSubtitle = ""
 
     private var goalValue: Int64 {
         if let mirroredGoalValue = appState.sessionGoalValue {
@@ -95,9 +98,9 @@ struct ActiveSessionView: View {
 
             // Hero Ring with progress
             HeroRingView(
-                progress: progress,
-                centerText: "\(appState.jumpCount)",
-                subtitle: ringSubtitle
+                progress: animatedProgress,
+                centerText: animatedCenterText,
+                subtitle: animatedRingSubtitle
             )
 
             // Stats Row 1: TIME, CALORIES, RATE
@@ -126,9 +129,24 @@ struct ActiveSessionView: View {
         }
         .padding(.horizontal, 24)
         .task {
+            syncHeroRing(animated: false)
             while !Task.isCancelled, appState.sessionState == .active {
                 now = Date()
                 try? await Task.sleep(for: .seconds(1))
+            }
+        }
+        .onChange(of: appState.jumpCount) {
+            syncHeroRing()
+        }
+        .onChange(of: appState.sessionGoalValue) {
+            syncHeroRing()
+        }
+        .onChange(of: appState.sessionGoalType) {
+            syncHeroRing()
+        }
+        .onChange(of: now) {
+            if goalType == .time {
+                syncHeroRing()
             }
         }
     }
@@ -143,6 +161,22 @@ struct ActiveSessionView: View {
             DeviceSource.watch.shortName
         case nil:
             "--"
+        }
+    }
+
+    private func syncHeroRing(animated: Bool = true) {
+        let updates = {
+            animatedProgress = progress
+            animatedCenterText = "\(appState.jumpCount)"
+            animatedRingSubtitle = ringSubtitle
+        }
+
+        if animated {
+            withAnimation(.spring(duration: 0.4, bounce: 0.2)) {
+                updates()
+            }
+        } else {
+            updates()
         }
     }
 }
