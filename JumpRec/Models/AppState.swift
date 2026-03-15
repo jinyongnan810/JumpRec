@@ -125,6 +125,15 @@ final class JumpRecState {
         workoutMirrorManager.onMirroredSessionEnded = { [weak self] in
             self?.handleMirroredSessionEnded()
         }
+        phoneWorkoutManager.onMetricsUpdated = { [weak self] caloriesBurned, averageHeartRate, peakHeartRate in
+            guard let self else { return }
+            guard sessionState == .active, !isMirroredWatchSession else { return }
+
+            self.caloriesBurned = caloriesBurned
+            self.averageHeartRate = averageHeartRate
+            self.peakHeartRate = peakHeartRate
+            syncLiveActivity()
+        }
         connectivityManager.onCompletedSessionReceived = { [weak self] startedAt, endedAt, jumpCount, caloriesBurned, jumpOffsets, averageHeartRate, peakHeartRate, session in
             self?.applyCompletedWatchSession(
                 startedAt: startedAt,
@@ -258,7 +267,9 @@ final class JumpRecState {
                 endedAt: endTime,
                 jumpCount: jumpCount,
                 caloriesBurned: caloriesBurned,
-                jumpOffsets: jumps
+                jumpOffsets: jumps,
+                averageHeartRate: averageHeartRate,
+                peakHeartRate: peakHeartRate
             )
             exportMotionCSVIfNeeded(samples: motionSamples, startedAt: startTime, endedAt: endTime)
         }

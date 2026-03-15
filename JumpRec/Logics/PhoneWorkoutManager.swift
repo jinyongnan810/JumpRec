@@ -9,6 +9,9 @@ import HealthKit
 /// Manages the iPhone-side HealthKit workout session used for local tracking.
 @MainActor
 final class PhoneWorkoutManager: NSObject {
+    /// Publishes live iPhone workout metrics back to app state.
+    var onMetricsUpdated: ((_ caloriesBurned: Double, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
+
     /// Errors thrown when workout authorization is missing.
     private enum AuthorizationError: LocalizedError {
         case workoutWriteDenied
@@ -58,7 +61,10 @@ final class PhoneWorkoutManager: NSObject {
         print("[PhoneWorkoutManager] Authorization ready for workout start.")
 
         if workoutStore == nil {
-            workoutStore = PhoneWorkoutStore(healthStore: healthStore)
+            workoutStore = PhoneWorkoutStore(
+                healthStore: healthStore,
+                onMetricsUpdated: onMetricsUpdated
+            )
         }
         try await (workoutStore as? PhoneWorkoutStore)?.startWorkout(at: startDate)
         print("[PhoneWorkoutManager] Workout start request completed.")
@@ -132,11 +138,16 @@ final class PhoneWorkoutManager: NSObject {
 @available(iOS 26.0, *)
 private final class PhoneWorkoutStore: NSObject {
     private let healthStore: HKHealthStore
+    private let onMetricsUpdated: ((_ caloriesBurned: Double, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
 
-    init(healthStore: HKHealthStore) {
+    init(
+        healthStore: HKHealthStore,
+        onMetricsUpdated: ((_ caloriesBurned: Double, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
+    ) {
         self.healthStore = healthStore
+        self.onMetricsUpdated = onMetricsUpdated
     }
 
     func startWorkout(at startDate: Date) async throws {
@@ -193,6 +204,11 @@ private final class PhoneWorkoutStore: NSObject {
         session = nil
         builder = nil
     }
+
+    @MainActor
+    private func publishMetrics(caloriesBurned: Double, averageHeartRate: Int?, peakHeartRate: Int?) {
+        onMetricsUpdated?(caloriesBurned, averageHeartRate, peakHeartRate)
+    }
 }
 
 @available(iOS 26.0, *)
@@ -210,7 +226,39 @@ extension PhoneWorkoutStore: HKWorkoutSessionDelegate {
 
 @available(iOS 26.0, *)
 extension PhoneWorkoutStore: HKLiveWorkoutBuilderDelegate {
-    nonisolated func workoutBuilder(_: HKLiveWorkoutBuilder, didCollectDataOf _: Set<HKSampleType>) {}
+    nonisolated func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder, didCollectDataOf collectedTypes: Set<HKSampleType>) {
+        let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)
+        let energyBurnedType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)
+        let shouldRefreshMetrics = collectedTypes.contains { sampleType in
+            guard let quantityType = sampleType as? HKQuantityType else { return false }
+            return quantityType == heartRateType || quantityType == energyBurnedType
+        }
+
+        guard shouldRefreshMetrics else { return }
+
+        let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
+        let heartRateStatistics = heartRateType.flatMap { workoutBuilder.statistics(for: $0) }
+        let averageHeartRate = heartRateStatistics?
+            .averageQuantity()?
+            .doubleValue(for: heartRateUnit)
+            .rounded()
+        let peakHeartRate = heartRateStatistics?
+            .maximumQuantity()?
+            .doubleValue(for: heartRateUnit)
+            .rounded()
+        let caloriesBurned = energyBurnedType
+            .flatMap { workoutBuilder.statistics(for: $0) }?
+            .sumQuantity()?
+            .doubleValue(for: .kilocalorie()) ?? 0
+
+        Task { @MainActor [weak self] in
+            self?.publishMetrics(
+                caloriesBurned: caloriesBurned,
+                averageHeartRate: averageHeartRate.map(Int.init),
+                peakHeartRate: peakHeartRate.map(Int.init)
+            )
+        }
+    }
 
     nonisolated func workoutBuilderDidCollectEvent(_: HKLiveWorkoutBuilder) {}
 }
