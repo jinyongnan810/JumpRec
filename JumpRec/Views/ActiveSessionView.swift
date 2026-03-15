@@ -64,6 +64,22 @@ struct ActiveSessionView: View {
         }
     }
 
+    private var ringCenterText: String {
+        if goalType == .count {
+            return "\(appState.jumpCount)"
+        } else {
+            return "\(elapsedSeconds / 60)"
+        }
+    }
+
+    private var leadingStatLabel: LocalizedStringKey {
+        goalType == .count ? "TIME" : "JUMPS"
+    }
+
+    private var leadingStatValue: String {
+        goalType == .count ? elapsedFormatted : appState.jumpCount.formatted()
+    }
+
     private var elapsedFormatted: String {
         let m = elapsedSeconds / 60
         let s = elapsedSeconds % 60
@@ -105,7 +121,7 @@ struct ActiveSessionView: View {
 
             // Stats Row 1: TIME, CALORIES, RATE
             HStack(spacing: 10) {
-                StatCardView(label: "TIME", value: elapsedFormatted)
+                StatCardView(label: leadingStatLabel, value: leadingStatValue)
                 StatCardView(label: "CALORIES", value: "\(Int(appState.caloriesBurned.rounded()))")
                 StatCardView(label: "RATE", value: localizedRateText(appState.averageRate), valueColor: AppColors.accent)
             }
@@ -167,7 +183,7 @@ struct ActiveSessionView: View {
     private func syncHeroRing(animated: Bool = true) {
         let updates = {
             animatedProgress = progress
-            animatedCenterText = "\(appState.jumpCount)"
+            animatedCenterText = ringCenterText
             animatedRingSubtitle = ringSubtitle
         }
 
