@@ -97,14 +97,23 @@ jobs:
       - name: Generate release notes from commits
         id: notes
         run: |
-          BASE_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          TAG="${{ steps.tag.outputs.name }}"
+          BASE_TAG=""
+
+          if [ "${{ inputs.action }}" = "keep" ]; then
+            # In keep mode TAG was deleted above, so the current latest tag is the base.
+            BASE_TAG=$(git tag --sort=-v:refname | head -n 1 || true)
+          else
+            # For new releases, exclude the tag we are about to create if present locally.
+            BASE_TAG=$(git tag --sort=-v:refname | grep -v "^${TAG}$" | head -n 1 || true)
+          fi
+
           NOTES_FILE="release-notes.md"
-          echo "# ${{ steps.tag.outputs.name }}" > "$NOTES_FILE"
-          echo >> "$NOTES_FILE"
+          : > "$NOTES_FILE"
 
           if [ -n "$BASE_TAG" ]; then
             RANGE="$BASE_TAG..HEAD"
-            echo "_Changes since $BASE_TAG_" >> "$NOTES_FILE"
+            echo "Changes since $BASE_TAG" >> "$NOTES_FILE"
             echo >> "$NOTES_FILE"
             LOG=$(git log "$RANGE" --pretty=format:'%s')
           else
