@@ -94,6 +94,63 @@ jobs:
           git tag -d "$TAG" 2>/dev/null || true
           echo "Deleted release/tag: $TAG"
 
+      - name: Generate release notes from commits
+        id: notes
+        run: |
+          BASE_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          NOTES_FILE="release-notes.md"
+          echo "# ${{ steps.tag.outputs.name }}" > "$NOTES_FILE"
+          echo >> "$NOTES_FILE"
+
+          if [ -n "$BASE_TAG" ]; then
+            RANGE="$BASE_TAG..HEAD"
+            echo "_Changes since $BASE_TAG_" >> "$NOTES_FILE"
+            echo >> "$NOTES_FILE"
+            LOG=$(git log "$RANGE" --pretty=format:'%s')
+          else
+            echo "_Initial release_" >> "$NOTES_FILE"
+            echo >> "$NOTES_FILE"
+            LOG=$(git log --pretty=format:'%s')
+          fi
+
+          awk '
+            BEGIN {
+              sections[1] = "🚀 Features";
+              sections[2] = "🐛 Fixes";
+              sections[3] = "⚡ Performance";
+              sections[4] = "♻️ Refactor";
+              sections[5] = "📝 Docs";
+              sections[6] = "🧪 Tests";
+              sections[7] = "🛠 Maintenance";
+              sections[8] = "📦 Other Changes";
+            }
+            {
+              line = $0;
+              lower = tolower(line);
+              if (lower ~ /^feat(\(.+\))?: /) items["🚀 Features"] = items["🚀 Features"] "- " line "\n";
+              else if (lower ~ /^fix(\(.+\))?: /) items["🐛 Fixes"] = items["🐛 Fixes"] "- " line "\n";
+              else if (lower ~ /^perf(\(.+\))?: /) items["⚡ Performance"] = items["⚡ Performance"] "- " line "\n";
+              else if (lower ~ /^refactor(\(.+\))?: /) items["♻️ Refactor"] = items["♻️ Refactor"] "- " line "\n";
+              else if (lower ~ /^docs?(\(.+\))?: /) items["📝 Docs"] = items["📝 Docs"] "- " line "\n";
+              else if (lower ~ /^test(s)?(\(.+\))?: /) items["🧪 Tests"] = items["🧪 Tests"] "- " line "\n";
+              else if (lower ~ /^(chore|build|ci)(\(.+\))?: /) items["🛠 Maintenance"] = items["🛠 Maintenance"] "- " line "\n";
+              else items["📦 Other Changes"] = items["📦 Other Changes"] "- " line "\n";
+            }
+            END {
+              for (i = 1; i <= 8; i++) {
+                section = sections[i];
+                if (items[section] != "") {
+                  print "## " section;
+                  printf "%s", items[section];
+                  print "";
+                }
+              }
+            }
+          ' <<< "$LOG" >> "$NOTES_FILE"
+
+          echo "file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
+          echo "Generated $NOTES_FILE"
+
       - name: Create release tag
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -103,6 +160,6 @@ jobs:
           git push origin "$TAG"
           gh release create "$TAG" \
             --title "$TAG" \
-            --generate-notes \
+            --notes-file "${{ steps.notes.outputs.file }}" \
             --latest
           echo "Created release: $TAG"
