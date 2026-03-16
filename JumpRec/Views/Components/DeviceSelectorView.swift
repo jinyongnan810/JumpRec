@@ -40,8 +40,8 @@ struct DeviceSelectorView: View {
 
                 HStack(spacing: 8) {
                     availabilityBadge(for: .watch, isAvailable: isWatchMotionAvailable)
-                    availabilityBadge(for: .iPhone, isAvailable: isPhoneMotionAvailable)
                     availabilityBadge(for: .airpods, isAvailable: isHeadphoneMotionAvailable)
+                    availabilityBadge(for: .iPhone, isAvailable: isPhoneMotionAvailable)
                 }
             }
         }
