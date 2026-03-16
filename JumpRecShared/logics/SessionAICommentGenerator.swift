@@ -133,36 +133,20 @@ public enum SessionAICommentGenerator {
 
     /// Builds the per-session prompt passed to the language model.
     private static func prompt(for session: JumpSession, language: OutputLanguage) -> String {
+        let metrics = session.promptMetrics(language: language)
+
         switch language {
         case .english:
-            """
+            return """
             Create a short highlight and a short phrase for this jump rope session.
             The phrase must be either a gentle reflective question or a kind supportive phrase.
-            Duration: \(session.durationText)
-            Jumps: \(session.jumpCount)
-            Calories: \(Int(session.caloriesBurned.rounded()))
-            Average rate: \(session.rateText(from: session.averageRate, language: language))
-            Peak rate: \(session.rateText(from: session.peakRate, language: language))
-            Longest streak: \(session.longestStreak)
-            Short breaks: \(session.smallBreaksCount)
-            Long breaks: \(session.longBreaksCount)
-            Average heart rate: \(session.heartRateText(from: session.averageHeartRate, language: language))
-            Peak heart rate: \(session.heartRateText(from: session.peakHeartRate, language: language))
+            \(metrics.joined(separator: "\n"))
             """
         case .japanese:
-            """
+            return """
             この縄跳びセッションについて、短い highlight と短い phrase を作成してください。
             phrase は、やさしい振り返りの問いかけ、または思いやりのある一言にしてください。
-            時間: \(session.durationText)
-            ジャンプ回数: \(session.jumpCount)
-            消費カロリー: \(Int(session.caloriesBurned.rounded()))
-            平均レート: \(session.rateText(from: session.averageRate, language: language))
-            最高レート: \(session.rateText(from: session.peakRate, language: language))
-            最長連続回数: \(session.longestStreak)
-            短い休憩: \(session.smallBreaksCount)
-            長い休憩: \(session.longBreaksCount)
-            平均心拍数: \(session.heartRateText(from: session.averageHeartRate, language: language))
-            最高心拍数: \(session.heartRateText(from: session.peakHeartRate, language: language))
+            \(metrics.joined(separator: "\n"))
             """
         }
     }
@@ -192,6 +176,65 @@ public enum SessionAICommentGenerator {
 #endif
 
 private extension JumpSession {
+    /// Returns the prompt metrics, omitting calories and heart rate when they are missing or zero.
+    func promptMetrics(language: SessionAICommentGenerator.OutputLanguage) -> [String] {
+        var metrics = [
+            promptLine(english: "Duration", japanese: "時間", value: durationText, language: language),
+            promptLine(english: "Jumps", japanese: "ジャンプ回数", value: "\(jumpCount)", language: language),
+            promptLine(
+                english: "Average rate",
+                japanese: "平均レート",
+                value: rateText(from: averageRate, language: language),
+                language: language
+            ),
+            promptLine(
+                english: "Peak rate",
+                japanese: "最高レート",
+                value: rateText(from: peakRate, language: language),
+                language: language
+            ),
+            promptLine(english: "Longest streak", japanese: "最長連続回数", value: "\(longestStreak)", language: language),
+            promptLine(english: "Short breaks", japanese: "短い休憩", value: "\(smallBreaksCount)", language: language),
+            promptLine(english: "Long breaks", japanese: "長い休憩", value: "\(longBreaksCount)", language: language),
+        ]
+
+        if caloriesBurned > 0 {
+            metrics.insert(
+                promptLine(
+                    english: "Calories",
+                    japanese: "消費カロリー",
+                    value: "\(Int(caloriesBurned.rounded()))",
+                    language: language
+                ),
+                at: 2
+            )
+        }
+
+        if let averageHeartRate, averageHeartRate > 0 {
+            metrics.append(
+                promptLine(
+                    english: "Average heart rate",
+                    japanese: "平均心拍数",
+                    value: heartRateText(from: averageHeartRate, language: language),
+                    language: language
+                )
+            )
+        }
+
+        if let peakHeartRate, peakHeartRate > 0 {
+            metrics.append(
+                promptLine(
+                    english: "Peak heart rate",
+                    japanese: "最高心拍数",
+                    value: heartRateText(from: peakHeartRate, language: language),
+                    language: language
+                )
+            )
+        }
+
+        return metrics
+    }
+
     /// Returns the session duration formatted as `mm:ss`.
     var durationText: String {
         let seconds = max(durationSeconds, 0)
@@ -219,6 +262,20 @@ private extension JumpSession {
             return "\(value) bpm"
         case .japanese:
             return "\(value) bpm"
+        }
+    }
+
+    private func promptLine(
+        english: String,
+        japanese: String,
+        value: String,
+        language: SessionAICommentGenerator.OutputLanguage
+    ) -> String {
+        switch language {
+        case .english:
+            "\(english): \(value)"
+        case .japanese:
+            "\(japanese): \(value)"
         }
     }
 }
