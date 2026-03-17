@@ -26,7 +26,7 @@ final class WorkoutMirrorManager: NSObject {
     private let healthStore = HKHealthStore()
     /// Decodes mirrored payloads coming from the watch.
     private let decoder = JSONDecoder()
-    /// Tracks the currently attached mirrored workout session.
+    /// ⭐️Tracks the currently attached mirrored workout session.
     private var mirroredSession: HKWorkoutSession?
 
     /// Restricts creation to the shared singleton.

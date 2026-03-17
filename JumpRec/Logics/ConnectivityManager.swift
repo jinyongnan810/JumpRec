@@ -15,7 +15,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     /// Shared singleton used across the iPhone app.
     static let shared = ConnectivityManager()
 
-    /// The active WatchConnectivity session.
+    /// ⭐️The active WatchConnectivity session.
     private let session: WCSession = .default
 
     /// Indicates whether WatchConnectivity is supported on this device.
@@ -30,7 +30,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     var activationState: WCSessionActivationState = .notActivated
     /// Delivers fully reconstructed sessions received from Apple Watch.
     var onCompletedSessionReceived: ((Date, Date, Int, Double, [TimeInterval], Int?, Int?, JumpSession) -> Void)?
-    /// Persists synced settings in the shared ubiquitous key-value store.
+    /// ⭐️Persists synced settings in the shared ubiquitous key-value store.
     private let settingsStore = NSUbiquitousKeyValueStore.default
 
     /// Configures and activates the shared connectivity session.
@@ -73,6 +73,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             "[WatchConnectivityManager] Session state changed: isPaired(\(session.isPaired)), isWatchAppInstalled(\(session.isWatchAppInstalled))"
         )
         DispatchQueue.main.async {
+            // isPaired is true even the watch is took off
             self.isPaired = session.isPaired
             self.isWatchAppInstalled = session.isWatchAppInstalled
         }
@@ -138,11 +139,11 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
     /// Rebuilds and persists a completed session received from Apple Watch.
     private func handleCompletedSession(_ userInfo: [String: Any]) {
-        guard let startedAtTimestamp = numberAsDouble(userInfo["startedAt"]),
-              let endedAtTimestamp = numberAsDouble(userInfo["endedAt"]),
-              let jumpCount = numberAsInt(userInfo["jumpCount"]),
-              let caloriesBurned = numberAsDouble(userInfo["caloriesBurned"]),
-              let jumpOffsets = (userInfo["jumpOffsets"] as? [Any])?.compactMap(numberAsDouble)
+        guard let startedAtTimestamp = NumberParser.double(userInfo["startedAt"]),
+              let endedAtTimestamp = NumberParser.double(userInfo["endedAt"]),
+              let jumpCount = NumberParser.int(userInfo["jumpCount"]),
+              let caloriesBurned = NumberParser.double(userInfo["caloriesBurned"]),
+              let jumpOffsets = (userInfo["jumpOffsets"] as? [Any])?.compactMap(NumberParser.double)
         else {
             print("[WatchConnectivityManager] Invalid completed session payload")
             return
@@ -150,8 +151,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
         let startedAt = Date(timeIntervalSince1970: startedAtTimestamp)
         let endedAt = Date(timeIntervalSince1970: endedAtTimestamp)
-        let averageHeartRate = numberAsInt(userInfo["averageHeartRate"])
-        let peakHeartRate = numberAsInt(userInfo["peakHeartRate"])
+        let averageHeartRate = NumberParser.int(userInfo["averageHeartRate"])
+        let peakHeartRate = NumberParser.int(userInfo["peakHeartRate"])
 
         Task { @MainActor in
             let session = MyDataStore.shared.saveCompletedSession(
@@ -179,20 +180,6 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         print("[WatchConnectivityManager] Saved completed session from watch: \(jumpCount) jumps")
     }
 
-    /// Converts a numeric payload value into `Double`.
-    private func numberAsDouble(_ value: Any?) -> Double? {
-        if let value = value as? Double { return value }
-        if let value = value as? NSNumber { return value.doubleValue }
-        return nil
-    }
-
-    /// Converts a numeric payload value into `Int`.
-    private func numberAsInt(_ value: Any?) -> Int? {
-        if let value = value as? Int { return value }
-        if let value = value as? NSNumber { return value.intValue }
-        return nil
-    }
-
     /// Syncs the selected workout settings to Apple Watch.
     func syncSettings(goalType: GoalType, jumpCount: Int64, jumpTime: Int64) {
         let payload: [String: Any] = [
@@ -217,8 +204,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
 
         guard let goalTypeRawValue = payload["goalType"] as? String,
-              let jumpCount = numberAsInt(payload["jumpCount"]),
-              let jumpTime = numberAsInt(payload["jumpTime"])
+              let jumpCount = NumberParser.int(payload["jumpCount"]),
+              let jumpTime = NumberParser.int(payload["jumpTime"])
         else {
             print("[WatchConnectivityManager] Invalid goal settings payload")
             return

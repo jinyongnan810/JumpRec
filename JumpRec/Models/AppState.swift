@@ -44,7 +44,7 @@ final class JumpRecState {
     var peakHeartRate: Int?
     /// Stores the selected goal type for the active session.
     var sessionGoalType: GoalType?
-    /// Stores the selected goal value for the active session.
+    /// Stores the selected goal value for the active session: jumps for count goals, minutes for time goals.
     var sessionGoalValue: Int?
     /// Indicates whether the current session is being mirrored from Apple Watch.
     var isMirroredWatchSession = false

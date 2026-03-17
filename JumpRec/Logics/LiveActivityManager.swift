@@ -20,7 +20,7 @@ import Foundation
         /// Restricts creation to the shared singleton.
         private init() {}
 
-        /// Starts a live activity or updates the current one with fresh metrics.
+        /// ⭐️Starts a live activity or updates the current one with fresh metrics.
         func startOrUpdate(
             startedAt: Date,
             goalSummary: String,

@@ -51,7 +51,7 @@ class JumpRecState {
     var energyBurned: Double = 0
     /// Stores the active goal type for the session.
     var goalType: GoalType = .count
-    /// Stores the active goal value, in jumps or seconds depending on `goalType`.
+    /// Stores the active goal value: jumps for count goals, seconds for time goals after converting from the minute-based setting.
     var goal: Int = 0
     /// Returns the finished session duration formatted as `mm:ss`.
     var totalTime: String {

@@ -28,7 +28,7 @@ final class PhoneWorkoutManager: NSObject {
     /// Shared singleton used by app state.
     static let shared = PhoneWorkoutManager()
 
-    /// The HealthKit store used for authorization and workout creation.
+    /// ⭐️The HealthKit store used for authorization and workout creation.
     private let healthStore = HKHealthStore()
     /// Holds the active iOS 26 workout implementation when available.
     private var workoutStore: AnyObject?
