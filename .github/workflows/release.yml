@@ -98,6 +98,7 @@ jobs:
         id: notes
         run: |
           TAG="${{ steps.tag.outputs.name }}"
+          REPO="${{ github.repository }}"
           BASE_TAG=""
 
           if [ "${{ inputs.action }}" = "keep" ]; then
@@ -156,6 +157,13 @@ jobs:
               }
             }
           ' <<< "$LOG" >> "$NOTES_FILE"
+
+          echo "## 🔍 Code Diff" >> "$NOTES_FILE"
+          if [ -n "$BASE_TAG" ]; then
+            echo "- https://github.com/$REPO/compare/$BASE_TAG...$TAG" >> "$NOTES_FILE"
+          else
+            echo "- https://github.com/$REPO/commits/$TAG" >> "$NOTES_FILE"
+          fi
 
           echo "file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
           echo "Generated $NOTES_FILE"
