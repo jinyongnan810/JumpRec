@@ -302,8 +302,8 @@ final class MotionManager: NSObject {
         return hasHeadphoneRoute && headphoneMotionManager.isDeviceMotionAvailable
     }
 
-    @objc
     /// Recomputes availability and preferred source after an audio-route change.
+    @objc
     private func handleAudioRouteChange(_: Notification) {
         let wasConnected = isHeadphoneConnected
         isHeadphoneConnected = currentAudioRouteSupportsHeadphoneMotion()

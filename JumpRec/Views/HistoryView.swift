@@ -12,6 +12,7 @@ struct HistoryView: View {
 
     @Environment(\.modelContext) private var modelContext
 
+    @Namespace private var navigationTransitionNamespace
     @State private var displayedMonth = Date()
     @State private var showRecords = false
     @State private var selectedSession: JumpSession?
@@ -98,6 +99,7 @@ struct HistoryView: View {
                                 selectedSession = session
                             } label: {
                                 SessionRowView(session: session)
+                                    .matchedTransitionSource(id: session.id, in: navigationTransitionNamespace)
                             }
                             .buttonStyle(.plain)
                             .listRowInsets(EdgeInsets(top: 4, leading: 24, bottom: 4, trailing: 24))
@@ -118,6 +120,7 @@ struct HistoryView: View {
             .scrollContentBackground(.hidden)
             .navigationDestination(item: $selectedSession) { session in
                 SessionDetailView(session: session)
+                    .navigationTransition(.zoom(sourceID: session.id, in: navigationTransitionNamespace))
             }
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.inline)
