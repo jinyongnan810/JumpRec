@@ -10,6 +10,8 @@ import SwiftData
 public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
     /// Highest jump count achieved in a single session.
     case highestJumpCount
+    /// Longest uninterrupted jump streak achieved in a single session.
+    case longestJumpStreak
     /// Longest completed session duration.
     case longestSession
     /// Highest calories burned in a session.
@@ -24,6 +26,8 @@ public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
         switch self {
         case .highestJumpCount:
             "Highest Jump Count"
+        case .longestJumpStreak:
+            "Longest Jump Streak"
         case .longestSession:
             "Longest Session"
         case .mostCalories:
@@ -38,6 +42,8 @@ public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
         switch self {
         case .highestJumpCount:
             "trophy.fill"
+        case .longestJumpStreak:
+            "figure.jumprope"
         case .longestSession:
             "timer"
         case .mostCalories:
@@ -50,7 +56,7 @@ public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
     /// Returns the comparison rule used when evaluating new record values.
     public var comparison: PersonalRecordComparison {
         switch self {
-        case .highestJumpCount, .longestSession, .mostCalories, .bestJumpRate:
+        case .highestJumpCount, .longestJumpStreak, .longestSession, .mostCalories, .bestJumpRate:
             .largerIsBetter
         }
     }

@@ -512,6 +512,17 @@
         }
       }
     },
+    "Longest Jump Streak" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最長ジャンプ連続回数"
+          }
+        }
+      }
+    },
     "Longest Jump Strikes" : {
       "localizations" : {
         "ja" : {

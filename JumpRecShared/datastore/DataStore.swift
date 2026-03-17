@@ -203,6 +203,15 @@ public class MyDataStore {
                 achievedAt: session.startedAt
             ),
             PersonalRecordCandidate(
+                kind: .longestJumpStreak,
+                metricValue: Double(session.longestStreak),
+                displayValue: String(
+                    format: String(localized: "%@ jumps"),
+                    session.longestStreak.formatted()
+                ),
+                achievedAt: session.startedAt
+            ),
+            PersonalRecordCandidate(
                 kind: .longestSession,
                 metricValue: Double(session.durationSeconds),
                 displayValue: formattedDuration(seconds: session.durationSeconds),

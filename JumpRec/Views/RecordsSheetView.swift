@@ -87,10 +87,10 @@ struct RecordsSheetView: View {
 
     let calendar = Calendar.current
     let now = Date()
-    let sampleData: [(daysAgo: Int, jumps: Int, minutes: Int, calories: Double, peakRate: Double)] = [
-        (3, 2847, 15, 384, 186),
-        (10, 1500, 12, 280, 172),
-        (20, 900, 6, 150, 155),
+    let sampleData: [(daysAgo: Int, jumps: Int, minutes: Int, calories: Double, peakRate: Double, longestStreak: Int)] = [
+        (3, 2847, 15, 384, 186, 642),
+        (10, 1500, 12, 280, 172, 390),
+        (20, 900, 6, 150, 155, 244),
     ]
     for data in sampleData {
         let start = calendar.date(byAdding: .day, value: -data.daysAgo, to: now)!
@@ -100,7 +100,8 @@ struct RecordsSheetView: View {
             endedAt: end,
             jumpCount: data.jumps,
             peakRate: data.peakRate,
-            caloriesBurned: data.calories
+            caloriesBurned: data.calories,
+            longestStreak: data.longestStreak
         )
         container.mainContext.insert(session)
     }
@@ -110,6 +111,14 @@ struct RecordsSheetView: View {
             kind: .highestJumpCount,
             metricValue: 2847,
             displayValue: "2,847 jumps",
+            achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
+        )
+    )
+    container.mainContext.insert(
+        PersonalRecord(
+            kind: .longestJumpStreak,
+            metricValue: 642,
+            displayValue: "642 jumps",
             achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
         )
     )
@@ -204,6 +213,11 @@ private struct RecordCardView: View {
                 format: String(localized: "%@ jumps"),
                 Int(record.metricValue.rounded()).formatted()
             )
+        case .longestJumpStreak:
+            return String(
+                format: String(localized: "%@ jumps"),
+                Int(record.metricValue.rounded()).formatted()
+            )
         case .longestSession:
             return formattedDuration(seconds: Int(record.metricValue.rounded()))
         case .mostCalories:
@@ -227,12 +241,14 @@ private extension PersonalRecordKind {
         switch self {
         case .highestJumpCount:
             0
-        case .longestSession:
+        case .longestJumpStreak:
             1
-        case .mostCalories:
+        case .longestSession:
             2
-        case .bestJumpRate:
+        case .mostCalories:
             3
+        case .bestJumpRate:
+            4
         @unknown default:
             Int.max
         }
