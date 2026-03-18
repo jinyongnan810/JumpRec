@@ -9,6 +9,8 @@ import SwiftUI
 struct HeroRingView: View {
     /// The normalized progress value from `0.0` to `1.0`.
     var progress: Double
+    /// The color used by the progress ring.
+    var color: Color = AppColors.accent
     /// The primary text shown in the center of the ring.
     var centerText: String
     /// The supporting label shown below the center text.
@@ -27,7 +29,7 @@ struct HeroRingView: View {
             // Foreground ring
             Circle()
                 .trim(from: 0, to: progress)
-                .stroke(AppColors.accent, style: StrokeStyle(lineWidth: 14, lineCap: .round))
+                .stroke(color, style: StrokeStyle(lineWidth: 14, lineCap: .round))
                 .frame(width: 200, height: 200)
                 .rotationEffect(.degrees(-90))
 

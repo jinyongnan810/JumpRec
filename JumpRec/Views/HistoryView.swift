@@ -235,6 +235,7 @@ private struct SessionRowView: View {
     }
 
     private var caloriesText: String {
+        // ⭐️Measurements format with unit
         Measurement(value: session.caloriesBurned, unit: UnitEnergy.kilocalories)
             .formatted(.measurement(width: .abbreviated, usage: .workout, numberFormatStyle: .number.precision(.fractionLength(0))))
     }

@@ -175,7 +175,7 @@
         }
       }
     },
-    "CALORIES" : {
+    "Calories" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -185,7 +185,7 @@
         }
       }
     },
-    "Calories" : {
+    "CALORIES" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -319,7 +319,7 @@
         }
       }
     },
-    "DURATION" : {
+    "Duration" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -329,7 +329,7 @@
         }
       }
     },
-    "Duration" : {
+    "DURATION" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -512,22 +512,22 @@
         }
       }
     },
-    "JUMPS" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ジャンプ"
-          }
-        }
-      }
-    },
     "Jumps" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "回数"
+          }
+        }
+      }
+    },
+    "JUMPS" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ"
           }
         }
       }
@@ -697,6 +697,7 @@
       }
     },
     "RATE" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {

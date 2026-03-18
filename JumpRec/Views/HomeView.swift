@@ -21,6 +21,7 @@ struct HomeView: View {
     var onStart: () -> Void
     /// Controls presentation of the goal sheet.
     @State private var showGoalSheet = false
+    /// Enable navigation transition
     @Namespace private var navigationTransitionNamespace
     /// Tracks the active countdown value, or `nil` when idle.
     @State private var countdownValue: Int?
@@ -46,6 +47,36 @@ struct HomeView: View {
         }
     }
 
+    /// Returns the ring progress for the current home-screen state.
+    private var heroRingProgress: Double {
+        isCountingDown ? countdownProgress : 1
+    }
+
+    /// Returns the primary ring text for the current home-screen state.
+    private var heroRingCenterText: String {
+        isCountingDown ? "\(countdownValue ?? 3)" : String(localized: "Ready?")
+    }
+
+    /// Returns the supporting ring label for the current home-screen state.
+    private var heroRingSubtitle: String {
+        isCountingDown ? String(localized: "Starting...") : String(localized: "Tap Start to begin")
+    }
+
+    /// Returns the ring color for the current home-screen state.
+    private var heroRingColor: Color {
+        isCountingDown ? AppColors.accent : AppColors.textMuted
+    }
+
+    /// Builds the hero ring for the current home-screen state.
+    private var heroRingView: some View {
+        HeroRingView(
+            progress: heroRingProgress,
+            color: heroRingColor,
+            centerText: heroRingCenterText,
+            subtitle: heroRingSubtitle
+        )
+    }
+
     // MARK: - View
 
     /// Renders the home screen and session-start controls.
@@ -63,19 +94,8 @@ struct HomeView: View {
             }
 
             // Hero Ring / Countdown Ring
-            if isCountingDown {
-                HeroRingView(
-                    progress: countdownProgress,
-                    centerText: "\(countdownValue ?? 3)",
-                    subtitle: String(localized: "Starting...")
-                )
-            } else {
-                HeroRingView(
-                    progress: 0,
-                    centerText: String(localized: "Ready?"),
-                    subtitle: String(localized: "Tap Start to begin")
-                )
-            }
+            heroRingView
+                .animation(.spring(response: 0.45, dampingFraction: 0.85), value: isCountingDown)
 
             DeviceSelectorView(
                 activeSource: displayedMotionSource,
