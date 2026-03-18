@@ -738,7 +738,7 @@ final class JumpRecState {
 
     /// Returns whether Japanese is the preferred system language.
     private var isJapanesePreferred: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("ja") == true
+        Locale.isJapanesePreferredLanguage
     }
 
     /// Returns the language code used for speech synthesis.
@@ -766,9 +766,8 @@ final class JumpRecState {
 
     /// Returns the localized spoken phrase for minute milestones.
     private func localizedMinuteAnnouncement(for minutesElapsed: Int) -> String {
-        if isJapanesePreferred {
-            return "\(minutesElapsed) 分"
-        }
-        return minutesElapsed == 1 ? "1 minute" : "\(minutesElapsed) minutes"
+        Duration.seconds(Double(minutesElapsed) * 60).formatted(
+            .units(allowed: [.minutes], width: .wide)
+        )
     }
 }

@@ -165,23 +165,15 @@ struct HistoryView: View {
         return value.formatted()
     }
 
+    // ⭐️ Format localize string with unit
     private func formatDuration(_ duration: TimeInterval) -> String {
         let totalSeconds = Int(duration)
         let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let isJapanese = Locale.preferredLanguages.first?.hasPrefix("ja") == true
+        let allowedUnits: Set<Duration.UnitsFormatStyle.Unit> = hours > 0 ? [.hours, .minutes] : [.minutes]
 
-        if hours > 0 {
-            if isJapanese {
-                return "\(hours)時間\(minutes)分"
-            }
-            return String(format: "%dh %02dm", hours, minutes)
-        }
-
-        if isJapanese {
-            return "\(minutes)分"
-        }
-        return String(format: "%dm", minutes)
+        return Duration.seconds(duration).formatted(
+            .units(allowed: allowedUnits, width: .abbreviated)
+        )
     }
 
     private func deleteSessions(at offsets: IndexSet) {
@@ -226,20 +218,26 @@ private struct SessionRowView: View {
     let session: JumpSession
 
     private var dateText: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d, yyyy"
-        return formatter.string(from: session.startedAt)
+        session.startedAt.formatted(date: .abbreviated, time: .shortened)
     }
 
     private var durationText: String {
-        let seconds = Int(session.endedAt.timeIntervalSince(session.startedAt))
-        let m = seconds / 60
-        let s = seconds % 60
-        return String(format: "%02d:%02d", m, s)
+        let duration = session.endedAt.timeIntervalSince(session.startedAt)
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = duration >= 3600 ? [.hour, .minute, .second] : [.minute, .second]
+        formatter.unitsStyle = .positional
+        formatter.zeroFormattingBehavior = [.pad]
+
+        return formatter.string(from: duration) ?? "0:00"
     }
 
     private var caloriesText: String {
-        "\(Int(session.caloriesBurned)) cal"
+        Measurement(value: session.caloriesBurned, unit: UnitEnergy.kilocalories)
+            .formatted(.measurement(width: .abbreviated, usage: .workout, numberFormatStyle: .number.precision(.fractionLength(0))))
+    }
+
+    private var showsCalories: Bool {
+        session.caloriesBurned > 0
     }
 
     var body: some View {
@@ -249,18 +247,25 @@ private struct SessionRowView: View {
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(AppColors.textPrimary)
 
-                HStack(spacing: 12) {
-                    Text("\(session.jumpCount.formatted()) jumps")
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundStyle(AppColors.accent)
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 8) {
+                        jumpsChip
+                        durationChip
+                        if showsCalories {
+                            caloriesChip
+                        }
+                    }
 
-                    Text(durationText)
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundStyle(AppColors.textSecondary)
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack(spacing: 8) {
+                            jumpsChip
+                            durationChip
+                        }
 
-                    Text(caloriesText)
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundStyle(AppColors.textSecondary)
+                        if showsCalories {
+                            caloriesChip
+                        }
+                    }
                 }
             }
 
@@ -274,6 +279,56 @@ private struct SessionRowView: View {
         .padding(.horizontal, 16)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var jumpsChip: some View {
+        metricChip(
+            systemImage: "figure.jumprope",
+            value: session.jumpCount.formatted(),
+            valueColor: AppColors.accent,
+            accessibilityLabel: String(localized: "Jumps")
+        )
+    }
+
+    private var durationChip: some View {
+        metricChip(
+            systemImage: "timer",
+            value: durationText,
+            accessibilityLabel: String(localized: "Duration")
+        )
+    }
+
+    private var caloriesChip: some View {
+        metricChip(
+            systemImage: "flame.fill",
+            value: caloriesText,
+            accessibilityLabel: String(localized: "Calories")
+        )
+    }
+
+    private func metricChip(
+        systemImage: String,
+        value: String,
+        valueColor: Color = AppColors.textSecondary,
+        accessibilityLabel: String
+    ) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: systemImage)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(AppColors.textSecondary)
+            Text(value)
+                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                .foregroundStyle(valueColor)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+//        .background(AppColors.bgPrimary.opacity(0.45))
+//        .clipShape(Capsule())
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityValue(value)
     }
 }
 

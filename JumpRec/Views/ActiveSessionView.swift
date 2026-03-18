@@ -194,20 +194,6 @@ struct ActiveSessionView: View {
 
     // MARK: - Helpers
 
-    /// Returns the short label for the currently active motion source.
-    private var sourceLabel: String {
-        switch appState.activeMotionSource {
-        case .airpods:
-            DeviceSource.airpods.shortName
-        case .iPhone:
-            DeviceSource.iPhone.shortName
-        case .watch:
-            DeviceSource.watch.shortName
-        case nil:
-            "--"
-        }
-    }
-
     /// Synchronizes the displayed hero-ring values with the latest session state.
     private func syncHeroRing(animated: Bool = true) {
         let updates = {

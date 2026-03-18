@@ -104,6 +104,7 @@ struct GoalSheetView: View {
                 Text(displayValue)
                     .font(.system(size: 32, weight: .bold, design: .monospaced))
                     .foregroundStyle(AppColors.textPrimary)
+                    .contentTransition(.numericText())
 
                 Text(unitLabel)
                     .font(.system(size: 13))
@@ -151,10 +152,12 @@ struct GoalSheetView: View {
 
     /// Increments or decrements the active goal value while respecting minimums.
     private func adjustValue(by amount: Int64) {
-        if selectedType == .count {
-            countValue = max(100, countValue + amount)
-        } else {
-            timeValue = max(1, timeValue + amount)
+        withAnimation {
+            if selectedType == .count {
+                countValue = max(100, countValue + amount)
+            } else {
+                timeValue = max(1, timeValue + amount)
+            }
         }
     }
 

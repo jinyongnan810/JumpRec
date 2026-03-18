@@ -92,7 +92,7 @@ public enum SessionAICommentGenerator {
 
     /// Returns the preferred output language based on the current locale.
     private static var preferredOutputLanguage: OutputLanguage {
-        Locale.preferredLanguages.first?.hasPrefix("ja") == true ? .japanese : .english
+        Locale.isJapanesePreferredLanguage ? .japanese : .english
     }
 
     /// Returns the system instructions used for AI comment generation.

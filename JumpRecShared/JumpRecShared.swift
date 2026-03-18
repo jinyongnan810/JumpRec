@@ -7,8 +7,15 @@
 
 import Foundation
 
+public extension Locale {
+    /// Returns whether Japanese is the preferred system language.
+    static var isJapanesePreferredLanguage: Bool {
+        preferredLanguages.first?.hasPrefix("ja") == true
+    }
+}
+
 public func localizedRateText(_ value: Int) -> String {
-    if Locale.preferredLanguages.first?.hasPrefix("ja") == true {
+    if Locale.isJapanesePreferredLanguage {
         return "\(value)/分"
     }
     return "\(value)/min"

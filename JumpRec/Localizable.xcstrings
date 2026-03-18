@@ -185,6 +185,16 @@
         }
       }
     },
+    "Calories" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カロリー"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "localizations" : {
         "ja" : {
@@ -310,6 +320,16 @@
       }
     },
     "DURATION" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時間"
+          }
+        }
+      }
+    },
+    "Duration" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -498,6 +518,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプ"
+          }
+        }
+      }
+    },
+    "Jumps" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回数"
           }
         }
       }
