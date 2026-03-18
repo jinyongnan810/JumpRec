@@ -148,7 +148,7 @@ struct ActiveSessionView: View {
             HStack(spacing: 10) {
                 StatCardView(label: leadingStatLabel, value: leadingStatValue)
                 StatCardView(label: "CALORIES", value: "\(Int(appState.caloriesBurned.rounded()))")
-                StatCardView(label: "RATE", value: localizedRateText(appState.averageRate), valueColor: AppColors.accent)
+                StatCardView(label: "RATE(AVG)", value: localizedRateText(appState.averageRate), valueColor: AppColors.accent)
             }
 
             Spacer()

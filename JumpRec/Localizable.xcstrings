@@ -706,6 +706,16 @@
         }
       }
     },
+    "RATE(AVG)" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レート(平均)"
+          }
+        }
+      }
+    },
     "Ready?" : {
       "localizations" : {
         "ja" : {

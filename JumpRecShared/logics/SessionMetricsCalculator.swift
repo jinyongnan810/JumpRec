@@ -14,7 +14,7 @@ public enum SessionMetricsCalculator {
     /// The spacing between generated chart samples in seconds.
     private static let bucketSeconds = 5
     /// The rolling window used to compute jump-rate samples.
-    private static let rollingWindowSeconds = 30
+    private static let rollingWindowSeconds = 5
     /// The minimum gap that counts as a short break.
     private static let smallBreakLowerBound: TimeInterval = 5
     /// The minimum gap that counts as a long break.
