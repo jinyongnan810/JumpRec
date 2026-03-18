@@ -7,6 +7,8 @@ import SwiftUI
 
 /// Displays the pre-session start screen and countdown flow.
 struct HomeView: View {
+    private static let goalTransitionID = "goal-settings"
+
     /// The persisted goal settings displayed on the home screen.
     @Bindable var settings: JumpRecSettings
     /// The observable app state used to display device availability.
@@ -19,6 +21,7 @@ struct HomeView: View {
     var onStart: () -> Void
     /// Controls presentation of the goal sheet.
     @State private var showGoalSheet = false
+    @Namespace private var navigationTransitionNamespace
     /// Tracks the active countdown value, or `nil` when idle.
     @State private var countdownValue: Int?
     /// Holds the asynchronous countdown task so it can be cancelled.
@@ -108,6 +111,7 @@ struct HomeView: View {
                     .padding(.vertical, 8)
                     .padding(.horizontal, 12)
             }
+            .matchedTransitionSource(id: Self.goalTransitionID, in: navigationTransitionNamespace)
             .appGlassButton(tint: AppColors.accent)
             .disabled(isCountingDown)
 
@@ -116,6 +120,7 @@ struct HomeView: View {
         .padding(.horizontal, 24)
         .sheet(isPresented: $showGoalSheet) {
             GoalSheetView(settings: settings)
+                .navigationTransition(.zoom(sourceID: Self.goalTransitionID, in: navigationTransitionNamespace))
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
                 .presentationBackground(AppColors.cardSurface)

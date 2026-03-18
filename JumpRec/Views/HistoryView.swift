@@ -13,6 +13,7 @@ struct HistoryView: View {
     @Environment(\.modelContext) private var modelContext
 
     @Namespace private var navigationTransitionNamespace
+    private static let recordsTransitionID = "records"
     @State private var displayedMonth = Date()
     @State private var showRecords = false
     @State private var selectedSession: JumpSession?
@@ -131,6 +132,7 @@ struct HistoryView: View {
                     } label: {
                         Label("Records", systemImage: "trophy.fill")
                     }
+                    .matchedTransitionSource(id: Self.recordsTransitionID, in: navigationTransitionNamespace)
                 }
                 #if DEBUG
                     ToolbarItem(placement: .topBarLeading) {
@@ -146,6 +148,7 @@ struct HistoryView: View {
         }
         .sheet(isPresented: $showRecords) {
             RecordsSheetView()
+                .navigationTransition(.zoom(sourceID: Self.recordsTransitionID, in: navigationTransitionNamespace))
                 .presentationDetents([.large, .medium])
                 .presentationDragIndicator(.visible)
                 .presentationBackground(AppColors.cardSurface)
