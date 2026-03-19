@@ -5,6 +5,16 @@
 
 import SwiftUI
 
+/// Metadata for an optional breakdown explanation popover.
+struct SessionBreakdownExplanation: Identifiable, Equatable {
+    /// Stable identifier for popover presentation.
+    let id: String
+    /// The popover title.
+    let title: LocalizedStringKey
+    /// The popover body copy.
+    let message: LocalizedStringKey
+}
+
 /// Displays a labeled value card inside session summary screens.
 struct SessionMetricCard: View {
     /// The metric label shown above the value.
@@ -41,15 +51,38 @@ struct SessionBreakdownRow<Content: View>: View {
     let label: LocalizedStringKey
     /// The trailing custom content for the row.
     @ViewBuilder let content: Content
+    /// Optional explanation displayed when the row is tapped.
+    let explanation: SessionBreakdownExplanation?
+    /// Controls local popover presentation for rows with explanations.
+    @State private var isShowingExplanation = false
+
+    /// Creates a breakdown row with a plain text label.
+    init(
+        label: LocalizedStringKey,
+        explanation: SessionBreakdownExplanation? = nil,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.label = label
+        self.explanation = explanation
+        self.content = content()
+    }
 
     // MARK: - View
 
     /// Renders the breakdown row container.
     var body: some View {
         HStack {
-            Text(label)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(AppColors.textPrimary)
+            HStack(spacing: 6) {
+                Text(label)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(AppColors.textPrimary)
+
+                if explanation != nil {
+                    Image(systemName: "info.circle.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(AppColors.textMuted)
+                }
+            }
 
             Spacer()
 
@@ -59,5 +92,27 @@ struct SessionBreakdownRow<Content: View>: View {
         .padding(.horizontal, 16)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 10))
+        .contentShape(RoundedRectangle(cornerRadius: 10))
+        .onTapGesture {
+            guard explanation != nil else { return }
+            isShowingExplanation = true
+        }
+        .popover(isPresented: $isShowingExplanation) {
+            if let explanation {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(explanation.title)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(AppColors.textPrimary)
+
+                    Text(explanation.message)
+                        .font(.system(size: 13))
+                        .foregroundStyle(AppColors.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(16)
+                .frame(maxWidth: 280, alignment: .leading)
+                .presentationCompactAdaptation(.popover)
+            }
+        }
     }
 }

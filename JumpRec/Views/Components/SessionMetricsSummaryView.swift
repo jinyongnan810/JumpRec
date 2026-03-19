@@ -77,19 +77,40 @@ struct SessionMetricsSummaryView: View {
                         .foregroundStyle(AppColors.textSecondary)
                 }
 
-                SessionBreakdownRow(label: "Longest Jump Strikes") {
+                SessionBreakdownRow(
+                    label: "Longest Jump Strikes",
+                    explanation: SessionBreakdownExplanation(
+                        id: "longest-streak",
+                        title: "Longest Streak",
+                        message: "The highest number of consecutive jumps you completed without stopping."
+                    )
+                ) {
                     Text(longestJumpStrikes)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
                         .foregroundStyle(AppColors.accent)
                 }
 
-                SessionBreakdownRow(label: "Short Breaks") {
+                SessionBreakdownRow(
+                    label: "Short Breaks",
+                    explanation: SessionBreakdownExplanation(
+                        id: "short-breaks",
+                        title: "Short Breaks",
+                        message: "The number of detected pauses longer than 5 seconds and up to 15 seconds between jumps."
+                    )
+                ) {
                     Text(shortBreaks)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
                         .foregroundStyle(AppColors.warning)
                 }
 
-                SessionBreakdownRow(label: "Long Breaks") {
+                SessionBreakdownRow(
+                    label: "Long Breaks",
+                    explanation: SessionBreakdownExplanation(
+                        id: "long-breaks",
+                        title: "Long Breaks",
+                        message: "The number of detected pauses longer than 15 seconds between jumps."
+                    )
+                ) {
                     Text(longBreaks)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
                         .foregroundStyle(AppColors.warning)

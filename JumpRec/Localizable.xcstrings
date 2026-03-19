@@ -574,6 +574,16 @@
         }
       }
     },
+    "Longest Streak" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最長ストリーク"
+          }
+        }
+      }
+    },
     "minute" : {
       "localizations" : {
         "ja" : {
@@ -937,6 +947,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開始をタップして始めましょう"
+          }
+        }
+      }
+    },
+    "The highest number of consecutive jumps you completed without stopping." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "休憩挟まず続けられた連続ジャンプの最大回数です。"
+          }
+        }
+      }
+    },
+    "The number of detected pauses longer than 5 seconds and up to 15 seconds between jumps." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5秒以上、15秒以下の休憩・中断が検出された回数です。"
+          }
+        }
+      }
+    },
+    "The number of detected pauses longer than 15 seconds between jumps." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15秒以上の休憩・中断が検出された回数です。"
           }
         }
       }
