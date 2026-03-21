@@ -35,7 +35,7 @@ struct RecordsSheetView: View {
                     achievedAt: achievedAt
                 )
             }
-            .sorted { $0.kind.sortOrder < $1.kind.sortOrder }
+            .sorted { $0.achievedAt > $1.achievedAt }
     }
 
     var body: some View {
@@ -111,7 +111,7 @@ struct RecordsSheetView: View {
             kind: .highestJumpCount,
             metricValue: 2847,
             displayValue: "2,847 jumps",
-            achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
+            achievedAt: calendar.date(byAdding: .day, value: -4, to: now)!
         )
     )
     container.mainContext.insert(
@@ -119,7 +119,7 @@ struct RecordsSheetView: View {
             kind: .longestJumpStreak,
             metricValue: 642,
             displayValue: "642 jumps",
-            achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
+            achievedAt: calendar.date(byAdding: .day, value: -1, to: now)!
         )
     )
     container.mainContext.insert(
@@ -127,7 +127,7 @@ struct RecordsSheetView: View {
             kind: .longestSession,
             metricValue: 900,
             displayValue: "15:00",
-            achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
+            achievedAt: calendar.date(byAdding: .day, value: -5, to: now)!
         )
     )
     container.mainContext.insert(
@@ -135,7 +135,7 @@ struct RecordsSheetView: View {
             kind: .mostCalories,
             metricValue: 384,
             displayValue: "384 cal",
-            achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
+            achievedAt: calendar.date(byAdding: .day, value: -2, to: now)!
         )
     )
     container.mainContext.insert(
@@ -221,7 +221,14 @@ private struct RecordCardView: View {
         case .longestSession:
             return formattedDuration(seconds: Int(record.metricValue.rounded()))
         case .mostCalories:
-            return "\(Int(record.metricValue.rounded())) \(String(localized: "cal"))"
+            return Measurement(value: record.metricValue, unit: UnitEnergy.kilocalories)
+                .formatted(
+                    .measurement(
+                        width: .abbreviated,
+                        usage: .workout,
+                        numberFormatStyle: .number.precision(.fractionLength(0))
+                    )
+                )
         case .bestJumpRate:
             return localizedRateText(Int(record.metricValue.rounded()))
         @unknown default:
@@ -233,24 +240,5 @@ private struct RecordCardView: View {
         let minutes = max(seconds, 0) / 60
         let remainingSeconds = max(seconds, 0) % 60
         return String(format: "%02d:%02d", minutes, remainingSeconds)
-    }
-}
-
-private extension PersonalRecordKind {
-    var sortOrder: Int {
-        switch self {
-        case .highestJumpCount:
-            0
-        case .longestJumpStreak:
-            1
-        case .longestSession:
-            2
-        case .mostCalories:
-            3
-        case .bestJumpRate:
-            4
-        @unknown default:
-            Int.max
-        }
     }
 }

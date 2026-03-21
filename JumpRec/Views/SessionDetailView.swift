@@ -32,10 +32,7 @@ struct SessionDetailView: View {
 
     /// Returns the session duration formatted as `mm:ss`.
     private var durationText: String {
-        let seconds = Int(session.endedAt.timeIntervalSince(session.startedAt))
-        let m = seconds / 60
-        let s = seconds % 60
-        return String(format: "%02d:%02d", m, s)
+        session.formattedDuration
     }
 
     /// Returns the saved rate samples sorted by elapsed time.
@@ -104,14 +101,12 @@ struct SessionDetailView: View {
 
     /// Returns the formatted peak-rate text.
     private var peakRateText: String {
-        guard let peak = session.peakRate else { return "–" }
-        return localizedRateText(Int(peak))
+        session.formattedPeakRate(placeholder: "–")
     }
 
     /// Returns the formatted average-rate text.
     private var averageRateText: String {
-        guard let average = session.averageRate else { return "–" }
-        return localizedRateText(Int(average))
+        session.formattedAverageRate(placeholder: "–")
     }
 
     // MARK: - Actions
@@ -141,23 +136,17 @@ struct SessionDetailView: View {
 
     /// Returns the formatted longest-streak text.
     private var longestJumpStrikesText: String {
-        session.longestStreak.formatted()
+        session.formattedLongestStreak
     }
 
     /// Returns the formatted average heart-rate text.
     private var averageHeartRateText: String {
-        heartRateText(session.averageHeartRate)
+        session.formattedAverageHeartRate(placeholder: "–")
     }
 
     /// Returns the formatted peak heart-rate text.
     private var peakHeartRateText: String {
-        heartRateText(session.peakHeartRate)
-    }
-
-    /// Formats an optional heart-rate value for display.
-    private func heartRateText(_ value: Int?) -> String {
-        guard let value else { return "–" }
-        return "\(value) bpm"
+        session.formattedPeakHeartRate(placeholder: "–")
     }
 }
 

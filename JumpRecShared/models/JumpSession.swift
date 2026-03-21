@@ -103,3 +103,65 @@ public final class JumpSession {
         self.aiComment = aiComment
     }
 }
+
+public extension JumpSession {
+    /// Returns the session duration formatted as `mm:ss`.
+    var formattedDuration: String {
+        let minutes = durationSeconds / 60
+        let seconds = durationSeconds % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+
+    /// Returns the formatted jump count text.
+    var formattedJumpCount: String {
+        jumpCount.formatted()
+    }
+
+    /// Returns the formatted calories text.
+    var formattedCalories: String {
+        "\(Int(caloriesBurned.rounded()))"
+    }
+
+    /// Returns the formatted average-rate text.
+    func formattedAverageRate(placeholder: String = "--") -> String {
+        guard let averageRate else { return placeholder }
+        return localizedRateText(Int(averageRate.rounded()))
+    }
+
+    /// Returns the formatted peak-rate text.
+    func formattedPeakRate(placeholder: String = "--") -> String {
+        guard let peakRate else { return placeholder }
+        return localizedRateText(Int(peakRate.rounded()))
+    }
+
+    /// Returns the formatted longest-streak text.
+    var formattedLongestStreak: String {
+        longestStreak.formatted()
+    }
+
+    /// Returns the formatted small-break count.
+    var formattedSmallBreaksCount: String {
+        smallBreaksCount.formatted()
+    }
+
+    /// Returns the formatted long-break count.
+    var formattedLongBreaksCount: String {
+        longBreaksCount.formatted()
+    }
+
+    /// Returns the formatted average heart-rate text.
+    func formattedAverageHeartRate(placeholder: String = "--") -> String {
+        formattedHeartRate(averageHeartRate, placeholder: placeholder)
+    }
+
+    /// Returns the formatted peak heart-rate text.
+    func formattedPeakHeartRate(placeholder: String = "--") -> String {
+        formattedHeartRate(peakHeartRate, placeholder: placeholder)
+    }
+
+    /// Formats an optional heart-rate value for display.
+    private func formattedHeartRate(_ value: Int?, placeholder: String) -> String {
+        guard let value else { return placeholder }
+        return "\(value) bpm"
+    }
+}

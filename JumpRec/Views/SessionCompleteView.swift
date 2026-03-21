@@ -139,9 +139,7 @@ struct SessionCompleteView: View {
     /// Returns the completed session duration text.
     private var durationText: String {
         if let completedSession {
-            let minutes = completedSession.durationSeconds / 60
-            let seconds = completedSession.durationSeconds % 60
-            return String(format: "%02d:%02d", minutes, seconds)
+            return completedSession.formattedDuration
         }
         return appState.elapsedFormatted
     }
@@ -149,7 +147,7 @@ struct SessionCompleteView: View {
     /// Returns the formatted jump-count text.
     private var jumpCountText: String {
         if let completedSession {
-            return completedSession.jumpCount.formatted()
+            return completedSession.formattedJumpCount
         }
         return appState.jumpCount.formatted()
     }
@@ -157,23 +155,23 @@ struct SessionCompleteView: View {
     /// Returns the formatted calories text.
     private var caloriesText: String {
         if let completedSession {
-            return "\(Int(completedSession.caloriesBurned.rounded()))"
+            return completedSession.formattedCalories
         }
         return "\(Int(appState.caloriesBurned.rounded()))"
     }
 
     /// Returns the formatted average-rate text.
     private var averageRateText: String {
-        if let averageRate = completedSession?.averageRate {
-            return localizedRateText(Int(averageRate.rounded()))
+        if let completedSession {
+            return completedSession.formattedAverageRate()
         }
         return localizedRateText(appState.averageRate)
     }
 
     /// Returns the formatted peak-rate text.
     private var peakRateText: String {
-        if let peakRate = completedSession?.peakRate {
-            return localizedRateText(Int(peakRate.rounded()))
+        if let completedSession {
+            return completedSession.formattedPeakRate()
         }
         if let peakRate = SessionMetricsCalculator.peakRate(from: rateSamples) {
             return localizedRateText(Int(peakRate.rounded()))
@@ -184,7 +182,7 @@ struct SessionCompleteView: View {
     /// Returns the formatted longest-streak text.
     private var longestStreakText: String {
         if let completedSession {
-            return completedSession.longestStreak.formatted()
+            return completedSession.formattedLongestStreak
         }
         return appState.breakMetrics.longestStreak.formatted()
     }
@@ -192,7 +190,7 @@ struct SessionCompleteView: View {
     /// Returns the formatted short-break count.
     private var shortBreaksText: String {
         if let completedSession {
-            return completedSession.smallBreaksCount.formatted()
+            return completedSession.formattedSmallBreaksCount
         }
         return appState.breakMetrics.small.formatted()
     }
@@ -200,19 +198,25 @@ struct SessionCompleteView: View {
     /// Returns the formatted long-break count.
     private var longBreaksText: String {
         if let completedSession {
-            return completedSession.longBreaksCount.formatted()
+            return completedSession.formattedLongBreaksCount
         }
         return appState.breakMetrics.long.formatted()
     }
 
     /// Returns the formatted average heart-rate text.
     private var averageHeartRateText: String {
-        heartRateText(completedSession?.averageHeartRate ?? appState.averageHeartRate)
+        if let completedSession {
+            return completedSession.formattedAverageHeartRate()
+        }
+        return heartRateText(appState.averageHeartRate)
     }
 
     /// Returns the formatted peak heart-rate text.
     private var peakHeartRateText: String {
-        heartRateText(completedSession?.peakHeartRate ?? appState.peakHeartRate)
+        if let completedSession {
+            return completedSession.formattedPeakHeartRate()
+        }
+        return heartRateText(appState.peakHeartRate)
     }
 
     /// Formats an optional heart-rate value for display.
@@ -223,7 +227,47 @@ struct SessionCompleteView: View {
 }
 
 #Preview {
-    SessionCompleteView(appState: JumpRecState(), onDone: {})
+    let appState = JumpRecState()
+    let start = Calendar.current.date(byAdding: .minute, value: -8, to: Date())!
+    let end = Date()
+    let session = JumpSession(
+        startedAt: start,
+        endedAt: end,
+        jumpCount: 1248,
+        peakRate: 176,
+        averageRate: 156,
+        caloriesBurned: 214,
+        smallBreaksCount: 4,
+        longBreaksCount: 1,
+        longestStreak: 286,
+        averageHeartRate: 148,
+        peakHeartRate: 176,
+        aiComment: "Strong control through the middle section. You kept a high cadence, limited long breaks, and finished with a consistent rhythm."
+    )
+
+    let sampleData: [(Int, Double)] = [
+        (0, 92), (30, 118), (60, 136), (90, 152),
+        (120, 164), (150, 171), (180, 176), (210, 168),
+        (240, 160), (270, 156), (300, 150), (330, 158),
+        (360, 154), (390, 146), (420, 138), (450, 132),
+    ]
+
+    session.rateSamples = sampleData.map { secondOffset, rate in
+        SessionRateSample(session: session, secondOffset: secondOffset, rate: rate)
+    }
+
+    appState.sessionState = .complete
+    appState.startTime = start
+    appState.endTime = end
+    appState.jumpCount = session.jumpCount
+    appState.jumps = sampleData.map { TimeInterval($0.0) }
+    appState.caloriesBurned = session.caloriesBurned
+    appState.averageHeartRate = session.averageHeartRate
+    appState.peakHeartRate = session.peakHeartRate
+    appState.completedSession = session
+    appState.motionCSVShareURL = URL(fileURLWithPath: "/tmp/jumprec-preview-motion.csv")
+
+    return SessionCompleteView(appState: appState, onDone: {})
         .background(AppColors.bgPrimary)
         .preferredColorScheme(.dark)
 }
