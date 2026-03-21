@@ -95,7 +95,6 @@ struct HomeView: View {
 
             // Hero Ring / Countdown Ring
             heroRingView
-                .animation(.spring(response: 0.45, dampingFraction: 0.85), value: isCountingDown)
 
             DeviceSelectorView(
                 activeSource: displayedMotionSource,
@@ -199,6 +198,12 @@ struct HomeView: View {
             await MainActor.run {
                 countdownValue = 3
                 countdownProgress = 1
+            }
+
+            // Let SwiftUI render the full ring once before starting the trim animation.
+            await Task.yield()
+
+            await MainActor.run {
                 withAnimation(.linear(duration: 3.0)) {
                     countdownProgress = 0
                 }
@@ -234,13 +239,16 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(
-        settings: JumpRecSettings(),
-        appState: JumpRecState(),
-        isWatchAvailable: true,
-        watchUnavailableReason: "Apple Watch is ready.",
-        onStart: {}
-    )
-    .background(AppColors.bgPrimary)
-    .preferredColorScheme(.dark)
+    NavigationStack {
+        HomeView(
+            settings: JumpRecSettings(),
+            appState: JumpRecState(),
+            isWatchAvailable: true,
+            watchUnavailableReason: "Apple Watch is ready.",
+            onStart: {}
+        )
+        .background(AppColors.bgPrimary)
+        .preferredColorScheme(.dark)
+    }
+
 }
