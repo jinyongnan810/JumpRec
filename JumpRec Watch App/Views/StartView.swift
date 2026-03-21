@@ -70,7 +70,7 @@ struct StartView: View {
                                 }
                             }
                         Circle()
-                            .trim(from: 0, to: isAnimating ? 1 : 0)
+                            .trim(from: 0, to: isAnimating ? 0 : 1)
                             .stroke(
                                 style: .init(
                                     lineWidth: 8,
