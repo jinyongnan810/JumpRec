@@ -7,7 +7,6 @@ import SwiftData
 import SwiftUI
 
 struct HistoryView: View {
-    @Query(sort: \JumpSession.startedAt, order: .reverse) var sessions: [JumpSession]
     @Query(sort: \PersonalRecord.kindRawValue) private var personalRecords: [PersonalRecord]
 
     @Environment(\.modelContext) private var modelContext
@@ -23,128 +22,59 @@ struct HistoryView: View {
 
     private var calendar: Calendar { Calendar.current }
 
-    /// Sessions that fall within the currently displayed month
-    private var sessionsInMonth: [JumpSession] {
+    private var displayedMonthRange: DateInterval? {
         let comps = calendar.dateComponents([.year, .month], from: displayedMonth)
         guard let start = calendar.date(from: comps),
-              let end = calendar.date(byAdding: .month, value: 1, to: start) else { return [] }
-        return sessions.filter { $0.startedAt >= start && $0.startedAt < end }
-    }
-
-    /// Set of day-of-month integers that have sessions
-    private var sessionDays: Set<Int> {
-        Set(sessionsInMonth.map { calendar.component(.day, from: $0.startedAt) })
-    }
-
-    /// Total jump count per day-of-month
-    private var jumpsByDay: [Int: Int] {
-        var result: [Int: Int] = [:]
-        for session in sessionsInMonth {
-            let day = calendar.component(.day, from: session.startedAt)
-            result[day, default: 0] += session.jumpCount
-        }
-        return result
-    }
-
-    /// Total jumps for the displayed month
-    private var totalJumps: Int {
-        sessionsInMonth.reduce(0) { $0 + $1.jumpCount }
-    }
-
-    /// Total time for the displayed month
-    private var totalDuration: TimeInterval {
-        sessionsInMonth.reduce(0) { total, session in
-            total + session.endedAt.timeIntervalSince(session.startedAt)
-        }
+              let end = calendar.date(byAdding: .month, value: 1, to: start) else { return nil }
+        return DateInterval(start: start, end: end)
     }
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    HistoryCalendarView(
-                        displayedMonth: displayedMonth,
-                        sessionDays: sessionDays,
-                        jumpsByDay: jumpsByDay,
-                        onPreviousMonth: {
-                            displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth) ?? displayedMonth
-                        },
-                        onNextMonth: {
-                            displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
-                        }
-                    ).listRowSeparator(.hidden)
-                }
-
-                Section {
-                    HStack(spacing: 12) {
-                        StatCardView(label: "SESSIONS", value: "\(sessionsInMonth.count)", valueColor: AppColors.accent)
-                        StatCardView(label: "JUMPS", value: formatCount(totalJumps))
-                        StatCardView(label: "TIME", value: formatDuration(totalDuration))
-                    }
-                    .listRowSeparator(.hidden)
-                }
-
-                Section {
-                    if sessionsInMonth.isEmpty {
-                        Text("No sessions in this month.")
-                            .font(.system(size: 14))
-                            .foregroundStyle(AppColors.textSecondary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.vertical, 24)
-                            .listRowInsets(EdgeInsets(top: 0, leading: 24, bottom: 0, trailing: 24))
-                            .listRowSeparator(.hidden)
-                            .listRowBackground(Color.clear)
-                    } else {
-                        ForEach(sessionsInMonth, id: \.id) { session in
-                            Button {
-                                selectedSession = session
-                            } label: {
-                                SessionRowView(session: session)
-                                    .matchedTransitionSource(id: session.id, in: navigationTransitionNamespace)
-                            }
-                            .buttonStyle(.plain)
-                            .listRowInsets(EdgeInsets(top: 4, leading: 24, bottom: 4, trailing: 24))
-                            .listRowSeparator(.hidden)
-                        }
-                        .onDelete(perform: deleteSessions)
-                    }
-                } header: {
-                    Text("SESSIONS THIS MONTH")
-                        .font(.system(size: 11, weight: .semibold))
-                        .tracking(2)
-                        .foregroundStyle(AppColors.textMuted)
-                        .textCase(nil)
-                        .padding(.horizontal, 24)
-                }
+            if let displayedMonthRange {
+                MonthSessionsList(
+                    displayedMonth: displayedMonth,
+                    monthRange: displayedMonthRange,
+                    navigationTransitionNamespace: navigationTransitionNamespace,
+                    selectedSession: $selectedSession,
+                    onPreviousMonth: {
+                        displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth) ?? displayedMonth
+                    },
+                    onNextMonth: {
+                        displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
+                    },
+                    onDeleteSessions: promptDeleteSessions
+                )
+            } else {
+                ContentUnavailableView("Unable to load this month.", systemImage: "calendar")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(AppColors.bgPrimary)
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-            .navigationDestination(item: $selectedSession) { session in
-                SessionDetailView(session: session)
-                    .navigationTransition(.zoom(sourceID: session.id, in: navigationTransitionNamespace))
+        }
+        .navigationDestination(item: $selectedSession) { session in
+            SessionDetailView(session: session)
+                .navigationTransition(.zoom(sourceID: session.id, in: navigationTransitionNamespace))
+        }
+        .navigationTitle("History")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showRecords = true
+                } label: {
+                    Label("Records", systemImage: "trophy.fill")
+                }
+                .matchedTransitionSource(id: Self.recordsTransitionID, in: navigationTransitionNamespace)
             }
-            .navigationTitle("History")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showRecords = true
+            #if DEBUG
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(role: .destructive) {
+                        promptDeleteAllSessions()
                     } label: {
-                        Label("Records", systemImage: "trophy.fill")
+                        Label("Delete All", systemImage: "trash")
                     }
-                    .matchedTransitionSource(id: Self.recordsTransitionID, in: navigationTransitionNamespace)
                 }
-                #if DEBUG
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button(role: .destructive) {
-                            promptDeleteAllSessions()
-                        } label: {
-                            Label("Delete All", systemImage: "trash")
-                        }
-                        .disabled(sessions.isEmpty)
-                    }
-                #endif
-            }
+            #endif
         }
         .sheet(isPresented: $showRecords) {
             RecordsSheetView()
@@ -160,28 +90,9 @@ struct HistoryView: View {
         )
     }
 
-    private func formatCount(_ value: Int) -> String {
-        if value >= 10000 {
-            let k = Double(value) / 1000.0
-            return String(format: "%.1fK", k)
-        }
-        return value.formatted()
-    }
-
-    // ⭐️ Format localize string with unit
-    private func formatDuration(_ duration: TimeInterval) -> String {
-        let totalSeconds = Int(duration)
-        let hours = totalSeconds / 3600
-        let allowedUnits: Set<Duration.UnitsFormatStyle.Unit> = hours > 0 ? [.hours, .minutes] : [.minutes]
-
-        return Duration.seconds(duration).formatted(
-            .units(allowed: allowedUnits, width: .abbreviated)
-        )
-    }
-
-    private func deleteSessions(at offsets: IndexSet) {
+    private func promptDeleteSessions(_ sessions: [JumpSession]) {
         isDeletingAllSessions = false
-        sessionsPendingDeletion = offsets.map { sessionsInMonth[$0] }
+        sessionsPendingDeletion = sessions
         showingDeleteConfirmation = !sessionsPendingDeletion.isEmpty
     }
 
@@ -208,10 +119,160 @@ struct HistoryView: View {
     }
 
     private func promptDeleteAllSessions() {
-        guard !sessions.isEmpty else { return }
+        let descriptor = FetchDescriptor<JumpSession>()
+
+        guard let sessions = try? modelContext.fetch(descriptor), !sessions.isEmpty else { return }
         isDeletingAllSessions = true
         sessionsPendingDeletion = sessions
         showingDeleteConfirmation = true
+    }
+}
+
+private struct MonthSessionsList: View {
+    @Query private var sessions: [JumpSession]
+
+    let displayedMonth: Date
+    let monthRange: DateInterval
+    let navigationTransitionNamespace: Namespace.ID
+    @Binding var selectedSession: JumpSession?
+    let onPreviousMonth: () -> Void
+    let onNextMonth: () -> Void
+    let onDeleteSessions: ([JumpSession]) -> Void
+
+    private var calendar: Calendar { Calendar.current }
+
+    init(
+        displayedMonth: Date,
+        monthRange: DateInterval,
+        navigationTransitionNamespace: Namespace.ID,
+        selectedSession: Binding<JumpSession?>,
+        onPreviousMonth: @escaping () -> Void,
+        onNextMonth: @escaping () -> Void,
+        onDeleteSessions: @escaping ([JumpSession]) -> Void
+    ) {
+        self.displayedMonth = displayedMonth
+        self.monthRange = monthRange
+        self.navigationTransitionNamespace = navigationTransitionNamespace
+        _selectedSession = selectedSession
+        self.onPreviousMonth = onPreviousMonth
+        self.onNextMonth = onNextMonth
+        self.onDeleteSessions = onDeleteSessions
+
+        let start = monthRange.start
+        let end = monthRange.end
+        let predicate = #Predicate<JumpSession> { session in
+            session.startedAt >= start && session.startedAt < end
+        }
+        _sessions = Query(filter: predicate, sort: \JumpSession.startedAt, order: .reverse)
+    }
+
+    /// Set of day-of-month integers that have sessions
+    private var sessionDays: Set<Int> {
+        Set(sessions.map { calendar.component(.day, from: $0.startedAt) })
+    }
+
+    /// Total jump count per day-of-month
+    private var jumpsByDay: [Int: Int] {
+        var result: [Int: Int] = [:]
+        for session in sessions {
+            let day = calendar.component(.day, from: session.startedAt)
+            result[day, default: 0] += session.jumpCount
+        }
+        return result
+    }
+
+    /// Total jumps for the displayed month
+    private var totalJumps: Int {
+        sessions.reduce(0) { $0 + $1.jumpCount }
+    }
+
+    /// Total time for the displayed month
+    private var totalDuration: TimeInterval {
+        sessions.reduce(0) { total, session in
+            total + session.endedAt.timeIntervalSince(session.startedAt)
+        }
+    }
+
+    var body: some View {
+        List {
+            Section {
+                HistoryCalendarView(
+                    displayedMonth: displayedMonth,
+                    sessionDays: sessionDays,
+                    jumpsByDay: jumpsByDay,
+                    onPreviousMonth: onPreviousMonth,
+                    onNextMonth: onNextMonth
+                )
+                .listRowSeparator(.hidden)
+            }
+
+            Section {
+                HStack(spacing: 12) {
+                    StatCardView(label: "SESSIONS", value: "\(sessions.count)", valueColor: AppColors.accent)
+                    StatCardView(label: "JUMPS", value: formatCount(totalJumps))
+                    StatCardView(label: "TIME", value: formatDuration(totalDuration))
+                }
+                .listRowSeparator(.hidden)
+            }
+
+            Section {
+                if sessions.isEmpty {
+                    Text("No sessions in this month.")
+                        .font(.system(size: 14))
+                        .foregroundStyle(AppColors.textSecondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 24)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 24, bottom: 0, trailing: 24))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                } else {
+                    ForEach(sessions, id: \.id) { session in
+                        Button {
+                            selectedSession = session
+                        } label: {
+                            SessionRowView(session: session)
+                                .matchedTransitionSource(id: session.id, in: navigationTransitionNamespace)
+                        }
+                        .buttonStyle(.plain)
+                        .listRowInsets(EdgeInsets(top: 4, leading: 24, bottom: 4, trailing: 24))
+                        .listRowSeparator(.hidden)
+                    }
+                    .onDelete(perform: deleteSessions)
+                }
+            } header: {
+                Text("SESSIONS THIS MONTH")
+                    .font(.system(size: 11, weight: .semibold))
+                    .tracking(2)
+                    .foregroundStyle(AppColors.textMuted)
+                    .textCase(nil)
+                    .padding(.horizontal, 24)
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+    }
+
+    private func deleteSessions(at offsets: IndexSet) {
+        onDeleteSessions(offsets.map { sessions[$0] })
+    }
+
+    private func formatCount(_ value: Int) -> String {
+        if value >= 10000 {
+            let k = Double(value) / 1000.0
+            return String(format: "%.1fK", k)
+        }
+        return value.formatted()
+    }
+
+    // ⭐️ Format localize string with unit
+    private func formatDuration(_ duration: TimeInterval) -> String {
+        let totalSeconds = Int(duration)
+        let hours = totalSeconds / 3600
+        let allowedUnits: Set<Duration.UnitsFormatStyle.Unit> = hours > 0 ? [.hours, .minutes] : [.minutes]
+
+        return Duration.seconds(duration).formatted(
+            .units(allowed: allowedUnits, width: .abbreviated)
+        )
     }
 }
 
