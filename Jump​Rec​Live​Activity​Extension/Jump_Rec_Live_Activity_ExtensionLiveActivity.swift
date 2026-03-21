@@ -24,8 +24,8 @@ struct JumpRecLiveActivityWidget: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: JumpRecLiveActivityAttributes.self) { context in
             JumpRecLiveActivityView(context: context)
-                .activityBackgroundTint(Color.black.opacity(0.18))
-                .activitySystemActionForegroundColor(.white)
+                .activityBackgroundTint(AppColors.bgPrimary.opacity(0.92))
+                .activitySystemActionForegroundColor(AppColors.textPrimary)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
@@ -65,12 +65,16 @@ struct JumpRecLiveActivityWidget: Widget {
             } compactLeading: {
                 Text("\(context.state.jumpCount)")
                     .font(.headline)
+                    .foregroundStyle(AppColors.textPrimary)
             } compactTrailing: {
                 Image(systemName: iconName(for: context.state.sourceLabel))
                     .font(.headline)
+                    .foregroundStyle(AppColors.accent)
             } minimal: {
                 Image(systemName: iconName(for: context.state.sourceLabel))
+                    .foregroundStyle(AppColors.accent)
             }
+            .keylineTint(AppColors.accent)
         }
     }
 
@@ -78,10 +82,10 @@ struct JumpRecLiveActivityWidget: Widget {
         VStack(alignment: .leading, spacing: 4) {
             Text(title.uppercased())
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
             Text(value)
                 .font(.headline)
-                .foregroundStyle(.primary)
+                .foregroundStyle(AppColors.textPrimary)
         }
     }
 
@@ -118,9 +122,10 @@ private struct JumpRecLiveActivityView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("JumpRec")
                         .font(.headline)
+                        .foregroundStyle(AppColors.textPrimary)
                     Text(context.attributes.goalSummary)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppColors.textSecondary)
                 }
 
                 Spacer()
@@ -128,6 +133,7 @@ private struct JumpRecLiveActivityView: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     Label(localizedSourceLabel(for: context.state.sourceLabel), systemImage: iconName)
                         .font(.caption.weight(.semibold))
+                        .foregroundStyle(AppColors.accent)
                     durationView
                 }
             }
@@ -138,8 +144,9 @@ private struct JumpRecLiveActivityView: View {
                 statCard(title: String(localized: "Rate"), value: localizedRateText(context.state.averageRate))
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 12)
         .padding(.horizontal, 16)
+        .foregroundStyle(AppColors.textPrimary)
     }
 
     @ViewBuilder
@@ -148,9 +155,11 @@ private struct JumpRecLiveActivityView: View {
             let interval = Int(endedAt.timeIntervalSince(context.attributes.startedAt))
             Text(String(format: "%02d:%02d", interval / 60, interval % 60))
                 .font(.title3.monospacedDigit())
+                .foregroundStyle(AppColors.textPrimary)
         } else {
             Text(context.attributes.startedAt, style: .timer)
                 .font(.title3.monospacedDigit())
+                .foregroundStyle(AppColors.textPrimary)
         }
     }
 
@@ -169,12 +178,13 @@ private struct JumpRecLiveActivityView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title.uppercased())
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.textSecondary)
             Text(value)
                 .font(.headline)
+                .foregroundStyle(AppColors.textPrimary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(10)
-        .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+        .background(AppColors.cardSurface.opacity(0.75), in: RoundedRectangle(cornerRadius: 12))
     }
 }
