@@ -29,7 +29,7 @@ struct JumpRecTests {
 
         #expect(samples.count == 12)
         #expect(samples.map(\.secondOffset) == Array(stride(from: 5, through: 60, by: 5)))
-        #expect(samples.map { "\($0.rate)" } == ["144.0", "150.0", "148.0", "150.0", "148.8", "150.0", "150.0", "150.0", "150.0", "150.0", "150.0", "150.0"])
+        #expect(samples.map { "\($0.rate)" } == ["144.0", "156.0", "144.0", "156.0", "144.0", "156.0", "144.0", "156.0", "144.0", "156.0", "144.0", "156.0"])
     }
 
     @Test func testIPhoneProfileCountsOnlyPositiveYAboveThreshold() async throws {
