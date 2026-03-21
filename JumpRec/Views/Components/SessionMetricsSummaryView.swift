@@ -30,6 +30,13 @@ struct SessionMetricsSummaryView: View {
     /// The rate samples plotted in the chart.
     let rateSamples: [SessionRateSample]
 
+    /// Explains why heart-rate data can be unavailable for some sessions.
+    private let heartRateExplanation = SessionBreakdownExplanation(
+        id: "heart-rate-availability",
+        title: "Heart Rate Availability",
+        message: "Heart rate is only available when your session is recorded with Apple Watch or supported headphones that provide heart-rate data."
+    )
+
     // MARK: - View
 
     /// Renders the stats grid, rate chart, and breakdown rows.
@@ -116,13 +123,19 @@ struct SessionMetricsSummaryView: View {
                         .foregroundStyle(AppColors.warning)
                 }
 
-                SessionBreakdownRow(label: "Average Heart Rate") {
+                SessionBreakdownRow(
+                    label: "Average Heart Rate",
+                    explanation: heartRateExplanation
+                ) {
                     Text(averageHeartRate)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
                         .foregroundStyle(AppColors.heartRate)
                 }
 
-                SessionBreakdownRow(label: "Peak Heart Rate") {
+                SessionBreakdownRow(
+                    label: "Peak Heart Rate",
+                    explanation: heartRateExplanation
+                ) {
                     Text(peakHeartRate)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
                         .foregroundStyle(AppColors.heartRate)

@@ -144,6 +144,26 @@
         }
       }
     },
+    "Heart Rate Availability" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心拍数の利用条件"
+          }
+        }
+      }
+    },
+    "Heart rate is only available when your session is recorded with Apple Watch or supported headphones that provide heart-rate data." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心拍数は、Apple Watch または心拍データに対応したヘッドホンで記録したセッションでのみ利用できます。"
+          }
+        }
+      }
+    },
     "AVG RATE" : {
       "localizations" : {
         "ja" : {
