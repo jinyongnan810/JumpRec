@@ -39,34 +39,36 @@ struct RecordsSheetView: View {
     }
 
     var body: some View {
-        VStack(spacing: 20) {
-            // Title
-            Text("Personal Records")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(AppColors.textPrimary)
+        ScrollView {
+            VStack(spacing: 20) {
+                // Title
+                Text("Personal Records")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(AppColors.textPrimary)
 
-            // Records list
-            if displayRecords.isEmpty {
-                VStack(spacing: 8) {
-                    Spacer()
-                    Text("No records yet")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(AppColors.textSecondary)
-                    Text("Complete sessions to set personal records!")
-                        .font(.system(size: 13))
-                        .foregroundStyle(AppColors.textMuted)
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-            } else {
-                VStack(spacing: 10) {
-                    ForEach(displayRecords) { record in
-                        RecordCardView(record: record)
+                // Records list
+                if displayRecords.isEmpty {
+                    VStack(spacing: 8) {
+                        Spacer()
+                        Text("No records yet")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(AppColors.textSecondary)
+                        Text("Complete sessions to set personal records!")
+                            .font(.system(size: 13))
+                            .foregroundStyle(AppColors.textMuted)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity)
+                } else {
+                    VStack(spacing: 10) {
+                        ForEach(displayRecords) { record in
+                            RecordCardView(record: record)
+                        }
                     }
                 }
-            }
 
-            Spacer()
+                Spacer()
+            }
         }
         .padding(.top, 16)
         .padding(.horizontal, 24)

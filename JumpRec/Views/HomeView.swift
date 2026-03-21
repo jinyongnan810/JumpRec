@@ -250,5 +250,4 @@ struct HomeView: View {
         .background(AppColors.bgPrimary)
         .preferredColorScheme(.dark)
     }
-
 }

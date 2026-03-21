@@ -6,9 +6,9 @@
 import Foundation
 import SwiftData
 
-extension MyDataStore {
+public extension MyDataStore {
     /// Inserts a session and any derived rate samples into the model context.
-    public func addSession(session: JumpSession, rateSamples: [SessionRateSample] = []) {
+    func addSession(session: JumpSession, rateSamples: [SessionRateSample] = []) {
         modelContext.insert(session)
         attach(rateSamples, to: session)
         upsertPersonalRecords(for: session)
@@ -21,7 +21,7 @@ extension MyDataStore {
 
     /// Creates a finalized session record and persists it with normalized rate samples.
     @discardableResult
-    public func saveCompletedSession(
+    func saveCompletedSession(
         startedAt: Date,
         endedAt: Date,
         jumpCount: Int,
@@ -65,7 +65,7 @@ extension MyDataStore {
     }
 
     @discardableResult
-    public func generateAICommentIfNeeded(for session: JumpSession) async -> String? {
+    func generateAICommentIfNeeded(for session: JumpSession) async -> String? {
         await SessionAICommentGenerator.generateIfNeeded(for: session, in: modelContext)
     }
 
