@@ -31,63 +31,65 @@ struct HistoryView: View {
 
     var body: some View {
         NavigationStack {
-            if let displayedMonthRange {
-                MonthSessionsList(
-                    displayedMonth: displayedMonth,
-                    monthRange: displayedMonthRange,
-                    navigationTransitionNamespace: navigationTransitionNamespace,
-                    selectedSession: $selectedSession,
-                    onPreviousMonth: {
-                        displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth) ?? displayedMonth
-                    },
-                    onNextMonth: {
-                        displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
-                    },
-                    onDeleteSessions: promptDeleteSessions
-                )
-            } else {
-                ContentUnavailableView("Unable to load this month.", systemImage: "calendar")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(AppColors.bgPrimary)
-            }
-        }
-        .navigationDestination(item: $selectedSession) { session in
-            SessionDetailView(session: session)
-                .navigationTransition(.zoom(sourceID: session.id, in: navigationTransitionNamespace))
-        }
-        .navigationTitle("History")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showRecords = true
-                } label: {
-                    Label("Records", systemImage: "trophy.fill")
+            Group {
+                if let displayedMonthRange {
+                    MonthSessionsList(
+                        displayedMonth: displayedMonth,
+                        monthRange: displayedMonthRange,
+                        navigationTransitionNamespace: navigationTransitionNamespace,
+                        selectedSession: $selectedSession,
+                        onPreviousMonth: {
+                            displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth) ?? displayedMonth
+                        },
+                        onNextMonth: {
+                            displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
+                        },
+                        onDeleteSessions: promptDeleteSessions
+                    )
+                } else {
+                    ContentUnavailableView("Unable to load this month.", systemImage: "calendar")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(AppColors.bgPrimary)
                 }
-                .matchedTransitionSource(id: Self.recordsTransitionID, in: navigationTransitionNamespace)
             }
-            #if DEBUG
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(role: .destructive) {
-                        promptDeleteAllSessions()
+            .navigationDestination(item: $selectedSession) { session in
+                SessionDetailView(session: session)
+                    .navigationTransition(.zoom(sourceID: session.id, in: navigationTransitionNamespace))
+            }
+            .navigationTitle("History")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showRecords = true
                     } label: {
-                        Label("Delete All", systemImage: "trash")
+                        Label("Records", systemImage: "trophy.fill")
                     }
+                    .matchedTransitionSource(id: Self.recordsTransitionID, in: navigationTransitionNamespace)
                 }
-            #endif
+                #if DEBUG
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button(role: .destructive) {
+                            promptDeleteAllSessions()
+                        } label: {
+                            Label("Delete All", systemImage: "trash")
+                        }
+                    }
+                #endif
+            }
+            .sheet(isPresented: $showRecords) {
+                RecordsSheetView()
+                    .navigationTransition(.zoom(sourceID: Self.recordsTransitionID, in: navigationTransitionNamespace))
+                    .presentationDetents([.large, .medium])
+                    .presentationDragIndicator(.visible)
+                    .presentationBackground(AppColors.cardSurface)
+            }
+            .deleteSessionAlert(
+                isPresented: $showingDeleteConfirmation,
+                sessionCount: sessionsPendingDeletion.count,
+                onDelete: confirmDeleteSessions
+            )
         }
-        .sheet(isPresented: $showRecords) {
-            RecordsSheetView()
-                .navigationTransition(.zoom(sourceID: Self.recordsTransitionID, in: navigationTransitionNamespace))
-                .presentationDetents([.large, .medium])
-                .presentationDragIndicator(.visible)
-                .presentationBackground(AppColors.cardSurface)
-        }
-        .deleteSessionAlert(
-            isPresented: $showingDeleteConfirmation,
-            sessionCount: sessionsPendingDeletion.count,
-            onDelete: confirmDeleteSessions
-        )
     }
 
     private func promptDeleteSessions(_ sessions: [JumpSession]) {
