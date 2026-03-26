@@ -168,5 +168,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .modelContainer(MyDataStore.shared.modelContainer)
         .environment(MyDataStore.shared)
 }

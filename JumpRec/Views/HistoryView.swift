@@ -405,6 +405,7 @@ private struct SessionRowView: View {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(
         for: JumpSession.self,
+        PersonalRecord.self,
         SessionRateSample.self,
         configurations: config
     )

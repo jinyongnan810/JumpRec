@@ -64,5 +64,6 @@ struct MainView: View {
 #Preview {
     MainView()
         .environment(JumpRecSettings())
+        .modelContainer(MyDataStore.shared.modelContainer)
         .environment(MyDataStore.shared)
 }
