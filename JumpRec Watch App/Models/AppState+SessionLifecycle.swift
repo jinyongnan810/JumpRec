@@ -123,18 +123,38 @@ extension JumpRecState {
     /// Starts the timer used for minute-based announcements.
     func startMinuteTimer() {
         invalidateMinuteTimer()
-        minuteTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated {
-                self?.handleMinuteLandmark()
+        guard let startTime else { return }
+
+        // Use a task rather than a run-loop timer so minute announcements continue to be scheduled
+        // from the workout session's async lifecycle instead of depending on the visible watch UI.
+        minuteLandmarkTask = Task { [weak self, startTime] in
+            guard let self else { return }
+
+            while !Task.isCancelled {
+                let elapsedSeconds = max(0, Int(Date().timeIntervalSince(startTime)))
+                let nextMinuteBoundary = ((elapsedSeconds / 60) + 1) * 60
+                let secondsUntilBoundary = max(1, nextMinuteBoundary - elapsedSeconds)
+
+                do {
+                    try await Task.sleep(for: .seconds(secondsUntilBoundary))
+                } catch is CancellationError {
+                    return
+                } catch {
+                    // Sleep should only fail on cancellation. Treat any other failure as a stop signal
+                    // so the workout does not keep an orphaned landmark scheduler alive.
+                    return
+                }
+
+                guard !Task.isCancelled else { return }
+                handleMinuteLandmark()
             }
         }
-        RunLoop.current.add(minuteTimer!, forMode: .common)
     }
 
     /// Invalidates the active minute timer.
     func invalidateMinuteTimer() {
-        minuteTimer?.invalidate()
-        minuteTimer = nil
+        minuteLandmarkTask?.cancel()
+        minuteLandmarkTask = nil
     }
 
     /// Announces elapsed minutes and ends the session when the time goal is met.

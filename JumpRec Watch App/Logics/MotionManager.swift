@@ -20,7 +20,7 @@ class MotionManager: NSObject {
     var jumpCount = 0
 
     /// Delivers accepted jumps back to app state.
-    var addJump: (Int) -> Void
+    var addJump: @MainActor (Int) -> Void
 
     // MARK: - Motion Components
 
@@ -46,7 +46,11 @@ class MotionManager: NSObject {
     // MARK: - Initialization
 
     /// Configures the watch motion manager and workout callbacks.
-    init(addJump: @escaping (Int) -> Void, updateHeartRate: @escaping (Int) -> Void, updateEnergyBurned: @escaping (Double) -> Void) {
+    init(
+        addJump: @escaping @MainActor (Int) -> Void,
+        updateHeartRate: @escaping @MainActor (Int) -> Void,
+        updateEnergyBurned: @escaping @MainActor (Double) -> Void
+    ) {
         self.addJump = addJump
         workoutManager = WorkoutManager(updateHeartRate: updateHeartRate, updateEnergyBurned: updateEnergyBurned)
         super.init()
@@ -134,7 +138,9 @@ class MotionManager: NSObject {
 
         // The detector returns a boolean event instead of a score so the watch UI can stay simple and update live.
         if jumpDetector.processMotionSample(sample) {
-            addJump(1)
+            Task { @MainActor [addJump] in
+                addJump(1)
+            }
         }
     }
 }

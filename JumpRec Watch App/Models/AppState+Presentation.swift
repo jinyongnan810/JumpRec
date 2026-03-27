@@ -31,10 +31,24 @@ extension JumpRecState {
 
     /// Speaks a localized prompt after an optional delay.
     func speak(text: String, delay: Double = 0.5) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            if delay > 0 {
+                do {
+                    try await Task.sleep(for: .seconds(delay))
+                } catch is CancellationError {
+                    return
+                } catch {
+                    // The watch only delays speech for pacing. If the sleep unexpectedly fails,
+                    // skip the utterance instead of speaking at an unintended time.
+                    return
+                }
+            }
+
             let utterance = AVSpeechUtterance(string: text)
-            utterance.voice = AVSpeechSynthesisVoice(language: self.preferredSpeechLanguageCode)
-            self.synthesizer.speak(utterance)
+            utterance.voice = AVSpeechSynthesisVoice(language: preferredSpeechLanguageCode)
+            synthesizer.speak(utterance)
         }
     }
 

@@ -72,9 +72,11 @@ class JumpRecState {
     /// Detects watch motion and jump events.
     @ObservationIgnored
     var motionManager: MotionManager?
-    /// Announces minute milestones during time-based sessions.
+    /// Owns the asynchronous minute-landmark scheduler for time-based sessions.
+    /// A task is more resilient than a run-loop timer when the watch UI dims or temporarily leaves
+    /// the foreground during an active workout.
     @ObservationIgnored
-    var minuteTimer: Timer?
+    var minuteLandmarkTask: Task<Void, Never>?
 
     // MARK: - Initialization
 

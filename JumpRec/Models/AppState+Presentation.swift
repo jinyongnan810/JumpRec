@@ -12,39 +12,63 @@ extension JumpRecState {
 
     /// Starts, updates, or ends the live activity to match session state.
     func syncLiveActivity() {
+        // Cancel the previous request before issuing a new one so rapid state changes do not let an
+        // older async update recreate or overwrite the activity after the session has already moved on.
+        liveActivityTask?.cancel()
+
         if sessionState == .idle {
-            Task {
+            liveActivityTask = Task { [weak self] in
+                guard let self else { return }
                 await liveActivityManager.endIfNeeded()
+                guard !Task.isCancelled else { return }
+                liveActivityTask = nil
             }
             return
         }
 
         if sessionState == .complete {
             guard let endedAt = endTime else { return }
-            Task {
+            let startedAt = startTime
+            let goalSummary = liveActivityGoalSummary
+            let jumpCount = jumpCount
+            let caloriesBurned = caloriesBurned
+            let averageRate = averageRate
+            let sourceLabel = liveActivitySourceLabel
+            liveActivityTask = Task { [weak self] in
+                guard let self else { return }
                 await liveActivityManager.end(
-                    startedAt: startTime,
-                    goalSummary: liveActivityGoalSummary,
+                    startedAt: startedAt,
+                    goalSummary: goalSummary,
                     jumpCount: jumpCount,
                     caloriesBurned: caloriesBurned,
                     averageRate: averageRate,
-                    sourceLabel: liveActivitySourceLabel,
+                    sourceLabel: sourceLabel,
                     endedAt: endedAt
                 )
+                guard !Task.isCancelled else { return }
+                liveActivityTask = nil
             }
             return
         }
 
         guard let startTime else { return }
-        Task {
+        let goalSummary = liveActivityGoalSummary
+        let jumpCount = jumpCount
+        let caloriesBurned = caloriesBurned
+        let averageRate = averageRate
+        let sourceLabel = liveActivitySourceLabel
+        liveActivityTask = Task { [weak self] in
+            guard let self else { return }
             await liveActivityManager.startOrUpdate(
                 startedAt: startTime,
-                goalSummary: liveActivityGoalSummary,
+                goalSummary: goalSummary,
                 jumpCount: jumpCount,
                 caloriesBurned: caloriesBurned,
                 averageRate: averageRate,
-                sourceLabel: liveActivitySourceLabel
+                sourceLabel: sourceLabel
             )
+            guard !Task.isCancelled else { return }
+            liveActivityTask = nil
         }
     }
 
@@ -100,9 +124,10 @@ extension JumpRecState {
 
         let csvText = makeMotionCSV(from: samples)
         let filename = makeMotionCSVFilename(startedAt: startedAt, endedAt: endedAt)
-        motionCSVShareURL = ConnectivityManager.shared.saveCSVToLocalDocuments(csvText: csvText, filename: filename)
+        let connectivityManager = ConnectivityManager.shared
+        motionCSVShareURL = connectivityManager.saveCSVToLocalDocuments(csvText: csvText, filename: filename)
         DispatchQueue.global(qos: .utility).async {
-            ConnectivityManager.shared.saveCSVtoICloud(csvText: csvText, filename: filename)
+            connectivityManager.saveCSVtoICloud(csvText: csvText, filename: filename)
         }
     }
 

@@ -224,7 +224,11 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     ///   - csvText: The CSV content as string
     ///   - filename: The filename for the CSV file
     ///   - containerId: The iCloud container identifier (default: "iCloud.com.kinn.JumpRec")
-    func saveCSVtoICloud(csvText: String, filename: String, containerId: String = "iCloud.com.kinn.JumpRec") {
+    nonisolated func saveCSVtoICloud(
+        csvText: String,
+        filename: String,
+        containerId: String = "iCloud.com.kinn.JumpRec"
+    ) {
         // Check ubiquityIdentityToken, retry if needed
         var ubiquityToken = FileManager.default.ubiquityIdentityToken
         var containerURL: URL? = nil
@@ -278,7 +282,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     ///   - csvText: The CSV content as string
     ///   - filename: The filename for the CSV file
     @discardableResult
-    func saveCSVToLocalDocuments(csvText: String, filename: String) -> URL? {
+    nonisolated func saveCSVToLocalDocuments(csvText: String, filename: String) -> URL? {
         do {
             let documentsURL = try FileManager.default.url(
                 for: .documentDirectory,

@@ -9,12 +9,12 @@ import Foundation
 
 public extension Locale {
     /// Returns whether Japanese is the preferred system language.
-    static var isJapanesePreferredLanguage: Bool {
+    nonisolated static var isJapanesePreferredLanguage: Bool {
         preferredLanguages.first?.hasPrefix("ja") == true
     }
 }
 
-public func localizedRateText(_ value: Int) -> String {
+public nonisolated func localizedRateText(_ value: Int) -> String {
     if Locale.isJapanesePreferredLanguage {
         return "\(value)/分"
     }
