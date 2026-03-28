@@ -27,7 +27,6 @@ public let DefaultJumpTime: Int64 = 10
 
 /// Stores and synchronizes user-selected workout settings across devices.
 @Observable
-@MainActor
 public class JumpRecSettings {
     // MARK: - Dependencies
 
@@ -36,12 +35,6 @@ public class JumpRecSettings {
     /// Prevents save loops while values are being reloaded from storage.
     @ObservationIgnored
     private var isLoadingFromStore = false
-    /// Keeps the external iCloud settings observer alive for as long as this settings object exists.
-    @ObservationIgnored
-    private var externalSettingsObservationTask: Task<Void, Never>?
-    /// Keeps the in-app settings refresh observer alive for as long as this settings object exists.
-    @ObservationIgnored
-    private var inAppSettingsObservationTask: Task<Void, Never>?
 
     // MARK: - Persisted Settings
 
@@ -91,12 +84,22 @@ public class JumpRecSettings {
         jumpCount = DefaultJumpCount
         jumpTime = DefaultJumpTime
         loadSettings()
-        startObservingSettingsChanges()
-    }
 
-    deinit {
-        externalSettingsObservationTask?.cancel()
-        inAppSettingsObservationTask?.cancel()
+        NotificationCenter.default.addObserver(
+            forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
+            object: store,
+            queue: .main
+        ) { [weak self] _ in
+            self?.loadSettings()
+        }
+
+        NotificationCenter.default.addObserver(
+            forName: .jumpRecSettingsDidUpdate,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.loadSettings()
+        }
     }
 
     // MARK: - Loading
@@ -117,33 +120,5 @@ public class JumpRecSettings {
         jumpCount = storedJumpCount == 0 ? DefaultJumpCount : storedJumpCount
         jumpTime = storedJumpTime == 0 ? DefaultJumpTime : storedJumpTime
         isLoadingFromStore = false
-    }
-
-    // MARK: - Observation
-
-    /// Starts async notification observers so settings refreshes stay on the main actor without
-    /// capturing this observable object inside Foundation's sendable callback closures.
-    private func startObservingSettingsChanges() {
-        externalSettingsObservationTask = Task { @MainActor [weak self] in
-            guard let self else { return }
-
-            for await _ in NotificationCenter.default.notifications(
-                named: NSUbiquitousKeyValueStore.didChangeExternallyNotification
-            ) {
-                guard !Task.isCancelled else { return }
-                loadSettings()
-            }
-        }
-
-        inAppSettingsObservationTask = Task { @MainActor [weak self] in
-            guard let self else { return }
-
-            for await _ in NotificationCenter.default.notifications(
-                named: .jumpRecSettingsDidUpdate
-            ) {
-                guard !Task.isCancelled else { return }
-                loadSettings()
-            }
-        }
     }
 }

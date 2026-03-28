@@ -9,14 +9,13 @@ import Foundation
 import HealthKit
 
 /// Manages HealthKit workout sessions, heart rate, and energy burned tracking.
-@MainActor
 class WorkoutManager: NSObject {
     // MARK: - Callbacks
 
     /// Delivers heart-rate updates back to app state.
-    var updateHeartRate: @MainActor (Int) -> Void
+    var updateHeartRate: (Int) -> Void
     /// Delivers energy-burned updates back to app state.
-    var updateEnergyBurned: @MainActor (Double) -> Void
+    var updateEnergyBurned: (Double) -> Void
 
     // MARK: - HealthKit State
 
@@ -44,10 +43,7 @@ class WorkoutManager: NSObject {
     // MARK: - Initialization
 
     /// Requests authorization and stores callbacks for workout metrics.
-    init(
-        updateHeartRate: @escaping @MainActor (Int) -> Void,
-        updateEnergyBurned: @escaping @MainActor (Double) -> Void
-    ) {
+    init(updateHeartRate: @escaping (Int) -> Void, updateEnergyBurned: @escaping (Double) -> Void) {
         self.updateHeartRate = updateHeartRate
         self.updateEnergyBurned = updateEnergyBurned
         super.init()
@@ -96,18 +92,15 @@ class WorkoutManager: NSObject {
             builder?.delegate = self
 
             session?.startActivity(with: startDate)
-            builder?.beginCollection(withStart: startDate) { [weak self] success, error in
+            builder?.beginCollection(withStart: startDate) { success, error in
                 print("Collecting health data started: \(success)")
                 if let error {
                     print("Failed to start collecting health data: \(error)")
                 }
 
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
-                    startMirroring(startDate: startDate, goalType: goalType, goalValue: goalValue)
-                    startHeartRateQuery()
-                    startEnergyBurnedQuery()
-                }
+                self.startMirroring(startDate: startDate, goalType: goalType, goalValue: goalValue)
+                self.startHeartRateQuery()
+                self.startEnergyBurnedQuery()
             }
         } catch {
             print("Collecting health data failed")
@@ -132,9 +125,8 @@ class WorkoutManager: NSObject {
             )
         )
         session?.end()
-        let currentBuilder = builder
-        currentBuilder?.endCollection(withEnd: Date()) { _, _ in
-            currentBuilder?.finishWorkout { workout, _ in
+        builder?.endCollection(withEnd: Date()) { _, _ in
+            self.builder?.finishWorkout { workout, _ in
                 print("workout finished: \(String(describing: workout))")
             }
         }
@@ -171,10 +163,11 @@ class WorkoutManager: NSObject {
                     let bpm = sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
                     print("heartrate: \(bpm) bpm")
                     let heartRate = Int(bpm)
-
-                    Task { @MainActor [weak self] in
-                        self?.recordHeartRateSample(heartRate)
-                    }
+                    self.heartRateSum += heartRate
+                    self.heartRateSamples += 1
+                    self.averageHeartRate = self.heartRateSum / self.heartRateSamples
+                    self.peakHeartRate = max(self.peakHeartRate ?? 0, heartRate)
+                    self.updateHeartRate(heartRate)
                 }
             }
         }
@@ -199,10 +192,15 @@ class WorkoutManager: NSObject {
             if let samples = samples as? [HKQuantitySample] {
                 for sample in samples {
                     let kcal = sample.quantity.doubleValue(for: HKUnit.kilocalorie())
-
-                    Task { @MainActor [weak self] in
-                        self?.publishEnergyBurnedSample(kcal)
-                    }
+                    self.updateEnergyBurned(kcal)
+                    self.sendPayload(
+                        MirroredWorkoutPayload(
+                            kind: .metrics,
+                            energyBurned: kcal,
+                            averageHeartRate: self.averageHeartRate,
+                            peakHeartRate: self.peakHeartRate
+                        )
+                    )
                 }
             }
         }
@@ -260,32 +258,6 @@ class WorkoutManager: NSObject {
         } catch {
             print("Failed to encode mirrored workout payload: \(error)")
         }
-    }
-
-    // MARK: - Metric Publishing
-
-    /// Records a heart-rate sample on the main actor so query callbacks do not mutate workout state
-    /// from HealthKit's delivery queue.
-    private func recordHeartRateSample(_ heartRate: Int) {
-        heartRateSum += heartRate
-        heartRateSamples += 1
-        averageHeartRate = heartRateSum / heartRateSamples
-        peakHeartRate = max(peakHeartRate ?? 0, heartRate)
-        updateHeartRate(heartRate)
-    }
-
-    /// Publishes active-energy changes and mirrored metrics from the main actor so the payload uses
-    /// the same serialized workout state as the UI callbacks.
-    private func publishEnergyBurnedSample(_ kilocalories: Double) {
-        updateEnergyBurned(kilocalories)
-        sendPayload(
-            MirroredWorkoutPayload(
-                kind: .metrics,
-                energyBurned: kilocalories,
-                averageHeartRate: averageHeartRate,
-                peakHeartRate: peakHeartRate
-            )
-        )
     }
 }
 

@@ -11,7 +11,6 @@ extension JumpRecState {
 
     /// Starts a session locally or requests a mirrored watch session when available.
     func start(goalType: GoalType, goalValue: Int) {
-        cancelSessionLifecycleTasks()
         sessionGoalType = goalType
         sessionGoalValue = goalValue
 
@@ -23,16 +22,14 @@ extension JumpRecState {
                 jumpTime: Int64(goalType == .time ? goalValue : 0)
             )
 
-            companionWorkoutTask = Task { [weak self] in
-                guard let self else { return }
+            Task {
                 do {
                     try await workoutMirrorManager.startCompanionWorkout()
-                } catch is CancellationError {
-                    // The user reset or restarted the flow before the watch launch finished.
                 } catch {
-                    guard !Task.isCancelled, pendingMirroredStart else { return }
-                    pendingMirroredStart = false
-                    startLocalSession(goalType: goalType, goalValue: goalValue)
+                    await MainActor.run {
+                        self.pendingMirroredStart = false
+                        self.startLocalSession(goalType: goalType, goalValue: goalValue)
+                    }
                 }
             }
             return
@@ -47,16 +44,12 @@ extension JumpRecState {
         guard !isMirroredWatchSession else { return }
 
         invalidateMinuteTimer()
-        cancelPhoneWorkoutTasks()
         motionManager?.stopTracking()
         let motionSamples = motionManager?.consumeRecordedSamples() ?? []
         endTime = Date()
         if let endTime {
-            phoneWorkoutEndTask = Task { [weak self] in
-                guard let self else { return }
+            Task {
                 await phoneWorkoutManager.endWorkout(at: endTime)
-                guard !Task.isCancelled else { return }
-                phoneWorkoutEndTask = nil
             }
         }
         sessionState = .complete
@@ -88,7 +81,6 @@ extension JumpRecState {
     /// Resets the app back to its idle state and clears active session data.
     func reset() {
         invalidateMinuteTimer()
-        cancelSessionLifecycleTasks()
         motionManager?.stopTracking()
         phoneWorkoutManager.discardWorkout()
         sessionState = .idle
@@ -103,7 +95,9 @@ extension JumpRecState {
         completedSession = nil
         pendingMirroredStart = false
         syncIdleTimer()
-        syncLiveActivity()
+        Task {
+            await liveActivityManager.endIfNeeded()
+        }
     }
 
     // MARK: - Live Metrics
@@ -148,17 +142,12 @@ extension JumpRecState {
         notificationFeedbackGenerator.notificationOccurred(.success)
         speak(text: localizedSessionStartedAnnouncement)
         syncLiveActivity()
-        phoneWorkoutStartTask = Task { [weak self] in
-            guard let self else { return }
+        Task {
             do {
                 try await phoneWorkoutManager.startWorkout(at: sessionStartDate)
-            } catch is CancellationError {
-                // A new session state replaced this one before HealthKit finished starting.
             } catch {
                 print("[JumpRecState] Failed to start iPhone workout session: \(error)")
             }
-            guard !Task.isCancelled, sessionState == .active, startTime == sessionStartDate else { return }
-            phoneWorkoutStartTask = nil
         }
     }
 
@@ -244,22 +233,5 @@ extension JumpRecState {
         @unknown default:
             return false
         }
-    }
-
-    /// Cancels all unstructured tasks that belong to the current session lifecycle.
-    private func cancelSessionLifecycleTasks() {
-        companionWorkoutTask?.cancel()
-        companionWorkoutTask = nil
-        cancelPhoneWorkoutTasks()
-        liveActivityTask?.cancel()
-        liveActivityTask = nil
-    }
-
-    /// Cancels the in-flight HealthKit start/end requests before replacing them with newer state.
-    private func cancelPhoneWorkoutTasks() {
-        phoneWorkoutStartTask?.cancel()
-        phoneWorkoutStartTask = nil
-        phoneWorkoutEndTask?.cancel()
-        phoneWorkoutEndTask = nil
     }
 }

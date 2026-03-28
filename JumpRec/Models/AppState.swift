@@ -97,18 +97,6 @@ final class JumpRecState {
     /// Announces minute milestones during time-based sessions.
     @ObservationIgnored
     var minuteTimer: Timer?
-    /// Owns the in-flight request that asks the watch to start a mirrored workout.
-    @ObservationIgnored
-    var companionWorkoutTask: Task<Void, Never>?
-    /// Owns the in-flight request that starts the local iPhone HealthKit workout.
-    @ObservationIgnored
-    var phoneWorkoutStartTask: Task<Void, Never>?
-    /// Owns the in-flight request that ends the local iPhone HealthKit workout.
-    @ObservationIgnored
-    var phoneWorkoutEndTask: Task<Void, Never>?
-    /// Serializes live-activity work so older updates can be cancelled before newer state is applied.
-    @ObservationIgnored
-    var liveActivityTask: Task<Void, Never>?
 
     // MARK: - Initialization
 

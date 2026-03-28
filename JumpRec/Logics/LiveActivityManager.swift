@@ -9,15 +9,19 @@ import Foundation
     import ActivityKit
 
     /// Owns the app's live-activity lifecycle for active jump sessions.
+    @MainActor
     final class LiveActivityManager {
         /// Shared singleton used by app state.
         static let shared = LiveActivityManager()
+
+        /// Tracks the currently displayed live activity, if any.
+        private var currentActivity: Activity<JumpRecLiveActivityAttributes>?
 
         /// Restricts creation to the shared singleton.
         private init() {}
 
         /// ⭐️Starts a live activity or updates the current one with fresh metrics.
-        nonisolated func startOrUpdate(
+        func startOrUpdate(
             startedAt: Date,
             goalSummary: String,
             jumpCount: Int,
@@ -42,13 +46,14 @@ import Foundation
                 relevanceScore: 100
             )
 
-            if let activity = Activity<JumpRecLiveActivityAttributes>.activities.first {
+            if let activity = resolvedActivity {
                 await activity.update(content)
+                currentActivity = activity
                 return
             }
 
             do {
-                _ = try Activity.request(
+                currentActivity = try Activity.request(
                     attributes: attributes,
                     content: content,
                     pushType: nil
@@ -59,7 +64,7 @@ import Foundation
         }
 
         /// Ends the current live activity with final metrics.
-        nonisolated func end(
+        func end(
             startedAt _: Date?,
             goalSummary _: String,
             jumpCount: Int,
@@ -68,7 +73,7 @@ import Foundation
             sourceLabel: String,
             endedAt: Date
         ) async {
-            guard let activity = Activity<JumpRecLiveActivityAttributes>.activities.first else { return }
+            guard let activity = resolvedActivity else { return }
 
             let finalContent = ActivityContent(
                 state: JumpRecLiveActivityAttributes.ContentState(
@@ -83,17 +88,30 @@ import Foundation
             )
 
             await activity.end(finalContent, dismissalPolicy: .default)
+            currentActivity = nil
         }
 
         /// Immediately ends any live activity still associated with the app.
-        nonisolated func endIfNeeded() async {
+        func endIfNeeded() async {
             for activity in Activity<JumpRecLiveActivityAttributes>.activities {
                 await activity.end(nil, dismissalPolicy: .immediate)
             }
+            currentActivity = nil
+        }
+
+        /// Returns the cached activity or resolves the current one from the system.
+        private var resolvedActivity: Activity<JumpRecLiveActivityAttributes>? {
+            if let currentActivity {
+                return currentActivity
+            }
+
+            currentActivity = Activity<JumpRecLiveActivityAttributes>.activities.first
+            return currentActivity
         }
     }
 #else
     /// Fallback live-activity manager used when ActivityKit is unavailable.
+    @MainActor
     final class LiveActivityManager {
         /// Shared singleton used by app state.
         static let shared = LiveActivityManager()
@@ -102,7 +120,7 @@ import Foundation
         private init() {}
 
         /// No-op fallback when ActivityKit is unavailable.
-        nonisolated func startOrUpdate(
+        func startOrUpdate(
             startedAt _: Date,
             goalSummary _: String,
             jumpCount _: Int,
@@ -112,7 +130,7 @@ import Foundation
         ) async {}
 
         /// No-op fallback when ActivityKit is unavailable.
-        nonisolated func end(
+        func end(
             startedAt _: Date?,
             goalSummary _: String,
             jumpCount _: Int,
@@ -123,6 +141,6 @@ import Foundation
         ) async {}
 
         /// No-op fallback when ActivityKit is unavailable.
-        nonisolated func endIfNeeded() async {}
+        func endIfNeeded() async {}
     }
 #endif

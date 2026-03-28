@@ -10,9 +10,9 @@ import Foundation
 
     /// Defines the immutable and mutable data shown in the live activity.
     @available(iOS 18.0, *)
-    public nonisolated struct JumpRecLiveActivityAttributes {
+    public struct JumpRecLiveActivityAttributes: ActivityAttributes {
         /// Defines the live-updating content for the activity.
-        public nonisolated struct ContentState: Codable, Hashable {
+        public struct ContentState: Codable, Hashable {
             /// The current jump count.
             public var jumpCount: Int
             /// The rounded calories burned value.
@@ -51,9 +51,4 @@ import Foundation
             self.goalSummary = goalSummary
         }
     }
-
-    /// Declaring the ActivityKit conformance in an extension keeps this shared data type nonisolated
-    /// even when app targets enable default MainActor isolation.
-    @available(iOS 18.0, *)
-    nonisolated extension JumpRecLiveActivityAttributes: ActivityAttributes {}
 #endif
