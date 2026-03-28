@@ -6,7 +6,6 @@
 //
 
 import HealthKit
-import SwiftData
 import SwiftUI
 import WatchKit
 
@@ -20,13 +19,10 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate {
 @main
 struct JumpRec_Watch_AppApp: App {
     @WKApplicationDelegateAdaptor(WatchAppDelegate.self) private var appDelegate
-    @State private var dataStore = MyDataStore.shared
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(JumpRecSettings())
-                .modelContainer(dataStore.modelContainer)
-                .environment(dataStore)
         }
     }
 }

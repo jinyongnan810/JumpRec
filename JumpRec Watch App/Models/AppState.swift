@@ -61,10 +61,6 @@ class JumpRecState {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
-    /// Provides shared persistence helpers.
-    @ObservationIgnored
-    let dataStore = MyDataStore.shared
-
     /// Speaks workout announcements on Apple Watch.
     @ObservationIgnored
     let synthesizer = AVSpeechSynthesizer()

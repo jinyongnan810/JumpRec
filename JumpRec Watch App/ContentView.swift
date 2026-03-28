@@ -5,7 +5,6 @@
 //  Created by Yuunan kin on 2025/09/13.
 //
 
-import SwiftData
 import SwiftUI
 
 struct ContentView: View {
@@ -18,6 +17,4 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(JumpRecSettings())
-        .modelContainer(MyDataStore.shared.modelContainer)
-        .environment(MyDataStore.shared)
 }

@@ -41,7 +41,7 @@ extension JumpRecState {
         start(goalType: settings.goalType, goalCount: settings.goalCount)
     }
 
-    /// Ends the current watch workout, saves it, and sends results to the phone.
+    /// Ends the current watch workout and sends the finalized results to the phone.
     func end() {
         guard jumpState == .jumping else { return }
         invalidateMinuteTimer()
@@ -55,16 +55,6 @@ extension JumpRecState {
         jumpState = .finished
 
         guard let startTime, let endTime else { return }
-        dataStore.saveCompletedSession(
-            startedAt: startTime,
-            endedAt: endTime,
-            jumpCount: jumpCount,
-            caloriesBurned: energyBurned,
-            jumpOffsets: jumps,
-            averageHeartRate: averageHeartRate,
-            peakHeartRate: peakHeartRateValue
-        )
-
         ConnectivityManager.shared.sendCompletedSession(
             startedAt: startTime,
             endedAt: endTime,
