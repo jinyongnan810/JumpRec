@@ -7,8 +7,20 @@ import SwiftData
 import SwiftUI
 
 struct HistoryView: View {
-    @Query(sort: \PersonalRecord.kindRawValue) private var personalRecords: [PersonalRecord]
+    /// A one-row probe is enough to distinguish an empty library from a populated one.
+    /// Using a descriptor with `fetchLimit = 1` avoids loading the full session history just to decide which empty state to show.
+    private static var sessionExistenceDescriptor: FetchDescriptor<JumpSession> {
+        var descriptor = FetchDescriptor<JumpSession>(
+            sortBy: [SortDescriptor(\.startedAt, order: .reverse)]
+        )
+        descriptor.fetchLimit = 1
+        return descriptor
+    }
 
+    @Query(sort: \PersonalRecord.kindRawValue) private var personalRecords: [PersonalRecord]
+    @Query(Self.sessionExistenceDescriptor) private var sessionExistenceProbe: [JumpSession]
+
+    @Environment(MyDataStore.self) private var dataStore
     @Environment(\.modelContext) private var modelContext
 
     @Namespace private var navigationTransitionNamespace
@@ -32,7 +44,9 @@ struct HistoryView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if let displayedMonthRange {
+                if sessionExistenceProbe.isEmpty {
+                    emptyLibraryState
+                } else if let displayedMonthRange {
                     MonthSessionsList(
                         displayedMonth: displayedMonth,
                         monthRange: displayedMonthRange,
@@ -90,6 +104,24 @@ struct HistoryView: View {
                 onDelete: confirmDeleteSessions
             )
         }
+        .onAppear {
+            dataStore.updateInitialCloudRestoreState(hasSessions: !sessionExistenceProbe.isEmpty)
+        }
+        .onChange(of: sessionExistenceProbe.isEmpty) { _, isEmpty in
+            dataStore.updateInitialCloudRestoreState(hasSessions: !isEmpty)
+        }
+    }
+
+    /// Explains why a freshly installed app can appear empty even though SwiftData is CloudKit-backed.
+    /// This keeps the history screen from looking permanently blank while the local store is still waiting on iCloud.
+    private var emptyLibraryState: some View {
+        ContentUnavailableView {
+            Label("No sessions yet", systemImage: "icloud")
+        } description: {
+            Text(dataStore.cloudRestoreStatusMessage)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(AppColors.bgPrimary)
     }
 
     private func promptDeleteSessions(_ sessions: [JumpSession]) {

@@ -71,10 +71,14 @@ struct ContentView: View {
         .onAppear {
 //            configureTabBarAppearance()
             appState.updateSceneActive(scenePhase == .active)
+            dataStore.refreshCloudDiagnostics()
             syncSettingsToWatch()
         }
         .onChange(of: scenePhase) { _, newValue in
             appState.updateSceneActive(newValue == .active)
+            if newValue == .active {
+                dataStore.refreshCloudDiagnostics()
+            }
         }
         .onChange(of: settings.goalType) { _, _ in
             syncSettingsToWatch()

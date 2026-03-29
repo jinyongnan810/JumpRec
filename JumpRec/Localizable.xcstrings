@@ -686,6 +686,9 @@
         }
       }
     },
+    "No sessions yet" : {
+
+    },
     "Peak Heart Rate" : {
       "localizations" : {
         "ja" : {
