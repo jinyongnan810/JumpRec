@@ -72,6 +72,30 @@ public enum SessionMetricsCalculator {
         rateSamples.map(\.rate).max()
     }
 
+    /// Returns a normalized pace-consistency score in the range `0...1`.
+    /// The score is based on average absolute deviation from the session's sampled mean rate,
+    /// so higher values represent a steadier rhythm. We keep this as a normalized score rather
+    /// than raw variance because it is easier to compare across both slower and faster sessions.
+    /// Callers are expected to pass rate samples in ascending `secondOffset` order.
+    public static func rhythmConsistencyScore(from rateSamples: [SessionRateSample]) -> Double? {
+        guard rateSamples.count > 1 else { return nil }
+
+        let meanRate = rateSamples.map(\.rate).reduce(0, +) / Double(rateSamples.count)
+        guard meanRate > 0 else { return nil }
+
+        let averageAbsoluteDeviation = rateSamples
+            .map { abs($0.rate - meanRate) }
+            .reduce(0, +) / Double(rateSamples.count)
+        let normalizedDeviation = min(1, averageAbsoluteDeviation / meanRate)
+        return max(0, 1 - normalizedDeviation)
+    }
+
+    /// Returns calories burned per minute for sessions with a valid duration.
+    public static func caloriesPerMinute(caloriesBurned: Double, durationSeconds: Int) -> Double? {
+        guard caloriesBurned > 0, durationSeconds > 0 else { return nil }
+        return caloriesBurned / (Double(durationSeconds) / 60.0)
+    }
+
     // MARK: - Break Metrics
 
     /// Derives short-break, long-break, and longest-streak metrics from jump offsets.

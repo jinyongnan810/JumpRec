@@ -31,6 +31,16 @@
         }
       }
     },
+    "%@ kcal/min" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ kcal/分"
+          }
+        }
+      }
+    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -719,6 +729,17 @@
         }
       }
     },
+    "Best Average Jump Rate" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高平均ジャンプレート"
+          }
+        }
+      }
+    },
     "Rate" : {
       "localizations" : {
         "ja" : {
@@ -902,6 +923,17 @@
         }
       }
     },
+    "Sneaky Burn" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高効率カロリーバーン"
+          }
+        }
+      }
+    },
     "START" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -929,6 +961,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開始しています..."
+          }
+        }
+      }
+    },
+    "Steady Rhythm" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安定リズム"
           }
         }
       }

@@ -20,3 +20,17 @@ public func localizedRateText(_ value: Int) -> String {
     }
     return "\(value)/min"
 }
+
+/// Formats a normalized score such as `0.92` as a locale-aware percentage for UI display.
+public func localizedPercentText(_ value: Double) -> String {
+    value.formatted(.percent.precision(.fractionLength(0)))
+}
+
+/// Formats a calorie-efficiency metric for display in a way that can be localized per target.
+public func localizedCaloriesPerMinuteText(_ value: Double) -> String {
+    let formattedValue = value.formatted(.number.precision(.fractionLength(1)))
+    return String(
+        format: String(localized: "%@ kcal/min"),
+        formattedValue
+    )
+}

@@ -32,6 +32,40 @@ struct JumpRecTests {
         #expect(samples.map { "\($0.rate)" } == ["144.0", "156.0", "144.0", "156.0", "144.0", "156.0", "144.0", "156.0", "144.0", "156.0", "144.0", "156.0"])
     }
 
+    @Test func testRhythmConsistencyScoreRewardsSteadySessions() async throws {
+        let steadySession = makeSession(durationSeconds: 60)
+        let steadySamples = [
+            150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
+            150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
+        ].enumerated().map { index, rate in
+            SessionRateSample(session: steadySession, secondOffset: (index + 1) * 5, rate: rate)
+        }
+
+        let unevenSession = makeSession(durationSeconds: 60)
+        let unevenSamples = [
+            60.0, 240.0, 60.0, 240.0, 60.0, 240.0,
+            60.0, 240.0, 60.0, 240.0, 60.0, 240.0,
+        ].enumerated().map { index, rate in
+            SessionRateSample(session: unevenSession, secondOffset: (index + 1) * 5, rate: rate)
+        }
+
+        let steadyScore = try #require(SessionMetricsCalculator.rhythmConsistencyScore(from: steadySamples))
+        let unevenScore = try #require(SessionMetricsCalculator.rhythmConsistencyScore(from: unevenSamples))
+
+        #expect(steadyScore == 1.0)
+        #expect(unevenScore == 0.4)
+    }
+
+    @Test func testAverageRateUsesWholeSessionDuration() async throws {
+        let averageRate = try #require(SessionMetricsCalculator.averageRate(jumpCount: 540, durationSeconds: 180))
+        #expect(averageRate == 180.0)
+    }
+
+    @Test func testCaloriesPerMinuteUsesSessionDuration() async throws {
+        let value = try #require(SessionMetricsCalculator.caloriesPerMinute(caloriesBurned: 90, durationSeconds: 300))
+        #expect(value == 18.0)
+    }
+
     @Test func testIPhoneProfileCountsOnlyPositiveYAboveThreshold() async throws {
         let detector = JumpDetector(profile: .iPhonePocket)
         let samples = [
@@ -161,6 +195,19 @@ private extension JumpRecTests {
             rotationRateY: 0,
             rotationRateZ: 0,
             timestamp: timestamp
+        )
+    }
+
+    /// Builds a minimal session shell that can own derived rate samples inside tests.
+    func makeSession(durationSeconds: Int) -> JumpSession {
+        let startedAt = Date()
+        let endedAt = startedAt.addingTimeInterval(TimeInterval(durationSeconds))
+        return JumpSession(
+            startedAt: startedAt,
+            endedAt: endedAt,
+            jumpCount: 0,
+            peakRate: 0,
+            caloriesBurned: 0
         )
     }
 }

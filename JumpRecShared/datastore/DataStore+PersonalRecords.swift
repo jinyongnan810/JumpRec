@@ -13,8 +13,11 @@ extension MyDataStore {
     private enum PersonalRecordThreshold {
         static let highestJumpCount = 200
         static let longestJumpStreak = 100
-        static let longestSessionDurationSeconds = 3 * 60
+        static let longestSessionDurationSeconds = 60
         static let mostCalories = 20.0
+        static let steadyRhythmSampleCount = 12
+        static let averageJumpRateDurationSeconds = 60
+        static let sneakyBurnDurationSeconds = 60
     }
 
     func upsertPersonalRecords(for session: JumpSession) {
@@ -55,12 +58,19 @@ extension MyDataStore {
     func backfillPersonalRecordsIfNeeded() {
         let recordDescriptor = FetchDescriptor<PersonalRecord>()
         let existingRecords = (try? modelContext.fetch(recordDescriptor)) ?? []
-        guard existingRecords.isEmpty else { return }
+        let existingKinds = Set(
+            existingRecords.compactMap { record in
+                record.kindRawValue.flatMap(PersonalRecordKind.init(rawValue:))
+            }
+        )
+        guard existingKinds.count < PersonalRecordKind.allCases.count else { return }
 
         let sessionDescriptor = FetchDescriptor<JumpSession>()
         let sessions = (try? modelContext.fetch(sessionDescriptor)) ?? []
         guard !sessions.isEmpty else { return }
 
+        // Reprocessing all historical sessions keeps previously shipped record kinds intact while
+        // allowing newly introduced kinds to be derived for existing users during app upgrade.
         for session in sessions {
             upsertPersonalRecords(for: session)
         }
@@ -70,6 +80,9 @@ extension MyDataStore {
 
     private func personalRecordCandidates(for session: JumpSession) -> [PersonalRecordCandidate] {
         var candidates: [PersonalRecordCandidate] = []
+        // Session rate samples are persisted in chronological order when the session is saved,
+        // so record calculations can consume them directly without re-sorting on every update.
+        let rateSamples = session.rateSamples ?? []
 
         // Each category has a minimum qualification threshold so personal records reflect
         // a meaningful workout milestone instead of the first small session in history.
@@ -129,6 +142,54 @@ extension MyDataStore {
                     kind: .bestJumpRate,
                     metricValue: peakRate,
                     displayValue: localizedRateText(Int(peakRate.rounded())),
+                    achievedAt: session.startedAt
+                )
+            )
+        }
+
+        // These playful records rely on persisted rate samples, so they are only eligible once
+        // the session is long enough to provide meaningful pacing data.
+        if
+            rateSamples.count >= PersonalRecordThreshold.steadyRhythmSampleCount,
+            let rhythmScore = SessionMetricsCalculator.rhythmConsistencyScore(from: rateSamples)
+        {
+            candidates.append(
+                PersonalRecordCandidate(
+                    kind: .steadyRhythm,
+                    metricValue: rhythmScore,
+                    displayValue: localizedPercentText(rhythmScore),
+                    achievedAt: session.startedAt
+                )
+            )
+        }
+
+        if
+            session.durationSeconds >= PersonalRecordThreshold.averageJumpRateDurationSeconds,
+            let averageRate = session.averageRate
+        {
+            candidates.append(
+                PersonalRecordCandidate(
+                    kind: .bestAverageJumpRate,
+                    metricValue: averageRate,
+                    displayValue: localizedRateText(Int(averageRate.rounded())),
+                    achievedAt: session.startedAt
+                )
+            )
+        }
+
+        if
+            session.durationSeconds >= PersonalRecordThreshold.sneakyBurnDurationSeconds,
+            session.caloriesBurned > PersonalRecordThreshold.mostCalories,
+            let caloriesPerMinute = SessionMetricsCalculator.caloriesPerMinute(
+                caloriesBurned: session.caloriesBurned,
+                durationSeconds: session.durationSeconds
+            )
+        {
+            candidates.append(
+                PersonalRecordCandidate(
+                    kind: .sneakyBurn,
+                    metricValue: caloriesPerMinute,
+                    displayValue: localizedCaloriesPerMinuteText(caloriesPerMinute),
                     achievedAt: session.startedAt
                 )
             )

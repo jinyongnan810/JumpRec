@@ -148,6 +148,30 @@ struct RecordsSheetView: View {
             achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
         )
     )
+    container.mainContext.insert(
+        PersonalRecord(
+            kind: .steadyRhythm,
+            metricValue: 0.92,
+            displayValue: "92%",
+            achievedAt: calendar.date(byAdding: .day, value: -6, to: now)!
+        )
+    )
+    container.mainContext.insert(
+        PersonalRecord(
+            kind: .bestAverageJumpRate,
+            metricValue: 168,
+            displayValue: "168/min",
+            achievedAt: calendar.date(byAdding: .day, value: -7, to: now)!
+        )
+    )
+    container.mainContext.insert(
+        PersonalRecord(
+            kind: .sneakyBurn,
+            metricValue: 24.6,
+            displayValue: "24.6 kcal/min",
+            achievedAt: calendar.date(byAdding: .day, value: -8, to: now)!
+        )
+    )
 
     return RecordsSheetView()
         .modelContainer(container)
@@ -233,6 +257,12 @@ private struct RecordCardView: View {
                 )
         case .bestJumpRate:
             return localizedRateText(Int(record.metricValue.rounded()))
+        case .steadyRhythm:
+            return localizedPercentText(record.metricValue)
+        case .bestAverageJumpRate:
+            return localizedRateText(Int(record.metricValue.rounded()))
+        case .sneakyBurn:
+            return localizedCaloriesPerMinuteText(record.metricValue)
         @unknown default:
             return record.metricValue.formatted()
         }

@@ -4,6 +4,9 @@
     "%@ jumps" : {
 
     },
+    "%@ kcal/min" : {
+
+    },
     "%lld" : {
       "shouldTranslate" : false
     },

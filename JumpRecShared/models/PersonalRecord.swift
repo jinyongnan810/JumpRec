@@ -18,6 +18,12 @@ public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
     case mostCalories
     /// Best jump rate achieved in a session.
     case bestJumpRate
+    /// Most consistent sustained pace score derived from saved rate samples.
+    case steadyRhythm
+    /// Highest whole-session average jump rate among qualifying sessions.
+    case bestAverageJumpRate
+    /// Highest calorie burn efficiency measured in kilocalories per minute.
+    case sneakyBurn
 
     // MARK: - Display Metadata
 
@@ -34,6 +40,12 @@ public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
             "Most Calories"
         case .bestJumpRate:
             "Best Jump Rate"
+        case .steadyRhythm:
+            "Steady Rhythm"
+        case .bestAverageJumpRate:
+            "Best Average Jump Rate"
+        case .sneakyBurn:
+            "Sneaky Burn"
         }
     }
 
@@ -50,13 +62,19 @@ public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
             "flame.fill"
         case .bestJumpRate:
             "bolt.fill"
+        case .steadyRhythm:
+            "waveform.path.ecg"
+        case .bestAverageJumpRate:
+            "speedometer"
+        case .sneakyBurn:
+            "flame.circle.fill"
         }
     }
 
     /// Returns the comparison rule used when evaluating new record values.
     public var comparison: PersonalRecordComparison {
         switch self {
-        case .highestJumpCount, .longestJumpStreak, .longestSession, .mostCalories, .bestJumpRate:
+        case .highestJumpCount, .longestJumpStreak, .longestSession, .mostCalories, .bestJumpRate, .steadyRhythm, .bestAverageJumpRate, .sneakyBurn:
             .largerIsBetter
         }
     }
