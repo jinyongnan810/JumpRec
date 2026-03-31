@@ -7,6 +7,16 @@ import Foundation
 import SwiftData
 
 extension MyDataStore {
+    /// Minimum values a session must reach before it can establish a personal record.
+    /// This avoids surfacing trivial early-session numbers as "records" when the user
+    /// has not yet completed a meaningful workout.
+    private enum PersonalRecordThreshold {
+        static let highestJumpCount = 200
+        static let longestJumpStreak = 100
+        static let longestSessionDurationSeconds = 3 * 60
+        static let mostCalories = 20.0
+    }
+
     func upsertPersonalRecords(for session: JumpSession) {
         for candidate in personalRecordCandidates(for: session) {
             let kindRawValue = candidate.kind.rawValue
@@ -59,38 +69,59 @@ extension MyDataStore {
     }
 
     private func personalRecordCandidates(for session: JumpSession) -> [PersonalRecordCandidate] {
-        var candidates: [PersonalRecordCandidate] = [
-            PersonalRecordCandidate(
-                kind: .highestJumpCount,
-                metricValue: Double(session.jumpCount),
-                displayValue: String(
-                    format: String(localized: "%@ jumps"),
-                    session.jumpCount.formatted()
-                ),
-                achievedAt: session.startedAt
-            ),
-            PersonalRecordCandidate(
-                kind: .longestJumpStreak,
-                metricValue: Double(session.longestStreak),
-                displayValue: String(
-                    format: String(localized: "%@ jumps"),
-                    session.longestStreak.formatted()
-                ),
-                achievedAt: session.startedAt
-            ),
-            PersonalRecordCandidate(
-                kind: .longestSession,
-                metricValue: Double(session.durationSeconds),
-                displayValue: formattedDuration(seconds: session.durationSeconds),
-                achievedAt: session.startedAt
-            ),
-            PersonalRecordCandidate(
-                kind: .mostCalories,
-                metricValue: session.caloriesBurned,
-                displayValue: "\(Int(session.caloriesBurned.rounded())) \(String(localized: "cal"))",
-                achievedAt: session.startedAt
-            ),
-        ]
+        var candidates: [PersonalRecordCandidate] = []
+
+        // Each category has a minimum qualification threshold so personal records reflect
+        // a meaningful workout milestone instead of the first small session in history.
+        if session.jumpCount > PersonalRecordThreshold.highestJumpCount {
+            candidates.append(
+                PersonalRecordCandidate(
+                    kind: .highestJumpCount,
+                    metricValue: Double(session.jumpCount),
+                    displayValue: String(
+                        format: String(localized: "%@ jumps"),
+                        session.jumpCount.formatted()
+                    ),
+                    achievedAt: session.startedAt
+                )
+            )
+        }
+
+        if session.longestStreak > PersonalRecordThreshold.longestJumpStreak {
+            candidates.append(
+                PersonalRecordCandidate(
+                    kind: .longestJumpStreak,
+                    metricValue: Double(session.longestStreak),
+                    displayValue: String(
+                        format: String(localized: "%@ jumps"),
+                        session.longestStreak.formatted()
+                    ),
+                    achievedAt: session.startedAt
+                )
+            )
+        }
+
+        if session.durationSeconds > PersonalRecordThreshold.longestSessionDurationSeconds {
+            candidates.append(
+                PersonalRecordCandidate(
+                    kind: .longestSession,
+                    metricValue: Double(session.durationSeconds),
+                    displayValue: formattedDuration(seconds: session.durationSeconds),
+                    achievedAt: session.startedAt
+                )
+            )
+        }
+
+        if session.caloriesBurned > PersonalRecordThreshold.mostCalories {
+            candidates.append(
+                PersonalRecordCandidate(
+                    kind: .mostCalories,
+                    metricValue: session.caloriesBurned,
+                    displayValue: "\(Int(session.caloriesBurned.rounded())) \(String(localized: "cal"))",
+                    achievedAt: session.startedAt
+                )
+            )
+        }
 
         if let peakRate = session.peakRate {
             candidates.append(
