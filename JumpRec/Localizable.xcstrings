@@ -750,6 +750,46 @@
         }
       }
     },
+    "Rhythm Consistency" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リズム安定度"
+          }
+        }
+      }
+    },
+    "A normalized score that reflects how evenly you maintained your jumping pace throughout the session." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション全体を通して、どれだけ一定のペースで跳び続けられたかを示す正規化スコアです。"
+          }
+        }
+      }
+    },
+    "Calories Per Minute" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1分あたりの消費カロリー"
+          }
+        }
+      }
+    },
+    "Your average calorie burn efficiency across the full session duration." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション全体を通した、平均的なカロリー消費効率です。"
+          }
+        }
+      }
+    },
     "RATE" : {
       "extractionState" : "stale",
       "localizations" : {

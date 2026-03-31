@@ -105,6 +105,16 @@ public final class JumpSession {
 }
 
 public extension JumpSession {
+    /// Groups derived workout analytics that are calculated from saved session data.
+    /// Keeping these values together ensures every UI surface reads the same interpretation
+    /// of the underlying session instead of reimplementing the formulas independently.
+    struct DerivedMetrics: Sendable {
+        /// A normalized `0...1` score that reflects how steady the user's pace was.
+        public let rhythmConsistency: Double?
+        /// Calories burned per minute across the full session duration.
+        public let caloriesPerMinute: Double?
+    }
+
     /// Returns the session duration formatted as `mm:ss`.
     var formattedDuration: String {
         let minutes = durationSeconds / 60
@@ -122,6 +132,19 @@ public extension JumpSession {
         "\(Int(caloriesBurned.rounded()))"
     }
 
+    /// Returns the derived analytics used by detailed session summaries.
+    /// Rate samples are expected to be in ascending `secondOffset` order when provided.
+    func derivedMetrics(rateSamples: [SessionRateSample]? = nil) -> DerivedMetrics {
+        let resolvedRateSamples = rateSamples ?? self.rateSamples ?? []
+        return DerivedMetrics(
+            rhythmConsistency: SessionMetricsCalculator.rhythmConsistencyScore(from: resolvedRateSamples),
+            caloriesPerMinute: SessionMetricsCalculator.caloriesPerMinute(
+                caloriesBurned: caloriesBurned,
+                durationSeconds: durationSeconds
+            )
+        )
+    }
+
     /// Returns the formatted average-rate text.
     func formattedAverageRate(placeholder: String = "--") -> String {
         guard let averageRate else { return placeholder }
@@ -132,6 +155,25 @@ public extension JumpSession {
     func formattedPeakRate(placeholder: String = "--") -> String {
         guard let peakRate else { return placeholder }
         return localizedRateText(Int(peakRate.rounded()))
+    }
+
+    /// Returns the formatted rhythm-consistency text derived from rate samples.
+    func formattedRhythmConsistency(
+        rateSamples: [SessionRateSample]? = nil,
+        placeholder: String = "--"
+    ) -> String {
+        guard let rhythmConsistency = derivedMetrics(rateSamples: rateSamples).rhythmConsistency else {
+            return placeholder
+        }
+        return localizedPercentText(rhythmConsistency)
+    }
+
+    /// Returns the formatted calories-per-minute efficiency text.
+    func formattedCaloriesPerMinute(placeholder: String = "--") -> String {
+        guard let caloriesPerMinute = derivedMetrics().caloriesPerMinute else {
+            return placeholder
+        }
+        return localizedCaloriesPerMinuteText(caloriesPerMinute)
     }
 
     /// Returns the formatted longest-streak text.

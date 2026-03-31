@@ -40,6 +40,11 @@ struct SessionDetailView: View {
         (session.rateSamples ?? []).sorted { $0.secondOffset < $1.secondOffset }
     }
 
+    /// Returns the shared derived metrics used across summary surfaces.
+    private var derivedMetrics: JumpSession.DerivedMetrics {
+        session.derivedMetrics(rateSamples: rateSamples)
+    }
+
     // MARK: - View
 
     /// Renders the saved-session summary, AI comment, and delete action.
@@ -69,6 +74,8 @@ struct SessionDetailView: View {
                     calories: "\(Int(session.caloriesBurned))",
                     averageRate: averageRateText,
                     peakRate: peakRateText,
+                    rhythmConsistency: rhythmConsistencyText,
+                    caloriesPerMinute: caloriesPerMinuteText,
                     longestJumpStrikes: longestJumpStrikesText,
                     shortBreaks: "\(session.smallBreaksCount)",
                     longBreaks: "\(session.longBreaksCount)",
@@ -107,6 +114,18 @@ struct SessionDetailView: View {
     /// Returns the formatted average-rate text.
     private var averageRateText: String {
         session.formattedAverageRate(placeholder: "–")
+    }
+
+    /// Returns the formatted rhythm-consistency text.
+    private var rhythmConsistencyText: String {
+        guard let rhythmConsistency = derivedMetrics.rhythmConsistency else { return "–" }
+        return localizedPercentText(rhythmConsistency)
+    }
+
+    /// Returns the formatted calories-per-minute text.
+    private var caloriesPerMinuteText: String {
+        guard let caloriesPerMinute = derivedMetrics.caloriesPerMinute else { return "–" }
+        return localizedCaloriesPerMinuteText(caloriesPerMinute)
     }
 
     // MARK: - Actions

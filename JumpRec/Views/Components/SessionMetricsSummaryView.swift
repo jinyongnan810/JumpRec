@@ -17,6 +17,10 @@ struct SessionMetricsSummaryView: View {
     let averageRate: String
     /// The formatted peak jump rate.
     let peakRate: String
+    /// The formatted rhythm-consistency score.
+    let rhythmConsistency: String
+    /// The formatted calorie-efficiency value.
+    let caloriesPerMinute: String
     /// The formatted longest streak value.
     let longestJumpStrikes: String
     /// The formatted short-break count.
@@ -82,6 +86,32 @@ struct SessionMetricsSummaryView: View {
                     Text(peakRate)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
                         .foregroundStyle(AppColors.textSecondary)
+                }
+
+                SessionBreakdownRow(
+                    label: "Calories Per Minute",
+                    explanation: SessionBreakdownExplanation(
+                        id: "calories-per-minute",
+                        title: "Calories Per Minute",
+                        message: "Your average calorie burn efficiency across the full session duration."
+                    )
+                ) {
+                    Text(caloriesPerMinute)
+                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                        .foregroundStyle(AppColors.warning)
+                }
+
+                SessionBreakdownRow(
+                    label: "Rhythm Consistency",
+                    explanation: SessionBreakdownExplanation(
+                        id: "rhythm-consistency",
+                        title: "Rhythm Consistency",
+                        message: "A normalized score that reflects how evenly you maintained your jumping pace throughout the session."
+                    )
+                ) {
+                    Text(rhythmConsistency)
+                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                        .foregroundStyle(AppColors.accent)
                 }
 
                 SessionBreakdownRow(

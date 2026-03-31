@@ -19,29 +19,46 @@ struct SessionCompleteView: View {
         appState.completedSession
     }
 
-    /// Returns rate samples for the saved session or generates temporary ones from live data.
-    private var rateSamples: [SessionRateSample] {
+    /// Provides one session-shaped value for all summary calculations on this screen.
+    /// When persistence has not finished yet, we synthesize a temporary session so the
+    /// summary UI still uses the exact same formatting and derived-metric logic.
+    private var summarySession: JumpSession {
         if let completedSession {
-            return (completedSession.rateSamples ?? []).sorted { $0.secondOffset < $1.secondOffset }
+            return completedSession
         }
 
         let durationSeconds = max(appState.durationSeconds, 1)
+        let startTime = appState.startTime ?? .now
         let session = JumpSession(
-            startedAt: appState.startTime ?? .now,
-            endedAt: (appState.startTime ?? .now).addingTimeInterval(TimeInterval(durationSeconds)),
+            startedAt: startTime,
+            endedAt: startTime.addingTimeInterval(TimeInterval(durationSeconds)),
             jumpCount: appState.jumpCount,
             peakRate: 0,
             averageRate: Double(appState.averageRate),
             caloriesBurned: appState.caloriesBurned,
             smallBreaksCount: appState.breakMetrics.small,
             longBreaksCount: appState.breakMetrics.long,
-            longestStreak: appState.breakMetrics.longestStreak
+            longestStreak: appState.breakMetrics.longestStreak,
+            averageHeartRate: appState.averageHeartRate,
+            peakHeartRate: appState.peakHeartRate
         )
-        return SessionMetricsCalculator.makeRateSamples(
+        session.rateSamples = SessionMetricsCalculator.makeRateSamples(
             for: session,
             jumpOffsets: appState.jumps,
             durationSeconds: durationSeconds
         )
+        session.peakRate = SessionMetricsCalculator.peakRate(from: session.rateSamples ?? [])
+        return session
+    }
+
+    /// Returns rate samples for the saved session or generates temporary ones from live data.
+    private var rateSamples: [SessionRateSample] {
+        (summarySession.rateSamples ?? []).sorted { $0.secondOffset < $1.secondOffset }
+    }
+
+    /// Returns the shared derived metrics used across summary surfaces.
+    private var derivedMetrics: JumpSession.DerivedMetrics {
+        summarySession.derivedMetrics(rateSamples: rateSamples)
     }
 
     // MARK: - View
@@ -85,6 +102,8 @@ struct SessionCompleteView: View {
                     calories: caloriesText,
                     averageRate: averageRateText,
                     peakRate: peakRateText,
+                    rhythmConsistency: rhythmConsistencyText,
+                    caloriesPerMinute: caloriesPerMinuteText,
                     longestJumpStrikes: longestStreakText,
                     shortBreaks: shortBreaksText,
                     longBreaks: longBreaksText,
@@ -138,91 +157,64 @@ struct SessionCompleteView: View {
 
     /// Returns the completed session duration text.
     private var durationText: String {
-        if let completedSession {
-            return completedSession.formattedDuration
-        }
-        return appState.elapsedFormatted
+        summarySession.formattedDuration
     }
 
     /// Returns the formatted jump-count text.
     private var jumpCountText: String {
-        if let completedSession {
-            return completedSession.formattedJumpCount
-        }
-        return appState.jumpCount.formatted()
+        summarySession.formattedJumpCount
     }
 
     /// Returns the formatted calories text.
     private var caloriesText: String {
-        if let completedSession {
-            return completedSession.formattedCalories
-        }
-        return "\(Int(appState.caloriesBurned.rounded()))"
+        summarySession.formattedCalories
     }
 
     /// Returns the formatted average-rate text.
     private var averageRateText: String {
-        if let completedSession {
-            return completedSession.formattedAverageRate()
-        }
-        return localizedRateText(appState.averageRate)
+        summarySession.formattedAverageRate()
     }
 
     /// Returns the formatted peak-rate text.
     private var peakRateText: String {
-        if let completedSession {
-            return completedSession.formattedPeakRate()
-        }
-        if let peakRate = SessionMetricsCalculator.peakRate(from: rateSamples) {
-            return localizedRateText(Int(peakRate.rounded()))
-        }
-        return "--"
+        summarySession.formattedPeakRate()
+    }
+
+    /// Returns the formatted rhythm-consistency text.
+    private var rhythmConsistencyText: String {
+        guard let rhythmConsistency = derivedMetrics.rhythmConsistency else { return "--" }
+        return localizedPercentText(rhythmConsistency)
+    }
+
+    /// Returns the formatted calories-per-minute text.
+    private var caloriesPerMinuteText: String {
+        guard let caloriesPerMinute = derivedMetrics.caloriesPerMinute else { return "--" }
+        return localizedCaloriesPerMinuteText(caloriesPerMinute)
     }
 
     /// Returns the formatted longest-streak text.
     private var longestStreakText: String {
-        if let completedSession {
-            return completedSession.formattedLongestStreak
-        }
-        return appState.breakMetrics.longestStreak.formatted()
+        summarySession.formattedLongestStreak
     }
 
     /// Returns the formatted short-break count.
     private var shortBreaksText: String {
-        if let completedSession {
-            return completedSession.formattedSmallBreaksCount
-        }
-        return appState.breakMetrics.small.formatted()
+        summarySession.formattedSmallBreaksCount
     }
 
     /// Returns the formatted long-break count.
     private var longBreaksText: String {
-        if let completedSession {
-            return completedSession.formattedLongBreaksCount
-        }
-        return appState.breakMetrics.long.formatted()
+        summarySession.formattedLongBreaksCount
     }
 
     /// Returns the formatted average heart-rate text.
     private var averageHeartRateText: String {
-        if let completedSession {
-            return completedSession.formattedAverageHeartRate()
-        }
-        return heartRateText(appState.averageHeartRate)
+        summarySession.formattedAverageHeartRate()
     }
 
     /// Returns the formatted peak heart-rate text.
     private var peakHeartRateText: String {
-        if let completedSession {
-            return completedSession.formattedPeakHeartRate()
-        }
-        return heartRateText(appState.peakHeartRate)
-    }
-
-    /// Formats an optional heart-rate value for display.
-    private func heartRateText(_ value: Int?) -> String {
-        guard let value else { return "--" }
-        return "\(value) bpm"
+        summarySession.formattedPeakHeartRate()
     }
 }
 
