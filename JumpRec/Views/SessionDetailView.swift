@@ -81,7 +81,8 @@ struct SessionDetailView: View {
                     longBreaks: "\(session.longBreaksCount)",
                     averageHeartRate: averageHeartRateText,
                     peakHeartRate: peakHeartRateText,
-                    rateSamples: rateSamples
+                    rateSamples: rateSamples,
+                    achievedRecordKinds: []
                 )
             }
             .padding(.horizontal, 24)

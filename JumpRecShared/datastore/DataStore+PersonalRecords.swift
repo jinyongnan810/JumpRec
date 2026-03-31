@@ -20,7 +20,9 @@ extension MyDataStore {
         static let sneakyBurnDurationSeconds = 60
     }
 
-    func upsertPersonalRecords(for session: JumpSession) {
+    @discardableResult
+    func upsertPersonalRecords(for session: JumpSession) -> [PersonalRecordKind] {
+        var updatedKinds: [PersonalRecordKind] = []
         for candidate in personalRecordCandidates(for: session) {
             let kindRawValue = candidate.kind.rawValue
             let descriptor = FetchDescriptor<PersonalRecord>(
@@ -38,6 +40,10 @@ extension MyDataStore {
                 continue
             }
 
+            if !updatedKinds.contains(candidate.kind) {
+                updatedKinds.append(candidate.kind)
+            }
+
             if let existingRecord {
                 existingRecord.metricValue = candidate.metricValue
                 existingRecord.displayValue = candidate.displayValue
@@ -53,6 +59,7 @@ extension MyDataStore {
                 )
             }
         }
+        return updatedKinds
     }
 
     func backfillPersonalRecordsIfNeeded() {

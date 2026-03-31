@@ -11,7 +11,10 @@ public extension MyDataStore {
     func addSession(session: JumpSession, rateSamples: [SessionRateSample] = []) {
         modelContext.insert(session)
         attach(rateSamples, to: session)
-        upsertPersonalRecords(for: session)
+        let updatedRecordKinds = upsertPersonalRecords(for: session)
+        if !updatedRecordKinds.isEmpty {
+            markUnseenPersonalRecordUpdates(updatedRecordKinds)
+        }
         saveContextIfNeeded()
 
         print("inserted session and rate samples")

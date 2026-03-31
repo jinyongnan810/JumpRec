@@ -56,6 +56,10 @@ extension ModelContainer {
 @MainActor
 @Observable
 public final class MyDataStore {
+    private enum DefaultsKey {
+        static let unseenPersonalRecordKinds = "unseenPersonalRecordKinds"
+    }
+
     // MARK: - Cloud Restore Diagnostics
 
     /// Describes whether the current device can reach the expected iCloud account for CloudKit sync.
@@ -110,8 +114,13 @@ public final class MyDataStore {
     /// Stores the best-known local persistence location for debugging uninstall and restore issues.
     public private(set) var storeLocationDescription = "Unknown"
 
+    /// Tracks which exact record kinds were newly achieved so UI surfaces can explain the badge.
+    public private(set) var unseenPersonalRecordKinds: [PersonalRecordKind] = []
+
     @ObservationIgnored
     private var cloudRestoreTask: Task<Void, Never>?
+    @ObservationIgnored
+    private let defaults: UserDefaults
 
     /// Creates the shared store and applies one-time bootstrap work.
     private static func makeSharedStore() throws -> MyDataStore {
@@ -128,8 +137,11 @@ public final class MyDataStore {
 
     private init(modelContainer: ModelContainer) {
         self.modelContainer = modelContainer
+        defaults = UserDefaults(suiteName: ModelContainer.groupContainerIdentifier) ?? .standard
         modelContext = modelContainer.mainContext
         modelContext.autosaveEnabled = true
+        unseenPersonalRecordKinds = (defaults.stringArray(forKey: DefaultsKey.unseenPersonalRecordKinds) ?? [])
+            .compactMap(PersonalRecordKind.init(rawValue:))
     }
 
     deinit {
@@ -145,6 +157,22 @@ public final class MyDataStore {
         } catch {
             print("Failed to save context: \(error)")
         }
+    }
+
+    /// Marks that new or improved personal records are waiting to be viewed by the user.
+    public func markUnseenPersonalRecordUpdates(_ kinds: [PersonalRecordKind]) {
+        guard !kinds.isEmpty else { return }
+
+        var mergedKinds = unseenPersonalRecordKinds
+        for kind in kinds where !mergedKinds.contains(kind) {
+            mergedKinds.append(kind)
+        }
+        updateUnseenPersonalRecordUpdates(mergedKinds)
+    }
+
+    /// Clears the personal-record badge after the records sheet has been opened and closed.
+    public func clearUnseenPersonalRecordUpdates() {
+        updateUnseenPersonalRecordUpdates([])
     }
 
     /// Refreshes iCloud-related diagnostics on demand.
@@ -207,6 +235,13 @@ public final class MyDataStore {
         print("[DataStore] Store URL: \(storeLocationDescription)")
         print("[DataStore] App group container: \(ModelContainer.groupContainerIdentifier)")
         print("[DataStore] Expected CloudKit container: \(ModelContainer.cloudKitContainerIdentifier)")
+    }
+
+    /// Stores the unseen record kinds in both observable state and app-group defaults.
+    private func updateUnseenPersonalRecordUpdates(_ kinds: [PersonalRecordKind]) {
+        guard unseenPersonalRecordKinds != kinds else { return }
+        unseenPersonalRecordKinds = kinds
+        defaults.set(kinds.map(\.rawValue), forKey: DefaultsKey.unseenPersonalRecordKinds)
     }
 
     /// Starts a short grace period for CloudKit to repopulate an empty store after app install or reinstall.

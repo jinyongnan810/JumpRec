@@ -33,6 +33,8 @@ struct SessionMetricsSummaryView: View {
     let peakHeartRate: String
     /// The rate samples plotted in the chart.
     let rateSamples: [SessionRateSample]
+    /// The record kinds newly achieved in the current context.
+    let achievedRecordKinds: [PersonalRecordKind]
 
     /// Explains why heart-rate data can be unavailable for some sessions.
     private let heartRateExplanation = SessionBreakdownExplanation(
@@ -49,13 +51,29 @@ struct SessionMetricsSummaryView: View {
             // Stats Grid
             VStack(spacing: 8) {
                 HStack(spacing: 10) {
-                    SessionMetricCard(label: "DURATION", value: duration)
-                    SessionMetricCard(label: "JUMPS", value: jumps)
+                    SessionMetricCard(
+                        label: "DURATION",
+                        value: duration,
+                        showsBadge: achievedRecordKinds.contains(.longestSession)
+                    )
+                    SessionMetricCard(
+                        label: "JUMPS",
+                        value: jumps,
+                        showsBadge: achievedRecordKinds.contains(.highestJumpCount)
+                    )
                 }
 
                 HStack(spacing: 10) {
-                    SessionMetricCard(label: "CALORIES", value: calories)
-                    SessionMetricCard(label: "AVG RATE", value: averageRate)
+                    SessionMetricCard(
+                        label: "CALORIES",
+                        value: calories,
+                        showsBadge: achievedRecordKinds.contains(.mostCalories)
+                    )
+                    SessionMetricCard(
+                        label: "AVG RATE",
+                        value: averageRate,
+                        showsBadge: achievedRecordKinds.contains(.bestAverageJumpRate)
+                    )
                 }
             }
 
@@ -82,7 +100,10 @@ struct SessionMetricsSummaryView: View {
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
 
-                SessionBreakdownRow(label: "Peak Rate") {
+                SessionBreakdownRow(
+                    label: "Peak Rate",
+                    showsBadge: achievedRecordKinds.contains(.bestJumpRate)
+                ) {
                     Text(peakRate)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
                         .foregroundStyle(AppColors.textPrimary)
@@ -94,7 +115,8 @@ struct SessionMetricsSummaryView: View {
                         id: "calories-per-minute",
                         title: "Calories Per Minute",
                         message: "Your average calorie burn efficiency across the full session duration."
-                    )
+                    ),
+                    showsBadge: achievedRecordKinds.contains(.sneakyBurn)
                 ) {
                     Text(caloriesPerMinute)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
@@ -107,7 +129,8 @@ struct SessionMetricsSummaryView: View {
                         id: "rhythm-consistency",
                         title: "Rhythm Consistency",
                         message: "A normalized score that reflects how evenly you maintained your jumping pace throughout the session."
-                    )
+                    ),
+                    showsBadge: achievedRecordKinds.contains(.steadyRhythm)
                 ) {
                     Text(rhythmConsistency)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
@@ -120,7 +143,8 @@ struct SessionMetricsSummaryView: View {
                         id: "longest-streak",
                         title: "Longest Streak",
                         message: "The highest number of consecutive jumps you completed without stopping."
-                    )
+                    ),
+                    showsBadge: achievedRecordKinds.contains(.longestJumpStreak)
                 ) {
                     Text(longestJumpStrikes)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))

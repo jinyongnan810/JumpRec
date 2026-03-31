@@ -7,6 +7,8 @@ import SwiftUI
 
 /// Displays the summary screen after a session finishes.
 struct SessionCompleteView: View {
+    @Environment(MyDataStore.self) private var dataStore
+
     /// The app state containing the just-completed session details.
     @Bindable var appState: JumpRecState
     /// Resets the flow back to the idle state.
@@ -61,6 +63,11 @@ struct SessionCompleteView: View {
         summarySession.derivedMetrics(rateSamples: rateSamples)
     }
 
+    /// The exact personal record kinds that are still waiting to be acknowledged by the user.
+    private var unseenRecordKinds: [PersonalRecordKind] {
+        dataStore.unseenPersonalRecordKinds
+    }
+
     // MARK: - View
 
     /// Renders the post-session summary, chart, and actions.
@@ -85,6 +92,10 @@ struct SessionCompleteView: View {
                     Text("Here are your results.")
                         .font(.system(size: 13))
                         .foregroundStyle(AppColors.textSecondary)
+
+                    if !unseenRecordKinds.isEmpty {
+                        PersonalRecordBadgeView(style: .pill)
+                    }
                 }
 
                 if let completedSession,
@@ -109,7 +120,8 @@ struct SessionCompleteView: View {
                     longBreaks: longBreaksText,
                     averageHeartRate: averageHeartRateText,
                     peakHeartRate: peakHeartRateText,
-                    rateSamples: rateSamples
+                    rateSamples: rateSamples,
+                    achievedRecordKinds: unseenRecordKinds
                 )
             }
             .padding(.horizontal, 24)
@@ -219,6 +231,7 @@ struct SessionCompleteView: View {
 }
 
 #Preview {
+    let dataStore = MyDataStore.shared
     let appState = JumpRecState()
     let start = Calendar.current.date(byAdding: .minute, value: -8, to: Date())!
     let end = Date()
@@ -259,7 +272,10 @@ struct SessionCompleteView: View {
     appState.completedSession = session
     appState.motionCSVShareURL = URL(fileURLWithPath: "/tmp/jumprec-preview-motion.csv")
 
+    dataStore.markUnseenPersonalRecordUpdates([.highestJumpCount, .steadyRhythm, .sneakyBurn])
+
     return SessionCompleteView(appState: appState, onDone: {})
+        .environment(dataStore)
         .background(AppColors.bgPrimary)
         .preferredColorScheme(.dark)
 }

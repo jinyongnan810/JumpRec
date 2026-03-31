@@ -78,6 +78,15 @@ struct HistoryView: View {
                         showRecords = true
                     } label: {
                         Label("Records", systemImage: "trophy.fill")
+                            .overlay(alignment: .topTrailing) {
+                                if !dataStore.unseenPersonalRecordKinds.isEmpty {
+                                    PersonalRecordBadgeView(
+                                        style: .compact,
+                                        animationMode: .once
+                                    )
+                                    .offset(x: 10, y: -8)
+                                }
+                            }
                     }
                     .matchedTransitionSource(id: Self.recordsTransitionID, in: navigationTransitionNamespace)
                 }
@@ -434,6 +443,7 @@ private struct SessionRowView: View {
 // MARK: - Preview
 
 #Preview {
+    let dataStore = MyDataStore.shared
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(
         for: JumpSession.self,
@@ -471,8 +481,11 @@ private struct SessionRowView: View {
         container.mainContext.insert(session)
     }
 
+    dataStore.markUnseenPersonalRecordUpdates([.highestJumpCount, .steadyRhythm, .sneakyBurn])
+
     return HistoryView()
         .modelContainer(container)
+        .environment(dataStore)
         .background(AppColors.bgPrimary)
         .preferredColorScheme(.dark)
 }

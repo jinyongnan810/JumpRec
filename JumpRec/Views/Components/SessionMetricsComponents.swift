@@ -23,6 +23,8 @@ struct SessionMetricCard: View {
     let value: String
     /// The accent color applied to the value text.
     var valueColor: Color = AppColors.textPrimary
+    /// Indicates whether this metric should show the new-record badge.
+    var showsBadge = false
 
     // MARK: - View
 
@@ -42,6 +44,12 @@ struct SessionMetricCard: View {
         .padding(14)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(alignment: .topTrailing) {
+            if showsBadge {
+                PersonalRecordBadgeView(style: .compact)
+                    .offset(x: 6, y: -6)
+            }
+        }
     }
 }
 
@@ -53,6 +61,8 @@ struct SessionBreakdownRow<Content: View>: View {
     @ViewBuilder let content: Content
     /// Optional explanation displayed when the row is tapped.
     let explanation: SessionBreakdownExplanation?
+    /// Indicates whether this breakdown row should show the new-record badge.
+    let showsBadge: Bool
     /// Controls local popover presentation for rows with explanations.
     @State private var isShowingExplanation = false
 
@@ -60,10 +70,12 @@ struct SessionBreakdownRow<Content: View>: View {
     init(
         label: LocalizedStringKey,
         explanation: SessionBreakdownExplanation? = nil,
+        showsBadge: Bool = false,
         @ViewBuilder content: () -> Content
     ) {
         self.label = label
         self.explanation = explanation
+        self.showsBadge = showsBadge
         self.content = content()
     }
 
@@ -92,6 +104,12 @@ struct SessionBreakdownRow<Content: View>: View {
         .padding(.horizontal, 16)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(alignment: .topTrailing) {
+            if showsBadge {
+                PersonalRecordBadgeView(style: .compact)
+                    .offset(x: 6, y: -6)
+            }
+        }
         .contentShape(RoundedRectangle(cornerRadius: 10))
         .onTapGesture {
             guard explanation != nil else { return }

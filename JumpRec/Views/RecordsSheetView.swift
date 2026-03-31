@@ -8,7 +8,7 @@ import SwiftUI
 
 struct RecordsSheetView: View {
     @Query(sort: \PersonalRecord.kindRawValue) private var records: [PersonalRecord]
-    @Environment(\.dismiss) private var dismiss
+    @Environment(MyDataStore.self) private var dataStore
 
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -38,13 +38,25 @@ struct RecordsSheetView: View {
             .sorted { $0.achievedAt > $1.achievedAt }
     }
 
+    private var unseenRecordKinds: [PersonalRecordKind] {
+        dataStore.unseenPersonalRecordKinds
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
                 // Title
-                Text("Personal Records")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(AppColors.textPrimary)
+                HStack(spacing: 8) {
+                    Text("Personal Records")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(AppColors.textPrimary)
+
+                    if !unseenRecordKinds.isEmpty {
+                        PersonalRecordBadgeView(style: .pill)
+                    }
+
+                    Spacer()
+                }
 
                 // Records list
                 if displayRecords.isEmpty {
@@ -62,7 +74,10 @@ struct RecordsSheetView: View {
                 } else {
                     VStack(spacing: 10) {
                         ForEach(displayRecords) { record in
-                            RecordCardView(record: record)
+                            RecordCardView(
+                                record: record,
+                                isHighlighted: unseenRecordKinds.contains(record.kind)
+                            ).padding(.horizontal, 12)
                         }
                     }
                 }
@@ -73,12 +88,17 @@ struct RecordsSheetView: View {
         .padding(.top, 16)
         .padding(.horizontal, 24)
         .padding(.bottom, 32)
+        .onDisappear {
+            // Dismissing the records sheet counts as acknowledging any newly achieved records.
+            dataStore.clearUnseenPersonalRecordUpdates()
+        }
     }
 }
 
 // MARK: - Preview
 
 #Preview {
+    let dataStore = MyDataStore.shared
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(
         for: JumpSession.self,
@@ -173,8 +193,11 @@ struct RecordsSheetView: View {
         )
     )
 
+    dataStore.markUnseenPersonalRecordUpdates([.highestJumpCount, .steadyRhythm, .sneakyBurn])
+
     return RecordsSheetView()
         .modelContainer(container)
+        .environment(dataStore)
         .presentationBackground(AppColors.cardSurface)
         .preferredColorScheme(.dark)
 }
@@ -192,6 +215,7 @@ private struct RecordItem: Identifiable {
 
 private struct RecordCardView: View {
     let record: RecordItem
+    let isHighlighted: Bool
 
     private static let cardBg = Color(hex: 0x0F172A)
 
@@ -223,6 +247,12 @@ private struct RecordCardView: View {
         .padding(16)
         .background(Self.cardBg)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(alignment: .topTrailing) {
+            if isHighlighted {
+                PersonalRecordBadgeView(style: .compact)
+                    .offset(x: 6, y: -6)
+            }
+        }
     }
 
     private static let dateFormatter: DateFormatter = {
