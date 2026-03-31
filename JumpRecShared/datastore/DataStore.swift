@@ -126,7 +126,7 @@ public final class MyDataStore {
     private static func makeSharedStore() throws -> MyDataStore {
         let modelContainer = try ModelContainer.createContainer()
         let store = MyDataStore(modelContainer: modelContainer)
-        store.backfillPersonalRecordsIfNeeded()
+//        store.backfillPersonalRecordsIfNeeded()
         store.logPersistenceConfiguration()
         store.observeCloudAccountChanges()
         store.refreshCloudDiagnostics()
