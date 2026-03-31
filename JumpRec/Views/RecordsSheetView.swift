@@ -9,6 +9,7 @@ import SwiftUI
 struct RecordsSheetView: View {
     @Query(sort: \PersonalRecord.kindRawValue) private var records: [PersonalRecord]
     @Environment(MyDataStore.self) private var dataStore
+    @State private var isShowingClearRecordsConfirmation = false
 
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -43,54 +44,75 @@ struct RecordsSheetView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                // Title
-                HStack(spacing: 8) {
-                    Text("Personal Records")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(AppColors.textPrimary)
-
-                    if !unseenRecordKinds.isEmpty {
-                        PersonalRecordBadgeView(style: .pill)
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Records list
+                    if displayRecords.isEmpty {
+                        VStack(spacing: 8) {
+                            Spacer()
+                            Text("No records yet")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundStyle(AppColors.textSecondary)
+                            Text("Complete sessions to set personal records!")
+                                .font(.system(size: 13))
+                                .foregroundStyle(AppColors.textMuted)
+                            Spacer()
+                        }
+                        .frame(maxWidth: .infinity)
+                    } else {
+                        VStack(spacing: 10) {
+                            ForEach(displayRecords) { record in
+                                RecordCardView(
+                                    record: record,
+                                    isHighlighted: unseenRecordKinds.contains(record.kind)
+                                ).padding(.horizontal, 12)
+                            }
+                        }
                     }
 
                     Spacer()
                 }
-
-                // Records list
-                if displayRecords.isEmpty {
-                    VStack(spacing: 8) {
-                        Spacer()
-                        Text("No records yet")
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(AppColors.textSecondary)
-                        Text("Complete sessions to set personal records!")
-                            .font(.system(size: 13))
-                            .foregroundStyle(AppColors.textMuted)
-                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity)
-                } else {
-                    VStack(spacing: 10) {
-                        ForEach(displayRecords) { record in
-                            RecordCardView(
-                                record: record,
-                                isHighlighted: unseenRecordKinds.contains(record.kind)
-                            ).padding(.horizontal, 12)
-                        }
+            }
+            .padding(.top, 16)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 32)
+            .navigationTitle("Personal Records")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    if !unseenRecordKinds.isEmpty {
+                        PersonalRecordBadgeView(style: .pill)
                     }
                 }
-
-                Spacer()
+                ToolbarItem(placement: .topBarTrailing) {
+                    if !displayRecords.isEmpty {
+                        Button(role: .destructive) {
+                            // The destructive action is split from the tap target so the sheet can present
+                            // a confirmation step before removing every cached personal record.
+                            isShowingClearRecordsConfirmation = true
+                        } label: {
+                            Image(systemName: "trash")
+                        }
+                        .accessibilityLabel(Text("Delete Records"))
+                    }
+                }
             }
-        }
-        .padding(.top, 16)
-        .padding(.horizontal, 24)
-        .padding(.bottom, 32)
-        .onDisappear {
-            // Dismissing the records sheet counts as acknowledging any newly achieved records.
-            dataStore.clearUnseenPersonalRecordUpdates()
+            .alert(
+                "Delete all records?",
+                isPresented: $isShowingClearRecordsConfirmation
+            ) {
+                Button("Delete Records", role: .destructive) {
+                    dataStore.clearAllPersonalRecords()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This removes all personal records from this sheet. Your saved sessions stay in history.")
+            }
+            .onDisappear {
+                // Dismissing the records sheet counts as acknowledging any newly achieved records.
+                dataStore.clearUnseenPersonalRecordUpdates()
+            }
         }
     }
 }
@@ -195,11 +217,12 @@ struct RecordsSheetView: View {
 
     dataStore.markUnseenPersonalRecordUpdates([.highestJumpCount, .steadyRhythm, .sneakyBurn])
 
-    return RecordsSheetView()
-        .modelContainer(container)
-        .environment(dataStore)
-        .presentationBackground(AppColors.cardSurface)
-        .preferredColorScheme(.dark)
+    return
+        RecordsSheetView()
+            .modelContainer(container)
+            .environment(dataStore)
+            .presentationBackground(AppColors.cardSurface)
+            .preferredColorScheme(.dark)
 }
 
 // MARK: - Record Item Model

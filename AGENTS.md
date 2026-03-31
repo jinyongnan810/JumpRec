@@ -11,6 +11,7 @@ When making changes, prioritize readability, maintainability, and safety over cl
 - Avoid introducing new dependencies unless clearly justified.
 - Preserve existing architecture unless there is a strong reason to improve it.
 - Do not make broad refactors unless they are required for the task.
+- Also implement localization if ui changes
 
 ## Readability and comments
 - Always leave detailed comments for reading.

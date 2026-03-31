@@ -62,6 +62,28 @@ extension MyDataStore {
         return updatedKinds
     }
 
+    /// Removes every cached personal record row from the local store.
+    /// This is intentionally scoped to the derived record cache only, so clearing the sheet does not
+    /// destroy the underlying session history that future record calculations still depend on.
+    func clearAllPersonalRecords() {
+        let descriptor = FetchDescriptor<PersonalRecord>()
+        let existingRecords = (try? modelContext.fetch(descriptor)) ?? []
+
+        guard !existingRecords.isEmpty else {
+            // Keeping the unseen state in sync avoids stale badges if the user clears records from an already-empty sheet.
+            clearUnseenPersonalRecordUpdates()
+            return
+        }
+
+        for record in existingRecords {
+            modelContext.delete(record)
+        }
+
+        // Clearing the records also clears any "new record" badge state because there is nothing left to acknowledge.
+        clearUnseenPersonalRecordUpdates()
+        saveContextIfNeeded()
+    }
+
     func backfillPersonalRecordsIfNeeded() {
         let recordDescriptor = FetchDescriptor<PersonalRecord>()
         let existingRecords = (try? modelContext.fetch(recordDescriptor)) ?? []

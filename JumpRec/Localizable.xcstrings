@@ -310,6 +310,26 @@
     "Delete All" : {
 
     },
+    "Delete all records?" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての記録を削除しますか？"
+          }
+        }
+      }
+    },
+    "Delete Records" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記録を削除"
+          }
+        }
+      }
+    },
     "Delete Session" : {
       "localizations" : {
         "ja" : {
@@ -1104,6 +1124,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この操作は取り消せません。"
+          }
+        }
+      }
+    },
+    "This removes all personal records from this sheet. Your saved sessions stay in history." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このシートからすべての自己ベストを削除します。保存済みのセッション履歴はそのまま残ります。"
           }
         }
       }
