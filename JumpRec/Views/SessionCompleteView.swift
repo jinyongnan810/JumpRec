@@ -14,6 +14,11 @@ struct SessionCompleteView: View {
     /// Resets the flow back to the idle state.
     var onDone: () -> Void
 
+    /// Drives the one-time entrance animation for the completion badge.
+    /// Keeping this state local makes the animation deterministic for this screen
+    /// without coupling it to broader session lifecycle state.
+    @State private var isCompletionBadgeVisible = false
+
     // MARK: - Derived Values
 
     /// Returns the saved session object when one is available.
@@ -80,11 +85,19 @@ struct SessionCompleteView: View {
                         Circle()
                             .fill(AppColors.accent)
                             .frame(width: 64, height: 64)
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundStyle(AppColors.bgPrimary)
+                            .scaleEffect(isCompletionBadgeVisible ? 1 : 0.6)
+                            .opacity(isCompletionBadgeVisible ? 1 : 0)
+                        completionCheckmark
                     }
-
+                    // The delayed spring gives the completion icon a clear "arrival"
+                    // moment when this screen is pushed into view, while avoiding a
+                    // repeated animation during unrelated body updates.
+                    .onAppear {
+                        guard !isCompletionBadgeVisible else { return }
+                        withAnimation(.spring(response: 1, dampingFraction: 1)) {
+                            isCompletionBadgeVisible = true
+                        }
+                    }
                     Text("Session Complete!")
                         .font(.system(size: 24, weight: .semibold))
                         .foregroundStyle(AppColors.textPrimary)
@@ -92,10 +105,6 @@ struct SessionCompleteView: View {
                     Text("Here are your results.")
                         .font(.system(size: 13))
                         .foregroundStyle(AppColors.textSecondary)
-
-                    if !unseenRecordKinds.isEmpty {
-                        PersonalRecordBadgeView(style: .pill)
-                    }
                 }
 
                 if let completedSession,
@@ -227,6 +236,33 @@ struct SessionCompleteView: View {
     /// Returns the formatted peak heart-rate text.
     private var peakHeartRateText: String {
         summarySession.formattedPeakHeartRate()
+    }
+
+    // MARK: - Private Subviews
+
+    /// Chooses the symbol animation style based on OS support.
+    /// Newer systems get the line-drawing treatment, while earlier releases keep
+    /// the bounce fallback so the completion state still feels celebratory.
+    @ViewBuilder
+    private var completionCheckmark: some View {
+        let checkmark = Image(systemName: "checkmark")
+            .font(.system(size: 28, weight: .bold))
+            .foregroundStyle(AppColors.bgPrimary)
+
+        if #available(iOS 26.0, *) {
+            checkmark
+                .foregroundStyle(.white)
+                .symbolEffect(
+                    .drawOn,
+                    options: .speed(0.5),
+                    isActive: !isCompletionBadgeVisible
+                )
+        } else {
+            checkmark
+                .symbolEffect(.bounce, value: isCompletionBadgeVisible)
+                .scaleEffect(isCompletionBadgeVisible ? 1 : 0.2)
+                .opacity(isCompletionBadgeVisible ? 1 : 0)
+        }
     }
 }
 
