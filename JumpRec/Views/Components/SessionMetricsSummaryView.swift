@@ -50,7 +50,7 @@ struct SessionMetricsSummaryView: View {
             VStack(spacing: 8) {
                 HStack(spacing: 10) {
                     SessionMetricCard(label: "DURATION", value: duration)
-                    SessionMetricCard(label: "JUMPS", value: jumps, valueColor: AppColors.accent)
+                    SessionMetricCard(label: "JUMPS", value: jumps)
                 }
 
                 HStack(spacing: 10) {
@@ -85,7 +85,7 @@ struct SessionMetricsSummaryView: View {
                 SessionBreakdownRow(label: "Peak Rate") {
                     Text(peakRate)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(AppColors.textSecondary)
+                        .foregroundStyle(AppColors.textPrimary)
                 }
 
                 SessionBreakdownRow(
@@ -98,7 +98,7 @@ struct SessionMetricsSummaryView: View {
                 ) {
                     Text(caloriesPerMinute)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(AppColors.warning)
+                        .foregroundStyle(AppColors.textPrimary)
                 }
 
                 SessionBreakdownRow(
@@ -111,7 +111,7 @@ struct SessionMetricsSummaryView: View {
                 ) {
                     Text(rhythmConsistency)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(AppColors.accent)
+                        .foregroundStyle(AppColors.textPrimary)
                 }
 
                 SessionBreakdownRow(
@@ -124,7 +124,7 @@ struct SessionMetricsSummaryView: View {
                 ) {
                     Text(longestJumpStrikes)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(AppColors.accent)
+                        .foregroundStyle(AppColors.textPrimary)
                 }
 
                 SessionBreakdownRow(
@@ -137,7 +137,7 @@ struct SessionMetricsSummaryView: View {
                 ) {
                     Text(shortBreaks)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(AppColors.warning)
+                        .foregroundStyle(AppColors.textPrimary)
                 }
 
                 SessionBreakdownRow(
@@ -150,7 +150,7 @@ struct SessionMetricsSummaryView: View {
                 ) {
                     Text(longBreaks)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(AppColors.warning)
+                        .foregroundStyle(AppColors.textPrimary)
                 }
 
                 SessionBreakdownRow(
@@ -159,7 +159,7 @@ struct SessionMetricsSummaryView: View {
                 ) {
                     Text(averageHeartRate)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(AppColors.heartRate)
+                        .foregroundStyle(AppColors.textPrimary)
                 }
 
                 SessionBreakdownRow(
@@ -168,7 +168,7 @@ struct SessionMetricsSummaryView: View {
                 ) {
                     Text(peakHeartRate)
                         .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(AppColors.heartRate)
+                        .foregroundStyle(AppColors.textPrimary)
                 }
             }
         }
