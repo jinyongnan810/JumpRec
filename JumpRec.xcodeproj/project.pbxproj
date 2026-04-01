@@ -687,7 +687,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "JumpRec-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = JumpRec.;
+				INFOPLIST_KEY_CFBundleDisplayName = JumpRec;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need your health information to get better understanding of the workout status.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need your health information to get better understanding of the workout status.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "JumpRec. want to use your motion data to detect jump motion.";
@@ -729,7 +729,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "JumpRec-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = JumpRec.;
+				INFOPLIST_KEY_CFBundleDisplayName = JumpRec;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need your health information to get better understanding of the workout status.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need your health information to get better understanding of the workout status.";
 				INFOPLIST_KEY_NSMotionUsageDescription = "JumpRec. want to use your motion data to detect jump motion.";
@@ -772,7 +772,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = JumpRec/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = JumpRec.;
+				INFOPLIST_KEY_CFBundleDisplayName = JumpRec;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -816,7 +816,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = JumpRec/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = JumpRec.;
+				INFOPLIST_KEY_CFBundleDisplayName = JumpRec;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
