@@ -32,12 +32,12 @@ struct SessionMetricCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label)
-                .font(.system(size: 10, weight: .semibold))
+                .font(AppFonts.eyebrowLabel)
                 .tracking(2)
                 .foregroundStyle(AppColors.textMuted)
 
             Text(value)
-                .font(.system(size: 22, weight: .bold, design: .monospaced))
+                .font(AppFonts.metricValueLargeMonospaced)
                 .foregroundStyle(valueColor)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -86,12 +86,12 @@ struct SessionBreakdownRow<Content: View>: View {
         HStack {
             HStack(spacing: 6) {
                 Text(label)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(AppFonts.secondaryActionLabel)
                     .foregroundStyle(AppColors.textPrimary)
 
                 if explanation != nil {
                     Image(systemName: "info.circle.fill")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(AppFonts.smallValue)
                         .foregroundStyle(AppColors.textMuted)
                 }
             }
@@ -119,11 +119,11 @@ struct SessionBreakdownRow<Content: View>: View {
             if let explanation {
                 VStack(alignment: .leading, spacing: 10) {
                     Text(explanation.title)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(AppFonts.detailValue)
                         .foregroundStyle(AppColors.textPrimary)
 
                     Text(explanation.message)
-                        .font(.system(size: 13))
+                        .font(AppFonts.bodySmall)
                         .foregroundStyle(AppColors.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }

@@ -15,12 +15,12 @@ struct JumpingView: View {
     var body: some View {
         VStack(spacing: 4) {
             Text("JUMPS")
-                .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                .font(AppFonts.watchMetricLabel)
                 .tracking(2)
                 .foregroundStyle(AppColors.textMuted)
 
             Text("\(appState.jumpCount)")
-                .font(.system(size: 40, weight: .bold, design: .monospaced))
+                .font(AppFonts.watchMetricValue)
                 .foregroundStyle(AppColors.accent)
                 .contentTransition(.numericText())
                 .animation(.bouncy, value: appState.jumpCount)
@@ -29,16 +29,16 @@ struct JumpingView: View {
 
             HStack {
                 TimerView(startTime: appState.startTime ?? Date())
-                    .font(.system(size: 14, weight: .medium, design: .monospaced))
+                    .font(AppFonts.watchMetricDetail)
                     .foregroundStyle(AppColors.textSecondary)
 
                 Spacer()
 
                 HStack(spacing: 4) {
                     Image(systemName: "heart.fill")
-                        .font(.system(size: 10))
+                        .font(AppFonts.watchBodySmall)
                     Text(appState.heartrate == 0 ? "--" : "\(appState.heartrate)")
-                        .font(.system(size: 14, weight: .medium, design: .monospaced))
+                        .font(AppFonts.watchMetricDetail)
                 }
                 .foregroundStyle(AppColors.heartRate)
             }
@@ -48,7 +48,7 @@ struct JumpingView: View {
                 appState.end()
             } label: {
                 Text("STOP")
-                    .font(.system(size: 12, weight: .bold, design: .monospaced))
+                    .font(AppFonts.watchMetricCompact)
                     .tracking(1)
                     .foregroundStyle(AppColors.textPrimary)
                     .frame(maxWidth: .infinity)

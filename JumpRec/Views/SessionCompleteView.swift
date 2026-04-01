@@ -99,11 +99,11 @@ struct SessionCompleteView: View {
                         }
                     }
                     Text("Session Complete!")
-                        .font(.system(size: 24, weight: .semibold))
+                        .font(AppFonts.screenTitle)
                         .foregroundStyle(AppColors.textPrimary)
 
                     Text("Here are your results.")
-                        .font(.system(size: 13))
+                        .font(AppFonts.bodySmall)
                         .foregroundStyle(AppColors.textSecondary)
                 }
 
@@ -143,9 +143,9 @@ struct SessionCompleteView: View {
                     ShareLink(item: motionCSVShareURL) {
                         HStack(spacing: 8) {
                             Image(systemName: "square.and.arrow.up")
-                                .font(.system(size: 18))
+                                .font(AppFonts.sectionIcon)
                             Text("SHARE CSV")
-                                .font(.system(size: 15, weight: .semibold))
+                                .font(AppFonts.cardTitle)
                         }
                         .foregroundStyle(AppColors.textPrimary)
                         .frame(maxWidth: .infinity)
@@ -158,9 +158,9 @@ struct SessionCompleteView: View {
                 Button(action: onDone) {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 18))
+                            .font(AppFonts.sectionIcon)
                         Text("DONE")
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(AppFonts.cardTitle)
                     }
                     .foregroundStyle(AppColors.bgPrimary)
                     .frame(maxWidth: .infinity)
@@ -246,7 +246,7 @@ struct SessionCompleteView: View {
     @ViewBuilder
     private var completionCheckmark: some View {
         let checkmark = Image(systemName: "checkmark")
-            .font(.system(size: 28, weight: .bold))
+            .font(AppFonts.largeDisplay)
             .foregroundStyle(AppColors.bgPrimary)
 
         if #available(iOS 26.0, *) {

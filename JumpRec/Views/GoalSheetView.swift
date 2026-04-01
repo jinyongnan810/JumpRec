@@ -29,7 +29,7 @@ struct GoalSheetView: View {
         VStack(spacing: 24) {
             // Title
             Text("Set Session Goal")
-                .font(.system(size: 15, weight: .semibold))
+                .font(AppFonts.primaryButtonLabel)
                 .foregroundStyle(AppColors.textPrimary)
 
             // Segmented Control
@@ -46,7 +46,7 @@ struct GoalSheetView: View {
                 dismiss()
             } label: {
                 Text("Confirm")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(AppFonts.primaryButtonLabel)
                     .foregroundStyle(AppColors.bgPrimary)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
@@ -92,7 +92,7 @@ struct GoalSheetView: View {
                 adjustValue(by: -stepAmount)
             } label: {
                 Image(systemName: "minus")
-                    .font(.system(size: 22))
+                    .font(AppFonts.largeControlIcon)
                     .foregroundStyle(AppColors.accent)
                     .frame(width: 48, height: 48)
             }
@@ -102,12 +102,12 @@ struct GoalSheetView: View {
             // Value display
             VStack(spacing: 4) {
                 Text(displayValue)
-                    .font(.system(size: 32, weight: .bold, design: .monospaced))
+                    .font(AppFonts.metricValueXLMonospaced)
                     .foregroundStyle(AppColors.textPrimary)
                     .contentTransition(.numericText())
 
                 Text(unitLabel)
-                    .font(.system(size: 13))
+                    .font(AppFonts.bodySmall)
                     .foregroundStyle(AppColors.textSecondary)
             }
             .frame(minWidth: 100)
@@ -117,7 +117,7 @@ struct GoalSheetView: View {
                 adjustValue(by: stepAmount)
             } label: {
                 Image(systemName: "plus")
-                    .font(.system(size: 22))
+                    .font(AppFonts.largeControlIcon)
                     .foregroundStyle(AppColors.accent)
                     .frame(width: 48, height: 48)
             }
@@ -175,11 +175,11 @@ struct GoalSheetView: View {
     private func configureSegmentedControlAppearance() {
         let selectedTextAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor(AppColors.bgPrimary),
-            .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+            .font: AppFonts.segmentedControlLabel,
         ]
         let normalTextAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor(AppColors.textSecondary),
-            .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
+            .font: AppFonts.segmentedControlLabel,
         ]
 
         UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(AppColors.accent)

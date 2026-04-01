@@ -31,7 +31,7 @@ struct AICommentCardView: View {
                 card {
                     Label {
                         Text(comment)
-                            .font(.system(size: 15, weight: .medium))
+                            .font(AppFonts.bodyLabelStrong)
                             .foregroundStyle(AppColors.textPrimary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     } icon: {
@@ -44,7 +44,7 @@ struct AICommentCardView: View {
                         ProgressView()
                             .tint(AppColors.accent)
                         Text("Writing your session comment...")
-                            .font(.system(size: 14, weight: .medium))
+                            .font(AppFonts.bodyLabel)
                             .foregroundStyle(AppColors.textSecondary)
                         Spacer()
                     }
@@ -94,7 +94,7 @@ struct AICommentCardView: View {
     @ViewBuilder
     private var sparklesIcon: some View {
         let sparkles = Image(systemName: "sparkles")
-            .font(.system(size: 18, weight: .semibold))
+            .font(AppFonts.sectionTitle)
             .foregroundStyle(AppColors.accent)
 
         if #available(iOS 26.0, *) {

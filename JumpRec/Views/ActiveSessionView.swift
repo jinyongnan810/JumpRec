@@ -121,11 +121,11 @@ struct ActiveSessionView: View {
             // Header
             VStack(spacing: 4) {
                 Text("JumpRec")
-                    .font(.system(size: 24, weight: .semibold))
+                    .font(AppFonts.screenTitle)
                     .foregroundStyle(AppColors.textPrimary)
 
                 Label(goalText, systemImage: "target")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(AppFonts.heroRingSubtitle)
                     .foregroundStyle(AppColors.accent)
             }
 
@@ -157,9 +157,9 @@ struct ActiveSessionView: View {
             Button(action: onStop) {
                 HStack(spacing: 8) {
                     Image(systemName: "stop.fill")
-                        .font(.system(size: 18))
+                        .font(AppFonts.sectionIcon)
                     Text(appState.isMirroredWatchSession ? "STOP ON WATCH" : "STOP SESSION")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(AppFonts.cardTitle)
                 }
                 .foregroundStyle(AppColors.textPrimary)
                 .frame(maxWidth: .infinity)

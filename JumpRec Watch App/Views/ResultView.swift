@@ -17,16 +17,16 @@ struct ResultView: View {
         NavigationStack {
             VStack(spacing: 8) {
                 Text("SESSION COMPLETE")
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .font(AppFonts.watchMetricLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
 
                 Text("\(appState.jumpCount)")
-                    .font(.system(size: 36, weight: .bold, design: .monospaced))
+                    .font(AppFonts.watchResultValue)
                     .foregroundStyle(AppColors.accent)
 
                 Text("JUMPS")
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .font(AppFonts.watchMetricLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
 
@@ -37,22 +37,22 @@ struct ResultView: View {
                 HStack(spacing: 16) {
                     VStack(spacing: 2) {
                         Image(systemName: "clock")
-                            .font(.system(size: 10))
+                            .font(AppFonts.watchBodySmall)
                             .foregroundStyle(AppColors.textSecondary)
                         Text(appState.totalTime)
-                            .font(.system(size: 14, weight: .bold, design: .monospaced))
+                            .font(AppFonts.watchMetricDetailBold)
                             .foregroundStyle(AppColors.textPrimary)
                     }
 
                     VStack(spacing: 2) {
                         Image(systemName: "flame.fill")
-                            .font(.system(size: 10))
+                            .font(AppFonts.watchBodySmall)
                             .foregroundStyle(AppColors.warning)
                         Text(String(format: "%.0f", appState.energyBurned))
-                            .font(.system(size: 14, weight: .bold, design: .monospaced))
+                            .font(AppFonts.watchMetricDetailBold)
                             .foregroundStyle(AppColors.textPrimary)
                             + Text(" kcal")
-                            .font(.system(size: 9, weight: .medium))
+                            .font(AppFonts.watchBodyTiny)
                             .foregroundStyle(AppColors.textSecondary)
                     }
                 }

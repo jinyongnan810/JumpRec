@@ -34,7 +34,7 @@ struct PersonalRecordBadgeView: View {
 
             if style == .pill {
                 Text("New Record")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(AppFonts.badgeLabel)
                     .foregroundStyle(AppColors.textPrimary)
             }
         }

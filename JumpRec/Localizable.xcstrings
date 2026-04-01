@@ -307,6 +307,9 @@
         }
       }
     },
+    "Delete All" : {
+
+    },
     "Delete all records?" : {
       "localizations" : {
         "ja" : {

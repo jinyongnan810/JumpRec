@@ -61,7 +61,7 @@ struct StartView: View {
                 if isCountingDown {
                     ZStack {
                         Text("\(countdown, specifier: "%.0f")")
-                            .font(.system(size: 48, weight: .bold, design: .monospaced))
+                            .font(AppFonts.watchCountdown)
                             .foregroundStyle(AppColors.textPrimary)
                             .contentTransition(.numericText())
                             .onReceive(timer.autoconnect()) { _ in
@@ -93,7 +93,7 @@ struct StartView: View {
                 } else {
                     VStack(spacing: 12) {
                         Text("START")
-                            .font(.system(size: 20, weight: .bold, design: .monospaced))
+                            .font(AppFonts.watchPrimaryButton)
                             .tracking(2)
                             .foregroundStyle(AppColors.bgPrimary)
                             .frame(maxWidth: .infinity)
@@ -108,9 +108,9 @@ struct StartView: View {
 
                         HStack(spacing: 4) {
                             Image(systemName: "target")
-                                .font(.system(size: 11))
+                                .font(AppFonts.watchSupporting)
                             goal
-                                .font(.system(size: 12, weight: .medium))
+                                .font(AppFonts.watchGoalLabel)
                         }
                         .foregroundStyle(AppColors.textSecondary)
                     }

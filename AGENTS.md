@@ -34,6 +34,8 @@ When making changes, prioritize readability, maintainability, and safety over cl
 - Use SwiftUI-native patterns first before falling back to UIKit.
 - Avoid putting too much business logic directly inside SwiftUI views.
 - Move non-UI logic into view models, helpers, or services when appropriate.
+- Use the shared typography catalog in `JumpRecShared/AppFonts.swift` for app font styling instead of introducing new inline `.font(...)` definitions when an existing shared style fits.
+- When a new font treatment is genuinely needed, add it to `AppFonts` first so typography remains centralized across the iPhone app, Watch app, and extensions.
 
 ## Architecture preferences
 - Favor simple MVVM-style separation when suitable for the feature.

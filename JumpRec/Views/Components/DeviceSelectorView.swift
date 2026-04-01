@@ -27,7 +27,7 @@ struct DeviceSelectorView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("ACTIVE SOURCE")
-                .font(.system(size: 11, weight: .semibold))
+                .font(AppFonts.badgeLabel)
                 .tracking(2)
                 .foregroundStyle(AppColors.textMuted)
 
@@ -35,7 +35,7 @@ struct DeviceSelectorView: View {
                 activeSourceCard
 
                 Text("Automatically switches to the best available device.")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(AppFonts.secondaryActionLabel)
                     .foregroundStyle(AppColors.textSecondary)
 
                 HStack(spacing: 8) {
@@ -55,17 +55,17 @@ struct DeviceSelectorView: View {
 
         return HStack(spacing: 14) {
             Image(systemName: source?.iconName ?? "sensor.tag.radiowaves.forward")
-                .font(.system(size: 24, weight: .semibold))
+                .font(AppFonts.screenTitle)
                 .foregroundStyle(AppColors.accent)
                 .frame(width: 32)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(source?.shortName ?? String(localized: "Searching"))
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(AppFonts.sectionTitle)
                     .foregroundStyle(AppColors.textPrimary)
 
                 Text(source == nil ? String(localized: "No motion source connected yet") : String(localized: "Currently selected for motion data"))
-                    .font(.system(size: 13, weight: .medium))
+                    .font(AppFonts.secondaryActionLabel)
                     .foregroundStyle(AppColors.textSecondary)
             }
             Spacer()
@@ -123,10 +123,10 @@ struct DeviceSelectorView: View {
     private func badgeLabel(for source: DeviceSource, isAvailable: Bool, isActive: Bool) -> some View {
         HStack(spacing: 6) {
             Image(systemName: source.iconName)
-                .font(.system(size: 13, weight: .semibold))
+                .font(AppFonts.badgeIconLabel)
 
             Text(source.shortName)
-                .font(.system(size: 12, weight: .semibold))
+                .font(AppFonts.smallValue)
         }
         .foregroundStyle(badgeForeground(isAvailable: isAvailable, isActive: isActive))
         .padding(.horizontal, 10)
@@ -146,11 +146,11 @@ struct DeviceSelectorView: View {
     private func infoPopover(message: String) -> some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "info.circle.fill")
-                .font(.system(size: 14, weight: .semibold))
+                .font(AppFonts.smallActionLabel)
                 .foregroundStyle(AppColors.warning)
 
             Text(message)
-                .font(.system(size: 12, weight: .medium))
+                .font(AppFonts.heroRingSubtitle)
                 .foregroundStyle(AppColors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 

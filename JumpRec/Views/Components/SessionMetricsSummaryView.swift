@@ -80,7 +80,7 @@ struct SessionMetricsSummaryView: View {
             // Graph Section
             VStack(alignment: .leading, spacing: 12) {
                 Text("JUMPING RATE")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(AppFonts.badgeLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
 
@@ -96,7 +96,7 @@ struct SessionMetricsSummaryView: View {
             // Session Breakdown
             VStack(alignment: .leading, spacing: 8) {
                 Text("SESSION BREAKDOWN")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(AppFonts.badgeLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
 
@@ -105,7 +105,7 @@ struct SessionMetricsSummaryView: View {
                     showsBadge: achievedRecordKinds.contains(.bestJumpRate)
                 ) {
                     Text(peakRate)
-                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                        .font(AppFonts.metricDetailMonospaced)
                         .foregroundStyle(AppColors.textPrimary)
                 }
 
@@ -119,7 +119,7 @@ struct SessionMetricsSummaryView: View {
                     showsBadge: achievedRecordKinds.contains(.sneakyBurn)
                 ) {
                     Text(caloriesPerMinute)
-                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                        .font(AppFonts.metricDetailMonospaced)
                         .foregroundStyle(AppColors.textPrimary)
                 }
 
@@ -133,7 +133,7 @@ struct SessionMetricsSummaryView: View {
                     showsBadge: achievedRecordKinds.contains(.steadyRhythm)
                 ) {
                     Text(rhythmConsistency)
-                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                        .font(AppFonts.metricDetailMonospaced)
                         .foregroundStyle(AppColors.textPrimary)
                 }
 
@@ -147,7 +147,7 @@ struct SessionMetricsSummaryView: View {
                     showsBadge: achievedRecordKinds.contains(.longestJumpStreak)
                 ) {
                     Text(longestJumpStrikes)
-                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                        .font(AppFonts.metricDetailMonospaced)
                         .foregroundStyle(AppColors.textPrimary)
                 }
 
@@ -160,7 +160,7 @@ struct SessionMetricsSummaryView: View {
                     )
                 ) {
                     Text(shortBreaks)
-                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                        .font(AppFonts.metricDetailMonospaced)
                         .foregroundStyle(AppColors.textPrimary)
                 }
 
@@ -173,7 +173,7 @@ struct SessionMetricsSummaryView: View {
                     )
                 ) {
                     Text(longBreaks)
-                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                        .font(AppFonts.metricDetailMonospaced)
                         .foregroundStyle(AppColors.textPrimary)
                 }
 
@@ -182,7 +182,7 @@ struct SessionMetricsSummaryView: View {
                     explanation: heartRateExplanation
                 ) {
                     Text(averageHeartRate)
-                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                        .font(AppFonts.metricDetailMonospaced)
                         .foregroundStyle(AppColors.textPrimary)
                 }
 
@@ -191,7 +191,7 @@ struct SessionMetricsSummaryView: View {
                     explanation: heartRateExplanation
                 ) {
                     Text(peakHeartRate)
-                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                        .font(AppFonts.metricDetailMonospaced)
                         .foregroundStyle(AppColors.textPrimary)
                 }
             }

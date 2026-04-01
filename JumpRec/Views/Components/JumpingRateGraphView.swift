@@ -28,7 +28,7 @@ struct JumpingRateGraphView: View {
                     .stroke(AppColors.tabInactive.opacity(0.35), lineWidth: 1)
                     .overlay {
                         Text("No data")
-                            .font(.system(size: 13, weight: .medium))
+                            .font(AppFonts.secondaryActionLabel)
                             .foregroundStyle(AppColors.textSecondary)
                     }
             } else {
@@ -69,7 +69,7 @@ struct JumpingRateGraphView: View {
                                let label = xAxisLabelMap[elapsedSeconds]
                             {
                                 Text(label)
-                                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                    .font(AppFonts.graphAxisMonospaced)
                                     .foregroundStyle(AppColors.tabInactive)
                             }
                         }
@@ -85,7 +85,7 @@ struct JumpingRateGraphView: View {
                                let mark = yAxisMarks.first(where: { abs($0.value - axisValue) < 0.0001 })
                             {
                                 Text(mark.label)
-                                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                    .font(AppFonts.graphAxisMonospaced)
                                     .foregroundStyle(AppColors.tabInactive)
                             }
                         }

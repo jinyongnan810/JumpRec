@@ -261,7 +261,7 @@ private struct MonthSessionsList: View {
             Section {
                 if sessions.isEmpty {
                     Text("No sessions in this month.")
-                        .font(.system(size: 14))
+                        .font(AppFonts.bodyRegular)
                         .foregroundStyle(AppColors.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.vertical, 24)
@@ -284,7 +284,7 @@ private struct MonthSessionsList: View {
                 }
             } header: {
                 Text("SESSIONS THIS MONTH")
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(AppFonts.badgeLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
                     .textCase(nil)
@@ -352,7 +352,7 @@ private struct SessionRowView: View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(dateText)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(AppFonts.bodyLabel)
                     .foregroundStyle(AppColors.textPrimary)
 
                 ViewThatFits(in: .horizontal) {
@@ -380,7 +380,7 @@ private struct SessionRowView: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 18))
+                .font(AppFonts.sectionIcon)
                 .foregroundStyle(AppColors.tabInactive)
         }
         .padding(.vertical, 14)
@@ -422,10 +422,10 @@ private struct SessionRowView: View {
     ) -> some View {
         HStack(spacing: 6) {
             Image(systemName: systemImage)
-                .font(.system(size: 11, weight: .semibold))
+                .font(AppFonts.badgeLabel)
                 .foregroundStyle(AppColors.textSecondary)
             Text(value)
-                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                .font(AppFonts.smallValueMonospaced)
                 .foregroundStyle(valueColor)
                 .lineLimit(1)
                 .minimumScaleFactor(0.85)

@@ -45,7 +45,7 @@ struct JumpRecLiveActivityWidget: Widget {
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack(alignment: .leading, spacing: 10) {
                         Text(context.attributes.goalSummary)
-                            .font(.caption)
+                            .font(AppFonts.liveActivityCaption)
                             .foregroundStyle(.secondary)
 
                         HStack(spacing: 16) {
@@ -64,11 +64,11 @@ struct JumpRecLiveActivityWidget: Widget {
                 }
             } compactLeading: {
                 Text("\(context.state.jumpCount)")
-                    .font(.headline)
+                    .font(AppFonts.liveActivityHeadline)
                     .foregroundStyle(AppColors.textPrimary)
             } compactTrailing: {
                 Image(systemName: iconName(for: context.state.sourceLabel))
-                    .font(.headline)
+                    .font(AppFonts.liveActivityHeadline)
                     .foregroundStyle(AppColors.accent)
             } minimal: {
                 Image(systemName: iconName(for: context.state.sourceLabel))
@@ -81,10 +81,10 @@ struct JumpRecLiveActivityWidget: Widget {
     private func metricView(title: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title.uppercased())
-                .font(.caption2)
+                .font(AppFonts.liveActivityCaption2)
                 .foregroundStyle(AppColors.textSecondary)
             Text(value)
-                .font(.headline)
+                .font(AppFonts.liveActivityHeadline)
                 .foregroundStyle(AppColors.textPrimary)
         }
     }
@@ -98,7 +98,7 @@ struct JumpRecLiveActivityWidget: Widget {
                 Text(context.attributes.startedAt, style: .timer)
             }
         }
-        .font(.title3.monospacedDigit())
+        .font(AppFonts.liveActivityTimer)
     }
 
     private func iconName(for sourceLabel: String) -> String {
@@ -121,10 +121,10 @@ private struct JumpRecLiveActivityView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("JumpRec")
-                        .font(.headline)
+                        .font(AppFonts.liveActivityHeadline)
                         .foregroundStyle(AppColors.textPrimary)
                     Text(context.attributes.goalSummary)
-                        .font(.caption)
+                        .font(AppFonts.liveActivityCaption)
                         .foregroundStyle(AppColors.textSecondary)
                 }
 
@@ -132,7 +132,7 @@ private struct JumpRecLiveActivityView: View {
 
                 VStack(alignment: .trailing, spacing: 4) {
                     Label(localizedSourceLabel(for: context.state.sourceLabel), systemImage: iconName)
-                        .font(.caption.weight(.semibold))
+                        .font(AppFonts.liveActivityCaptionSemibold)
                         .foregroundStyle(AppColors.accent)
                     durationView
                 }
@@ -154,11 +154,11 @@ private struct JumpRecLiveActivityView: View {
         if let endedAt = context.state.endedAt {
             let interval = Int(endedAt.timeIntervalSince(context.attributes.startedAt))
             Text(String(format: "%02d:%02d", interval / 60, interval % 60))
-                .font(.title3.monospacedDigit())
+                .font(AppFonts.liveActivityTimer)
                 .foregroundStyle(AppColors.textPrimary)
         } else {
             Text(context.attributes.startedAt, style: .timer)
-                .font(.title3.monospacedDigit())
+                .font(AppFonts.liveActivityTimer)
                 .foregroundStyle(AppColors.textPrimary)
         }
     }
@@ -177,10 +177,10 @@ private struct JumpRecLiveActivityView: View {
     private func statCard(title: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title.uppercased())
-                .font(.caption2)
+                .font(AppFonts.liveActivityCaption2)
                 .foregroundStyle(AppColors.textSecondary)
             Text(value)
-                .font(.headline)
+                .font(AppFonts.liveActivityHeadline)
                 .foregroundStyle(AppColors.textPrimary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

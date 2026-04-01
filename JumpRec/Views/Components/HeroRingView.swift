@@ -36,12 +36,12 @@ struct HeroRingView: View {
             // Center content
             VStack(spacing: 4) {
                 Text(centerText)
-                    .font(.system(size: 48, weight: .bold, design: .rounded))
+                    .font(AppFonts.heroRingValue)
                     .foregroundStyle(AppColors.accent)
                     .contentTransition(.numericText())
 
                 Text(subtitle)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(AppFonts.heroRingSubtitle)
                     .foregroundStyle(AppColors.textSecondary)
             }
         }

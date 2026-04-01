@@ -64,24 +64,24 @@ struct GoalView: View {
     private func goalRow(titleKey: LocalizedStringKey, systemImage: String, detail: String, isSelected: Bool) -> some View {
         HStack(spacing: 8) {
             Image(systemName: systemImage)
-                .font(.system(size: 12))
+                .font(AppFonts.watchBody)
                 .foregroundStyle(AppColors.accent)
 
             Text(titleKey)
-                .font(.system(size: 15, weight: .semibold))
+                .font(AppFonts.watchSectionTitle)
                 .foregroundStyle(AppColors.textPrimary)
 
             Spacer(minLength: 4)
 
             Text(detail)
-                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .font(AppFonts.watchGoalChip)
                 .foregroundStyle(AppColors.textMuted)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
             if isSelected {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 14))
+                    .font(AppFonts.watchSupportingRegular)
                     .foregroundStyle(AppColors.accent)
             }
         }
@@ -129,10 +129,10 @@ struct CountView: View {
         VStack(spacing: 12) {
             VStack(spacing: 8) {
                 Text("\(count)")
-                    .font(.system(size: 28, weight: .bold, design: .monospaced))
+                    .font(AppFonts.watchGoalValue)
                     .foregroundStyle(AppColors.accent)
                 Text("JUMPS")
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .font(AppFonts.watchMetricLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
             }
@@ -179,10 +179,10 @@ struct TimeView: View {
         VStack(spacing: 12) {
             VStack(spacing: 8) {
                 Text("\(time)")
-                    .font(.system(size: 28, weight: .bold, design: .monospaced))
+                    .font(AppFonts.watchGoalValue)
                     .foregroundStyle(AppColors.accent)
                 Text("MINUTES")
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .font(AppFonts.watchMetricLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
             }

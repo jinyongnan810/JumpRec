@@ -85,11 +85,11 @@ struct HomeView: View {
             // Header
             VStack(spacing: 4) {
                 Text("JumpRec")
-                    .font(.system(size: 24, weight: .semibold))
+                    .font(AppFonts.screenTitle)
                     .foregroundStyle(AppColors.textPrimary)
 
                 Label(goalText, systemImage: "target")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(AppFonts.heroRingSubtitle)
                     .foregroundStyle(AppColors.textMuted)
             }
 
@@ -113,7 +113,7 @@ struct HomeView: View {
                 }
             } label: {
                 Text(primaryButtonTitle)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(AppFonts.primaryButtonLabel)
                     .foregroundStyle(primaryButtonTextColor)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
@@ -125,7 +125,7 @@ struct HomeView: View {
                 showGoalSheet = true
             } label: {
                 Label("Set Goal", systemImage: "target")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(AppFonts.secondaryActionLabel)
                     .foregroundStyle(AppColors.accent)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 12)

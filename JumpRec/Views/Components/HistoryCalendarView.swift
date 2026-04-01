@@ -70,7 +70,7 @@ struct HistoryCalendarView: View {
             HStack {
                 Button(action: onPreviousMonth) {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 18))
+                        .font(AppFonts.sectionIcon)
                         .foregroundStyle(AppColors.textSecondary)
                         .frame(width: 32, height: 32)
                 }
@@ -80,14 +80,14 @@ struct HistoryCalendarView: View {
                 Spacer()
 
                 Text(monthTitle)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(AppFonts.cardTitle)
                     .foregroundStyle(AppColors.textPrimary)
 
                 Spacer()
 
                 Button(action: onNextMonth) {
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 18))
+                        .font(AppFonts.sectionIcon)
                         .foregroundStyle(AppColors.textSecondary)
                         .frame(width: 32, height: 32)
                 }
@@ -98,7 +98,7 @@ struct HistoryCalendarView: View {
             HStack(spacing: 0) {
                 ForEach(dayHeaders, id: \.self) { header in
                     Text(header)
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                        .font(AppFonts.graphLabelMonospaced)
                         .tracking(1)
                         .foregroundStyle(AppColors.tabInactive)
                         .frame(maxWidth: .infinity)
@@ -200,14 +200,14 @@ private struct HistoryCalendarDayCellView: View {
                 }
 
                 Text("\(day)")
-                    .font(.system(size: 12, weight: dayFontWeight, design: .monospaced))
+                    .font(AppFonts.calendarDay(weight: dayFontWeight))
                     .foregroundStyle(dayColor)
             }
             .frame(width: 36, height: 36)
 
             if let jumpCount {
                 Text(formatJumpCount(jumpCount))
-                    .font(.system(size: 8, weight: .semibold, design: .monospaced))
+                    .font(AppFonts.calendarBadgeMonospaced)
                     .foregroundStyle(AppColors.accent)
             }
         }

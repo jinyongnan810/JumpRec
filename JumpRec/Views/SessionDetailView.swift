@@ -54,7 +54,7 @@ struct SessionDetailView: View {
                 // Date Row
                 HStack {
                     Text(dateText)
-                        .font(.system(size: 15, weight: .medium))
+                        .font(AppFonts.bodyLabelStrong)
                         .foregroundStyle(AppColors.textSecondary)
 
                     Spacer()

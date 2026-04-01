@@ -22,7 +22,7 @@ struct TimerView: View {
         TimelineView(.periodic(from: .now, by: 0.1)) { timeline in
             let diff = timeline.date.timeIntervalSince(startTime)
             Text(diff.minutesSecondsMilliseconds)
-                .font(.system(size: 14, weight: .medium, design: .monospaced))
+                .font(AppFonts.watchTimer)
                 .foregroundStyle(AppColors.textSecondary)
         }
     }

@@ -52,10 +52,10 @@ struct RecordsSheetView: View {
                         VStack(spacing: 8) {
                             Spacer()
                             Text("No records yet")
-                                .font(.system(size: 15, weight: .medium))
+                                .font(AppFonts.bodyLabelStrong)
                                 .foregroundStyle(AppColors.textSecondary)
                             Text("Complete sessions to set personal records!")
-                                .font(.system(size: 13))
+                                .font(AppFonts.bodySmall)
                                 .foregroundStyle(AppColors.textMuted)
                             Spacer()
                         }
@@ -245,24 +245,24 @@ private struct RecordCardView: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: record.kind.icon)
-                .font(.system(size: 24))
+                .font(AppFonts.screenTitleRegular)
                 .foregroundStyle(AppColors.accent)
                 .frame(width: 24, height: 24)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(LocalizedStringKey(record.kind.title))
-                    .font(.system(size: 14))
+                    .font(AppFonts.bodyRegular)
                     .foregroundStyle(AppColors.textPrimary)
 
                 HStack {
                     Text(displayValue)
-                        .font(.system(size: 18, weight: .bold, design: .monospaced))
+                        .font(AppFonts.statValueMonospaced)
                         .foregroundStyle(AppColors.accent)
 
                     Spacer()
 
                     Text(Self.dateFormatter.string(from: record.achievedAt))
-                        .font(.system(size: 11, design: .monospaced))
+                        .font(AppFonts.supportingMonospaced)
                         .foregroundStyle(AppColors.textSecondary)
                 }
             }
