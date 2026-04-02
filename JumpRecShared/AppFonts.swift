@@ -6,7 +6,7 @@
 import SwiftUI
 
 #if canImport(UIKit)
-import UIKit
+    import UIKit
 #endif
 
 /// Centralizes every custom font choice used by the app so typography can be
@@ -114,17 +114,18 @@ public enum AppFonts {
     public static let liveActivityTimer = Font.title3.monospacedDigit()
 
     #if canImport(UIKit)
-    // MARK: - UIKit Fonts
 
-    /// Provides UIKit counterparts for the few controls whose typography still
-    /// has to be configured through appearance APIs.
-    public static func uiSystem(
-        _ size: CGFloat,
-        weight: UIFont.Weight = .regular
-    ) -> UIFont {
-        UIFont.systemFont(ofSize: size, weight: weight)
-    }
+        // MARK: - UIKit Fonts
 
-    public static let segmentedControlLabel = uiSystem(15, weight: .semibold)
+        /// Provides UIKit counterparts for the few controls whose typography still
+        /// has to be configured through appearance APIs.
+        public static func uiSystem(
+            _ size: CGFloat,
+            weight: UIFont.Weight = .regular
+        ) -> UIFont {
+            UIFont.systemFont(ofSize: size, weight: weight)
+        }
+
+        public static let segmentedControlLabel = uiSystem(15, weight: .semibold)
     #endif
 }

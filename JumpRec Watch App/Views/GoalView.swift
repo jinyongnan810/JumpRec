@@ -60,7 +60,14 @@ struct GoalView: View {
         }
     }
 
+    /// Matches the timing used by the row animation so follow-up symbol effects
+    /// can wait until the layout and opacity changes have settled.
+    private static let selectionAnimationDuration = 0.3
+    /// The row delays its selection animation slightly to wait for screen navigation
+    private static let selectionAnimationDelay = 0.2
+
     /// Renders a goal option row with active-state feedback.
+    @ViewBuilder
     private func goalRow(titleKey: LocalizedStringKey, systemImage: String, detail: String, isSelected: Bool) -> some View {
         HStack(spacing: 8) {
             Image(systemName: systemImage)
@@ -79,13 +86,78 @@ struct GoalView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
-            if isSelected {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(AppFonts.watchSupportingRegular)
-                    .foregroundStyle(AppColors.accent)
+            SelectionIndicatorView(
+                isSelected: isSelected,
+                symbolEffectDelay: Self.selectionAnimationDuration + Self.selectionAnimationDelay
+            )
+        }
+        .animation(
+            .easeInOut(duration: Self.selectionAnimationDuration)
+                .delay(Self.selectionAnimationDelay),
+            value: isSelected
+        )
+        .padding(.vertical, 4)
+    }
+}
+
+/// Displays the goal row's selection indicator and delays its symbol effect
+/// until the enclosing row has finished expanding the trailing slot.
+private struct SelectionIndicatorView: View {
+    /// Indicates whether the enclosing goal row is currently selected.
+    let isSelected: Bool
+    /// Describes how long the row's layout animation takes so the symbol effect
+    /// can start after the visual state change has completed.
+    let symbolEffectDelay: Double
+
+    /// Triggers value-driven symbol effects on older watchOS versions.
+    @State private var symbolEffectTrigger = 0
+    /// Controls the draw-on effect on newer watchOS versions after the delay.
+    @State private var isDrawEffectActive = true
+
+    var body: some View {
+        let checkMark = Image(systemName: "checkmark.circle.fill")
+            .font(AppFonts.watchSupportingRegular)
+            .foregroundStyle(AppColors.accent)
+
+        Group {
+            if #available(watchOS 26.0, *) {
+                checkMark
+                    .symbolEffect(
+                        .drawOn.byLayer,
+                        options: .speed(0.5),
+                        isActive: isDrawEffectActive
+                    )
+            } else {
+                checkMark
+                    .symbolEffect(
+                        .bounce,
+                        options: .speed(0.5),
+                        value: symbolEffectTrigger
+                    )
             }
         }
-        .padding(.vertical, 4)
+        .opacity(isSelected ? 1 : 0)
+        .frame(maxWidth: isSelected ? nil : 0)
+        .task(id: isSelected) {
+            // Reset immediately when the row is deselected so a later selection
+            // can replay the effect from a known baseline.
+            isDrawEffectActive = isSelected
+
+            do {
+                try await Task.sleep(for: .seconds(symbolEffectDelay))
+            } catch {
+                // SwiftUI cancels the task if the selection flips quickly. That
+                // cancellation is expected because the delayed symbol effect
+                // should not play for a stale selection state.
+                return
+            }
+
+            if #available(watchOS 26.0, *) {
+                isDrawEffectActive = !isSelected
+            } else {
+                symbolEffectTrigger += 1
+            }
+        }
     }
 }
 
