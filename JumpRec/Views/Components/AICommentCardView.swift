@@ -15,12 +15,6 @@ struct AICommentCardView: View {
     /// Triggers the discrete sparkle animation each time the card transitions from
     /// a loading placeholder into a finished AI summary.
     @State private var sparkleAnimationTrigger = 0
-    /// Remembers the previous loading state so the view can react only to the
-    /// completion edge instead of animating during every refresh.
-    @State private var previousLoadingState: Bool?
-    /// Holds a pending sparkle animation when loading finishes before the final
-    /// comment text has appeared in the hierarchy.
-    @State private var shouldAnimateSparklesWhenCommentAppears = false
 
     // MARK: - View
 
@@ -51,23 +45,15 @@ struct AICommentCardView: View {
                 }
             }
         }
-        // Capture the initial loading state so a preloaded comment does not animate
-        // on first render unless it actually finished generating while this view was visible.
-        .onAppear {
-            if previousLoadingState == nil {
-                previousLoadingState = isLoading
+        .onAppear(perform: {
+            if comment != nil {
+                sparkleAnimationTrigger += 1
             }
-            triggerPendingSparklesIfNeeded()
-        }
-        .onChange(of: isLoading) { _, newValue in
-            defer { previousLoadingState = newValue }
-
-            guard previousLoadingState == true, newValue == false else { return }
-            shouldAnimateSparklesWhenCommentAppears = true
-            triggerPendingSparklesIfNeeded()
-        }
-        .onChange(of: comment) { _, _ in
-            triggerPendingSparklesIfNeeded()
+        })
+        .onChange(of: isLoading) { _, _ in
+            if !isLoading {
+                sparkleAnimationTrigger += 1
+            }
         }
     }
 
@@ -100,7 +86,7 @@ struct AICommentCardView: View {
         if #available(iOS 26.0, *) {
             sparkles
                 .symbolEffect(
-                    .drawOn,
+                    .drawOn.byLayer,
                     options: .speed(0.5),
                     isActive: sparkleAnimationTrigger == 0
                 )
@@ -108,15 +94,6 @@ struct AICommentCardView: View {
             sparkles
                 .symbolEffect(.bounce, value: sparkleAnimationTrigger)
         }
-    }
-
-    /// Runs the pending sparkle animation only after the finished comment is visible.
-    /// Deferring the trigger this way avoids losing the effect when loading ends and
-    /// the text arrives in a separate state update.
-    private func triggerPendingSparklesIfNeeded() {
-        guard shouldAnimateSparklesWhenCommentAppears, comment != nil else { return }
-        shouldAnimateSparklesWhenCommentAppears = false
-        sparkleAnimationTrigger += 1
     }
 }
 

@@ -61,7 +61,10 @@ struct SessionDetailView: View {
                 }
 
                 if SessionAICommentGenerator.shouldGenerate(for: session) {
-                    AICommentCardView(comment: session.aiComment, isLoading: session.aiComment != nil)
+                    AICommentCardView(
+                        comment: session.aiComment,
+                        isLoading: isGeneratingComment
+                    )
                 }
 
                 SessionMetricsSummaryView(
