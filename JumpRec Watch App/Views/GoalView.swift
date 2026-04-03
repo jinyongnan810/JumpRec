@@ -87,76 +87,85 @@ struct GoalView: View {
                 .minimumScaleFactor(0.7)
 
             SelectionIndicatorView(
-                isSelected: isSelected,
-                symbolEffectDelay: Self.selectionAnimationDuration + Self.selectionAnimationDelay
+                isSelected: isSelected
             )
         }
         .animation(
-            .easeInOut(duration: Self.selectionAnimationDuration)
-                .delay(Self.selectionAnimationDelay),
+            .easeInOut(duration: 0.3)
+                .delay(0.2),
             value: isSelected
         )
         .padding(.vertical, 4)
     }
 }
 
-/// Displays the goal row's selection indicator and delays its symbol effect
-/// until the enclosing row has finished expanding the trailing slot.
 private struct SelectionIndicatorView: View {
-    /// Indicates whether the enclosing goal row is currently selected.
     let isSelected: Bool
-    /// Describes how long the row's layout animation takes so the symbol effect
-    /// can start after the visual state change has completed.
-    let symbolEffectDelay: Double
 
-    /// Triggers value-driven symbol effects on older watchOS versions.
-    @State private var symbolEffectTrigger = 0
-    /// Controls the draw-on effect on newer watchOS versions after the delay.
-    @State private var isDrawEffectActive = true
+    @State private var drawTrigger = 0
+    @State private var previousIsSelected = false
+    @State private var isDrawEffectActive = false
 
     var body: some View {
-        let checkMark = Image(systemName: "checkmark.circle.fill")
+        Image(systemName: "checkmark.circle.fill")
             .font(AppFonts.watchSupportingRegular)
             .foregroundStyle(AppColors.accent)
-
-        Group {
-            if #available(watchOS 26.0, *) {
-                checkMark
-                    .symbolEffect(
-                        .drawOn.byLayer,
-                        options: .speed(0.5),
-                        isActive: isDrawEffectActive
-                    )
-            } else {
-                checkMark
-                    .symbolEffect(
-                        .bounce,
-                        options: .speed(0.5),
-                        value: symbolEffectTrigger
-                    )
+            .modifier(SelectionEffectModifier(isSelected: isSelected, drawTrigger: drawTrigger, isDrawEffectActive: isDrawEffectActive))
+            .frame(width: 18, alignment: .trailing)
+            .opacity(isSelected ? 1 : 0)
+            .scaleEffect(isSelected ? 1 : 0.85)
+            .animation(.easeInOut(duration: 0.3).delay(0.2), value: isSelected)
+            .frame(maxWidth: isSelected ? 18 : 0)
+            .onAppear {
+                previousIsSelected = isSelected
+                drawTrigger += 1
             }
-        }
-        .opacity(isSelected ? 1 : 0)
-        .frame(maxWidth: isSelected ? nil : 0)
-        .task(id: isSelected) {
-            // Reset immediately when the row is deselected so a later selection
-            // can replay the effect from a known baseline.
-            isDrawEffectActive = isSelected
+            .task(id: isSelected) {
+                // Reset immediately when the row is deselected so a later selection
+                // can replay the effect from a known baseline.
+                isDrawEffectActive = isSelected
 
-            do {
-                try await Task.sleep(for: .seconds(symbolEffectDelay))
-            } catch {
-                // SwiftUI cancels the task if the selection flips quickly. That
-                // cancellation is expected because the delayed symbol effect
-                // should not play for a stale selection state.
-                return
-            }
+                do {
+                    if #available(watchOS 26.0, *) {
+                        try await Task.sleep(for: .seconds(0.5))
+                    }
+                } catch {
+                    // SwiftUI cancels the task if the selection flips quickly. That
+                    // cancellation is expected because the delayed symbol effect
+                    // should not play for a stale selection state.
+                    return
+                }
 
-            if #available(watchOS 26.0, *) {
-                isDrawEffectActive = !isSelected
-            } else {
-                symbolEffectTrigger += 1
+                if #available(watchOS 26.0, *) {
+                    isDrawEffectActive = !isSelected
+                } else {
+                    drawTrigger += 1
+                }
             }
+    }
+}
+
+private struct SelectionEffectModifier: ViewModifier {
+    let isSelected: Bool
+    let drawTrigger: Int
+    let isDrawEffectActive: Bool
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if #available(watchOS 26.0, *) {
+            content
+                .symbolEffect(
+                    .drawOn.byLayer,
+                    options: .speed(0.5),
+                    isActive: isDrawEffectActive
+                )
+        } else {
+            content
+                .symbolEffect(
+                    .wiggle.byLayer,
+                    options: .speed(0.6).repeat(1),
+                    value: drawTrigger
+                )
         }
     }
 }
