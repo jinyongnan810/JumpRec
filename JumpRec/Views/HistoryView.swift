@@ -78,16 +78,14 @@ struct HistoryView: View {
                         showRecords = true
                     } label: {
                         Label("Records", systemImage: "trophy.fill")
-                            .overlay(alignment: .topTrailing) {
-                                if !dataStore.unseenPersonalRecordKinds.isEmpty {
-                                    PersonalRecordBadgeView(
-                                        style: .compact,
-                                        animationMode: .once
-                                    )
-                                    .offset(x: 10, y: -8)
-                                }
-                            }
+                        // The toolbar label keeps the badge logic local while avoiding
+                        // an extra conditional wrapper around the button itself.
                     }
+                    .dotIndicatorOverlay(
+                        isVisible: !dataStore.unseenPersonalRecordKinds.isEmpty,
+                        size: 200,
+                        offset: CGSize(width: 95, height: -95)
+                    )
                     .matchedTransitionSource(id: Self.recordsTransitionID, in: navigationTransitionNamespace)
                 }
                 #if DEBUG

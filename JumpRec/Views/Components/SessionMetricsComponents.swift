@@ -44,12 +44,9 @@ struct SessionMetricCard: View {
         .padding(14)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(alignment: .topTrailing) {
-            if showsBadge {
-                PersonalRecordBadgeView(style: .compact)
-                    .offset(x: 6, y: -6)
-            }
-        }
+        // Keep the indicator attachment at the card level so the badge remains anchored
+        // to the card corner instead of shifting with the text stack's intrinsic size.
+        .dotIndicatorOverlay(isVisible: showsBadge)
     }
 }
 
@@ -104,12 +101,9 @@ struct SessionBreakdownRow<Content: View>: View {
         .padding(.horizontal, 16)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .overlay(alignment: .topTrailing) {
-            if showsBadge {
-                PersonalRecordBadgeView(style: .compact)
-                    .offset(x: 6, y: -6)
-            }
-        }
+        // Applying the badge after clipping keeps the decorative overlay aligned with the
+        // rounded row container without affecting the tappable content layout.
+        .dotIndicatorOverlay(isVisible: showsBadge, offset: CGSize(width: 40, height: -40))
         .contentShape(RoundedRectangle(cornerRadius: 10))
         .onTapGesture {
             guard explanation != nil else { return }

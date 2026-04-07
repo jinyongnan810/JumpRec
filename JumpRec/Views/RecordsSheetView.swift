@@ -80,11 +80,6 @@ struct RecordsSheetView: View {
             .navigationTitle("Personal Records")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    if !unseenRecordKinds.isEmpty {
-                        PersonalRecordBadgeView(style: .pill)
-                    }
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     if !displayRecords.isEmpty {
                         Button(role: .destructive) {
@@ -270,12 +265,9 @@ private struct RecordCardView: View {
         .padding(16)
         .background(Self.cardBg)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(alignment: .topTrailing) {
-            if isHighlighted {
-                PersonalRecordBadgeView(style: .compact)
-                    .offset(x: 6, y: -6)
-            }
-        }
+        // The larger negative Y offset preserves the original art direction where the
+        // badge sits above the compact record row rather than directly on its edge.
+        .dotIndicatorOverlay(isVisible: isHighlighted)
     }
 
     private static let dateFormatter: DateFormatter = {

@@ -54,6 +54,9 @@
         }
       }
     },
+    "3 unread" : {
+
+    },
     "A normalized score that reflects how evenly you maintained your jumping pace throughout the session." : {
       "localizations" : {
         "ja" : {
@@ -380,6 +383,9 @@
         }
       }
     },
+    "Dot Indicator" : {
+
+    },
     "Duration" : {
       "localizations" : {
         "ja" : {
@@ -522,6 +528,9 @@
           }
         }
       }
+    },
+    "Inbox" : {
+
     },
     "iPhone motion is not available on this device." : {
       "localizations" : {
@@ -719,6 +728,7 @@
       }
     },
     "New Record" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
