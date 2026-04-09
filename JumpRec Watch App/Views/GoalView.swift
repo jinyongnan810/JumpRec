@@ -244,14 +244,19 @@ struct TimeView: View {
     /// Dismisses the editor after the user confirms.
     @Environment(\.dismiss)
     private var dismiss
-    /// Stores the editable time goal in minutes.
-    @State private var time: Int64
+    /// Stores the raw Digital Crown position.
+    ///
+    /// The crown is intentionally configured with a much larger range than the
+    /// visible minute value because smaller `by` values proved unreliable on real
+    /// hardware. Scaling the raw crown value lets the user make finer adjustments
+    /// while still presenting a smaller minute-based number in the UI.
+    @State private var rawTimeValue: Double
     /// Applies the confirmed time back to persisted settings.
     private let onConfirm: (Int64) -> Void
 
     /// Creates a time editor with a staged value.
     init(initialTime: Int64, onConfirm: @escaping (Int64) -> Void) {
-        _time = State(initialValue: max(1, initialTime))
+        _rawTimeValue = State(initialValue: Double(max(1, initialTime) * 100))
         self.onConfirm = onConfirm
     }
 
@@ -259,7 +264,7 @@ struct TimeView: View {
     var body: some View {
         VStack(spacing: 12) {
             VStack(spacing: 8) {
-                Text("\(time)")
+                Text(timeDisplayText)
                     .font(AppFonts.watchGoalValue)
                     .foregroundStyle(AppColors.accent)
                 Text("MINUTES")
@@ -269,7 +274,9 @@ struct TimeView: View {
             }
 
             Button("Confirm") {
-                onConfirm(time)
+                // The rest of the app persists integer minute goals, so the scaled
+                // crown value is converted back into that representation here.
+                onConfirm(Int64(scaledTimeValue.rounded()))
                 dismiss()
             }
             .buttonStyle(.borderedProminent)
@@ -277,15 +284,24 @@ struct TimeView: View {
         }
         .focusable()
         .digitalCrownRotation(
-            Binding(
-                get: { Double(time) },
-                set: { time = Int64($0) }
-            ),
-            from: 1,
-            through: 100,
+            $rawTimeValue,
+            from: 100,
+            through: 10000,
             by: 1
         )
         .navigationTitle("Time Goal")
+    }
+
+    // MARK: - Helpers
+
+    /// Converts the raw Digital Crown position into the minute value shown to the user.
+    private var scaledTimeValue: Double {
+        rawTimeValue / 100
+    }
+
+    /// Formats the staged time so the watch shows the scaled value instead of the raw crown position.
+    private var timeDisplayText: String {
+        scaledTimeValue.formatted(.number.precision(.fractionLength(0)))
     }
 }
 
