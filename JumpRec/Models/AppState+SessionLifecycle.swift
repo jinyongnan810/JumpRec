@@ -135,9 +135,10 @@ extension JumpRecState {
         pendingMirroredStart = false
         sessionState = .active
         motionManager?.startTracking()
-        if goalType == .time {
-            startMinuteTimer()
-        }
+        // Start minute announcements for every session so users hear elapsed time
+        // even when the selected goal is jump-based. Goal completion still remains
+        // controlled by `isGoalReached(referenceDate:)`.
+        startMinuteTimer()
         syncIdleTimer()
         notificationFeedbackGenerator.notificationOccurred(.success)
         speak(text: localizedSessionStartedAnnouncement)
@@ -166,7 +167,10 @@ extension JumpRecState {
     func checkFeedbackLandmarks() {
         guard !isMirroredWatchSession else { return }
 
-        if sessionGoalType == .count, jumpCount > 0, jumpCount.isMultiple(of: 100) {
+        // Count landmarks are useful progress cues regardless of whether the user
+        // is chasing a jump target or a time target, so the announcement is no
+        // longer restricted to count-goal sessions.
+        if jumpCount > 0, jumpCount.isMultiple(of: 100) {
             notificationFeedbackGenerator.notificationOccurred(.success)
             notificationFeedbackGenerator.prepare()
             speak(text: localizedJumpAnnouncement(for: jumpCount))
@@ -189,16 +193,20 @@ extension JumpRecState {
         minuteTimer = nil
     }
 
-    /// Announces a minute milestone and ends the session if the time goal is reached.
+    /// Announces each elapsed minute.
+    ///
+    /// Time-goal sessions still end from this callback once the configured duration
+    /// has been met. Count-goal sessions keep running and only use this path for
+    /// spoken progress so the user hears both time and jump milestones.
     private func handleMinuteLandmark() {
-        guard sessionState == .active, !isMirroredWatchSession, sessionGoalType == .time, let startTime else {
+        guard sessionState == .active, !isMirroredWatchSession, let startTime else {
             return
         }
 
         let minutesElapsed = Int(Date().timeIntervalSince(startTime)) / 60
         guard minutesElapsed > 0 else { return }
 
-        if isGoalReached(referenceDate: Date()) {
+        if sessionGoalType == .time, isGoalReached(referenceDate: Date()) {
             finish()
             return
         }

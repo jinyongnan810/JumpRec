@@ -26,9 +26,9 @@ extension JumpRecState {
             motionManager?.startTracking(startDate: startTime, goalType: goalType, goalValue: goal)
         }
         jumpState = .jumping
-        if goalType == .time {
-            startMinuteTimer()
-        }
+        // Start minute announcements for every workout so elapsed-time feedback
+        // remains available even when the user selected a jump-count goal.
+        startMinuteTimer()
         WKInterfaceDevice.current().play(.start)
         speak(text: localizedSessionStartedAnnouncement)
         ConnectivityManager.shared.sendMessage(["watch app": "started"])
@@ -91,10 +91,10 @@ extension JumpRecState {
 
     /// Handles count-based milestones and goal completion.
     func checkJumpLandmark(before: Int, after: Int) {
-        if goalType == .time {
-            return
-        }
-        if jumpCount >= goal {
+        // Only count-goal sessions should auto-finish from jump progress, but the
+        // 100-jump announcement should fire in both goal modes so watch feedback
+        // matches the phone experience.
+        if goalType == .count, jumpCount >= goal {
             end()
             return
         }
@@ -127,12 +127,12 @@ extension JumpRecState {
         minuteTimer = nil
     }
 
-    /// Announces elapsed minutes and ends the session when the time goal is met.
+    /// Announces elapsed minutes for every session and ends timed sessions when needed.
     private func handleMinuteLandmark() {
-        guard jumpState == .jumping, goalType == .time, let startTime else { return }
+        guard jumpState == .jumping, let startTime else { return }
         let minutesElapsed = Int(Date().timeIntervalSince(startTime)) / 60
         if minutesElapsed <= 0 { return }
-        if minutesElapsed * 60 >= goal {
+        if goalType == .time, minutesElapsed * 60 >= goal {
             end()
             return
         }
