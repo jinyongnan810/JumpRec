@@ -133,6 +133,7 @@ struct ActiveSessionView: View {
                 activeSource: appState.activeMotionSource,
                 isPhoneMotionAvailable: appState.isPhoneMotionAvailable,
                 isHeadphoneMotionAvailable: appState.isHeadphoneMotionAvailable,
+                connectedHeadphoneName: appState.connectedHeadphoneName,
                 isWatchMotionAvailable: appState.activeMotionSource == .watch || appState.isMirroredWatchSession,
                 watchUnavailableReason: String(localized: "Apple Watch is unavailable for this session.")
             )

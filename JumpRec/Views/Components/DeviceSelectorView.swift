@@ -13,6 +13,8 @@ struct DeviceSelectorView: View {
     let isPhoneMotionAvailable: Bool
     /// Indicates whether headphone motion is available.
     let isHeadphoneMotionAvailable: Bool
+    /// Stores the real connected headphone name when the system exposes one.
+    let connectedHeadphoneName: String?
     /// Indicates whether watch motion is available.
     let isWatchMotionAvailable: Bool
     /// Explains why watch motion is unavailable.
@@ -60,7 +62,7 @@ struct DeviceSelectorView: View {
                 .frame(width: 32)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(source?.shortName ?? String(localized: "Searching"))
+                Text(displayName(for: source) ?? String(localized: "Searching"))
                     .font(AppFonts.sectionTitle)
                     .foregroundStyle(AppColors.textPrimary)
 
@@ -125,7 +127,7 @@ struct DeviceSelectorView: View {
             Image(systemName: source.iconName)
                 .font(AppFonts.badgeIconLabel)
 
-            Text(source.shortName)
+            Text(displayName(for: source) ?? source.shortName)
                 .font(AppFonts.smallValue)
         }
         .foregroundStyle(badgeForeground(isAvailable: isAvailable, isActive: isActive))
@@ -138,8 +140,24 @@ struct DeviceSelectorView: View {
                 .stroke(badgeStroke(isAvailable: isAvailable, isActive: isActive), lineWidth: 1)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(source.shortName)
+        .accessibilityLabel(displayName(for: source) ?? source.shortName)
         .accessibilityValue(badgeAccessibilityValue(isAvailable: isAvailable, isActive: isActive))
+    }
+
+    /// Returns the most specific label available for a source.
+    private func displayName(for source: DeviceSource?) -> String? {
+        guard let source else { return nil }
+
+        // The selector should show the actual headphone model when iOS provides a route name.
+        // For every other source, or when route metadata is unavailable, the shared enum label remains the fallback.
+        if source == .airpods,
+           let connectedHeadphoneName,
+           !connectedHeadphoneName.isEmpty
+        {
+            return connectedHeadphoneName
+        }
+
+        return source.shortName
     }
 
     /// Builds the informational popover shown for unavailable devices.
@@ -223,6 +241,7 @@ struct DeviceSelectorView: View {
         activeSource: .watch,
         isPhoneMotionAvailable: true,
         isHeadphoneMotionAvailable: true,
+        connectedHeadphoneName: "AirPods Pro",
         isWatchMotionAvailable: true,
         watchUnavailableReason: "Apple Watch is ready."
     )

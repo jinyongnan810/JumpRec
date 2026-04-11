@@ -753,7 +753,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "利用できるモーションソースが接続されていません"
+            "value" : "利用できるデバイス検索中"
           }
         }
       }

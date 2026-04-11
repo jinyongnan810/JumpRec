@@ -52,8 +52,8 @@ final class MotionManager: NSObject {
     private let onJumpDetected: @MainActor (Source) -> Void
     /// Reports active motion-source changes back to app state.
     private let onSourceChanged: @MainActor (Source?) -> Void
-    /// Reports motion availability changes back to app state.
-    private let onAvailabilityChanged: @MainActor (_ iPhoneAvailable: Bool, _ headphoneAvailable: Bool) -> Void
+    /// Reports motion availability changes and the best-known headphone name back to app state.
+    private let onAvailabilityChanged: @MainActor (_ iPhoneAvailable: Bool, _ headphoneAvailable: Bool, _ headphoneName: String?) -> Void
 
     // MARK: - Private State
 
@@ -61,6 +61,8 @@ final class MotionManager: NSObject {
     private var lastPreferredSource: Source?
     /// Tracks whether supported headphones are currently connected.
     private var isHeadphoneConnected = false
+    /// Stores the latest route name for the connected headphones so the UI can show a real product name.
+    private var connectedHeadphoneName: String?
     /// Stores raw motion samples when recording is enabled.
     private var recordedSamples: [MotionSample] = []
 
@@ -71,7 +73,7 @@ final class MotionManager: NSObject {
         shouldRecordMotionSamples: Bool = false,
         onJumpDetected: @escaping @MainActor (Source) -> Void,
         onSourceChanged: @escaping @MainActor (Source?) -> Void,
-        onAvailabilityChanged: @escaping @MainActor (_ iPhoneAvailable: Bool, _ headphoneAvailable: Bool) -> Void
+        onAvailabilityChanged: @escaping @MainActor (_ iPhoneAvailable: Bool, _ headphoneAvailable: Bool, _ headphoneName: String?) -> Void
     ) {
         self.shouldRecordMotionSamples = shouldRecordMotionSamples
         self.onJumpDetected = onJumpDetected
@@ -88,6 +90,7 @@ final class MotionManager: NSObject {
         )
         headphoneMotionManager.startConnectionStatusUpdates()
         isHeadphoneConnected = currentAudioRouteSupportsHeadphoneMotion()
+        connectedHeadphoneName = currentConnectedHeadphoneName()
         queue.maxConcurrentOperationCount = 1
         queue.name = "JumpRec.iPhoneMotionManager"
         phoneMotionManager.deviceMotionUpdateInterval = updateInterval
@@ -127,6 +130,7 @@ final class MotionManager: NSObject {
     /// Refreshes local availability flags and republishes the preferred source.
     func refreshAvailability() {
         isHeadphoneConnected = currentAudioRouteSupportsHeadphoneMotion()
+        connectedHeadphoneName = currentConnectedHeadphoneName()
         notifyAvailabilityChanged()
         updatePreferredSourceIfNeeded(force: true)
     }
@@ -143,6 +147,7 @@ final class MotionManager: NSObject {
         headphoneDetector.reset()
         resetRecordedSamples()
         isHeadphoneConnected = currentAudioRouteSupportsHeadphoneMotion()
+        connectedHeadphoneName = currentConnectedHeadphoneName()
 
         notifyAvailabilityChanged()
         startPhoneMotionUpdatesIfAvailable()
@@ -262,7 +267,9 @@ final class MotionManager: NSObject {
     /// Publishes the latest iPhone and headphone availability flags.
     private func notifyAvailabilityChanged() {
         Task { @MainActor in
-            onAvailabilityChanged(isPhoneMotionAvailable, isHeadphoneMotionAvailable)
+            // Route names come from AVAudioSession and can be missing or generic depending on the accessory.
+            // The UI only uses this when the system exposes something more specific than the fallback label.
+            onAvailabilityChanged(isPhoneMotionAvailable, isHeadphoneMotionAvailable, connectedHeadphoneName)
         }
     }
 
@@ -302,12 +309,36 @@ final class MotionManager: NSObject {
         return hasHeadphoneRoute && headphoneMotionManager.isDeviceMotionAvailable
     }
 
+    /// Returns the current route's descriptive headphone name when the active output looks like supported headphones.
+    private func currentConnectedHeadphoneName() -> String? {
+        let outputs = AVAudioSession.sharedInstance().currentRoute.outputs
+        guard let headphoneOutput = outputs.first(where: isSupportedHeadphonePort) else {
+            return nil
+        }
+
+        // `portName` is the system-provided human-readable route label, such as "AirPods Pro".
+        let trimmedName = headphoneOutput.portName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmedName.isEmpty ? nil : trimmedName
+    }
+
+    /// Centralizes the route types that can represent headphone motion sources so name lookup matches availability checks.
+    private func isSupportedHeadphonePort(_ output: AVAudioSessionPortDescription) -> Bool {
+        switch output.portType {
+        case .headphones, .bluetoothA2DP, .bluetoothHFP, .bluetoothLE:
+            true
+        default:
+            false
+        }
+    }
+
     /// Recomputes availability and preferred source after an audio-route change.
     @objc
     private func handleAudioRouteChange(_: Notification) {
         let wasConnected = isHeadphoneConnected
         isHeadphoneConnected = currentAudioRouteSupportsHeadphoneMotion()
-        guard isHeadphoneConnected != wasConnected else { return }
+        let previousHeadphoneName = connectedHeadphoneName
+        connectedHeadphoneName = currentConnectedHeadphoneName()
+        guard isHeadphoneConnected != wasConnected || connectedHeadphoneName != previousHeadphoneName else { return }
         notifyAvailabilityChanged()
         updatePreferredSourceIfNeeded(force: true)
     }
@@ -319,6 +350,7 @@ extension MotionManager: CMHeadphoneMotionManagerDelegate {
         // Connection callbacks refresh availability immediately, but actual promotion to
         // headphones still depends on receiving live motion samples.
         isHeadphoneConnected = currentAudioRouteSupportsHeadphoneMotion()
+        connectedHeadphoneName = currentConnectedHeadphoneName()
         notifyAvailabilityChanged()
         updatePreferredSourceIfNeeded(force: true)
     }
@@ -327,6 +359,7 @@ extension MotionManager: CMHeadphoneMotionManagerDelegate {
     func headphoneMotionManagerDidDisconnect(_: CMHeadphoneMotionManager) {
         // A disconnect invalidates headphone priority, so the preferred source is recomputed.
         isHeadphoneConnected = currentAudioRouteSupportsHeadphoneMotion()
+        connectedHeadphoneName = currentConnectedHeadphoneName()
         notifyAvailabilityChanged()
         updatePreferredSourceIfNeeded(force: true)
     }

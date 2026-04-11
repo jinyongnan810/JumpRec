@@ -100,6 +100,7 @@ struct HomeView: View {
                 activeSource: displayedMotionSource,
                 isPhoneMotionAvailable: appState.isPhoneMotionAvailable,
                 isHeadphoneMotionAvailable: appState.isHeadphoneMotionAvailable,
+                connectedHeadphoneName: appState.connectedHeadphoneName,
                 isWatchMotionAvailable: isWatchAvailable,
                 watchUnavailableReason: watchUnavailableReason
             )

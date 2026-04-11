@@ -58,6 +58,8 @@ final class JumpRecState {
     var isPhoneMotionAvailable = false
     /// Indicates whether headphone motion is currently available.
     var isHeadphoneMotionAvailable = false
+    /// Stores the current headphone route name so the selector can show a real product label when iOS provides one.
+    var connectedHeadphoneName: String?
     /// Stores the exported motion CSV URL when debug export is enabled.
     var motionCSVShareURL: URL?
 
@@ -110,9 +112,10 @@ final class JumpRecState {
             onSourceChanged: { [weak self] source in
                 self?.activeMotionSource = Self.deviceSource(from: source)
             },
-            onAvailabilityChanged: { [weak self] isPhoneAvailable, isHeadphoneAvailable in
+            onAvailabilityChanged: { [weak self] isPhoneAvailable, isHeadphoneAvailable, headphoneName in
                 self?.isPhoneMotionAvailable = isPhoneAvailable
                 self?.isHeadphoneMotionAvailable = isHeadphoneAvailable
+                self?.connectedHeadphoneName = headphoneName
             }
         )
         motionManager?.refreshAvailability()
