@@ -11,7 +11,7 @@ import UIKit
 /// Owns the iPhone app's session lifecycle, live metrics, and companion-device coordination.
 @Observable
 @MainActor
-final class JumpRecState {
+final class JumpRecState: NSObject {
     // MARK: - Configuration
 
     /// Enables CSV motion export for debug builds.
@@ -103,7 +103,8 @@ final class JumpRecState {
     // MARK: - Initialization
 
     /// Configures managers, callback wiring, audio, and haptics.
-    init() {
+    override init() {
+        super.init()
         motionManager = MotionManager(
             shouldRecordMotionSamples: isMotionCSVExportEnabled,
             onJumpDetected: { [weak self] source in
@@ -146,8 +147,10 @@ final class JumpRecState {
                 session: session
             )
         }
-        configureAudioSession()
-        warmUpSpeechSynthesizer()
+        // Wire the synthesizer delegate so the app can release its audio session
+        // after each spoken prompt finishes. This keeps Apple Music and other
+        // background audio at normal volume until JumpRec actually needs to speak.
+        synthesizer.delegate = self
         prepareHaptics()
     }
 

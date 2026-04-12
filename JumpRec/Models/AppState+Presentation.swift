@@ -144,8 +144,13 @@ extension JumpRecState {
 
     // MARK: - Audio And Haptics
 
-    /// Configures audio so spoken feedback can play over other audio.
-    func configureAudioSession() {
+    /// Configures the app's speech audio session immediately before an announcement.
+    ///
+    /// The app intentionally avoids activating this session during launch because
+    /// `.duckOthers` lowers Apple Music and other background audio as soon as the
+    /// session becomes active. Deferring activation until speech starts preserves
+    /// the user's listening volume while the app is merely open on screen.
+    private func configureSpeechAudioSession() {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
             try AVAudioSession.sharedInstance().setActive(true)
@@ -154,12 +159,16 @@ extension JumpRecState {
         }
     }
 
-    /// Pre-warms speech synthesis to avoid a long first utterance.
-    func warmUpSpeechSynthesizer() {
-        let utterance = AVSpeechUtterance(string: isJapanesePreferred ? "こんにちは" : "Hello")
-        utterance.volume = 0
-        utterance.voice = AVSpeechSynthesisVoice(language: preferredSpeechLanguageCode)
-        synthesizer.speak(utterance)
+    /// Releases the app's speech audio session once announcements are finished.
+    ///
+    /// `notifyOthersOnDeactivation` tells iOS that any ducked background audio can
+    /// return to its normal level immediately after JumpRec stops speaking.
+    private func deactivateSpeechAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+        } catch {
+            print("Audio session deactivation error: \(error)")
+        }
     }
 
     /// Prepares haptic generators used during the session.
@@ -172,6 +181,7 @@ extension JumpRecState {
     /// Speaks a localized prompt after an optional delay.
     func speak(text: String, delay: TimeInterval = 0.2) {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            self.configureSpeechAudioSession()
             let utterance = AVSpeechUtterance(string: text)
             utterance.voice = AVSpeechSynthesisVoice(language: self.preferredSpeechLanguageCode)
             self.synthesizer.speak(utterance)
@@ -211,5 +221,26 @@ extension JumpRecState {
         Duration.seconds(Double(minutesElapsed) * 60).formatted(
             .units(allowed: [.minutes], width: .wide)
         )
+    }
+}
+
+extension JumpRecState: AVSpeechSynthesizerDelegate {
+    /// Releases the ducking audio session after the last queued announcement ends.
+    ///
+    /// The delegate callback is not main-actor isolated, so the audio-session
+    /// cleanup hops back to the main actor before touching app state helpers.
+    nonisolated func speechSynthesizer(_: AVSpeechSynthesizer, didFinish _: AVSpeechUtterance) {
+        Task { @MainActor in
+            guard !self.synthesizer.isSpeaking, !self.synthesizer.isPaused else { return }
+            deactivateSpeechAudioSession()
+        }
+    }
+
+    /// Mirrors the normal-finish cleanup path when speech is cancelled early.
+    nonisolated func speechSynthesizer(_: AVSpeechSynthesizer, didCancel _: AVSpeechUtterance) {
+        Task { @MainActor in
+            guard !self.synthesizer.isSpeaking, !self.synthesizer.isPaused else { return }
+            deactivateSpeechAudioSession()
+        }
     }
 }
