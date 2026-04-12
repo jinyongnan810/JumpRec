@@ -50,6 +50,7 @@ private struct DotIndicatorOverlayModifier: ViewModifier {
             if isVisible {
                 DotIndicator(size: size, color: color)
                     .offset(x: offset.width, y: offset.height)
+                    .allowsHitTesting(false)
             }
         }
     }

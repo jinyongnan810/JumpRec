@@ -78,8 +78,6 @@ struct HistoryView: View {
                         showRecords = true
                     } label: {
                         Label("Records", systemImage: "trophy.fill")
-                        // The toolbar label keeps the badge logic local while avoiding
-                        // an extra conditional wrapper around the button itself.
                     }
                     .dotIndicatorOverlay(
                         isVisible: !dataStore.unseenPersonalRecordKinds.isEmpty,
