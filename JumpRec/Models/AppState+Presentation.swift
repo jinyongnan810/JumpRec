@@ -176,11 +176,44 @@ extension JumpRecState {
         notificationFeedbackGenerator.prepare()
     }
 
+    /// Primes `AVSpeechSynthesizer` with a silent utterance so the first real prompt starts quickly.
+    ///
+    /// Commit `2716b99` removed the old warmup when speech audio activation was deferred
+    /// until announcement time. That preserved background-audio volume, but it also
+    /// reintroduced the sluggish first spoken prompt because the synthesizer had to do
+    /// its one-time voice setup on the first user-visible utterance. This method restores
+    /// the warmup while keeping the newer audio-session behavior: we briefly activate the
+    /// speech session, speak a zero-volume utterance, and rely on the delegate cleanup to
+    /// release the session immediately afterward.
+    ///
+    /// The method is intentionally idempotent because SwiftUI may call `onAppear` more
+    /// than once across the app's lifecycle.
+    func warmUpSpeechSynthesizerIfNeeded() {
+        guard !hasWarmedUpSpeechSynthesizer else { return }
+
+        hasWarmedUpSpeechSynthesizer = true
+        isSpeechWarmupInProgress = true
+
+        configureSpeechAudioSession()
+
+        let warmupText = isJapanesePreferred ? "こんにちは" : "Hello"
+        let utterance = AVSpeechUtterance(string: warmupText)
+        utterance.volume = 0
+        utterance.voice = AVSpeechSynthesisVoice(language: preferredSpeechLanguageCode)
+        synthesizer.speak(utterance)
+    }
+
     // MARK: - Speech
 
     /// Speaks a localized prompt after an optional delay.
     func speak(text: String, delay: TimeInterval = 0.2) {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            // If the user acts before the silent warmup completes, discard it so the
+            // real announcement is not queued behind invisible setup work.
+            if self.isSpeechWarmupInProgress {
+                self.synthesizer.stopSpeaking(at: .immediate)
+                self.isSpeechWarmupInProgress = false
+            }
             self.configureSpeechAudioSession()
             let utterance = AVSpeechUtterance(string: text)
             utterance.voice = AVSpeechSynthesisVoice(language: self.preferredSpeechLanguageCode)
@@ -231,6 +264,7 @@ extension JumpRecState: AVSpeechSynthesizerDelegate {
     /// cleanup hops back to the main actor before touching app state helpers.
     nonisolated func speechSynthesizer(_: AVSpeechSynthesizer, didFinish _: AVSpeechUtterance) {
         Task { @MainActor in
+            self.isSpeechWarmupInProgress = false
             guard !self.synthesizer.isSpeaking, !self.synthesizer.isPaused else { return }
             deactivateSpeechAudioSession()
         }
@@ -239,6 +273,7 @@ extension JumpRecState: AVSpeechSynthesizerDelegate {
     /// Mirrors the normal-finish cleanup path when speech is cancelled early.
     nonisolated func speechSynthesizer(_: AVSpeechSynthesizer, didCancel _: AVSpeechUtterance) {
         Task { @MainActor in
+            self.isSpeechWarmupInProgress = false
             guard !self.synthesizer.isSpeaking, !self.synthesizer.isPaused else { return }
             deactivateSpeechAudioSession()
         }

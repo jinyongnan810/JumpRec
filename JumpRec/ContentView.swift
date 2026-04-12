@@ -71,6 +71,10 @@ struct ContentView: View {
         .onAppear {
 //            configureTabBarAppearance()
             appState.updateSceneActive(scenePhase == .active)
+            // Prime speech once when the root view first appears so the first spoken
+            // workout cue does not stall while `AVSpeechSynthesizer` performs its
+            // internal one-time initialization work.
+            appState.warmUpSpeechSynthesizerIfNeeded()
             dataStore.refreshCloudDiagnostics()
             syncSettingsToWatch()
         }

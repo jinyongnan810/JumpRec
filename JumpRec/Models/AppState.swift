@@ -93,6 +93,21 @@ final class JumpRecState: NSObject {
     /// Speaks audible session prompts and milestones.
     @ObservationIgnored
     let synthesizer = AVSpeechSynthesizer()
+    /// Tracks whether the synthesizer has already been primed during this app lifetime.
+    ///
+    /// The first `AVSpeechSynthesizer` utterance can be noticeably slower because iOS may
+    /// still need to instantiate the voice pipeline. Keeping this state on the app model
+    /// lets `ContentView` request a warmup on first appearance without repeating the work
+    /// every time SwiftUI re-renders the screen hierarchy.
+    @ObservationIgnored
+    var hasWarmedUpSpeechSynthesizer = false
+    /// Tracks whether a silent warmup utterance is currently occupying the synthesizer.
+    ///
+    /// A real session announcement should never wait behind the silent warmup. This flag
+    /// allows the speech path to cancel the warmup immediately if the user starts a
+    /// workout before the priming utterance finishes.
+    @ObservationIgnored
+    var isSpeechWarmupInProgress = false
     /// Emits haptic feedback for session events.
     @ObservationIgnored
     let notificationFeedbackGenerator = UINotificationFeedbackGenerator()
