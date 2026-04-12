@@ -18,6 +18,11 @@ struct SessionCompleteView: View {
     /// Keeping this state local makes the animation deterministic for this screen
     /// without coupling it to broader session lifecycle state.
     @State private var isCompletionBadgeVisible = false
+    /// Tracks whether this screen is actively requesting an AI recap for the just-finished session.
+    /// The completion flow can arrive before the background generation task has finished, so the
+    /// view keeps its own loading flag to show a deterministic placeholder instead of inferring
+    /// progress from the current comment text alone.
+    @State private var isGeneratingComment = false
 
     // MARK: - Derived Values
 
@@ -112,7 +117,7 @@ struct SessionCompleteView: View {
                 {
                     AICommentCardView(
                         comment: completedSession.aiComment,
-                        isLoading: completedSession.aiComment == nil && SessionAICommentGenerator.isAvailable
+                        isLoading: isGeneratingComment
                     )
                 }
 
@@ -171,6 +176,10 @@ struct SessionCompleteView: View {
                     tint: AppColors.accent
                 )
             }.padding(.horizontal, 24)
+        }
+        .task(id: completedSession?.id) {
+            guard !isGeneratingComment, completedSession != nil else { return }
+            await generateCommentIfNeeded()
         }
     }
 
@@ -236,6 +245,23 @@ struct SessionCompleteView: View {
     /// Returns the formatted peak heart-rate text.
     private var peakHeartRateText: String {
         summarySession.formattedPeakHeartRate()
+    }
+
+    // MARK: - Actions
+
+    /// Ensures the completion screen actively requests an AI recap for the saved session.
+    /// The session save path already attempts generation in the background, but this view still
+    /// performs an explicit check so the UI owns its loading state and reliably refreshes when the
+    /// comment becomes available while the summary screen is visible.
+    private func generateCommentIfNeeded() async {
+        guard let completedSession else { return }
+        guard SessionAICommentGenerator.shouldGenerate(for: completedSession) else { return }
+        guard completedSession.aiComment == nil else { return }
+        guard SessionAICommentGenerator.isAvailable else { return }
+
+        isGeneratingComment = true
+        _ = await dataStore.generateAICommentIfNeeded(for: completedSession)
+        isGeneratingComment = false
     }
 
     // MARK: - Private Subviews
