@@ -137,9 +137,26 @@ struct JumpingRateGraphView: View {
         let durationSeconds = chartXDomain.upperBound
         guard durationSeconds > 0 else { return [0] }
 
-        return (0 ... xAxisStepCount).map { step in
+        // Short sessions can collapse multiple rounded steps onto the same second
+        // (for example `[0, 1, 1, 2, 2]`). Deduplicating while preserving order keeps
+        // the axis stable and avoids `Dictionary(uniqueKeysWithValues:)` trapping later
+        // when labels are built from these marks.
+        let rawMarks = (0 ... xAxisStepCount).map { step in
             Int((Double(step) / Double(xAxisStepCount) * Double(durationSeconds)).rounded())
         }
+
+        var uniqueMarks: [Int] = []
+        uniqueMarks.reserveCapacity(rawMarks.count)
+
+        for mark in rawMarks where uniqueMarks.last != mark {
+            uniqueMarks.append(mark)
+        }
+
+        if uniqueMarks.last != durationSeconds {
+            uniqueMarks.append(durationSeconds)
+        }
+
+        return uniqueMarks
     }
 
     /// Maps x-axis positions to their formatted labels.
