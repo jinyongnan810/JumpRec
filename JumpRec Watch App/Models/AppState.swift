@@ -17,7 +17,7 @@ enum JumpState {
 /// Owns the watch app's session lifecycle, motion tracking, and mirrored workout updates.
 @Observable
 @MainActor
-class JumpRecState {
+class JumpRecState: NSObject {
     // MARK: - Shared Instance
 
     /// Provides the single shared app state used across watch views.
@@ -64,6 +64,20 @@ class JumpRecState {
     /// Speaks workout announcements on Apple Watch.
     @ObservationIgnored
     let synthesizer = AVSpeechSynthesizer()
+    /// Tracks whether the synthesizer has already been primed during this app lifetime.
+    ///
+    /// The first spoken announcement can stall while watchOS initializes the speech
+    /// pipeline. Keeping this flag on the shared state lets the root view request a
+    /// one-time warmup without repeating the work every time SwiftUI re-renders.
+    @ObservationIgnored
+    var hasWarmedUpSpeechSynthesizer = false
+    /// Tracks whether a silent warmup utterance is currently using the synthesizer.
+    ///
+    /// Real workout announcements should not wait for the zero-volume warmup to
+    /// complete. This flag lets the speech path cancel the warmup immediately when a
+    /// user-visible prompt is ready to play.
+    @ObservationIgnored
+    var isSpeechWarmupInProgress = false
 
     /// Detects watch motion and jump events.
     @ObservationIgnored
@@ -75,7 +89,8 @@ class JumpRecState {
     // MARK: - Initialization
 
     /// Configures motion tracking and speech for the watch app.
-    init() {
+    override init() {
+        super.init()
         motionManager = MotionManager(addJump: { by in
             Task { @MainActor in
                 self.addJump(by: by)
@@ -89,7 +104,8 @@ class JumpRecState {
                 self.energyBurned += energyBurned
             }
         })
-        configureAudioSession()
-        warmUpSpeechSynthesizer()
+        // The synthesizer delegate releases the speech audio session after each spoken
+        // prompt so the watch only ducks other audio while it is actively speaking.
+        synthesizer.delegate = self
     }
 }
