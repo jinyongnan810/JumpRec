@@ -7,6 +7,30 @@ import Foundation
 import SwiftData
 
 public extension MyDataStore {
+    /// Removes short sessions that are usually created during local development and manual testing.
+    /// This runs only in debug builds during store bootstrap so release users never lose history and
+    /// developers start each launch from a cleaner dataset without having to clear the entire store.
+    func removeDebugSessionsBelowMinimumJumpCountIfNeeded() {
+        #if DEBUG
+            let minimumJumpCount = 100
+            let descriptor = FetchDescriptor<JumpSession>(
+                predicate: #Predicate { session in
+                    session.jumpCount < minimumJumpCount
+                }
+            )
+            let sessionsToDelete = (try? modelContext.fetch(descriptor)) ?? []
+
+            guard !sessionsToDelete.isEmpty else { return }
+
+            for session in sessionsToDelete {
+                modelContext.delete(session)
+            }
+
+            saveContextIfNeeded()
+            print("[DataStore] Debug cleanup removed \(sessionsToDelete.count) sessions with fewer than \(minimumJumpCount) jumps")
+        #endif
+    }
+
     /// Inserts a session and any derived rate samples into the model context.
     func addSession(session: JumpSession, rateSamples: [SessionRateSample] = []) {
         modelContext.insert(session)
