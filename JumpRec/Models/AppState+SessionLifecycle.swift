@@ -11,8 +11,11 @@ extension JumpRecState {
 
     /// Starts a session locally or requests a mirrored watch session when available.
     func start(goalType: GoalType, goalValue: Int) {
+        // Enter a transient starting state immediately so the home screen can
+        // block duplicate taps while the watch companion workout request is in flight.
         sessionGoalType = goalType
         sessionGoalValue = goalValue
+        sessionState = .starting
 
         if connectivityManager.isPaired, connectivityManager.isWatchAppInstalled {
             pendingMirroredStart = true
@@ -27,6 +30,8 @@ extension JumpRecState {
                     try await workoutMirrorManager.startCompanionWorkout()
                 } catch {
                     await MainActor.run {
+                        // If watch startup fails, fall back to an iPhone-tracked session
+                        // instead of leaving the UI stuck in the pending-start state.
                         self.pendingMirroredStart = false
                         self.startLocalSession(goalType: goalType, goalValue: goalValue)
                     }

@@ -54,6 +54,8 @@ struct ContentView: View {
         .fullScreenCover(isPresented: isSessionFlowPresented) {
             Group {
                 switch appState.sessionState {
+                case .starting, .idle:
+                    EmptyView()
                 case .active:
                     ActiveSessionView(settings: settings, appState: appState) {
                         appState.finish()
@@ -62,8 +64,6 @@ struct ContentView: View {
                     SessionCompleteView(appState: appState) {
                         appState.reset()
                     }
-                case .idle:
-                    EmptyView()
                 }
             }
         }
@@ -99,7 +99,14 @@ struct ContentView: View {
 
     private var isSessionFlowPresented: Binding<Bool> {
         Binding(
-            get: { appState.sessionState != .idle },
+            get: {
+                switch appState.sessionState {
+                case .active, .complete:
+                    true
+                case .idle, .starting:
+                    false
+                }
+            },
             set: { isPresented in
                 if !isPresented {
                     appState.reset()

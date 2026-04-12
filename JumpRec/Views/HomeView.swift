@@ -120,6 +120,7 @@ struct HomeView: View {
                     .frame(height: 56)
             }
             .appGlassButton(prominent: true, tint: primaryButtonTint)
+            .disabled(isPrimaryButtonDisabled)
 
             // Set Goal Link
             Button {
@@ -159,6 +160,20 @@ struct HomeView: View {
         countdownValue != nil
     }
 
+    /// Returns whether the app is waiting for a session-start request to finish.
+    ///
+    /// This is primarily used when the iPhone asks the Apple Watch to start a
+    /// mirrored workout, because that handshake can take long enough that users
+    /// may tap the button repeatedly unless the UI clearly reflects the pending state.
+    private var isStartingSession: Bool {
+        appState.sessionState == .starting
+    }
+
+    /// Returns whether the primary action button should reject input.
+    private var isPrimaryButtonDisabled: Bool {
+        isStartingSession
+    }
+
     /// Chooses the best source to display before a session starts.
     private var displayedMotionSource: DeviceSource? {
         if let activeSource = appState.activeMotionSource {
@@ -178,22 +193,34 @@ struct HomeView: View {
 
     /// Returns the title for the primary button.
     private var primaryButtonTitle: String {
-        isCountingDown ? String(localized: "CANCEL") : String(localized: "START SESSION")
+        if isStartingSession {
+            String(localized: "Starting...")
+        } else if isCountingDown {
+            String(localized: "CANCEL")
+        } else {
+            String(localized: "START SESSION")
+        }
     }
 
     /// Returns the text color for the primary button.
     private var primaryButtonTextColor: Color {
-        isCountingDown ? AppColors.textPrimary : AppColors.bgPrimary
+        isCountingDown || isStartingSession ? AppColors.textPrimary : AppColors.bgPrimary
     }
 
     /// Returns the tint color for the primary button.
     private var primaryButtonTint: Color {
-        isCountingDown ? AppColors.danger : AppColors.accent
+        if isStartingSession {
+            AppColors.textMuted
+        } else if isCountingDown {
+            AppColors.danger
+        } else {
+            AppColors.accent
+        }
     }
 
     /// Starts the animated pre-session countdown.
     private func startWithCountdown() {
-        guard !isCountingDown else { return }
+        guard !isCountingDown, !isStartingSession else { return }
 
         countdownTask = Task {
             await MainActor.run {
