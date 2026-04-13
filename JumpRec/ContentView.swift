@@ -15,8 +15,8 @@ struct ContentView: View {
     @Environment(\.requestReview) private var requestReview
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("hasRequestedReviewAfterTenSessions") private var hasRequestedReviewAfterTenSessions = false
+    @AppStorage("qualifiedFinishedSessionCount") private var qualifiedFinishedSessionCount = 0
     @State private var connectivityManager = ConnectivityManager.shared
-    @Query() var sessions: [JumpSession]
 
     @State private var selectedTab: Tab = .jump
     @State private var settings = JumpRecSettings()
@@ -94,9 +94,7 @@ struct ContentView: View {
             syncSettingsToWatch()
         }
         .onChange(of: appState.completedSession?.id) { _, _ in
-            scheduleReviewRequestIfNeeded()
-        }
-        .onChange(of: sessions.count) { _, _ in
+            recordQualifiedCompletedSessionIfNeeded()
             scheduleReviewRequestIfNeeded()
         }
     }
@@ -151,6 +149,19 @@ struct ContentView: View {
 //        UITabBar.appearance().scrollEdgeAppearance = appearance
 //    }
 
+    /// Persists how many meaningful sessions the user has completed on this installation.
+    /// This intentionally uses `AppStorage` rather than querying SwiftData so the root view
+    /// does not need to keep the full session table live just to decide when to request a review.
+    /// Reinstalling the app resets this counter, which is acceptable for this lightweight heuristic.
+    private func recordQualifiedCompletedSessionIfNeeded() {
+        guard let completedSession = appState.completedSession else { return }
+
+        // Only workouts with at least 100 jumps count toward the review prompt so accidental
+        // starts, warmups, and short test sessions do not quickly exhaust the request threshold.
+        guard completedSession.jumpCount > 99 else { return }
+        qualifiedFinishedSessionCount += 1
+    }
+
     private func syncSettingsToWatch() {
         connectivityManager.syncSettings(
             goalType: settings.goalType,
@@ -162,7 +173,7 @@ struct ContentView: View {
     private func scheduleReviewRequestIfNeeded() {
         guard appState.sessionState == .complete,
               appState.completedSession != nil,
-              sessions.count >= 10,
+              qualifiedFinishedSessionCount >= 10,
               !hasRequestedReviewAfterTenSessions
         else {
             pendingReviewTask?.cancel()
