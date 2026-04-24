@@ -10,7 +10,7 @@ import SwiftData
 
 /// Represents a single jump rope session with summary statistics.
 /// This model stores the high-level metadata and calculated metrics for a workout session.
-/// Detailed time-series data is stored in related `SessionRateSample` rows.
+/// Detailed time-series data is stored in one lazily loaded `SessionRateSeries` blob.
 @Model
 public final class JumpSession {
     /// Unique identifier for the session
@@ -55,10 +55,9 @@ public final class JumpSession {
     /// Optional AI-generated recap for the session.
     public var aiComment: String?
 
-    /// Normalized rate samples for charting and analytics.
-    /// When this session is deleted, related samples are automatically deleted.
-    @Relationship(deleteRule: .cascade, inverse: \SessionRateSample.session)
-    public var rateSamples: [SessionRateSample]?
+    /// Encoded rate series for charting and analytics.
+    @Relationship(deleteRule: .cascade, inverse: \SessionRateSeries.session)
+    public var rateSeries: SessionRateSeries?
 
     /// Initializes a new jump rope session with summary statistics
     /// - Parameters:
@@ -132,10 +131,62 @@ public extension JumpSession {
         "\(Int(caloriesBurned.rounded()))"
     }
 
+    /// Decodes the persisted chart payload when detail surfaces need the full rate series.
+    ///
+    /// This property intentionally performs work only when called. List views should keep using the
+    /// scalar summary fields on `JumpSession` so they do not accidentally fault and decode chart data.
+    var decodedRateSamples: [RateSamplePoint] {
+        Self.decodeRateSamples(from: rateSeries?.payload)
+    }
+
+    /// Encodes a rate sample series for persistence in `SessionRateSeries`.
+    ///
+    /// The method centralizes the payload format so saves, previews, and migrations all write the
+    /// same representation. Encoding failures are unlikely for this simple Codable payload, but the
+    /// optional return keeps save flows explicit about dropping corrupt or unsupported data.
+    static func encodeRateSamples(_ samples: [RateSamplePoint]) -> Data? {
+        do {
+            return try JSONEncoder().encode(samples)
+        } catch {
+            print("[JumpSession] Failed to encode rate sample payload: \(error)")
+            return nil
+        }
+    }
+
+    /// Safely decodes a rate sample payload.
+    ///
+    /// Corrupt payloads, missing blobs, and future incompatible formats all resolve to an empty
+    /// series so chart and analytics views can degrade gracefully instead of crashing.
+    static func decodeRateSamples(from payload: Data?) -> [RateSamplePoint] {
+        guard let payload else { return [] }
+
+        do {
+            return try JSONDecoder().decode([RateSamplePoint].self, from: payload)
+        } catch {
+            print("[JumpSession] Failed to decode rate sample payload: \(error)")
+            return []
+        }
+    }
+
+    /// Attaches encoded rate samples to this session.
+    ///
+    /// This helper is used by save flows, previews, and migration code to keep the one-to-one model
+    /// consistent. Empty series still create metadata with a zero count only when callers explicitly
+    /// choose to persist them.
+    func replaceRateSamples(with samples: [RateSamplePoint]) {
+        let encodedPayload = Self.encodeRateSamples(samples)
+        let series = rateSeries ?? SessionRateSeries(session: self)
+        series.session = self
+        series.payload = encodedPayload
+        series.sampleCount = samples.count
+        series.version = 1
+        rateSeries = series
+    }
+
     /// Returns the derived analytics used by detailed session summaries.
     /// Rate samples are expected to be in ascending `secondOffset` order when provided.
-    func derivedMetrics(rateSamples: [SessionRateSample]? = nil) -> DerivedMetrics {
-        let resolvedRateSamples = rateSamples ?? self.rateSamples ?? []
+    func derivedMetrics(rateSamples: [RateSamplePoint]? = nil) -> DerivedMetrics {
+        let resolvedRateSamples = rateSamples ?? decodedRateSamples
         return DerivedMetrics(
             rhythmConsistency: SessionMetricsCalculator.rhythmConsistencyScore(from: resolvedRateSamples),
             caloriesPerMinute: SessionMetricsCalculator.caloriesPerMinute(
@@ -159,7 +210,7 @@ public extension JumpSession {
 
     /// Returns the formatted rhythm-consistency text derived from rate samples.
     func formattedRhythmConsistency(
-        rateSamples: [SessionRateSample]? = nil,
+        rateSamples: [RateSamplePoint]? = nil,
         placeholder: String = "--"
     ) -> String {
         guard let rhythmConsistency = derivedMetrics(rateSamples: rateSamples).rhythmConsistency else {

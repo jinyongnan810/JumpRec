@@ -109,9 +109,10 @@ extension MyDataStore {
 
     private func personalRecordCandidates(for session: JumpSession) -> [PersonalRecordCandidate] {
         var candidates: [PersonalRecordCandidate] = []
-        // Session rate samples are persisted in chronological order when the session is saved,
-        // so record calculations can consume them directly without re-sorting on every update.
-        let rateSamples = session.rateSamples ?? []
+        // Rate samples live in a lazily loaded blob so history lists avoid chart payload work. This
+        // record calculation runs only while saving or backfilling detailed records, where decoding
+        // the series is intentional and needed for rhythm-based achievements.
+        let rateSamples = session.decodedRateSamples
 
         // Each category has a minimum qualification threshold so personal records reflect
         // a meaningful workout milestone instead of the first small session in history.

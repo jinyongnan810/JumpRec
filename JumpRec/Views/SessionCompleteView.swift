@@ -54,18 +54,22 @@ struct SessionCompleteView: View {
             averageHeartRate: appState.averageHeartRate,
             peakHeartRate: appState.peakHeartRate
         )
-        session.rateSamples = SessionMetricsCalculator.makeRateSamples(
-            for: session,
+        let temporaryRateSamples = SessionMetricsCalculator.makeRateSamples(
             jumpOffsets: appState.jumps,
             durationSeconds: durationSeconds
         )
-        session.peakRate = SessionMetricsCalculator.peakRate(from: session.rateSamples ?? [])
+        session.replaceRateSamples(with: temporaryRateSamples)
+        session.peakRate = SessionMetricsCalculator.peakRate(from: temporaryRateSamples)
         return session
     }
 
-    /// Returns rate samples for the saved session or generates temporary ones from live data.
-    private var rateSamples: [SessionRateSample] {
-        (summarySession.rateSamples ?? []).sorted { $0.secondOffset < $1.secondOffset }
+    /// Returns rate samples for the saved session or generated temporary summary session.
+    ///
+    /// The completion screen displays the chart immediately after a workout, so decoding or reading
+    /// the in-memory rate-series payload here is expected and separate from lazy history loading.
+    /// The calculator generates points chronologically, so no extra per-render sorting is needed.
+    private var rateSamples: [RateSamplePoint] {
+        summarySession.decodedRateSamples
     }
 
     /// Returns the shared derived metrics used across summary surfaces.
@@ -319,9 +323,11 @@ struct SessionCompleteView: View {
         (360, 154), (390, 146), (420, 138), (450, 132),
     ]
 
-    session.rateSamples = sampleData.map { secondOffset, rate in
-        SessionRateSample(session: session, secondOffset: secondOffset, rate: rate)
-    }
+    session.replaceRateSamples(
+        with: sampleData.map { secondOffset, rate in
+            RateSamplePoint(secondOffset: secondOffset, rate: Float(rate))
+        }
+    )
 
     appState.sessionState = .complete
     appState.startTime = start

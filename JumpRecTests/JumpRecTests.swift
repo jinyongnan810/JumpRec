@@ -10,19 +10,8 @@ import Testing
 
 struct JumpRecTests {
     @Test func testMakeRateSamplesForSteady150Rate() async throws {
-        let startedAt = Date()
-        let endedAt = startedAt.addingTimeInterval(60)
         let jumpOffsets = stride(from: 0.4, through: 60.0, by: 0.4).map(\.self)
-        let session = JumpSession(
-            startedAt: startedAt,
-            endedAt: endedAt,
-            jumpCount: jumpOffsets.count,
-            peakRate: 0,
-            caloriesBurned: 0
-        )
-
         let samples = SessionMetricsCalculator.makeRateSamples(
-            for: session,
             jumpOffsets: jumpOffsets,
             durationSeconds: 60
         )
@@ -33,20 +22,18 @@ struct JumpRecTests {
     }
 
     @Test func testRhythmConsistencyScoreRewardsSteadySessions() async throws {
-        let steadySession = makeSession(durationSeconds: 60)
         let steadySamples = [
             150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
             150.0, 150.0, 150.0, 150.0, 150.0, 150.0,
         ].enumerated().map { index, rate in
-            SessionRateSample(session: steadySession, secondOffset: (index + 1) * 5, rate: rate)
+            RateSamplePoint(secondOffset: (index + 1) * 5, rate: Float(rate))
         }
 
-        let unevenSession = makeSession(durationSeconds: 60)
         let unevenSamples = [
             60.0, 240.0, 60.0, 240.0, 60.0, 240.0,
             60.0, 240.0, 60.0, 240.0, 60.0, 240.0,
         ].enumerated().map { index, rate in
-            SessionRateSample(session: unevenSession, secondOffset: (index + 1) * 5, rate: rate)
+            RateSamplePoint(secondOffset: (index + 1) * 5, rate: Float(rate))
         }
 
         let steadyScore = try #require(SessionMetricsCalculator.rhythmConsistencyScore(from: steadySamples))
@@ -195,19 +182,6 @@ private extension JumpRecTests {
             rotationRateY: 0,
             rotationRateZ: 0,
             timestamp: timestamp
-        )
-    }
-
-    /// Builds a minimal session shell that can own derived rate samples inside tests.
-    func makeSession(durationSeconds: Int) -> JumpSession {
-        let startedAt = Date()
-        let endedAt = startedAt.addingTimeInterval(TimeInterval(durationSeconds))
-        return JumpSession(
-            startedAt: startedAt,
-            endedAt: endedAt,
-            jumpCount: 0,
-            peakRate: 0,
-            caloriesBurned: 0
         )
     }
 }

@@ -31,17 +31,17 @@ public extension MyDataStore {
         #endif
     }
 
-    /// Inserts a session and any derived rate samples into the model context.
-    func addSession(session: JumpSession, rateSamples: [SessionRateSample] = []) {
+    /// Inserts a session and its encoded rate series into the model context.
+    func addSession(session: JumpSession, rateSamples: [RateSamplePoint] = []) {
         modelContext.insert(session)
-        attach(rateSamples, to: session)
+        attachRateSeries(rateSamples, to: session)
         let updatedRecordKinds = upsertPersonalRecords(for: session)
         if !updatedRecordKinds.isEmpty {
             markUnseenPersonalRecordUpdates(updatedRecordKinds)
         }
         saveContextIfNeeded()
 
-        print("inserted session and rate samples")
+        print("inserted session and encoded rate series")
         print("session: \(session)")
         print("samples: \(rateSamples.count)")
     }
@@ -72,7 +72,6 @@ public extension MyDataStore {
         )
 
         let rateSamples = SessionMetricsCalculator.makeRateSamples(
-            for: session,
             jumpOffsets: jumpOffsets,
             durationSeconds: session.durationSeconds
         )
@@ -96,15 +95,18 @@ public extension MyDataStore {
         await SessionAICommentGenerator.generateIfNeeded(for: session, in: modelContext)
     }
 
-    /// Links rate samples to their owning session before insertion.
-    private func attach(_ rateSamples: [SessionRateSample], to session: JumpSession) {
-        for sample in rateSamples {
-            sample.session = session
-            if session.rateSamples == nil {
-                session.rateSamples = []
-            }
-            session.rateSamples?.append(sample)
-            modelContext.insert(sample)
+    /// Creates the single child blob row for a session's rate samples.
+    ///
+    /// The list screen only needs the scalar fields on `JumpSession`, so storing rate points in this
+    /// separate one-to-one object prevents normal history fetches from materializing chart data. The
+    /// detail screen still has full fidelity by decoding `JumpSession.decodedRateSamples` on demand.
+    private func attachRateSeries(_ rateSamples: [RateSamplePoint], to session: JumpSession) {
+        guard !rateSamples.isEmpty else { return }
+
+        session.replaceRateSamples(with: rateSamples)
+
+        if let rateSeries = session.rateSeries {
+            modelContext.insert(rateSeries)
         }
     }
 }

@@ -35,9 +35,13 @@ struct SessionDetailView: View {
         session.formattedDuration
     }
 
-    /// Returns the saved rate samples sorted by elapsed time.
-    private var rateSamples: [SessionRateSample] {
-        (session.rateSamples ?? []).sorted { $0.secondOffset < $1.secondOffset }
+    /// Returns the saved rate samples in their persisted chart order.
+    ///
+    /// Accessing this property intentionally decodes the series payload because the detail screen is
+    /// the place where charts and rhythm analytics are actually visible. The save flow writes points
+    /// chronologically, so the detail view does not need to sort on every render.
+    private var rateSamples: [RateSamplePoint] {
+        session.decodedRateSamples
     }
 
     /// Returns the shared derived metrics used across summary surfaces.
@@ -175,7 +179,7 @@ struct SessionDetailView: View {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(
         for: JumpSession.self,
-        SessionRateSample.self,
+        SessionRateSeries.self,
         configurations: config
     )
 
@@ -204,14 +208,11 @@ struct SessionDetailView: View {
         (360, 124), (390, 116), (420, 108),
     ]
 
-    for (secondOffset, rate) in sampleData {
-        let sample = SessionRateSample(session: session, secondOffset: secondOffset, rate: rate)
-        container.mainContext.insert(sample)
-        if session.rateSamples == nil {
-            session.rateSamples = []
+    session.replaceRateSamples(
+        with: sampleData.map { secondOffset, rate in
+            RateSamplePoint(secondOffset: secondOffset, rate: Float(rate))
         }
-        session.rateSamples?.append(sample)
-    }
+    )
 
     return NavigationStack {
         SessionDetailView(session: session)

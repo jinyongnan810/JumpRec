@@ -444,7 +444,7 @@ private struct SessionRowView: View {
     let container = try! ModelContainer(
         for: JumpSession.self,
         PersonalRecord.self,
-        SessionRateSample.self,
+        SessionRateSeries.self,
         configurations: config
     )
 

@@ -32,7 +32,7 @@ struct SessionMetricsSummaryView: View {
     /// The formatted peak heart-rate value.
     let peakHeartRate: String
     /// The rate samples plotted in the chart.
-    let rateSamples: [SessionRateSample]
+    let rateSamples: [RateSamplePoint]
     /// The record kinds newly achieved in the current context.
     let achievedRecordKinds: [PersonalRecordKind]
 

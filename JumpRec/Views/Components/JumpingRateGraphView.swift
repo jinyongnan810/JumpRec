@@ -9,7 +9,7 @@ import SwiftUI
 /// Plots jump-rate samples over time for completed sessions.
 struct JumpingRateGraphView: View {
     /// The rate samples used to render the chart.
-    let samples: [SessionRateSample]
+    let samples: [RateSamplePoint]
 
     /// The color used for chart grid lines.
     private let gridLineColor = Color(hex: 0x0F172A)
@@ -102,12 +102,15 @@ struct JumpingRateGraphView: View {
 
     // MARK: - Derived Values
 
-    /// Converts stored session samples into chart points.
+    /// Converts chart-ready session samples into plotted points.
+    ///
+    /// `RateSamplePoint` payloads are encoded in chronological order by the session save flow. This
+    /// view preserves that order instead of sorting during every render, which keeps chart updates
+    /// cheap and makes ordering responsibility explicit at the data boundary.
     private var chartPoints: [ChartPoint] {
         samples
-            .sorted { $0.secondOffset < $1.secondOffset }
             .map { sample in
-                ChartPoint(elapsedSeconds: sample.secondOffset, value: sample.rate)
+                ChartPoint(elapsedSeconds: sample.secondOffset, value: Double(sample.rate))
             }
     }
 
@@ -223,20 +226,11 @@ private struct ChartAxisLabel {
 #Preview {
     JumpingRateGraphView(
         samples: {
-            let session = JumpSession(
-                startedAt: .now,
-                endedAt: .now.addingTimeInterval(332),
-                jumpCount: 847,
-                peakRate: 180,
-                averageRate: 153,
-                caloriesBurned: 156
-            )
-
             let values = [107, 115, 130, 135, 145, 160, 165, 180, 170, 150, 155, 165, 150, 130, 135, 145, 155, 165, 170, 150]
             let step = 332 / max(values.count - 1, 1)
 
             return values.enumerated().map { index, value in
-                SessionRateSample(session: session, secondOffset: index * step, rate: Double(value))
+                RateSamplePoint(secondOffset: index * step, rate: Float(value))
             }
         }()
     )

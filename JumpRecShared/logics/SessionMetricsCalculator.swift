@@ -24,15 +24,14 @@ public enum SessionMetricsCalculator {
 
     /// Generates normalized rate samples for charting a completed session.
     public static func makeRateSamples(
-        for session: JumpSession,
         jumpOffsets: [TimeInterval],
         durationSeconds: Int
-    ) -> [SessionRateSample] {
+    ) -> [RateSamplePoint] {
         guard durationSeconds > 0 else { return [] }
 
         guard !jumpOffsets.isEmpty else { return [] }
 
-        var samples: [SessionRateSample] = []
+        var samples: [RateSamplePoint] = []
         var left = 0
         var right = 0
         var sampleSeconds = Array(stride(from: bucketSeconds, through: durationSeconds, by: bucketSeconds))
@@ -55,7 +54,7 @@ public enum SessionMetricsCalculator {
             let countInWindow = max(0, right - left)
             let effectiveWindowSeconds = min(rollingWindowSeconds, max(1, second))
             let rate = Double(countInWindow) * 60.0 / Double(effectiveWindowSeconds)
-            samples.append(SessionRateSample(session: session, secondOffset: second, rate: rate))
+            samples.append(RateSamplePoint(secondOffset: second, rate: Float(rate)))
         }
 
         return samples
@@ -68,8 +67,8 @@ public enum SessionMetricsCalculator {
     }
 
     /// Returns the highest jump rate found in a sample series.
-    public static func peakRate(from rateSamples: [SessionRateSample]) -> Double? {
-        rateSamples.map(\.rate).max()
+    public static func peakRate(from rateSamples: [RateSamplePoint]) -> Double? {
+        rateSamples.map { Double($0.rate) }.max()
     }
 
     /// Returns a normalized pace-consistency score in the range `0...1`.
@@ -77,15 +76,16 @@ public enum SessionMetricsCalculator {
     /// so higher values represent a steadier rhythm. We keep this as a normalized score rather
     /// than raw variance because it is easier to compare across both slower and faster sessions.
     /// Callers are expected to pass rate samples in ascending `secondOffset` order.
-    public static func rhythmConsistencyScore(from rateSamples: [SessionRateSample]) -> Double? {
+    public static func rhythmConsistencyScore(from rateSamples: [RateSamplePoint]) -> Double? {
         guard rateSamples.count > 1 else { return nil }
 
-        let meanRate = rateSamples.map(\.rate).reduce(0, +) / Double(rateSamples.count)
+        let rates = rateSamples.map { Double($0.rate) }
+        let meanRate = rates.reduce(0, +) / Double(rates.count)
         guard meanRate > 0 else { return nil }
 
-        let averageAbsoluteDeviation = rateSamples
-            .map { abs($0.rate - meanRate) }
-            .reduce(0, +) / Double(rateSamples.count)
+        let averageAbsoluteDeviation = rates
+            .map { abs($0 - meanRate) }
+            .reduce(0, +) / Double(rates.count)
         let normalizedDeviation = min(1, averageAbsoluteDeviation / meanRate)
         return max(0, 1 - normalizedDeviation)
     }
