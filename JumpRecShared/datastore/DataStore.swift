@@ -203,22 +203,34 @@ public final class MyDataStore {
     /// Returns copy tailored for empty-library messaging.
     public var cloudRestoreStatusMessage: String {
         if isAwaitingInitialCloudRestore {
-            return "Syncing from iCloud. Your saved sessions may take a moment to reappear after reinstalling the app."
+            return String(
+                localized: "Syncing from iCloud. Your saved sessions may take a moment to reappear after reinstalling the app."
+            )
         }
 
         switch cloudAccountAvailability {
         case .available:
-            return "No cloud data restored yet. If you recently reinstalled the app, leave it open for a bit longer so iCloud can finish syncing."
+            return String(
+                localized: "No cloud data restored yet. If you recently reinstalled the app, leave it open for a bit longer so iCloud can finish syncing."
+            )
         case .checking:
-            return "Checking iCloud availability for your saved sessions."
+            return String(localized: "Checking iCloud availability for your saved sessions.")
         case .unavailable:
-            return "No iCloud account is currently signed in, so previous cloud-backed sessions cannot be restored on this device yet."
+            return String(
+                localized: "No iCloud account is currently signed in, so previous cloud-backed sessions cannot be restored on this device yet."
+            )
         case .restricted:
-            return "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now."
+            return String(
+                localized: "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now."
+            )
         case .temporarilyUnavailable:
-            return "iCloud is temporarily unavailable. Previously synced sessions may reappear once the account becomes reachable again."
+            return String(
+                localized: "iCloud is temporarily unavailable. Previously synced sessions may reappear once the account becomes reachable again."
+            )
         case .couldNotDetermine:
-            return "The app could not confirm iCloud availability, so session restore status is unknown."
+            return String(
+                localized: "The app could not confirm iCloud availability, so session restore status is unknown."
+            )
         }
     }
 

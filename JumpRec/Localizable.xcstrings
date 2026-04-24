@@ -259,6 +259,16 @@
         }
       }
     },
+    "Checking iCloud availability for your saved sessions." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存済みのセッションに対する iCloud の利用状況を確認しています。"
+          }
+        }
+      }
+    },
     "Complete sessions to set personal records!" : {
       "localizations" : {
         "ja" : {
@@ -529,6 +539,26 @@
         }
       }
     },
+    "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたセッションは現在復元できません。"
+          }
+        }
+      }
+    },
+    "iCloud is temporarily unavailable. Previously synced sessions may reappear once the account becomes reachable again." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたセッションが再表示される場合があります。"
+          }
+        }
+      }
+    },
     "Inbox" : {
 
     },
@@ -738,12 +768,32 @@
         }
       }
     },
+    "No cloud data restored yet. If you recently reinstalled the app, leave it open for a bit longer so iCloud can finish syncing." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだ iCloud のデータは復元されていません。最近アプリを再インストールした場合は、iCloud の同期が完了するまでこのまま少し開いたままにしてください。"
+          }
+        }
+      }
+    },
     "No data" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "データなし"
+          }
+        }
+      }
+    },
+    "No iCloud account is currently signed in, so previous cloud-backed sessions cannot be restored on this device yet." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在このデバイスでは iCloud にサインインしていないため、以前 iCloud に保存されたセッションはまだ復元できません。"
           }
         }
       }
@@ -779,7 +829,14 @@
       }
     },
     "No sessions yet" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだセッションがありません"
+          }
+        }
+      }
     },
     "Peak Heart Rate" : {
       "localizations" : {
@@ -1031,7 +1088,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッションをはじめる"
+            "value" : "はじめる"
           }
         }
       }
@@ -1083,7 +1140,17 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッションをストップ"
+            "value" : "ストップ"
+          }
+        }
+      }
+    },
+    "Syncing from iCloud. Your saved sessions may take a moment to reappear after reinstalling the app." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud から同期しています。アプリを再インストールした後は、保存済みのセッションが再表示されるまで少し時間がかかる場合があります。"
           }
         }
       }
@@ -1094,6 +1161,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "はじめるボタンでスタート"
+          }
+        }
+      }
+    },
+    "The app could not confirm iCloud availability, so session restore status is unknown." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリが iCloud の利用状況を確認できなかったため、セッションの復元状況は不明です。"
           }
         }
       }

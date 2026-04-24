@@ -33,6 +33,9 @@
         }
       }
     },
+    "Checking iCloud availability for your saved sessions." : {
+
+    },
     "Headphone" : {
       "localizations" : {
         "ja" : {
@@ -42,6 +45,12 @@
           }
         }
       }
+    },
+    "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now." : {
+
+    },
+    "iCloud is temporarily unavailable. Previously synced sessions may reappear once the account becomes reachable again." : {
+
     },
     "iPhone" : {
       "localizations" : {
@@ -73,6 +82,12 @@
         }
       }
     },
+    "No cloud data restored yet. If you recently reinstalled the app, leave it open for a bit longer so iCloud can finish syncing." : {
+
+    },
+    "No iCloud account is currently signed in, so previous cloud-backed sessions cannot be restored on this device yet." : {
+
+    },
     "Rate" : {
       "localizations" : {
         "ja" : {
@@ -92,6 +107,12 @@
           }
         }
       }
+    },
+    "Syncing from iCloud. Your saved sessions may take a moment to reappear after reinstalling the app." : {
+
+    },
+    "The app could not confirm iCloud availability, so session restore status is unknown." : {
+
     },
     "Watch" : {
       "localizations" : {
