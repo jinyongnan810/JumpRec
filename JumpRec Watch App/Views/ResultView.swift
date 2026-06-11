@@ -11,6 +11,8 @@ import SwiftUI
 struct ResultView: View {
     /// The watch app state containing the finished session values.
     let appState: JumpRecState
+    /// Reveals the compact result groups in reading order when this screen first appears.
+    @State private var hasContentAppeared = false
 
     /// Renders the compact results layout.
     var body: some View {
@@ -20,19 +22,23 @@ struct ResultView: View {
                     .font(AppFonts.watchMetricLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
+                    .staggeredAppearance(isVisible: hasContentAppeared, index: 0)
 
                 Text("\(appState.jumpCount)")
                     .font(AppFonts.watchResultValue)
                     .foregroundStyle(AppColors.accent)
+                    .staggeredAppearance(isVisible: hasContentAppeared, index: 1)
 
                 Text("JUMPS")
                     .font(AppFonts.watchMetricLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
+                    .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
 
                 Divider()
                     .background(AppColors.textMuted.opacity(0.3))
                     .padding(.vertical, 2)
+                    .staggeredAppearance(isVisible: hasContentAppeared, index: 3)
 
                 HStack(spacing: 16) {
                     VStack(spacing: 2) {
@@ -56,6 +62,7 @@ struct ResultView: View {
                             .foregroundStyle(AppColors.textSecondary)
                     }
                 }
+                .staggeredAppearance(isVisible: hasContentAppeared, index: 4)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -67,6 +74,11 @@ struct ResultView: View {
                     }
                 }
             }
+        }
+        .task {
+            // Let watchOS render the result hierarchy once before starting the shared entrance sequence.
+            await Task.yield()
+            hasContentAppeared = true
         }
     }
 }

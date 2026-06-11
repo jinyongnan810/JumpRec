@@ -21,6 +21,8 @@ struct GoalSheetView: View {
     @State private var countValue: Int64 = DefaultJumpCount
     /// Tracks the editable time goal value in minutes.
     @State private var timeValue: Int64 = DefaultJumpTime
+    /// Reveals the sheet controls in the same order that the user reads and interacts with them.
+    @State private var hasContentAppeared = false
 
     // MARK: - View
 
@@ -31,12 +33,16 @@ struct GoalSheetView: View {
             Text("Set Session Goal")
                 .font(AppFonts.primaryButtonLabel)
                 .foregroundStyle(AppColors.textPrimary)
+                .staggeredAppearance(isVisible: hasContentAppeared, index: 0)
 
             // Segmented Control
             segmentedControl
+                .staggeredAppearance(isVisible: hasContentAppeared, index: 1)
 
             // Value Stepper
-            stepperRow.animation(.easeInOut, value: selectedType)
+            stepperRow
+                .animation(.easeInOut, value: selectedType)
+                .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
 
             Spacer()
 
@@ -52,6 +58,7 @@ struct GoalSheetView: View {
                     .frame(height: 56)
             }
             .appGlassButton(prominent: true, tint: AppColors.accent)
+            .staggeredAppearance(isVisible: hasContentAppeared, index: 3)
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 32)
@@ -62,7 +69,13 @@ struct GoalSheetView: View {
             selectedType = settings.goalType
             countValue = settings.jumpCount
             timeValue = settings.jumpTime
-        }.padding(.top, 20)
+        }
+        .task {
+            // Defer the reveal until the persisted values have populated the editing controls.
+            await Task.yield()
+            hasContentAppeared = true
+        }
+        .padding(.top, 20)
     }
 
     // MARK: - Segmented Control

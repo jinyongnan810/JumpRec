@@ -18,6 +18,9 @@ struct SessionCompleteView: View {
     /// Keeping this state local makes the animation deterministic for this screen
     /// without coupling it to broader session lifecycle state.
     @State private var isCompletionBadgeVisible = false
+    /// Reveals the major completion-screen sections in their visual reading order.
+    /// This remains separate from the badge animation so the existing symbol effect can run independently.
+    @State private var hasContentAppeared = false
     /// Tracks whether this screen is actively requesting an AI recap for the just-finished session.
     /// The completion flow can arrive before the background generation task has finished, so the
     /// view keeps its own loading flag to show a deterministic placeholder instead of inferring
@@ -115,6 +118,7 @@ struct SessionCompleteView: View {
                         .font(AppFonts.bodySmall)
                         .foregroundStyle(AppColors.textSecondary)
                 }
+                .staggeredAppearance(isVisible: hasContentAppeared, index: 0)
 
                 if let completedSession,
                    SessionAICommentGenerator.shouldGenerate(for: completedSession)
@@ -123,6 +127,7 @@ struct SessionCompleteView: View {
                         comment: completedSession.aiComment,
                         isLoading: isGeneratingComment
                     )
+                    .staggeredAppearance(isVisible: hasContentAppeared, index: 1)
                 }
 
                 SessionMetricsSummaryView(
@@ -141,6 +146,7 @@ struct SessionCompleteView: View {
                     rateSamples: rateSamples,
                     achievedRecordKinds: unseenRecordKinds
                 )
+                .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
             }
             .padding(.horizontal, 24)
         }
@@ -161,6 +167,7 @@ struct SessionCompleteView: View {
                         .frame(height: 56)
                     }
                     .appGlassButton(prominent: false)
+                    .staggeredAppearance(isVisible: hasContentAppeared, index: 3)
                 }
 
                 // Done Button
@@ -179,7 +186,14 @@ struct SessionCompleteView: View {
                     prominent: true,
                     tint: AppColors.accent
                 )
+                .staggeredAppearance(isVisible: hasContentAppeared, index: 4)
             }.padding(.horizontal, 24)
+        }
+        .task {
+            // Waiting one update cycle ensures every section starts from the hidden state
+            // before the shared staggered modifier reveals the completed-session content.
+            await Task.yield()
+            hasContentAppeared = true
         }
         .task(id: completedSession?.id) {
             guard !isGeneratingComment, completedSession != nil else { return }
