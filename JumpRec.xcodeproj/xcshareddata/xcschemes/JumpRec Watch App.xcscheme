@@ -60,7 +60,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3FCE402D2E7589A9009C271D"
             BuildableName = "JumpRec Watch App.app"
-            BlueprintName = "JumpRec Watch App"
             ReferencedContainer = "container:JumpRec.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -77,7 +76,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3FCE402D2E7589A9009C271D"
             BuildableName = "JumpRec Watch App.app"
-            BlueprintName = "JumpRec Watch App"
             ReferencedContainer = "container:JumpRec.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

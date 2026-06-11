@@ -170,6 +170,13 @@ struct HistoryView: View {
 private struct MonthSessionsList: View {
     @Query private var sessions: [JumpSession]
 
+    /// Controls the calendar's one-time entrance without replaying it during month navigation.
+    @State private var hasCalendarAppeared = false
+
+    /// Drives the coordinated entrance sequence for the month-dependent summary and session rows.
+    /// Resetting this value when the month changes lets the newly queried items animate as a group.
+    @State private var hasAppeared = false
+
     let displayedMonth: Date
     let monthRange: DateInterval
     let navigationTransitionNamespace: Namespace.ID
@@ -243,6 +250,7 @@ private struct MonthSessionsList: View {
                     onNextMonth: onNextMonth
                 )
                 .listRowSeparator(.hidden)
+                .staggeredAppearance(isVisible: hasCalendarAppeared, index: 0)
             }
 
             Section {
@@ -252,6 +260,7 @@ private struct MonthSessionsList: View {
                     StatCardView(label: "TIME", value: formatDuration(totalDuration))
                 }
                 .listRowSeparator(.hidden)
+                .staggeredAppearance(isVisible: hasAppeared, index: 1)
             }
 
             Section {
@@ -264,8 +273,9 @@ private struct MonthSessionsList: View {
                         .listRowInsets(EdgeInsets(top: 0, leading: 24, bottom: 0, trailing: 24))
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
+                        .staggeredAppearance(isVisible: hasAppeared, index: 2)
                 } else {
-                    ForEach(sessions, id: \.id) { session in
+                    ForEach(Array(sessions.enumerated()), id: \.element.id) { index, session in
                         Button {
                             selectedSession = session
                         } label: {
@@ -275,6 +285,7 @@ private struct MonthSessionsList: View {
                         .buttonStyle(.plain)
                         .listRowInsets(EdgeInsets(top: 4, leading: 24, bottom: 4, trailing: 24))
                         .listRowSeparator(.hidden)
+                        .staggeredAppearance(isVisible: hasAppeared, index: index + 2)
                     }
                     .onDelete(perform: deleteSessions)
                 }
@@ -289,6 +300,19 @@ private struct MonthSessionsList: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .task {
+            // The calendar enters with the rest of the screen initially, but this state is
+            // intentionally independent from displayedMonth so navigation does not replay it.
+            await Task.yield()
+            hasCalendarAppeared = true
+        }
+        .task(id: displayedMonth) {
+            // Remove the previous month's presentation state without animation, then wait
+            // one update cycle so SwiftUI can render the new query results before revealing them.
+            hasAppeared = false
+            await Task.yield()
+            hasAppeared = true
+        }
     }
 
     private func deleteSessions(at offsets: IndexSet) {
