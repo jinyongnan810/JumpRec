@@ -101,8 +101,8 @@ extension JumpRecState {
         let csvText = makeMotionCSV(from: samples)
         let filename = makeMotionCSVFilename(startedAt: startedAt, endedAt: endedAt)
         motionCSVShareURL = ConnectivityManager.shared.saveCSVToLocalDocuments(csvText: csvText, filename: filename)
-        DispatchQueue.global(qos: .utility).async {
-            ConnectivityManager.shared.saveCSVtoICloud(csvText: csvText, filename: filename)
+        Task {
+            await ConnectivityManager.shared.saveCSVToICloud(csvText: csvText, filename: filename)
         }
     }
 

@@ -32,6 +32,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     var onCompletedSessionReceived: ((Date, Date, Int, Double, [TimeInterval], Int?, Int?, JumpSession) -> Void)?
     /// ⭐️Persists synced settings in the shared ubiquitous key-value store.
     private let settingsStore = NSUbiquitousKeyValueStore.default
+    /// Performs potentially delayed iCloud container resolution and file writes away from UI state.
+    private let cloudCSVExporter = CloudCSVExporter()
 
     /// Configures and activates the shared connectivity session.
     override private init() {
@@ -110,7 +112,10 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         do {
             let data = try Data(contentsOf: file.fileURL)
             if let csvText = String(data: data, encoding: .utf8) {
-                saveCSVtoICloud(csvText: csvText, filename: file.fileURL.lastPathComponent)
+                let filename = file.fileURL.lastPathComponent
+                Task {
+                    await saveCSVToICloud(csvText: csvText, filename: filename)
+                }
             } else {
                 print("[WatchConnectivityManager] Failed to decode CSV file content")
             }
@@ -134,7 +139,9 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             print("[WatchConnectivityManager] userInfo missing csvText or filename")
             return
         }
-        saveCSVtoICloud(csvText: csvText, filename: filename)
+        Task {
+            await saveCSVToICloud(csvText: csvText, filename: filename)
+        }
     }
 
     /// Rebuilds and persists a completed session received from Apple Watch.
@@ -219,58 +226,21 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)
     }
 
-    /// Saves CSV text to iCloud Drive in the specified container
+    /// Saves CSV text to iCloud Drive without blocking the caller while iCloud becomes available.
     /// - Parameters:
-    ///   - csvText: The CSV content as string
-    ///   - filename: The filename for the CSV file
-    ///   - containerId: The iCloud container identifier (default: "iCloud.com.kinn.JumpRec")
-    func saveCSVtoICloud(csvText: String, filename: String, containerId: String = "iCloud.com.kinn.JumpRec") {
-        // Check ubiquityIdentityToken, retry if needed
-        var ubiquityToken = FileManager.default.ubiquityIdentityToken
-        var containerURL: URL? = nil
-        var attempt = 0
-
-        while ubiquityToken == nil, attempt < 5 {
-            print("[WatchConnectivityManager] Waiting for iCloud ubiquityIdentityToken...")
-            Thread.sleep(forTimeInterval: 0.5)
-            ubiquityToken = FileManager.default.ubiquityIdentityToken
-            attempt += 1
-        }
-
-        guard ubiquityToken != nil else {
-            print("[WatchConnectivityManager] iCloud not available or user not logged in")
-            return
-        }
-
-        containerURL = FileManager.default.url(forUbiquityContainerIdentifier: containerId)
-
-        attempt = 0
-        while containerURL == nil, attempt < 5 {
-            print("[WatchConnectivityManager] Waiting for iCloud container URL...")
-            Thread.sleep(forTimeInterval: 0.5)
-            containerURL = FileManager.default.url(forUbiquityContainerIdentifier: containerId)
-            attempt += 1
-        }
-
-        guard let container = containerURL else {
-            print("[WatchConnectivityManager] Could not resolve iCloud container URL")
-            return
-        }
-
-        let documentsURL = container.appendingPathComponent("Documents", isDirectory: true)
-
-        do {
-            if !FileManager.default.fileExists(atPath: documentsURL.path) {
-                try FileManager.default.createDirectory(at: documentsURL, withIntermediateDirectories: true, attributes: nil)
-                print("[WatchConnectivityManager] Created Documents directory in iCloud container")
-            }
-
-            let fileURL = documentsURL.appendingPathComponent(filename)
-            try csvText.write(to: fileURL, atomically: true, encoding: .utf8)
-            print("[WatchConnectivityManager] Saved CSV to iCloud at \(fileURL.path)")
-        } catch {
-            print("[WatchConnectivityManager] Error saving CSV to iCloud: \(error.localizedDescription)")
-        }
+    ///   - csvText: The CSV content as a string.
+    ///   - filename: The destination filename in the iCloud Documents directory.
+    ///   - containerIdentifier: The iCloud container identifier used for the export.
+    func saveCSVToICloud(
+        csvText: String,
+        filename: String,
+        containerIdentifier: String = "iCloud.com.kinn.JumpRec"
+    ) async {
+        await cloudCSVExporter.save(
+            csvText: csvText,
+            filename: filename,
+            containerIdentifier: containerIdentifier
+        )
     }
 
     /// Saves CSV text to the app's local Documents directory.
