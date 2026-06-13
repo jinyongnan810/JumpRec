@@ -72,6 +72,19 @@ final class JumpRecState: NSObject {
     /// Remembers when a mirrored start request is waiting for watch confirmation.
     @ObservationIgnored
     var pendingMirroredStart = false
+    /// Identifies the current session attempt across asynchronous workout operations.
+    ///
+    /// HealthKit calls may finish after cancellation has been requested. Comparing this
+    /// token before applying a completion prevents an older operation from changing or
+    /// retaining workout state after reset or a replacement session.
+    @ObservationIgnored
+    var sessionGeneration = UUID()
+    /// Owns the request that asks Apple Watch to start a companion workout.
+    @ObservationIgnored
+    var companionWorkoutStartTask: Task<Void, Never>?
+    /// Serializes local HealthKit workout start and end operations.
+    @ObservationIgnored
+    var phoneWorkoutLifecycleTask: Task<Void, Never>?
 
     // MARK: - Dependencies
 

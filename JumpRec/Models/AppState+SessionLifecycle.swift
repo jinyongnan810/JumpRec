@@ -11,6 +11,8 @@ extension JumpRecState {
 
     /// Starts a session locally or requests a mirrored watch session when available.
     func start(goalType: GoalType, goalValue: Int) {
+        let generation = beginSessionAttempt()
+
         // Enter a transient starting state immediately so the home screen can
         // block duplicate taps while the watch companion workout request is in flight.
         sessionGoalType = goalType
@@ -25,22 +27,33 @@ extension JumpRecState {
                 jumpTime: Int64(goalType == .time ? goalValue : 0)
             )
 
-            Task {
+            companionWorkoutStartTask = Task { [weak self, workoutMirrorManager] in
                 do {
                     try await workoutMirrorManager.startCompanionWorkout()
                 } catch {
-                    await MainActor.run {
-                        // If watch startup fails, fall back to an iPhone-tracked session
-                        // instead of leaving the UI stuck in the pending-start state.
-                        self.pendingMirroredStart = false
-                        self.startLocalSession(goalType: goalType, goalValue: goalValue)
+                    guard let self,
+                          !Task.isCancelled,
+                          sessionGeneration == generation,
+                          sessionState == .starting,
+                          pendingMirroredStart
+                    else {
+                        return
                     }
+
+                    // If watch startup fails, fall back to an iPhone-tracked session
+                    // only when this request still owns the current starting state.
+                    pendingMirroredStart = false
+                    startLocalSession(
+                        goalType: goalType,
+                        goalValue: goalValue,
+                        generation: generation
+                    )
                 }
             }
             return
         }
 
-        startLocalSession(goalType: goalType, goalValue: goalValue)
+        startLocalSession(goalType: goalType, goalValue: goalValue, generation: generation)
     }
 
     /// Finishes the active local session and persists its results.
@@ -52,12 +65,27 @@ extension JumpRecState {
         motionManager?.stopTracking()
         let motionSamples = motionManager?.consumeRecordedSamples() ?? []
         endTime = Date()
+        sessionState = .complete
+
         if let endTime {
-            Task {
+            let generation = sessionGeneration
+            let precedingWorkoutTask = phoneWorkoutLifecycleTask
+            phoneWorkoutLifecycleTask = Task { [weak self, phoneWorkoutManager] in
+                // Ending must wait for an in-flight HealthKit start. Otherwise a late start
+                // could create a workout after the finish request has already done nothing.
+                await precedingWorkoutTask?.value
+                guard let self,
+                      !Task.isCancelled,
+                      sessionGeneration == generation,
+                      sessionState == .complete,
+                      !isMirroredWatchSession
+                else {
+                    return
+                }
+
                 await phoneWorkoutManager.endWorkout(at: endTime)
             }
         }
-        sessionState = .complete
         syncIdleTimer()
         notificationFeedbackGenerator.notificationOccurred(.success)
         speak(text: localizedSessionFinishedAnnouncement)
@@ -85,6 +113,7 @@ extension JumpRecState {
 
     /// Resets the app back to its idle state and clears active session data.
     func reset() {
+        invalidateWorkoutOperations()
         cancelMinuteAnnouncements()
         motionManager?.stopTracking()
         phoneWorkoutManager.discardWorkout()
@@ -123,7 +152,12 @@ extension JumpRecState {
     }
 
     /// Starts a session that is tracked directly on the iPhone.
-    func startLocalSession(goalType: GoalType, goalValue: Int) {
+    private func startLocalSession(goalType: GoalType, goalValue: Int, generation: UUID) {
+        guard sessionGeneration == generation else { return }
+
+        companionWorkoutStartTask?.cancel()
+        companionWorkoutStartTask = nil
+
         let sessionStartDate = Date()
         cancelMinuteAnnouncements()
         resetLiveMetrics()
@@ -146,13 +180,50 @@ extension JumpRecState {
         notificationFeedbackGenerator.notificationOccurred(.success)
         speak(text: localizedSessionStartedAnnouncement)
         syncLiveActivity()
-        Task {
+        phoneWorkoutLifecycleTask = Task { [weak self, phoneWorkoutManager] in
             do {
                 try await phoneWorkoutManager.startWorkout(at: sessionStartDate)
             } catch {
+                guard let self else { return }
+                if Task.isCancelled || sessionGeneration != generation {
+                    // The framework may have created partial workout state before failing.
+                    // Discard it when the operation no longer belongs to the active session.
+                    phoneWorkoutManager.discardWorkout()
+                    return
+                }
+
                 print("[JumpRecState] Failed to start iPhone workout session: \(error)")
+                return
+            }
+
+            guard let self,
+                  !Task.isCancelled,
+                  sessionGeneration == generation,
+                  sessionState == .active,
+                  !isMirroredWatchSession
+            else {
+                // Cancellation cannot guarantee that HealthKit stopped an operation already
+                // handed to the framework. Explicitly discard any workout created by a stale start.
+                phoneWorkoutManager.discardWorkout()
+                return
             }
         }
+    }
+
+    /// Creates a fresh identity for a new session and cancels work owned by the previous one.
+    private func beginSessionAttempt() -> UUID {
+        invalidateWorkoutOperations()
+        phoneWorkoutManager.discardWorkout()
+        return sessionGeneration
+    }
+
+    /// Invalidates asynchronous workout operations without relying on cooperative cancellation alone.
+    private func invalidateWorkoutOperations() {
+        sessionGeneration = UUID()
+        companionWorkoutStartTask?.cancel()
+        companionWorkoutStartTask = nil
+        phoneWorkoutLifecycleTask?.cancel()
+        phoneWorkoutLifecycleTask = nil
     }
 
     /// Clears the live metrics used by the active session UI.
