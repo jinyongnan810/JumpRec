@@ -100,6 +100,11 @@
 			path = "Jump​Rec​Live​Activity​Extension";
 			sourceTree = "<group>";
 		};
+		3FAD7F182FDD1787002975D1 /* Docs */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Docs;
+			sourceTree = "<group>";
+		};
 		3FCE40232E7589A8009C271D /* JumpRec */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -169,6 +174,7 @@
 		3FCE40182E7589A8009C271D = {
 			isa = PBXGroup;
 			children = (
+				3FAD7F182FDD1787002975D1 /* Docs */,
 				3FD1E71F2F75F7D400051DDE /* AGENTS.md */,
 				3FCE40232E7589A8009C271D /* JumpRec */,
 				3FCE40322E7589A9009C271D /* JumpRec Watch App */,
