@@ -5,7 +5,6 @@
 //  Created by Yuunan kin on 2025/10/05.
 //
 
-import Combine
 import SwiftUI
 
 /// Displays the watch start screen and pre-session countdown.
@@ -15,9 +14,7 @@ struct StartView: View {
     /// Drives the countdown ring animation.
     @State var isAnimating: Bool = false
     /// Stores the current countdown value.
-    @State var countdown: Double = 3
-    /// Publishes countdown ticks once per second.
-    var timer = Timer.publish(every: 1, on: .main, in: .common)
+    @State var countdown = 3
     /// Starts the workout when the countdown finishes.
     var onStart: () -> Void
 
@@ -60,15 +57,10 @@ struct StartView: View {
             ZStack {
                 if isCountingDown {
                     ZStack {
-                        Text("\(countdown, specifier: "%.0f")")
+                        Text(countdown.formatted())
                             .font(AppFonts.watchCountdown)
                             .foregroundStyle(AppColors.textPrimary)
                             .contentTransition(.numericText())
-                            .onReceive(timer.autoconnect()) { _ in
-                                withAnimation {
-                                    countdown -= 1
-                                }
-                            }
                         Circle()
                             .trim(from: 0, to: isAnimating ? 0 : 1)
                             .stroke(
@@ -83,12 +75,8 @@ struct StartView: View {
                                 duration: 3.0
                             ), value: isAnimating)
                     }
-                    .onAppear {
-                        withAnimation {
-                            isAnimating = true
-                        } completion: {
-                            onStart()
-                        }
+                    .task {
+                        await runCountdown()
                     }
                 } else {
                     VStack(spacing: 12) {
@@ -131,6 +119,48 @@ struct StartView: View {
                 GoalView()
             }
         }
+    }
+
+    // MARK: - Countdown
+
+    /// Runs the visible countdown and starts the workout only if the task remains active.
+    ///
+    /// SwiftUI cancels this task when the countdown view leaves the hierarchy. Each sleep
+    /// observes cancellation, preventing navigation or a parent state change from starting
+    /// a workout after the countdown is no longer visible.
+    private func runCountdown() async {
+        countdown = 3
+        isAnimating = false
+
+        // Allow SwiftUI to render the full ring before animating its trim to zero.
+        await Task.yield()
+        guard !Task.isCancelled else { return }
+
+        withAnimation(.linear(duration: 3)) {
+            isAnimating = true
+        }
+
+        for value in stride(from: 2, through: 1, by: -1) {
+            do {
+                try await Task.sleep(for: .seconds(1))
+            } catch {
+                return
+            }
+
+            guard !Task.isCancelled else { return }
+            withAnimation {
+                countdown = value
+            }
+        }
+
+        do {
+            try await Task.sleep(for: .seconds(1))
+        } catch {
+            return
+        }
+
+        guard !Task.isCancelled else { return }
+        onStart()
     }
 }
 

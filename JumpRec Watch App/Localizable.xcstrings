@@ -14,9 +14,6 @@
     "--" : {
       "shouldTranslate" : false
     },
-    "%.0f" : {
-      "shouldTranslate" : false
-    },
     "%@ jumps" : {
       "localizations" : {
         "ja" : {
