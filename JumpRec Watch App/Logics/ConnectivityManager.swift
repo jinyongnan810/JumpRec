@@ -8,6 +8,7 @@
 import Foundation
 import WatchConnectivity
 
+@MainActor
 final class ConnectivityManager: NSObject, WCSessionDelegate {
     /// Shared singleton used by the watch app.
     static let shared = ConnectivityManager()
@@ -29,14 +30,18 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     // MARK: - WCSessionDelegate
 
     /// Handles activation completion and applies any queued settings payload.
-    func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+    nonisolated func session(
+        _ session: WCSession,
+        activationDidCompleteWith activationState: WCSessionActivationState,
+        error: Error?
+    ) {
         if let error {
             print("[WatchConnectivityManager] Activation failed with error: \(error.localizedDescription)")
         } else {
             print("[WatchConnectivityManager] Activation completed with state: \(activationState.rawValue)")
         }
 
-        applySettingsPayload(session.receivedApplicationContext)
+        parseSettingsPayload(session.receivedApplicationContext)
     }
 
     /// Sends CSV text to iPhone via transferFile. Falls back to transferUserInfo if file creation fails.
@@ -96,30 +101,41 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     }
 
     /// Logs changes to reachability with the iPhone app.
-    func sessionReachabilityDidChange(_ session: WCSession) {
+    nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
         print("[WatchConnectivityManager] Session reachability changed: \(session.isReachable)")
     }
 
     /// Applies updated goal settings received from the iPhone app.
-    func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+    nonisolated func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         print("[WatchConnectivityManager] Received application context: \(applicationContext)")
-        applySettingsPayload(applicationContext)
+        parseSettingsPayload(applicationContext)
     }
 
-    /// Validates and persists a settings payload from the iPhone app.
-    private func applySettingsPayload(_ payload: [String: Any]) {
+    /// Parses loosely typed settings on the WatchConnectivity callback thread.
+    private nonisolated func parseSettingsPayload(_ payload: [String: Any]) {
         guard let type = payload["type"] as? String, type == "goalSettings" else {
             return
         }
 
         guard let goalTypeRawValue = payload["goalType"] as? String,
-              let jumpCount = payload["jumpCount"] as? Int,
-              let jumpTime = payload["jumpTime"] as? Int
+              let jumpCount = (payload["jumpCount"] as? NSNumber)?.intValue,
+              let jumpTime = (payload["jumpTime"] as? NSNumber)?.intValue
         else {
             print("[WatchConnectivityManager] Invalid goal settings payload")
             return
         }
 
+        Task { @MainActor [weak self] in
+            self?.applySettings(
+                goalTypeRawValue: goalTypeRawValue,
+                jumpCount: jumpCount,
+                jumpTime: jumpTime
+            )
+        }
+    }
+
+    /// Persists parsed settings and notifies main-actor observers.
+    private func applySettings(goalTypeRawValue: String, jumpCount: Int, jumpTime: Int) {
         settingsStore.set(goalTypeRawValue, forKey: "goalType")
         settingsStore.set(Int64(jumpCount), forKey: "jumpCount")
         settingsStore.set(Int64(jumpTime), forKey: "jumpTime")

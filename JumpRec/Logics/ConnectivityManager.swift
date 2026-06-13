@@ -11,6 +11,7 @@ import WatchConnectivity
 
 /// Manages WatchConnectivity session state, settings sync, and completed-session transfers.
 @Observable
+@MainActor
 final class ConnectivityManager: NSObject, WCSessionDelegate {
     /// Shared singleton used across the iPhone app.
     static let shared = ConnectivityManager()
@@ -47,53 +48,66 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     // MARK: - WCSessionDelegate
 
     /// Handles WatchConnectivity activation completion and refreshes local session flags.
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+    nonisolated func session(
+        _ session: WCSession,
+        activationDidCompleteWith activationState: WCSessionActivationState,
+        error: Error?
+    ) {
         if let error {
             print("[WatchConnectivityManager] Activation failed with error: \(error.localizedDescription)")
         } else {
             print("[WatchConnectivityManager] Activation completed with state: \(activationState.rawValue)")
         }
-        DispatchQueue.main.async {
-            self.activationState = activationState
-            self.isPaired = session.isPaired
-            self.isWatchAppInstalled = session.isWatchAppInstalled
-            self.isReachable = session.isReachable
+
+        // WCSession properties are read on the delegate callback thread, then only
+        // Sendable value snapshots cross to the main actor for observable state updates.
+        let isPaired = session.isPaired
+        let isWatchAppInstalled = session.isWatchAppInstalled
+        let isReachable = session.isReachable
+        Task { @MainActor [weak self] in
+            self?.activationState = activationState
+            self?.isPaired = isPaired
+            self?.isWatchAppInstalled = isWatchAppInstalled
+            self?.isReachable = isReachable
         }
     }
 
     /// Updates reachability when the watch app becomes reachable or unreachable.
-    func sessionReachabilityDidChange(_ session: WCSession) {
-        print("[WatchConnectivityManager] Session reachability changed: \(session.isReachable)")
-        DispatchQueue.main.async {
-            self.isReachable = session.isReachable
+    nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
+        let isReachable = session.isReachable
+        print("[WatchConnectivityManager] Session reachability changed: \(isReachable)")
+        Task { @MainActor [weak self] in
+            self?.isReachable = isReachable
         }
     }
 
     /// Updates pairing and install state when watch state changes.
-    func sessionWatchStateDidChange(_ session: WCSession) {
+    nonisolated func sessionWatchStateDidChange(_ session: WCSession) {
+        let isPaired = session.isPaired
+        let isWatchAppInstalled = session.isWatchAppInstalled
         print(
-            "[WatchConnectivityManager] Session state changed: isPaired(\(session.isPaired)), isWatchAppInstalled(\(session.isWatchAppInstalled))"
+            "[WatchConnectivityManager] Session state changed: isPaired(\(isPaired)), isWatchAppInstalled(\(isWatchAppInstalled))"
         )
-        DispatchQueue.main.async {
-            // isPaired is true even the watch is took off
-            self.isPaired = session.isPaired
-            self.isWatchAppInstalled = session.isWatchAppInstalled
+        Task { @MainActor [weak self] in
+            // Pairing remains true while the watch is off-wrist; installation is tracked separately.
+            self?.isPaired = isPaired
+            self?.isWatchAppInstalled = isWatchAppInstalled
         }
     }
 
     /// Logs when the current session becomes inactive.
-    func sessionDidBecomeInactive(_: WCSession) {
+    nonisolated func sessionDidBecomeInactive(_: WCSession) {
         print("[WatchConnectivityManager] Session did become inactive")
     }
 
     /// Reactivates the session after deactivation.
-    func sessionDidDeactivate(_ session: WCSession) {
+    nonisolated func sessionDidDeactivate(_ session: WCSession) {
         print("[WatchConnectivityManager] Session did deactivate")
         session.activate()
     }
 
     /// Logs incoming direct messages from the watch app.
-    func session(
+    nonisolated func session(
         _: WCSession,
         didReceiveMessage message: [String: Any]
     ) {
@@ -101,20 +115,39 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     }
 
     /// Applies settings synced via application context.
-    func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+    nonisolated func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         print("[WatchConnectivityManager] Received application context: \(applicationContext)")
-        applySettingsPayload(applicationContext)
+        guard let type = applicationContext["type"] as? String, type == "goalSettings" else {
+            return
+        }
+        guard let goalTypeRawValue = applicationContext["goalType"] as? String,
+              let jumpCount = NumberParser.int(applicationContext["jumpCount"]),
+              let jumpTime = NumberParser.int(applicationContext["jumpTime"])
+        else {
+            print("[WatchConnectivityManager] Invalid goal settings payload")
+            return
+        }
+
+        Task { @MainActor [weak self] in
+            self?.applySettings(
+                goalTypeRawValue: goalTypeRawValue,
+                jumpCount: jumpCount,
+                jumpTime: jumpTime
+            )
+        }
     }
 
     /// Handles incoming files transferred from the watch app.
-    func session(_: WCSession, didReceive file: WCSessionFile) {
-        print("[WatchConnectivityManager] Received file from watch: \(file.fileURL.lastPathComponent)")
+    nonisolated func session(_: WCSession, didReceive file: WCSessionFile) {
+        let filename = file.fileURL.lastPathComponent
+        print("[WatchConnectivityManager] Received file from watch: \(filename)")
         do {
+            // WatchConnectivity owns this temporary URL only for the callback lifetime,
+            // so copy its contents before starting any asynchronous work.
             let data = try Data(contentsOf: file.fileURL)
             if let csvText = String(data: data, encoding: .utf8) {
-                let filename = file.fileURL.lastPathComponent
-                Task {
-                    await saveCSVToICloud(csvText: csvText, filename: filename)
+                Task { @MainActor [weak self] in
+                    await self?.saveCSVToICloud(csvText: csvText, filename: filename)
                 }
             } else {
                 print("[WatchConnectivityManager] Failed to decode CSV file content")
@@ -125,11 +158,11 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     }
 
     /// Handles user-info transfers for sessions and CSV fallbacks.
-    func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+    nonisolated func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
         print("[WatchConnectivityManager] Received userInfo: \(userInfo)")
 
         if let type = userInfo["type"] as? String, type == "sessionComplete" {
-            handleCompletedSession(userInfo)
+            handleCompletedSessionPayload(userInfo)
             return
         }
 
@@ -139,13 +172,13 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             print("[WatchConnectivityManager] userInfo missing csvText or filename")
             return
         }
-        Task {
-            await saveCSVToICloud(csvText: csvText, filename: filename)
+        Task { @MainActor [weak self] in
+            await self?.saveCSVToICloud(csvText: csvText, filename: filename)
         }
     }
 
-    /// Rebuilds and persists a completed session received from Apple Watch.
-    private func handleCompletedSession(_ userInfo: [String: Any]) {
+    /// Parses a loosely typed completed-session payload on the delegate callback thread.
+    private nonisolated func handleCompletedSessionPayload(_ userInfo: [String: Any]) {
         guard let startedAtTimestamp = NumberParser.double(userInfo["startedAt"]),
               let endedAtTimestamp = NumberParser.double(userInfo["endedAt"]),
               let jumpCount = NumberParser.int(userInfo["jumpCount"]),
@@ -161,8 +194,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         let averageHeartRate = NumberParser.int(userInfo["averageHeartRate"])
         let peakHeartRate = NumberParser.int(userInfo["peakHeartRate"])
 
-        Task { @MainActor in
-            let session = MyDataStore.shared.saveCompletedSession(
+        Task { @MainActor [weak self] in
+            self?.saveCompletedSession(
                 startedAt: startedAt,
                 endedAt: endedAt,
                 jumpCount: jumpCount,
@@ -171,19 +204,39 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
                 averageHeartRate: averageHeartRate,
                 peakHeartRate: peakHeartRate
             )
-
-            self.onCompletedSessionReceived?(
-                startedAt,
-                endedAt,
-                jumpCount,
-                caloriesBurned,
-                jumpOffsets,
-                averageHeartRate,
-                peakHeartRate,
-                session
-            )
         }
+    }
 
+    /// Persists a parsed watch session and notifies the main-actor app state.
+    private func saveCompletedSession(
+        startedAt: Date,
+        endedAt: Date,
+        jumpCount: Int,
+        caloriesBurned: Double,
+        jumpOffsets: [TimeInterval],
+        averageHeartRate: Int?,
+        peakHeartRate: Int?
+    ) {
+        let session = MyDataStore.shared.saveCompletedSession(
+            startedAt: startedAt,
+            endedAt: endedAt,
+            jumpCount: jumpCount,
+            caloriesBurned: caloriesBurned,
+            jumpOffsets: jumpOffsets,
+            averageHeartRate: averageHeartRate,
+            peakHeartRate: peakHeartRate
+        )
+
+        onCompletedSessionReceived?(
+            startedAt,
+            endedAt,
+            jumpCount,
+            caloriesBurned,
+            jumpOffsets,
+            averageHeartRate,
+            peakHeartRate,
+            session
+        )
         print("[WatchConnectivityManager] Saved completed session from watch: \(jumpCount) jumps")
     }
 
@@ -204,20 +257,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
-    /// Validates and applies a goal-settings payload from the watch session.
-    private func applySettingsPayload(_ payload: [String: Any]) {
-        guard let type = payload["type"] as? String, type == "goalSettings" else {
-            return
-        }
-
-        guard let goalTypeRawValue = payload["goalType"] as? String,
-              let jumpCount = NumberParser.int(payload["jumpCount"]),
-              let jumpTime = NumberParser.int(payload["jumpTime"])
-        else {
-            print("[WatchConnectivityManager] Invalid goal settings payload")
-            return
-        }
-
+    /// Persists a parsed goal-settings payload and notifies main-actor observers.
+    private func applySettings(goalTypeRawValue: String, jumpCount: Int, jumpTime: Int) {
         settingsStore.set(goalTypeRawValue, forKey: "goalType")
         settingsStore.set(Int64(jumpCount), forKey: "jumpCount")
         settingsStore.set(Int64(jumpTime), forKey: "jumpTime")
