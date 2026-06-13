@@ -24,13 +24,28 @@ public enum SessionAICommentGenerator {
 
     // MARK: - Availability
 
+    /// Controls whether the AI comment feature is included in the current build configuration.
+    ///
+    /// AI comments are intentionally limited to debug builds while the feature is being evaluated.
+    /// Keeping this decision in the shared generator ensures that automatic generation, explicit
+    /// generation requests, and UI eligibility checks all use the same source of truth.
+    public static var isEnabled: Bool {
+        #if DEBUG
+            true
+        #else
+            false
+        #endif
+    }
+
     /// Returns whether the given session qualifies for AI comment generation.
     public static func shouldGenerate(for session: JumpSession) -> Bool {
-        session.jumpCount >= 100
+        isEnabled && session.jumpCount >= 100
     }
 
     /// Returns whether on-device AI generation is currently available.
     public static var isAvailable: Bool {
+        guard isEnabled else { return false }
+
         #if os(iOS) && canImport(FoundationModels)
             guard #available(iOS 26.0, *) else { return false }
 
@@ -50,6 +65,10 @@ public enum SessionAICommentGenerator {
         for session: JumpSession,
         in modelContext: ModelContext
     ) async -> String? {
+        // Check the build-level feature gate before returning a previously stored comment. This
+        // prevents non-debug callers from using AI recap content as well as generating new content.
+        guard isEnabled else { return nil }
+
         if let existingComment = session.aiComment?.trimmingCharacters(in: .whitespacesAndNewlines),
            !existingComment.isEmpty
         {
