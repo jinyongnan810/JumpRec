@@ -11,6 +11,7 @@ extension JumpRecState {
 
     /// Starts a session locally or requests a mirrored watch session when available.
     func start(goalType: GoalType, goalValue: Int) {
+        cancelPendingSpeech()
         let generation = beginSessionAttempt()
 
         // Enter a transient starting state immediately so the home screen can
@@ -114,6 +115,7 @@ extension JumpRecState {
     /// Resets the app back to its idle state and clears active session data.
     func reset() {
         invalidateWorkoutOperations()
+        cancelPendingSpeech()
         cancelMinuteAnnouncements()
         motionManager?.stopTracking()
         phoneWorkoutManager.discardWorkout()

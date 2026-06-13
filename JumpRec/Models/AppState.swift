@@ -128,6 +128,12 @@ final class JumpRecState: NSObject {
     /// workout before the priming utterance finishes.
     @ObservationIgnored
     var isSpeechWarmupInProgress = false
+    /// Owns the latest delayed speech request so obsolete session cues can be cancelled.
+    @ObservationIgnored
+    var pendingSpeechTask: Task<Void, Never>?
+    /// Identifies the latest speech request even when an older cancelled task resumes.
+    @ObservationIgnored
+    var pendingSpeechRequestID = UUID()
     /// Emits haptic feedback for session events.
     @ObservationIgnored
     let notificationFeedbackGenerator = UINotificationFeedbackGenerator()

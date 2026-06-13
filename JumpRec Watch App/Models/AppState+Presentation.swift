@@ -55,21 +55,49 @@ extension JumpRecState {
 
     // MARK: - Speech
 
-    /// Speaks a localized prompt after an optional delay.
+    /// Speaks a localized prompt after an optional, cancellable delay.
     func speak(text: String, delay: Double = 0.5) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            // Cancel the silent warmup if it is still running so the spoken workout cue
-            // can start immediately instead of being queued behind setup work.
-            if self.isSpeechWarmupInProgress {
-                self.synthesizer.stopSpeaking(at: .immediate)
-                self.isSpeechWarmupInProgress = false
+        cancelPendingSpeech()
+        let requestID = pendingSpeechRequestID
+
+        pendingSpeechTask = Task { [weak self] in
+            do {
+                try await Task.sleep(for: .seconds(delay))
+            } catch is CancellationError {
+                return
+            } catch {
+                print("[JumpRecState] Speech delay failed: \(error.localizedDescription)")
+                return
             }
 
-            self.configureSpeechAudioSession()
+            guard let self,
+                  !Task.isCancelled,
+                  pendingSpeechRequestID == requestID
+            else {
+                return
+            }
+
+            pendingSpeechTask = nil
+
+            // Cancel the silent warmup if it is still running so the spoken workout cue
+            // can start immediately instead of being queued behind setup work.
+            if isSpeechWarmupInProgress {
+                synthesizer.stopSpeaking(at: .immediate)
+                isSpeechWarmupInProgress = false
+            }
+
+            configureSpeechAudioSession()
             let utterance = AVSpeechUtterance(string: text)
-            utterance.voice = AVSpeechSynthesisVoice(language: self.preferredSpeechLanguageCode)
-            self.synthesizer.speak(utterance)
+            utterance.voice = AVSpeechSynthesisVoice(language: preferredSpeechLanguageCode)
+            synthesizer.speak(utterance)
         }
+    }
+
+    /// Cancels a speech cue that has not reached the synthesizer yet.
+    func cancelPendingSpeech() {
+        pendingSpeechRequestID = UUID()
+        pendingSpeechTask?.cancel()
+        pendingSpeechTask = nil
     }
 
     /// Returns whether Japanese is the preferred language.

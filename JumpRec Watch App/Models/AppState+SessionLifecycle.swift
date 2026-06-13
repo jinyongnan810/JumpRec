@@ -11,6 +11,7 @@ extension JumpRecState {
 
     /// Starts a new watch-tracked workout session.
     func start(goalType: GoalType, goalCount: Int) {
+        cancelPendingSpeech()
         resetSessionMetrics()
         self.goalType = goalType
         switch goalType {
@@ -70,6 +71,7 @@ extension JumpRecState {
 
     /// Resets the watch app back to the idle state.
     func reset() {
+        cancelPendingSpeech()
         cancelMinuteAnnouncements()
         motionManager?.stopTracking()
         resetSessionMetrics()

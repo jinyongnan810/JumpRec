@@ -78,6 +78,12 @@ class JumpRecState: NSObject {
     /// user-visible prompt is ready to play.
     @ObservationIgnored
     var isSpeechWarmupInProgress = false
+    /// Owns the latest delayed speech request so obsolete workout cues can be cancelled.
+    @ObservationIgnored
+    var pendingSpeechTask: Task<Void, Never>?
+    /// Identifies the latest speech request even when an older cancelled task resumes.
+    @ObservationIgnored
+    var pendingSpeechRequestID = UUID()
 
     /// Detects watch motion and jump events.
     @ObservationIgnored
