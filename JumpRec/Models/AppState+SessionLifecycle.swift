@@ -48,7 +48,7 @@ extension JumpRecState {
         guard sessionState == .active, let startTime else { return }
         guard !isMirroredWatchSession else { return }
 
-        invalidateMinuteTimer()
+        cancelMinuteAnnouncements()
         motionManager?.stopTracking()
         let motionSamples = motionManager?.consumeRecordedSamples() ?? []
         endTime = Date()
@@ -85,7 +85,7 @@ extension JumpRecState {
 
     /// Resets the app back to its idle state and clears active session data.
     func reset() {
-        invalidateMinuteTimer()
+        cancelMinuteAnnouncements()
         motionManager?.stopTracking()
         phoneWorkoutManager.discardWorkout()
         sessionState = .idle
@@ -127,7 +127,7 @@ extension JumpRecState {
     /// Starts a session that is tracked directly on the iPhone.
     func startLocalSession(goalType: GoalType, goalValue: Int) {
         let sessionStartDate = Date()
-        invalidateMinuteTimer()
+        cancelMinuteAnnouncements()
         resetLiveMetrics()
         completedSession = nil
         startTime = sessionStartDate
@@ -143,7 +143,7 @@ extension JumpRecState {
         // Start minute announcements for every session so users hear elapsed time
         // even when the selected goal is jump-based. Goal completion still remains
         // controlled by `isGoalReached(referenceDate:)`.
-        startMinuteTimer()
+        startMinuteAnnouncements()
         syncIdleTimer()
         notificationFeedbackGenerator.notificationOccurred(.success)
         speak(text: localizedSessionStartedAnnouncement)
@@ -182,20 +182,33 @@ extension JumpRecState {
         }
     }
 
-    /// Starts the timer used for time-based goal announcements.
-    func startMinuteTimer() {
-        invalidateMinuteTimer()
-        minuteTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated {
-                self?.handleMinuteLandmark()
+    /// Starts cancellable structured-concurrency work for minute announcements.
+    func startMinuteAnnouncements() {
+        cancelMinuteAnnouncements()
+        minuteAnnouncementTask = Task { [weak self] in
+            while !Task.isCancelled {
+                do {
+                    // Suspending avoids blocking the main thread while preserving the
+                    // same one-minute cadence as the former run-loop timer.
+                    try await Task.sleep(for: .seconds(60))
+                } catch is CancellationError {
+                    return
+                } catch {
+                    // `Task.sleep` currently only throws for cancellation. Returning for
+                    // any future error keeps this repeating task from spinning rapidly.
+                    return
+                }
+
+                guard let self else { return }
+                handleMinuteLandmark()
             }
         }
     }
 
-    /// Invalidates the active minute timer.
-    func invalidateMinuteTimer() {
-        minuteTimer?.invalidate()
-        minuteTimer = nil
+    /// Cancels pending minute-announcement work for the current session.
+    func cancelMinuteAnnouncements() {
+        minuteAnnouncementTask?.cancel()
+        minuteAnnouncementTask = nil
     }
 
     /// Announces each elapsed minute.

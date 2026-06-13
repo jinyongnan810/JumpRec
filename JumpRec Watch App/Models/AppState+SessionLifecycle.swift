@@ -28,7 +28,7 @@ extension JumpRecState {
         jumpState = .jumping
         // Start minute announcements for every workout so elapsed-time feedback
         // remains available even when the user selected a jump-count goal.
-        startMinuteTimer()
+        startMinuteAnnouncements()
         WKInterfaceDevice.current().play(.start)
         speak(text: localizedSessionStartedAnnouncement)
         ConnectivityManager.shared.sendMessage(["watch app": "started"])
@@ -44,7 +44,7 @@ extension JumpRecState {
     /// Ends the current watch workout and sends the finalized results to the phone.
     func end() {
         guard jumpState == .jumping else { return }
-        invalidateMinuteTimer()
+        cancelMinuteAnnouncements()
 
         motionManager?.stopTracking()
         endTime = Date()
@@ -70,7 +70,7 @@ extension JumpRecState {
 
     /// Resets the watch app back to the idle state.
     func reset() {
-        invalidateMinuteTimer()
+        cancelMinuteAnnouncements()
         motionManager?.stopTracking()
         resetSessionMetrics()
         jumpState = .idle
@@ -110,21 +110,33 @@ extension JumpRecState {
         speak(text: localizedJumpAnnouncement(for: hundred))
     }
 
-    /// Starts the timer used for minute-based announcements.
-    func startMinuteTimer() {
-        invalidateMinuteTimer()
-        minuteTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated {
-                self?.handleMinuteLandmark()
+    /// Starts cancellable structured-concurrency work for minute announcements.
+    func startMinuteAnnouncements() {
+        cancelMinuteAnnouncements()
+        minuteAnnouncementTask = Task { [weak self] in
+            while !Task.isCancelled {
+                do {
+                    // Suspending avoids blocking the main actor and removes the need to
+                    // force-unwrap a timer before adding it to the watch run loop.
+                    try await Task.sleep(for: .seconds(60))
+                } catch is CancellationError {
+                    return
+                } catch {
+                    // `Task.sleep` currently only throws for cancellation. Returning for
+                    // any future error keeps this repeating task from spinning rapidly.
+                    return
+                }
+
+                guard let self else { return }
+                handleMinuteLandmark()
             }
         }
-        RunLoop.current.add(minuteTimer!, forMode: .common)
     }
 
-    /// Invalidates the active minute timer.
-    func invalidateMinuteTimer() {
-        minuteTimer?.invalidate()
-        minuteTimer = nil
+    /// Cancels pending minute-announcement work for the current workout.
+    func cancelMinuteAnnouncements() {
+        minuteAnnouncementTask?.cancel()
+        minuteAnnouncementTask = nil
     }
 
     /// Announces elapsed minutes for every session and ends timed sessions when needed.

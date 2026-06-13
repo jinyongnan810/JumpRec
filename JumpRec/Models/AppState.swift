@@ -111,9 +111,12 @@ final class JumpRecState: NSObject {
     /// Emits haptic feedback for session events.
     @ObservationIgnored
     let notificationFeedbackGenerator = UINotificationFeedbackGenerator()
-    /// Announces minute milestones during time-based sessions.
+    /// Owns the cancellable task that announces elapsed-minute milestones.
+    ///
+    /// Retaining the task lets every session teardown path cancel pending work immediately,
+    /// preventing an old session from announcing after a new session has started.
     @ObservationIgnored
-    var minuteTimer: Timer?
+    var minuteAnnouncementTask: Task<Void, Never>?
 
     // MARK: - Initialization
 

@@ -82,9 +82,12 @@ class JumpRecState: NSObject {
     /// Detects watch motion and jump events.
     @ObservationIgnored
     var motionManager: MotionManager?
-    /// Announces minute milestones during time-based sessions.
+    /// Owns the cancellable task that announces elapsed-minute milestones.
+    ///
+    /// Retaining the task lets session cleanup stop a pending sleep before another
+    /// workout starts, avoiding announcements that belong to the previous workout.
     @ObservationIgnored
-    var minuteTimer: Timer?
+    var minuteAnnouncementTask: Task<Void, Never>?
 
     // MARK: - Initialization
 

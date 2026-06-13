@@ -27,7 +27,7 @@ extension JumpRecState {
     /// Handles the mirrored session ending without a final payload.
     func handleMirroredSessionEnded() {
         guard isMirroredWatchSession, sessionState == .active else { return }
-        invalidateMinuteTimer()
+        cancelMinuteAnnouncements()
         endTime = endTime ?? Date()
         sessionState = .complete
         syncIdleTimer()
@@ -47,7 +47,7 @@ extension JumpRecState {
     ) {
         guard isMirroredWatchSession else { return }
 
-        invalidateMinuteTimer()
+        cancelMinuteAnnouncements()
         startTime = startedAt
         endTime = endedAt
         self.jumpCount = jumpCount
@@ -63,7 +63,7 @@ extension JumpRecState {
 
     /// Initializes local mirrored-session state from a watch payload.
     private func beginMirroredSession(_ payload: MirroredWorkoutPayload) {
-        invalidateMinuteTimer()
+        cancelMinuteAnnouncements()
         pendingMirroredStart = false
         resetLiveMetrics()
         averageHeartRate = nil
@@ -118,7 +118,7 @@ extension JumpRecState {
     private func applyMirroredEnding(_ payload: MirroredWorkoutPayload) {
         guard isMirroredWatchSession else { return }
 
-        invalidateMinuteTimer()
+        cancelMinuteAnnouncements()
         endTime = payload.endTime ?? Date()
         if let energyBurned = payload.energyBurned {
             caloriesBurned = energyBurned
