@@ -10,7 +10,7 @@ import Foundation
 
     /// Defines the immutable and mutable data shown in the live activity.
     @available(iOS 18.0, *)
-    public struct JumpRecLiveActivityAttributes: ActivityAttributes {
+    public nonisolated struct JumpRecLiveActivityAttributes {
         /// Defines the live-updating content for the activity.
         public struct ContentState: Codable, Hashable {
             /// The current jump count.
@@ -51,4 +51,9 @@ import Foundation
             self.goalSummary = goalSummary
         }
     }
+
+    // Declaring the conformance separately keeps this immutable payload nonisolated even in app
+    // targets that use main-actor isolation by default.
+    @available(iOS 18.0, *)
+    nonisolated extension JumpRecLiveActivityAttributes: ActivityAttributes {}
 #endif

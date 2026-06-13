@@ -28,7 +28,7 @@ public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
     // MARK: - Display Metadata
 
     /// Returns the localized display title for the record type.
-    public var title: String {
+    public nonisolated var title: String {
         switch self {
         case .highestJumpCount:
             "Highest Jump Count"
@@ -50,7 +50,7 @@ public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
     }
 
     /// Returns the SF Symbol used to represent the record type.
-    public var icon: String {
+    public nonisolated var icon: String {
         switch self {
         case .highestJumpCount:
             "trophy.fill"

@@ -8,7 +8,7 @@
 import Foundation
 
 /// Shared calculation helpers for session summary metrics and rate samples.
-public enum SessionMetricsCalculator {
+public nonisolated enum SessionMetricsCalculator {
     // MARK: - Constants
 
     /// The spacing between generated chart samples in seconds.

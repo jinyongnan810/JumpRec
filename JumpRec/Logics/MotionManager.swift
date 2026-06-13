@@ -110,7 +110,7 @@ final class MotionManager: NSObject {
     }
 
     /// Stops route-change observation when the manager is released.
-    deinit {
+    isolated deinit {
         NotificationCenter.default.removeObserver(self)
         headphoneActivityManager.stopStatusUpdates()
     }

@@ -15,7 +15,7 @@ import SwiftData
 /// object churn and CloudKit records. The app now encodes arrays of these lightweight values into
 /// `SessionRateSeries.payload` so list screens can keep loading only the session summary row while
 /// detail screens decode the chart data on demand.
-public struct RateSamplePoint: Codable, Sendable {
+public nonisolated struct RateSamplePoint: Codable, Sendable {
     /// Time offset from the session start, measured in whole seconds.
     public let secondOffset: Int
 

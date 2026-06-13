@@ -26,6 +26,10 @@ public let DefaultJumpCount: Int64 = 1000
 public let DefaultJumpTime: Int64 = 10
 
 /// Stores and synchronizes user-selected workout settings across devices.
+///
+/// Settings are observed directly by SwiftUI, so all reads and mutations are isolated to the
+/// main actor. This also gives notification callbacks a single, explicit synchronization point.
+@MainActor
 @Observable
 public class JumpRecSettings {
     // MARK: - Dependencies
@@ -90,7 +94,11 @@ public class JumpRecSettings {
             object: store,
             queue: .main
         ) { [weak self] _ in
-            self?.loadSettings()
+            // NotificationCenter's closure is Sendable even when delivery uses the main queue.
+            // An explicit task communicates the actor hop to Swift's concurrency checker.
+            Task { @MainActor [weak self] in
+                self?.loadSettings()
+            }
         }
 
         NotificationCenter.default.addObserver(
@@ -98,7 +106,10 @@ public class JumpRecSettings {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.loadSettings()
+            // Paired-device updates use the same main-actor reload path as iCloud updates.
+            Task { @MainActor [weak self] in
+                self?.loadSettings()
+            }
         }
     }
 
