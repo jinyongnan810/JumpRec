@@ -100,9 +100,7 @@ extension JumpRecState {
         completedSession = nil
         pendingMirroredStart = false
         syncIdleTimer()
-        Task {
-            await liveActivityManager.endIfNeeded()
-        }
+        syncLiveActivity()
     }
 
     // MARK: - Live Metrics

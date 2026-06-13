@@ -11,9 +11,18 @@ extension JumpRecState {
     // MARK: - Live Activity And Idle Timer
 
     /// Starts, updates, or ends the live activity to match session state.
+    ///
+    /// Every operation waits for the previous ActivityKit call before proceeding. Metric
+    /// updates cancel the superseded task, so rapid jump events collapse to the newest
+    /// snapshot while an update already accepted by ActivityKit is still allowed to finish.
+    /// Terminal operations use the same chain, ensuring stale content cannot run after end.
     func syncLiveActivity() {
+        let previousTask = liveActivitySyncTask
+        previousTask?.cancel()
+
         if sessionState == .idle {
-            Task {
+            liveActivitySyncTask = Task { [liveActivityManager] in
+                await previousTask?.value
                 await liveActivityManager.endIfNeeded()
             }
             return
@@ -21,29 +30,52 @@ extension JumpRecState {
 
         if sessionState == .complete {
             guard let endedAt = endTime else { return }
-            Task {
+
+            // Capture final values before suspension so later reset work cannot alter the
+            // content that belongs to the completed session.
+            let startedAt = startTime
+            let goalSummary = liveActivityGoalSummary
+            let finalJumpCount = jumpCount
+            let finalCaloriesBurned = caloriesBurned
+            let finalAverageRate = averageRate
+            let finalSourceLabel = liveActivitySourceLabel
+
+            liveActivitySyncTask = Task { [liveActivityManager] in
+                await previousTask?.value
                 await liveActivityManager.end(
-                    startedAt: startTime,
-                    goalSummary: liveActivityGoalSummary,
-                    jumpCount: jumpCount,
-                    caloriesBurned: caloriesBurned,
-                    averageRate: averageRate,
-                    sourceLabel: liveActivitySourceLabel,
+                    startedAt: startedAt,
+                    goalSummary: goalSummary,
+                    jumpCount: finalJumpCount,
+                    caloriesBurned: finalCaloriesBurned,
+                    averageRate: finalAverageRate,
+                    sourceLabel: finalSourceLabel,
                     endedAt: endedAt
                 )
             }
             return
         }
 
-        guard let startTime else { return }
-        Task {
+        guard let startedAt = startTime else { return }
+
+        // Snapshot observable state on the main actor. The task may wait behind an in-flight
+        // update, and reading these properties later could mix values from another session.
+        let goalSummary = liveActivityGoalSummary
+        let latestJumpCount = jumpCount
+        let latestCaloriesBurned = caloriesBurned
+        let latestAverageRate = averageRate
+        let latestSourceLabel = liveActivitySourceLabel
+
+        liveActivitySyncTask = Task { [liveActivityManager] in
+            await previousTask?.value
+            guard !Task.isCancelled else { return }
+
             await liveActivityManager.startOrUpdate(
-                startedAt: startTime,
-                goalSummary: liveActivityGoalSummary,
-                jumpCount: jumpCount,
-                caloriesBurned: caloriesBurned,
-                averageRate: averageRate,
-                sourceLabel: liveActivitySourceLabel
+                startedAt: startedAt,
+                goalSummary: goalSummary,
+                jumpCount: latestJumpCount,
+                caloriesBurned: latestCaloriesBurned,
+                averageRate: latestAverageRate,
+                sourceLabel: latestSourceLabel
             )
         }
     }

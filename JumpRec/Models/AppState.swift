@@ -90,6 +90,13 @@ final class JumpRecState: NSObject {
     /// Manages live-activity presentation and updates.
     @ObservationIgnored
     let liveActivityManager = LiveActivityManager.shared
+    /// Serializes Live Activity operations and allows superseded metric updates to be cancelled.
+    ///
+    /// ActivityKit updates suspend while the system applies them. Retaining the latest task
+    /// prevents a burst of jump events from launching independent updates that can finish out
+    /// of order, and lets terminal operations wait for any update already in flight.
+    @ObservationIgnored
+    var liveActivitySyncTask: Task<Void, Never>?
     /// Speaks audible session prompts and milestones.
     @ObservationIgnored
     let synthesizer = AVSpeechSynthesizer()
