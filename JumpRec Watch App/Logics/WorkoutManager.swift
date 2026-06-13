@@ -9,7 +9,17 @@ import Foundation
 import HealthKit
 
 /// Manages HealthKit workout sessions, heart rate, and energy burned tracking.
-class WorkoutManager: NSObject {
+@MainActor
+final class WorkoutManager: NSObject {
+    /// Errors produced when HealthKit reports an unsuccessful callback without an error object.
+    private enum WorkoutFinalizationError: LocalizedError {
+        case endCollectionFailed
+
+        var errorDescription: String? {
+            "HealthKit could not end workout data collection."
+        }
+    }
+
     // MARK: - Callbacks
 
     /// Delivers heart-rate updates back to app state.
@@ -39,6 +49,12 @@ class WorkoutManager: NSObject {
     private var heartRateSum = 0
     /// Counts heart-rate samples for averaging.
     private var heartRateSamples = 0
+    /// Deduplicates an in-flight HealthKit authorization request.
+    private var authorizationTask: Task<Void, Error>?
+    /// Owns asynchronous startup or finishing work for the current workout.
+    private var workoutLifecycleTask: Task<Void, Never>?
+    /// Identifies the workout that owns asynchronous HealthKit completions.
+    private var workoutGeneration = UUID()
 
     // MARK: - Initialization
 
@@ -47,87 +63,163 @@ class WorkoutManager: NSObject {
         self.updateHeartRate = updateHeartRate
         self.updateEnergyBurned = updateEnergyBurned
         super.init()
-        requestAuthorization()
+
+        // Prime authorization early. Workout startup awaits the same retained task, so
+        // multiple callers never present overlapping HealthKit permission requests.
+        authorizationTask = Task { [healthStore] in
+            try await Self.requestAuthorization(using: healthStore)
+        }
     }
 
     // MARK: - Authorization
 
+    /// Waits for the current authorization request or starts one when needed.
+    private func ensureAuthorization() async throws {
+        if let authorizationTask {
+            try await authorizationTask.value
+            return
+        }
+
+        let task = Task { [healthStore] in
+            try await Self.requestAuthorization(using: healthStore)
+        }
+        authorizationTask = task
+
+        do {
+            try await task.value
+        } catch {
+            authorizationTask = nil
+            throw error
+        }
+    }
+
     /// Requests the HealthKit permissions required by the watch workout.
-    func requestAuthorization() {
-        let typesToShare: Set = [
+    private nonisolated static func requestAuthorization(using healthStore: HKHealthStore) async throws {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+
+        let typesToShare: Set<HKSampleType> = [
             HKQuantityType.workoutType(),
             HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
         ]
 
-        let typesToRead: Set = [
+        let typesToRead: Set<HKObjectType> = [
             HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
             HKQuantityType.quantityType(forIdentifier: .heartRate)!,
             HKObjectType.activitySummaryType(),
         ]
 
-        healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { success, error in
-            print("request health permission: \(success)")
-            if let error {
-                print("permission request error: \(error)")
-            }
-        }
+        try await healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead)
+        print("[WorkoutManager] HealthKit authorization request completed")
     }
 
     // MARK: - Workout Session
 
     /// Starts a jump-rope workout and begins mirroring it to the iPhone app.
     func startWorkout(startDate: Date, goalType: GoalType, goalValue: Int) {
+        workoutGeneration = UUID()
+        let generation = workoutGeneration
+        workoutLifecycleTask?.cancel()
+        stopLiveQueries()
+
         averageHeartRate = nil
         peakHeartRate = nil
         heartRateSum = 0
         heartRateSamples = 0
+
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .jumpRope
         configuration.locationType = .outdoor
+
         do {
-            session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
-            builder = session?.associatedWorkoutBuilder()
+            let session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
+            let builder = session.associatedWorkoutBuilder()
+            builder.dataSource = HKLiveWorkoutDataSource(
+                healthStore: healthStore,
+                workoutConfiguration: configuration
+            )
+            session.delegate = self
+            builder.delegate = self
+            self.session = session
+            self.builder = builder
+            session.startActivity(with: startDate)
 
-            session?.delegate = self
-            builder?.delegate = self
+            workoutLifecycleTask = Task { [weak self] in
+                guard let self else { return }
 
-            session?.startActivity(with: startDate)
-            builder?.beginCollection(withStart: startDate) { success, error in
-                print("Collecting health data started: \(success)")
-                if let error {
-                    print("Failed to start collecting health data: \(error)")
+                do {
+                    try await ensureAuthorization()
+                    try Task.checkCancellation()
+                    try await builder.beginCollection(at: startDate)
+                    try Task.checkCancellation()
+                    try await session.startMirroringToCompanionDevice()
+                    try Task.checkCancellation()
+                } catch is CancellationError {
+                    return
+                } catch {
+                    print("[WorkoutManager] Failed to start workout collection: \(error.localizedDescription)")
+                    return
                 }
 
-                self.startMirroring(startDate: startDate, goalType: goalType, goalValue: goalValue)
-                self.startHeartRateQuery()
-                self.startEnergyBurnedQuery()
+                guard workoutGeneration == generation,
+                      self.session === session,
+                      self.builder === builder
+                else {
+                    return
+                }
+
+                sendPayload(
+                    MirroredWorkoutPayload(
+                        kind: .started,
+                        startTime: startDate,
+                        goalType: goalType,
+                        goalValue: goalValue
+                    )
+                )
+                startHeartRateQuery(startDate: startDate)
+                startEnergyBurnedQuery(startDate: startDate)
             }
         } catch {
-            print("Collecting health data failed")
+            print("[WorkoutManager] Failed to create workout session: \(error.localizedDescription)")
         }
     }
 
     /// Ends the workout, sends final mirrored metrics, and saves it to HealthKit.
     func stopWorkout() {
-        if let heartRateQuery {
-            healthStore.stop(heartRateQuery)
-        }
-        if let energyBurnedQuery {
-            healthStore.stop(energyBurnedQuery)
-        }
+        workoutGeneration = UUID()
+        workoutLifecycleTask?.cancel()
+        workoutLifecycleTask = nil
+        stopLiveQueries()
+
+        let endDate = Date()
         sendPayload(
             MirroredWorkoutPayload(
                 kind: .ended,
-                endTime: Date(),
+                endTime: endDate,
                 energyBurned: currentEnergyBurned,
                 averageHeartRate: averageHeartRate,
                 peakHeartRate: peakHeartRate
             )
         )
-        session?.end()
-        builder?.endCollection(withEnd: Date()) { _, _ in
-            self.builder?.finishWorkout { workout, _ in
-                print("workout finished: \(String(describing: workout))")
+
+        guard let session, let builder else {
+            self.session = nil
+            self.builder = nil
+            return
+        }
+
+        session.end()
+        self.session = nil
+        self.builder = nil
+
+        workoutLifecycleTask = Task {
+            do {
+                try await endCollection(builder, at: endDate)
+                let workout = try await finishWorkout(builder)
+                print("[WorkoutManager] Workout finished: \(String(describing: workout))")
+            } catch is CancellationError {
+                return
+            } catch {
+                print("[WorkoutManager] Failed to finish workout: \(error.localizedDescription)")
             }
         }
     }
@@ -146,9 +238,9 @@ class WorkoutManager: NSObject {
     // MARK: - Live Queries
 
     /// Starts the live heart-rate query for the active workout.
-    private func startHeartRateQuery() {
+    private func startHeartRateQuery(startDate: Date) {
         let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
-        let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: .strictStartDate)
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: nil, options: .strictStartDate)
         heartRateQuery = HKAnchoredObjectQuery(
             type: heartRateType,
             predicate: predicate,
@@ -157,18 +249,19 @@ class WorkoutManager: NSObject {
         ) { _, _, _, _, _ in
         }
 
-        heartRateQuery?.updateHandler = { _, samples, _, _, _ in
-            if let samples = samples as? [HKQuantitySample] {
-                for sample in samples {
-                    let bpm = sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
-                    print("heartrate: \(bpm) bpm")
-                    let heartRate = Int(bpm)
-                    self.heartRateSum += heartRate
-                    self.heartRateSamples += 1
-                    self.averageHeartRate = self.heartRateSum / self.heartRateSamples
-                    self.peakHeartRate = max(self.peakHeartRate ?? 0, heartRate)
-                    self.updateHeartRate(heartRate)
-                }
+        heartRateQuery?.updateHandler = { [weak self] _, samples, _, _, error in
+            if let error {
+                print("[WorkoutManager] Heart-rate query failed: \(error.localizedDescription)")
+                return
+            }
+
+            let heartRates = (samples as? [HKQuantitySample])?.map { sample in
+                Int(sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute())))
+            } ?? []
+            guard !heartRates.isEmpty else { return }
+
+            Task { @MainActor [weak self] in
+                self?.applyHeartRates(heartRates)
             }
         }
         if let heartRateQuery {
@@ -177,9 +270,9 @@ class WorkoutManager: NSObject {
     }
 
     /// Starts the live energy-burned query for the active workout.
-    private func startEnergyBurnedQuery() {
+    private func startEnergyBurnedQuery(startDate: Date) {
         let energyBurnedType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!
-        let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: .strictStartDate)
+        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: nil, options: .strictStartDate)
         energyBurnedQuery = HKAnchoredObjectQuery(
             type: energyBurnedType,
             predicate: predicate,
@@ -188,20 +281,19 @@ class WorkoutManager: NSObject {
         ) { _, _, _, _, _ in
         }
 
-        energyBurnedQuery?.updateHandler = { _, samples, _, _, _ in
-            if let samples = samples as? [HKQuantitySample] {
-                for sample in samples {
-                    let kcal = sample.quantity.doubleValue(for: HKUnit.kilocalorie())
-                    self.updateEnergyBurned(kcal)
-                    self.sendPayload(
-                        MirroredWorkoutPayload(
-                            kind: .metrics,
-                            energyBurned: kcal,
-                            averageHeartRate: self.averageHeartRate,
-                            peakHeartRate: self.peakHeartRate
-                        )
-                    )
-                }
+        energyBurnedQuery?.updateHandler = { [weak self] _, samples, _, _, error in
+            if let error {
+                print("[WorkoutManager] Energy query failed: \(error.localizedDescription)")
+                return
+            }
+
+            let energyValues = (samples as? [HKQuantitySample])?.map { sample in
+                sample.quantity.doubleValue(for: .kilocalorie())
+            } ?? []
+            guard !energyValues.isEmpty else { return }
+
+            Task { @MainActor [weak self] in
+                self?.applyEnergyValues(energyValues)
             }
         }
         if let energyBurnedQuery {
@@ -221,23 +313,68 @@ class WorkoutManager: NSObject {
             .doubleValue(for: .kilocalorie()) ?? 0
     }
 
-    /// Starts HealthKit workout mirroring and sends the initial payload to iPhone.
-    private func startMirroring(startDate: Date, goalType: GoalType, goalValue: Int) {
-        guard let session else { return }
+    /// Applies heart-rate samples after crossing back from HealthKit's query callback.
+    private func applyHeartRates(_ heartRates: [Int]) {
+        for heartRate in heartRates {
+            heartRateSum += heartRate
+            heartRateSamples += 1
+            averageHeartRate = heartRateSum / heartRateSamples
+            peakHeartRate = max(peakHeartRate ?? 0, heartRate)
+            updateHeartRate(heartRate)
+        }
+    }
 
-        Task {
-            do {
-                try await session.startMirroringToCompanionDevice()
-                sendPayload(
-                    MirroredWorkoutPayload(
-                        kind: .started,
-                        startTime: startDate,
-                        goalType: goalType,
-                        goalValue: goalValue
-                    )
+    /// Applies energy samples and mirrors the latest aggregate metrics to iPhone.
+    private func applyEnergyValues(_ energyValues: [Double]) {
+        for energyBurned in energyValues {
+            updateEnergyBurned(energyBurned)
+            sendPayload(
+                MirroredWorkoutPayload(
+                    kind: .metrics,
+                    energyBurned: energyBurned,
+                    averageHeartRate: averageHeartRate,
+                    peakHeartRate: peakHeartRate
                 )
-            } catch {
-                print("Failed to start workout mirroring: \(error)")
+            )
+        }
+    }
+
+    /// Stops and releases HealthKit queries owned by the current workout.
+    private func stopLiveQueries() {
+        if let heartRateQuery {
+            healthStore.stop(heartRateQuery)
+            self.heartRateQuery = nil
+        }
+        if let energyBurnedQuery {
+            healthStore.stop(energyBurnedQuery)
+            self.energyBurnedQuery = nil
+        }
+    }
+
+    /// Bridges callback-only collection ending into the structured stop task.
+    private func endCollection(_ builder: HKLiveWorkoutBuilder, at endDate: Date) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            builder.endCollection(withEnd: endDate) { success, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else if success {
+                    continuation.resume()
+                } else {
+                    continuation.resume(throwing: WorkoutFinalizationError.endCollectionFailed)
+                }
+            }
+        }
+    }
+
+    /// Bridges callback-only workout saving into the structured stop task.
+    private func finishWorkout(_ builder: HKLiveWorkoutBuilder) async throws -> HKWorkout? {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<HKWorkout?, Error>) in
+            builder.finishWorkout { workout, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: workout)
+                }
             }
         }
     }
@@ -264,10 +401,10 @@ class WorkoutManager: NSObject {
 // MARK: - HKWorkoutSessionDelegate
 
 extension WorkoutManager: HKWorkoutSessionDelegate {
-    func workoutSession(_: HKWorkoutSession,
-                        didChangeTo toState: HKWorkoutSessionState,
-                        from _: HKWorkoutSessionState,
-                        date _: Date)
+    nonisolated func workoutSession(_: HKWorkoutSession,
+                                    didChangeTo toState: HKWorkoutSessionState,
+                                    from _: HKWorkoutSessionState,
+                                    date _: Date)
     {
         switch toState {
         case .running:
@@ -279,8 +416,8 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
         }
     }
 
-    func workoutSession(_: HKWorkoutSession,
-                        didFailWithError error: Error)
+    nonisolated func workoutSession(_: HKWorkoutSession,
+                                    didFailWithError error: Error)
     {
         print("workout session error: \(error.localizedDescription)")
     }
@@ -289,13 +426,13 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
 // MARK: - HKLiveWorkoutBuilderDelegate
 
 extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
-    func workoutBuilder(_: HKLiveWorkoutBuilder,
-                        didCollectDataOf collectedTypes: Set<HKSampleType>)
+    nonisolated func workoutBuilder(_: HKLiveWorkoutBuilder,
+                                    didCollectDataOf collectedTypes: Set<HKSampleType>)
     {
         print("1: collected health data types: \(collectedTypes)")
     }
 
-    func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {
+    nonisolated func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {
         print("2: collected health data: \(workoutBuilder)")
     }
 }
