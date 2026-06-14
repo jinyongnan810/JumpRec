@@ -93,12 +93,12 @@ final class WorkoutManager: NSObject {
         }
     }
 
-    /// Requests the HealthKit permissions required by the watch workout.
+    /// Requests the HealthKit permissions required by the watch workout when still undetermined.
     private nonisolated static func requestAuthorization(using healthStore: HKHealthStore) async throws {
         guard HKHealthStore.isHealthDataAvailable() else { return }
 
         let typesToShare: Set<HKSampleType> = [
-            HKQuantityType.workoutType(),
+            HKObjectType.workoutType(),
             HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
         ]
 
@@ -108,8 +108,40 @@ final class WorkoutManager: NSObject {
             HKObjectType.activitySummaryType(),
         ]
 
+        // requestAuthorization is safe after a previous decision, but checking first avoids asking
+        // watchOS to begin an authorization presentation every time AppState recreates this manager.
+        let requestStatus = try await authorizationRequestStatus(
+            using: healthStore,
+            toShare: typesToShare,
+            read: typesToRead
+        )
+        guard requestStatus == .shouldRequest else {
+            print("[WorkoutManager] HealthKit authorization was already requested")
+            return
+        }
+
         try await healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead)
         print("[WorkoutManager] HealthKit authorization request completed")
+    }
+
+    /// Bridges HealthKit's callback-only request-status API into the retained authorization task.
+    private nonisolated static func authorizationRequestStatus(
+        using healthStore: HKHealthStore,
+        toShare typesToShare: Set<HKSampleType>,
+        read typesToRead: Set<HKObjectType>
+    ) async throws -> HKAuthorizationRequestStatus {
+        try await withCheckedThrowingContinuation { continuation in
+            healthStore.getRequestStatusForAuthorization(
+                toShare: typesToShare,
+                read: typesToRead
+            ) { status, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: status)
+                }
+            }
+        }
     }
 
     // MARK: - Workout Session

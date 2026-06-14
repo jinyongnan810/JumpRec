@@ -87,8 +87,11 @@ final class PhoneWorkoutManager: NSObject {
         workoutStore = nil
     }
 
-    /// Ensures workout authorization has completed before continuing.
-    private func ensureAuthorization() async throws {
+    /// Ensures the app has requested every HealthKit permission used by iPhone workouts and mirroring.
+    ///
+    /// This method has internal visibility so the mirroring manager can share the same retained task.
+    /// Keeping one authorization owner prevents two startup services from racing separate system sheets.
+    func ensureAuthorization() async throws {
         if let authorizationTask {
             try await authorizationTask.value
             return
@@ -107,31 +110,58 @@ final class PhoneWorkoutManager: NSObject {
         }
     }
 
-    /// Requests HealthKit authorization if workout write access is missing.
+    /// Requests HealthKit authorization only when at least one required type is still undetermined.
     private func requestAuthorizationIfNeeded() async throws {
-        if healthStore.authorizationStatus(for: HKObjectType.workoutType()) == .sharingAuthorized {
-            return
-        }
-
-        let typesToShare: Set = [
-            HKQuantityType.workoutType(),
+        let typesToShare: Set<HKSampleType> = [
+            HKObjectType.workoutType(),
         ]
 
-        let typesToRead: Set = [
+        // Keep this list as the union of local-workout and mirrored-workout requirements. HealthKit
+        // does not reveal read authorization for privacy reasons, so the request-status API is the
+        // supported way to determine whether the system still needs to ask about any read type.
+        let typesToRead: Set<HKObjectType> = [
+            HKObjectType.workoutType(),
             HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
             HKQuantityType.quantityType(forIdentifier: .heartRate)!,
             HKObjectType.activitySummaryType(),
         ]
 
-        try await healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead)
+        let requestStatus = try await authorizationRequestStatus(
+            toShare: typesToShare,
+            read: typesToRead
+        )
+        if requestStatus == .shouldRequest {
+            try await healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead)
+        }
 
+        // Write authorization is visible and required to save an iPhone workout. Read authorization
+        // intentionally is not exposed by HealthKit; denied reads simply return no protected data.
         let status = healthStore.authorizationStatus(for: HKObjectType.workoutType())
         guard status == .sharingAuthorized else {
             print("[PhoneWorkoutManager] Workout write authorization status: \(status.rawValue)")
             throw AuthorizationError.workoutWriteDenied
         }
 
-        print("[PhoneWorkoutManager] Workout write authorization granted.")
+        print("[PhoneWorkoutManager] HealthKit authorization is ready.")
+    }
+
+    /// Bridges HealthKit's callback-only request-status check into the structured authorization task.
+    private func authorizationRequestStatus(
+        toShare typesToShare: Set<HKSampleType>,
+        read typesToRead: Set<HKObjectType>
+    ) async throws -> HKAuthorizationRequestStatus {
+        try await withCheckedThrowingContinuation { continuation in
+            healthStore.getRequestStatusForAuthorization(
+                toShare: typesToShare,
+                read: typesToRead
+            ) { status, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: status)
+                }
+            }
+        }
     }
 }
 

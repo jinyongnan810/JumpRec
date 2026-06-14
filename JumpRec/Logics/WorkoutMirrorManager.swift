@@ -39,6 +39,10 @@ final class WorkoutMirrorManager: NSObject {
     func startCompanionWorkout() async throws {
         guard HKHealthStore.isHealthDataAvailable() else { return }
 
+        // Reuse the iPhone workout manager's authorization task so launching the Watch app never
+        // races a second HealthKit request against the authorization primed during app startup.
+        try await PhoneWorkoutManager.shared.ensureAuthorization()
+
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .jumpRope
         configuration.locationType = .outdoor
@@ -46,7 +50,7 @@ final class WorkoutMirrorManager: NSObject {
         try await healthStore.startWatchApp(toHandle: configuration)
     }
 
-    /// Registers mirroring callbacks and requests HealthKit authorization.
+    /// Registers the mirroring callback early in the iPhone app lifecycle.
     func activate() {
         guard HKHealthStore.isHealthDataAvailable() else { return }
 
@@ -58,26 +62,8 @@ final class WorkoutMirrorManager: NSObject {
             }
         }
 
-        requestAuthorization()
-    }
-
-    /// Requests the HealthKit permissions required for workout mirroring.
-    private func requestAuthorization() {
-        // Read permission is still required on iPhone because the mirrored workout session is
-        // a HealthKit workflow, not just a transport channel for arbitrary watch messages.
-        let readTypes: Set<HKObjectType> = [
-            HKObjectType.workoutType(),
-            HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
-            HKQuantityType.quantityType(forIdentifier: .heartRate)!,
-        ]
-
-        healthStore.requestAuthorization(toShare: [], read: readTypes) { success, error in
-            if let error {
-                print("[WorkoutMirrorManager] Authorization failed: \(error)")
-            } else {
-                print("[WorkoutMirrorManager] Authorization success: \(success)")
-            }
-        }
+        // PhoneWorkoutManager owns the combined iPhone authorization request. Registration itself
+        // does not need to present UI and must remain safe when the app is launched in background.
     }
 
     /// Attaches the mirrored workout session so payloads can be received.
