@@ -69,21 +69,15 @@ extension JumpRecState {
         sessionState = .complete
 
         if let endTime {
-            let generation = sessionGeneration
             let precedingWorkoutTask = phoneWorkoutLifecycleTask
-            phoneWorkoutLifecycleTask = Task { [weak self, phoneWorkoutManager] in
+            phoneWorkoutLifecycleTask = Task { [phoneWorkoutManager] in
                 // Ending must wait for an in-flight HealthKit start. Otherwise a late start
                 // could create a workout after the finish request has already done nothing.
                 await precedingWorkoutTask?.value
-                guard let self,
-                      !Task.isCancelled,
-                      sessionGeneration == generation,
-                      sessionState == .complete,
-                      !isMirroredWatchSession
-                else {
-                    return
-                }
 
+                // Once the user has completed a local session, saving it is durable work. Do not
+                // depend on completion-screen state here because tapping Done may reset the UI
+                // before HealthKit has finished creating the workout sample.
                 await phoneWorkoutManager.endWorkout(at: endTime)
             }
         }
@@ -114,11 +108,17 @@ extension JumpRecState {
 
     /// Resets the app back to its idle state and clears active session data.
     func reset() {
-        invalidateWorkoutOperations()
+        let shouldFinishSavingCompletedWorkout = sessionState == .complete && !isMirroredWatchSession
+        invalidateWorkoutOperations(cancelPhoneWorkoutTask: !shouldFinishSavingCompletedWorkout)
         cancelPendingSpeech()
         cancelMinuteAnnouncements()
         motionManager?.stopTracking()
-        phoneWorkoutManager.discardWorkout()
+
+        // A completed local workout may still be finalizing asynchronously after the summary appears.
+        // Preserve that operation when the user taps Done; only active or abandoned sessions discard.
+        if !shouldFinishSavingCompletedWorkout {
+            phoneWorkoutManager.discardWorkout()
+        }
         sessionState = .idle
         resetLiveMetrics()
         activeMotionSource = nil
@@ -220,11 +220,13 @@ extension JumpRecState {
     }
 
     /// Invalidates asynchronous workout operations without relying on cooperative cancellation alone.
-    private func invalidateWorkoutOperations() {
+    private func invalidateWorkoutOperations(cancelPhoneWorkoutTask: Bool = true) {
         sessionGeneration = UUID()
         companionWorkoutStartTask?.cancel()
         companionWorkoutStartTask = nil
-        phoneWorkoutLifecycleTask?.cancel()
+        if cancelPhoneWorkoutTask {
+            phoneWorkoutLifecycleTask?.cancel()
+        }
         phoneWorkoutLifecycleTask = nil
     }
 

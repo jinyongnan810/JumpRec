@@ -32,6 +32,8 @@ final class PhoneWorkoutManager: NSObject {
     private let healthStore = HKHealthStore()
     /// Holds the active iOS 26 workout implementation when available.
     private var workoutStore: AnyObject?
+    /// Builds and saves local workouts on iOS versions that predate iPhone workout sessions.
+    private var workoutBuilder: HKWorkoutBuilder?
     /// Deduplicates in-flight authorization requests.
     private var authorizationTask: Task<Void, Error>?
 
@@ -48,43 +50,81 @@ final class PhoneWorkoutManager: NSObject {
         }
     }
 
-    /// Starts a HealthKit workout session at the provided time.
+    /// Starts a HealthKit workout at the provided time.
     func startWorkout(at startDate: Date) async throws {
         guard HKHealthStore.isHealthDataAvailable() else { return }
-        guard #available(iOS 26.0, *) else {
-            print("[PhoneWorkoutManager] iPhone workout sessions require iOS 26 or newer.")
-            return
-        }
 
         print("[PhoneWorkoutManager] Starting workout at \(startDate)")
         try await ensureAuthorization()
         print("[PhoneWorkoutManager] Authorization ready for workout start.")
 
-        if workoutStore == nil {
-            workoutStore = PhoneWorkoutStore(
-                healthStore: healthStore,
-                onMetricsUpdated: onMetricsUpdated
+        let configuration = makeWorkoutConfiguration()
+        if #available(iOS 26.0, *) {
+            if workoutStore == nil {
+                workoutStore = PhoneWorkoutStore(
+                    healthStore: healthStore,
+                    onMetricsUpdated: onMetricsUpdated
+                )
+            }
+            try await (workoutStore as? PhoneWorkoutStore)?.startWorkout(
+                at: startDate,
+                configuration: configuration
             )
+        } else {
+            // Before iOS 26, iPhone cannot run the newer live workout-session workflow. A regular
+            // builder still creates a workout sample that appears in Health when it is finished.
+            let builder = HKWorkoutBuilder(
+                healthStore: healthStore,
+                configuration: configuration,
+                device: .local()
+            )
+            workoutBuilder = builder
+            try await builder.beginCollection(at: startDate)
         }
-        try await (workoutStore as? PhoneWorkoutStore)?.startWorkout(at: startDate)
+
         print("[PhoneWorkoutManager] Workout start request completed.")
     }
 
-    /// Ends the active HealthKit workout session.
+    /// Ends and saves the active HealthKit workout.
     func endWorkout(at endDate: Date) async {
-        guard #available(iOS 26.0, *) else { return }
         print("[PhoneWorkoutManager] Ending workout at \(endDate)")
-        await (workoutStore as? PhoneWorkoutStore)?.endWorkout(at: endDate)
-        workoutStore = nil
+
+        if #available(iOS 26.0, *) {
+            await (workoutStore as? PhoneWorkoutStore)?.endWorkout(at: endDate)
+            workoutStore = nil
+        } else if let workoutBuilder {
+            do {
+                try await workoutBuilder.endCollection(at: endDate)
+                _ = try await workoutBuilder.finishWorkout()
+                print("[PhoneWorkoutManager] HKWorkoutBuilder finished and workout saved.")
+            } catch {
+                print("[PhoneWorkoutManager] Failed to save workout: \(error)")
+            }
+            self.workoutBuilder = nil
+        }
+
         print("[PhoneWorkoutManager] Workout finish request completed.")
     }
 
     /// Discards the active workout without saving it.
     func discardWorkout() {
-        guard #available(iOS 26.0, *) else { return }
         print("[PhoneWorkoutManager] Discarding active workout.")
-        (workoutStore as? PhoneWorkoutStore)?.discardWorkout()
-        workoutStore = nil
+        if #available(iOS 26.0, *) {
+            (workoutStore as? PhoneWorkoutStore)?.discardWorkout()
+            workoutStore = nil
+        }
+
+        // An unfinished HKWorkoutBuilder has not written a workout sample, so releasing it is the
+        // pre-iOS-26 equivalent of discarding the local session.
+        workoutBuilder = nil
+    }
+
+    /// Creates the configuration shared by live and builder-only iPhone workout implementations.
+    private func makeWorkoutConfiguration() -> HKWorkoutConfiguration {
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .jumpRope
+        configuration.locationType = .indoor
+        return configuration
     }
 
     /// Ensures the app has requested every HealthKit permission used by iPhone workouts and mirroring.
@@ -180,15 +220,14 @@ private final class PhoneWorkoutStore: NSObject {
         self.onMetricsUpdated = onMetricsUpdated
     }
 
-    func startWorkout(at startDate: Date) async throws {
+    func startWorkout(
+        at startDate: Date,
+        configuration: HKWorkoutConfiguration
+    ) async throws {
         if session != nil {
             print("[PhoneWorkoutManager] Existing workout detected. Ending it before starting a new one.")
             await endWorkout(at: Date())
         }
-
-        let configuration = HKWorkoutConfiguration()
-        configuration.activityType = .jumpRope
-        configuration.locationType = .outdoor
 
         let session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
         let builder = session.associatedWorkoutBuilder()
