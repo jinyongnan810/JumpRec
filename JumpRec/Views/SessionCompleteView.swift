@@ -118,7 +118,7 @@ struct SessionCompleteView: View {
                         .font(AppFonts.bodySmall)
                         .foregroundStyle(AppColors.textSecondary)
                 }
-                .staggeredAppearance(isVisible: hasContentAppeared, index: 0)
+                // .staggeredAppearance(isVisible: hasContentAppeared, index: 0)
 
                 if let completedSession,
                    SessionAICommentGenerator.shouldGenerate(for: completedSession)
