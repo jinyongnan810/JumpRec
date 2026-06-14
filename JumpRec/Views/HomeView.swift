@@ -83,17 +83,6 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 32) {
-                // Header
-                VStack(spacing: 4) {
-                    Text("JumpRec")
-                        .font(AppFonts.screenTitle)
-                        .foregroundStyle(AppColors.textPrimary)
-
-                    Label(goalText, systemImage: "target")
-                        .font(AppFonts.heroRingSubtitle)
-                        .foregroundStyle(AppColors.accent)
-                }
-
                 // Hero Ring / Countdown Ring
                 Spacer()
                 heroRingView
@@ -121,9 +110,32 @@ struct HomeView: View {
                 }
                 .appGlassButton(prominent: true, tint: primaryButtonTint)
                 .disabled(isPrimaryButtonDisabled)
+                .padding(.bottom, 24)
             }
             .padding(.horizontal, 24)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    // Keep the app identity and active goal visible in the navigation
+                    // header without consuming space from the session controls below.
+                    VStack(spacing: 2) {
+                        Text("JumpRec")
+                            .font(AppFonts.screenTitle)
+                            .foregroundStyle(AppColors.textPrimary)
+
+                        // Build the icon and text explicitly because navigation toolbars can
+                        // apply an icon-only label style to `Label` content.
+                        HStack(spacing: 4) {
+                            Image(systemName: "target")
+                            Text(goalText)
+                                .lineLimit(1)
+                        }
+                        .font(AppFonts.heroRingSubtitle)
+                        .foregroundStyle(AppColors.accent)
+                        .fixedSize(horizontal: true, vertical: false)
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+
                 ToolbarItem(placement: .topBarTrailing) {
                     // Keep the localized label for VoiceOver while the toolbar presents
                     // the compact settings symbol as the visible action.
