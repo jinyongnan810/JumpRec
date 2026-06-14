@@ -96,13 +96,10 @@ struct HomeView: View {
             // Hero Ring / Countdown Ring
             heroRingView
 
-            DeviceSelectorView(
-                activeSource: displayedMotionSource,
-                isPhoneMotionAvailable: appState.isPhoneMotionAvailable,
-                isHeadphoneMotionAvailable: appState.isHeadphoneMotionAvailable,
+            MotionSourceStatusView(
+                source: displayedMotionSource,
                 connectedHeadphoneName: appState.connectedHeadphoneName,
-                isWatchMotionAvailable: isWatchAvailable,
-                watchUnavailableReason: watchUnavailableReason
+                presentation: .preSession
             )
 
             // Start/Cancel Button

@@ -129,13 +129,10 @@ struct ActiveSessionView: View {
                     .foregroundStyle(AppColors.accent)
             }
 
-            DeviceSelectorView(
-                activeSource: appState.activeMotionSource,
-                isPhoneMotionAvailable: appState.isPhoneMotionAvailable,
-                isHeadphoneMotionAvailable: appState.isHeadphoneMotionAvailable,
+            MotionSourceStatusView(
+                source: appState.activeMotionSource,
                 connectedHeadphoneName: appState.connectedHeadphoneName,
-                isWatchMotionAvailable: appState.activeMotionSource == .watch || appState.isMirroredWatchSession,
-                watchUnavailableReason: String(localized: "Apple Watch is unavailable for this session.")
+                presentation: .activeSession
             )
 
             // Hero Ring with progress

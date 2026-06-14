@@ -41,6 +41,16 @@
         }
       }
     },
+    "%@. %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@. %2$@"
+          }
+        }
+      }
+    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -68,6 +78,7 @@
       }
     },
     "Active" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -78,6 +89,7 @@
       }
     },
     "Active source" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -88,6 +100,7 @@
       }
     },
     "ACTIVE SOURCE" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -128,6 +141,7 @@
       }
     },
     "Apple Watch is unavailable for this session." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -138,6 +152,7 @@
       }
     },
     "Automatically switches to the best available device." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -148,6 +163,7 @@
       }
     },
     "Available" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -259,6 +275,16 @@
         }
       }
     },
+    "Check Apple Watch, headphone, or iPhone motion availability." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch、ヘッドフォン、または iPhone のモーション利用状況を確認してください。"
+          }
+        }
+      }
+    },
     "Checking iCloud availability for your saved sessions." : {
       "localizations" : {
         "ja" : {
@@ -301,6 +327,7 @@
       }
     },
     "Currently selected for motion data" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -464,7 +491,18 @@
         }
       }
     },
+    "Headphone motion is preferred; iPhone will be used if it becomes unavailable." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘッドフォンのモーションを優先し、利用できなくなった場合は iPhone を使用します。"
+          }
+        }
+      }
+    },
     "Headphone motion is unavailable. Connect supported AirPods or Beats and allow motion access." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -556,10 +594,21 @@
         }
       }
     },
+    "If Apple Watch cannot start, iPhone will be used." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch を開始できない場合は、iPhone を使用します。"
+          }
+        }
+      }
+    },
     "Inbox" : {
 
     },
     "iPhone motion is not available on this device." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -743,6 +792,16 @@
         }
       }
     },
+    "Motion source" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モーションソース"
+          }
+        }
+      }
+    },
     "New personal records" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -795,7 +854,18 @@
         }
       }
     },
+    "No motion source available" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "利用可能なモーションソースがありません"
+          }
+        }
+      }
+    },
     "No motion source connected yet" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -927,11 +997,22 @@
       }
     },
     "Searching" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "検索中"
+          }
+        }
+      }
+    },
+    "Selected automatically when the session starts." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション開始時に自動で選択されます。"
           }
         }
       }
@@ -977,12 +1058,52 @@
         }
       }
     },
+    "SESSION DEVICE" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションデバイス"
+          }
+        }
+      }
+    },
     "Session in progress" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッション進行中"
+          }
+        }
+      }
+    },
+    "Session will start on Apple Watch" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションは Apple Watch で開始されます"
+          }
+        }
+      }
+    },
+    "Session will use %@ when available" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "利用可能な場合は %@ を使用します"
+          }
+        }
+      }
+    },
+    "Session will use iPhone" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションは iPhone を使用します"
           }
         }
       }
@@ -1049,6 +1170,7 @@
       }
     },
     "Shows why this device is unavailable" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -1086,6 +1208,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "はじめる"
+          }
+        }
+      }
+    },
+    "Starting motion tracking" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モーション計測を開始しています"
           }
         }
       }
@@ -1182,6 +1314,16 @@
         }
       }
     },
+    "The motion source is managed automatically during this iPhone session." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この iPhone セッションでは、モーションソースが自動で管理されます。"
+          }
+        }
+      }
+    },
     "The number of detected pauses longer than 5 seconds and up to 15 seconds between jumps." : {
       "localizations" : {
         "ja" : {
@@ -1222,6 +1364,16 @@
         }
       }
     },
+    "This session cannot switch to iPhone after it starts." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このセッションは開始後に iPhone へ切り替えられません。"
+          }
+        }
+      }
+    },
     "Time" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1243,10 +1395,51 @@
         }
       }
     },
+    "Tracking on Apple Watch" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch で計測中"
+          }
+        }
+      }
+    },
+    "TRACKING SOURCE" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "計測デバイス"
+          }
+        }
+      }
+    },
+    "Tracking with %@" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ で計測中"
+          }
+        }
+      }
+    },
+    "Tracking with iPhone" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone で計測中"
+          }
+        }
+      }
+    },
     "Unable to load this month." : {
 
     },
     "Unavailable" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
