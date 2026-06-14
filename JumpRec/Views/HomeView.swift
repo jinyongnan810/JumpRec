@@ -81,72 +81,74 @@ struct HomeView: View {
 
     /// Renders the home screen and session-start controls.
     var body: some View {
-        VStack(spacing: 32) {
-            // Header
-            VStack(spacing: 4) {
-                Text("JumpRec")
-                    .font(AppFonts.screenTitle)
-                    .foregroundStyle(AppColors.textPrimary)
+        NavigationStack {
+            VStack(spacing: 32) {
+                // Header
+                VStack(spacing: 4) {
+                    Text("JumpRec")
+                        .font(AppFonts.screenTitle)
+                        .foregroundStyle(AppColors.textPrimary)
 
-                Label(goalText, systemImage: "target")
-                    .font(AppFonts.heroRingSubtitle)
-                    .foregroundStyle(AppColors.textMuted)
-            }
-
-            // Hero Ring / Countdown Ring
-            heroRingView
-
-            MotionSourceStatusView(
-                source: displayedMotionSource,
-                connectedHeadphoneName: appState.connectedHeadphoneName,
-                presentation: .preSession
-            )
-
-            // Start/Cancel Button
-            Button {
-                if isCountingDown {
-                    cancelCountdown()
-                } else {
-                    startWithCountdown()
+                    Label(goalText, systemImage: "target")
+                        .font(AppFonts.heroRingSubtitle)
+                        .foregroundStyle(AppColors.accent)
                 }
-            } label: {
-                Text(primaryButtonTitle)
-                    .font(AppFonts.primaryButtonLabel)
-                    .foregroundStyle(primaryButtonTextColor)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-            }
-            .appGlassButton(prominent: true, tint: primaryButtonTint)
-            .disabled(isPrimaryButtonDisabled)
 
-            // Set Goal Link
-            Button {
-                showGoalSheet = true
-            } label: {
-                Label("Set Goal", systemImage: "target")
-                    .font(AppFonts.secondaryActionLabel)
-                    .foregroundStyle(AppColors.accent)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 12)
-            }
-            .matchedTransitionSource(id: Self.goalTransitionID, in: navigationTransitionNamespace)
-            .appGlassButton(tint: AppColors.accent)
-            .disabled(isCountingDown)
+                // Hero Ring / Countdown Ring
+                Spacer()
+                heroRingView
+                Spacer()
 
-            Spacer()
-        }
-        .padding(.horizontal, 24)
-        .sheet(isPresented: $showGoalSheet) {
-            GoalSheetView(settings: settings)
-                .navigationTransition(.zoom(sourceID: Self.goalTransitionID, in: navigationTransitionNamespace))
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
-                .presentationBackground(AppColors.cardSurface)
-        }
-        .onDisappear {
-            countdownTask?.cancel()
-            countdownTask = nil
-            countdownValue = nil
+                MotionSourceStatusView(
+                    source: displayedMotionSource,
+                    connectedHeadphoneName: appState.connectedHeadphoneName,
+                    presentation: .preSession
+                )
+
+                // Start/Cancel Button
+                Button {
+                    if isCountingDown {
+                        cancelCountdown()
+                    } else {
+                        startWithCountdown()
+                    }
+                } label: {
+                    Text(primaryButtonTitle)
+                        .font(AppFonts.primaryButtonLabel)
+                        .foregroundStyle(primaryButtonTextColor)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                }
+                .appGlassButton(prominent: true, tint: primaryButtonTint)
+                .disabled(isPrimaryButtonDisabled)
+            }
+            .padding(.horizontal, 24)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    // Keep the localized label for VoiceOver while the toolbar presents
+                    // the compact settings symbol as the visible action.
+                    Button {
+                        showGoalSheet = true
+                    } label: {
+                        Label("Set Goal", systemImage: "gearshape")
+                    }
+                    .tint(.primary)
+                    .matchedTransitionSource(id: Self.goalTransitionID, in: navigationTransitionNamespace)
+                    .disabled(isCountingDown)
+                }
+            }
+            .sheet(isPresented: $showGoalSheet) {
+                GoalSheetView(settings: settings)
+                    .navigationTransition(.zoom(sourceID: Self.goalTransitionID, in: navigationTransitionNamespace))
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
+                    .presentationBackground(AppColors.cardSurface)
+            }
+            .onDisappear {
+                countdownTask?.cancel()
+                countdownTask = nil
+                countdownValue = nil
+            }
         }
     }
 
@@ -264,15 +266,13 @@ struct HomeView: View {
 }
 
 #Preview {
-    NavigationStack {
-        HomeView(
-            settings: JumpRecSettings(),
-            appState: JumpRecState(),
-            isWatchAvailable: true,
-            watchUnavailableReason: "Apple Watch is ready.",
-            onStart: {}
-        )
-        .background(AppColors.bgPrimary)
-        .preferredColorScheme(.dark)
-    }
+    HomeView(
+        settings: JumpRecSettings(),
+        appState: JumpRecState(),
+        isWatchAvailable: true,
+        watchUnavailableReason: "Apple Watch is ready.",
+        onStart: {}
+    )
+    .background(AppColors.bgPrimary)
+    .preferredColorScheme(.dark)
 }

@@ -115,7 +115,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Watch は利用可能です。"
+            "value" : "Apple Watchは利用可能です。"
           }
         }
       }
@@ -125,7 +125,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ペアリングされた Apple Watch が見つからないため、Apple Watch は利用できません。"
+            "value" : "ペアリングされたApple Watchが見つからないため、Apple Watchは利用できません。"
           }
         }
       }
@@ -135,7 +135,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "JumpRec Watch アプリがインストールされていないため、Apple Watch は利用できません。"
+            "value" : "JumpRec Watch アプリがインストールされていないため、Apple Watchは利用できません。"
           }
         }
       }
@@ -146,7 +146,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このセッションでは Apple Watch を利用できません。"
+            "value" : "このセッションでは Apple Watchを利用できません。"
           }
         }
       }
@@ -280,7 +280,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Watch、ヘッドフォン、または iPhone のモーション利用状況を確認してください。"
+            "value" : "Apple Watch、ヘッドフォン、またはiPhoneのモーション利用状況を確認してください。"
           }
         }
       }
@@ -496,7 +496,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ヘッドフォンのモーションを優先し、利用できなくなった場合は iPhone を使用します。"
+            "value" : "ヘッドフォンのモーションを優先し、利用できなくなった場合はiPhoneを使用します。"
           }
         }
       }
@@ -527,7 +527,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "心拍数は、Apple Watch または心拍データに対応したヘッドホンで記録したセッションでのみ利用できます。"
+            "value" : "心拍数は、Apple Watchまたは心拍データに対応したヘッドホンで記録したセッションでのみ利用できます。"
           }
         }
       }
@@ -599,7 +599,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Watch を開始できない場合は、iPhone を使用します。"
+            "value" : "Apple Watchを開始できない場合は、iPhoneを使用します。"
           }
         }
       }
@@ -613,7 +613,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このデバイスでは iPhone のモーションを利用できません。"
+            "value" : "このデバイスでは iPhoneのモーションを利用できません。"
           }
         }
       }
@@ -1083,7 +1083,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッションは Apple Watch で開始されます"
+            "value" : "セッションはApple Watchで開始されます"
           }
         }
       }
@@ -1103,7 +1103,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッションは iPhone を使用します"
+            "value" : "セッションはiPhoneを使用します"
           }
         }
       }
@@ -1319,7 +1319,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "この iPhone セッションでは、モーションソースが自動で管理されます。"
+            "value" : "このiPhoneセッションでは、モーションソースが自動で管理されます。"
           }
         }
       }
@@ -1369,7 +1369,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このセッションは開始後に iPhone へ切り替えられません。"
+            "value" : "このセッションは開始後にiPhoneへ切り替えられません。"
           }
         }
       }
@@ -1400,7 +1400,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Watch で計測中"
+            "value" : "Apple Watchで計測中"
           }
         }
       }
@@ -1430,7 +1430,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iPhone で計測中"
+            "value" : "iPhoneで計測中"
           }
         }
       }
