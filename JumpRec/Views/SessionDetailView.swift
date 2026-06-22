@@ -91,6 +91,7 @@ struct SessionDetailView: View {
             .padding(.horizontal, 24)
         }
         .scrollIndicators(.hidden)
+        .topSoftScrollEdgeEffect()
         .navigationTitle("Session Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

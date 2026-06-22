@@ -300,6 +300,7 @@ private struct MonthSessionsList: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+        .topSoftScrollEdgeEffect()
         .task {
             // The calendar enters with the rest of the screen initially, but this state is
             // intentionally independent from displayedMonth so navigation does not replay it.

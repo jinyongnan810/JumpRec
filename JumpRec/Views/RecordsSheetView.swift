@@ -73,10 +73,11 @@ struct RecordsSheetView: View {
 
                     Spacer()
                 }
+                .padding(.top, 16)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 32)
             }
-            .padding(.top, 16)
-            .padding(.horizontal, 24)
-            .padding(.bottom, 32)
+            .topSoftScrollEdgeEffect()
             .navigationTitle("Personal Records")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
