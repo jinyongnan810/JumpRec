@@ -113,6 +113,17 @@ struct ActiveSessionView: View {
         return max(0, Int(now.timeIntervalSince(startTime)))
     }
 
+    /// Returns the live average heart-rate text, or a placeholder until HealthKit delivers samples.
+    private var averageHeartRateText: String {
+        guard let averageHeartRate = appState.averageHeartRate else { return "--" }
+        return "\(averageHeartRate) bpm"
+    }
+
+    /// Keeps the live stat cards in two equal columns so adding health metrics does not squeeze text.
+    private var statColumns: [GridItem] {
+        [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
+    }
+
     // MARK: - View
 
     /// Renders the active-session layout and live-updating metrics.
@@ -142,11 +153,13 @@ struct ActiveSessionView: View {
                 subtitle: animatedRingSubtitle
             )
 
-            // Stats Row 1: TIME, CALORIES, RATE
-            HStack(spacing: 10) {
+            // Live metrics are a grid instead of a single row because health values can be wider
+            // than jump/time values once heart-rate samples start arriving from external sensors.
+            LazyVGrid(columns: statColumns, spacing: 10) {
                 StatCardView(label: leadingStatLabel, value: leadingStatValue)
                 StatCardView(label: "CALORIES", value: "\(Int(appState.caloriesBurned.rounded()))")
-                StatCardView(label: "RATE(AVG)", value: localizedRateText(appState.averageRate), valueColor: AppColors.accent)
+                StatCardView(label: "HR(AVG)", value: averageHeartRateText, valueColor: AppColors.accent)
+                StatCardView(label: "RATE(AVG)", value: localizedRateText(appState.averageRate))
             }
 
             Spacer()

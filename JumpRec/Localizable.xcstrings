@@ -245,6 +245,16 @@
         }
       }
     },
+    "HR(AVG)" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均心拍"
+          }
+        }
+      }
+    },
     "Calories Per Minute" : {
       "localizations" : {
         "ja" : {

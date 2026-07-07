@@ -45,8 +45,13 @@ final class PhoneWorkoutManager: NSObject {
     /// Primes workout authorization early in the app lifecycle.
     func activate() {
         guard HKHealthStore.isHealthDataAvailable() else { return }
+        guard authorizationTask == nil else { return }
+
+        // Start the retained authorization task with the underlying HealthKit request directly.
+        // Calling `ensureAuthorization()` from this task would make it await itself because the
+        // task is already stored in `authorizationTask`, blocking every later workout start.
         authorizationTask = Task {
-            try await ensureAuthorization()
+            try await requestAuthorizationIfNeeded()
         }
     }
 
@@ -123,7 +128,7 @@ final class PhoneWorkoutManager: NSObject {
     private func makeWorkoutConfiguration() -> HKWorkoutConfiguration {
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .jumpRope
-        configuration.locationType = .indoor
+        configuration.locationType = .outdoor
         return configuration
     }
 
