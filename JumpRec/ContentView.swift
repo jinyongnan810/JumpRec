@@ -35,7 +35,11 @@ struct ContentView: View {
                         connectivityManager.isWatchAppInstalled,
                     watchUnavailableReason: watchUnavailableReason
                 ) {
-                    appState.start(goalType: settings.goalType, goalValue: settings.goalCount)
+                    appState.start(
+                        goalType: settings.goalType,
+                        goalValue: settings.goalCount,
+                        preferLocalHeadphonesOverWatch: settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable
+                    )
                 }
                 .tabItem {
                     Label("Jump", systemImage: "figure.jumprope")

@@ -69,6 +69,18 @@ public class JumpRecSettings {
         }
     }
 
+    /// Indicates whether compatible headphones should keep a session on iPhone instead of starting on Apple Watch.
+    ///
+    /// The default remains `false` to preserve the existing Watch-first behavior for current users.
+    /// Users who prefer headphone motion can opt into iPhone sessions from the settings sheet.
+    public var preferHeadphonesForIPhoneSessions: Bool {
+        didSet {
+            guard !isLoadingFromStore else { return }
+            store.set(preferHeadphonesForIPhoneSessions, forKey: "preferHeadphonesForIPhoneSessions")
+            store.synchronize()
+        }
+    }
+
     // MARK: - Derived Values
 
     /// Returns the currently active goal value as an `Int`.
@@ -87,6 +99,7 @@ public class JumpRecSettings {
         goalType = .count
         jumpCount = DefaultJumpCount
         jumpTime = DefaultJumpTime
+        preferHeadphonesForIPhoneSessions = false
         loadSettings()
 
         NotificationCenter.default.addObserver(
@@ -125,11 +138,13 @@ public class JumpRecSettings {
             ) == GoalType.time.rawValue ? .time : .count
         let storedJumpCount = store.longLong(forKey: "jumpCount")
         let storedJumpTime = store.longLong(forKey: "jumpTime")
+        let storedPreferHeadphonesForIPhoneSessions = store.bool(forKey: "preferHeadphonesForIPhoneSessions")
 
         isLoadingFromStore = true
         goalType = storedGoalType
         jumpCount = storedJumpCount == 0 ? DefaultJumpCount : storedJumpCount
         jumpTime = storedJumpTime == 0 ? DefaultJumpTime : storedJumpTime
+        preferHeadphonesForIPhoneSessions = storedPreferHeadphonesForIPhoneSessions
         isLoadingFromStore = false
     }
 }

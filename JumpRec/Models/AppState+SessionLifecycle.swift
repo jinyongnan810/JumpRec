@@ -10,7 +10,10 @@ extension JumpRecState {
     // MARK: - Session Lifecycle
 
     /// Starts a session locally or requests a mirrored watch session when available.
-    func start(goalType: GoalType, goalValue: Int) {
+    ///
+    /// `preferLocalHeadphonesOverWatch` is intentionally evaluated by the caller because only the UI layer
+    /// knows whether compatible headphones are currently available and whether the user enabled that preference.
+    func start(goalType: GoalType, goalValue: Int, preferLocalHeadphonesOverWatch: Bool = false) {
         cancelPendingSpeech()
         let generation = beginSessionAttempt()
 
@@ -20,7 +23,10 @@ extension JumpRecState {
         sessionGoalValue = goalValue
         sessionState = .starting
 
-        if connectivityManager.isPaired, connectivityManager.isWatchAppInstalled {
+        if connectivityManager.isPaired,
+           connectivityManager.isWatchAppInstalled,
+           !preferLocalHeadphonesOverWatch
+        {
             pendingMirroredStart = true
             connectivityManager.syncSettings(
                 goalType: goalType,

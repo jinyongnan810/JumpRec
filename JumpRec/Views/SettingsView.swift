@@ -1,13 +1,13 @@
 //
-//  GoalSheetView.swift
+//  SettingsView.swift
 //  JumpRec
 //
 
 import SwiftUI
 import UIKit
 
-/// Lets the user choose a count-based or time-based workout goal.
-struct GoalSheetView: View {
+/// Presents user-editable workout settings before a session starts.
+struct SettingsView: View {
     /// The persisted settings being edited by the sheet.
     @Bindable var settings: JumpRecSettings
     /// Dismisses the sheet after changes are applied.
@@ -15,7 +15,7 @@ struct GoalSheetView: View {
 
     // MARK: - View State
 
-    /// Tracks the selected goal type while editing.
+    /// Tracks the selected goal type while editing so the user can cancel by closing the sheet.
     @State private var selectedType: GoalType = .count
     /// Tracks the editable jump-count goal value.
     @State private var countValue: Int64 = DefaultJumpCount
@@ -26,27 +26,24 @@ struct GoalSheetView: View {
 
     // MARK: - View
 
-    /// Renders the goal-selection controls and confirmation button.
+    /// Renders settings sections and the confirmation button.
     var body: some View {
-        VStack(spacing: 24) {
-            // Title
-            Text("Set Session Goal")
+        VStack(spacing: 20) {
+            Text("Settings")
                 .font(AppFonts.primaryButtonLabel)
                 .foregroundStyle(AppColors.textPrimary)
                 .staggeredAppearance(isVisible: hasContentAppeared, index: 0)
 
-            // Segmented Control
-            segmentedControl
-                .staggeredAppearance(isVisible: hasContentAppeared, index: 1)
+            VStack(spacing: 16) {
+                goalSettingsSection
+                    .staggeredAppearance(isVisible: hasContentAppeared, index: 1)
 
-            // Value Stepper
-            stepperRow
-                .animation(.easeInOut, value: selectedType)
-                .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
+                iPhoneSessionSection
+                    .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
+            }
 
             Spacer()
 
-            // Confirm Button
             Button {
                 applyGoal()
                 dismiss()
@@ -78,21 +75,72 @@ struct GoalSheetView: View {
         .padding(.top, 20)
     }
 
+    // MARK: - Sections
+
+    /// Groups goal controls so this sheet can grow into a broader settings surface without mixing concerns.
+    private var goalSettingsSection: some View {
+        settingsSection(title: String(localized: "Goal Settings")) {
+            segmentedControl
+
+            stepperRow
+                .animation(.easeInOut, value: selectedType)
+        }
+    }
+
+    /// Lets the user opt into staying on the iPhone route when compatible headphones can provide motion data.
+    private var iPhoneSessionSection: some View {
+        settingsSection(title: String(localized: "iPhone Session")) {
+            Toggle(isOn: $settings.preferHeadphonesForIPhoneSessions) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Prefer Headphones for iPhone Sessions")
+                        .font(AppFonts.cardTitle)
+                        .foregroundStyle(AppColors.textPrimary)
+
+                    Text("When compatible headphones are available, start on iPhone instead of Apple Watch.")
+                        .font(AppFonts.bodySmall)
+                        .foregroundStyle(AppColors.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .toggleStyle(.switch)
+            .tint(AppColors.accent)
+        }
+    }
+
+    /// Applies the app's section chrome consistently without forcing callers into a separate reusable type.
+    private func settingsSection(title: String, @ViewBuilder content: () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(title)
+                .font(AppFonts.badgeLabel)
+                .tracking(2)
+                .foregroundStyle(AppColors.textMuted)
+
+            VStack(spacing: 18) {
+                content()
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(AppColors.bgPrimary.opacity(0.35))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(AppColors.accent.opacity(0.18), lineWidth: 1)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+    }
+
     // MARK: - Segmented Control
 
     /// Switches between count and time goal editing.
     private var segmentedControl: some View {
         Picker("Goal Type", selection: $selectedType) {
             Text("Jump Count")
-//                .font(.system(size: 15, weight: .semibold))
                 .tag(GoalType.count)
             Text("Jump Time")
-//                .font(.system(size: 15, weight: .semibold))
                 .tag(GoalType.time)
         }
         .pickerStyle(.segmented)
         .controlSize(.large)
-//        .tint(AppColors.accent)
     }
 
     // MARK: - Stepper Row
@@ -100,7 +148,6 @@ struct GoalSheetView: View {
     /// Displays the stepper controls for the active goal type.
     private var stepperRow: some View {
         HStack(spacing: 32) {
-            // Minus
             Button {
                 adjustValue(by: -stepAmount)
             } label: {
@@ -112,7 +159,6 @@ struct GoalSheetView: View {
             .appGlassButton(tint: AppColors.accent)
             .buttonBorderShape(.circle)
 
-            // Value display
             VStack(spacing: 4) {
                 Text(displayValue)
                     .font(AppFonts.metricValueXLMonospaced)
@@ -125,7 +171,6 @@ struct GoalSheetView: View {
             }
             .frame(minWidth: 100)
 
-            // Plus
             Button {
                 adjustValue(by: stepAmount)
             } label: {
@@ -137,6 +182,7 @@ struct GoalSheetView: View {
             .appGlassButton(tint: AppColors.accent)
             .buttonBorderShape(.circle)
         }
+        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Helpers
@@ -202,7 +248,7 @@ struct GoalSheetView: View {
 }
 
 #Preview {
-    GoalSheetView(settings: JumpRecSettings())
-        .presentationDetents([.medium])
+    SettingsView(settings: JumpRecSettings())
+        .presentationDetents([.large])
         .preferredColorScheme(.dark)
 }

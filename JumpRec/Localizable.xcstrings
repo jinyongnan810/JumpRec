@@ -245,16 +245,6 @@
         }
       }
     },
-    "HR(AVG)" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "平均心拍"
-          }
-        }
-      }
-    },
     "Calories Per Minute" : {
       "localizations" : {
         "ja" : {
@@ -471,6 +461,16 @@
         }
       }
     },
+    "Goal Settings" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目標設定"
+          }
+        }
+      }
+    },
     "Goal Type" : {
       "localizations" : {
         "ja" : {
@@ -584,6 +584,16 @@
         }
       }
     },
+    "HR(AVG)" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均心拍"
+          }
+        }
+      }
+    },
     "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now." : {
       "localizations" : {
         "ja" : {
@@ -624,6 +634,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このデバイスでは iPhoneのモーションを利用できません。"
+          }
+        }
+      }
+    },
+    "iPhone Session" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhoneセッション"
           }
         }
       }
@@ -945,6 +965,16 @@
         }
       }
     },
+    "Prefer Headphones for iPhone Sessions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhoneセッションでヘッドフォンを優先"
+          }
+        }
+      }
+    },
     "Rate" : {
       "localizations" : {
         "ja" : {
@@ -1139,6 +1169,7 @@
       }
     },
     "Set Goal" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -1149,11 +1180,22 @@
       }
     },
     "Set Session Goal" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッション目標を設定"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
           }
         }
       }
@@ -1455,6 +1497,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "利用不可"
+          }
+        }
+      }
+    },
+    "When compatible headphones are available, start on iPhone instead of Apple Watch." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "対応ヘッドフォンが利用可能な場合、Apple WatchではなくiPhoneで開始します。"
           }
         }
       }

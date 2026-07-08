@@ -7,7 +7,7 @@ import SwiftUI
 
 /// Displays the pre-session start screen and countdown flow.
 struct HomeView: View {
-    private static let goalTransitionID = "goal-settings"
+    private static let settingsTransitionID = "settings"
 
     /// The persisted goal settings displayed on the home screen.
     @Bindable var settings: JumpRecSettings
@@ -19,8 +19,8 @@ struct HomeView: View {
     let watchUnavailableReason: String
     /// Starts a new session after the countdown completes.
     var onStart: () -> Void
-    /// Controls presentation of the goal sheet.
-    @State private var showGoalSheet = false
+    /// Controls presentation of the settings sheet.
+    @State private var showSettingsView = false
     /// Enable navigation transition
     @Namespace private var navigationTransitionNamespace
     /// Tracks the active countdown value, or `nil` when idle.
@@ -140,19 +140,19 @@ struct HomeView: View {
                     // Keep the localized label for VoiceOver while the toolbar presents
                     // the compact settings symbol as the visible action.
                     Button {
-                        showGoalSheet = true
+                        showSettingsView = true
                     } label: {
-                        Label("Set Goal", systemImage: "gearshape")
+                        Label("Settings", systemImage: "gearshape")
                     }
                     .tint(.primary)
-                    .matchedTransitionSource(id: Self.goalTransitionID, in: navigationTransitionNamespace)
+                    .matchedTransitionSource(id: Self.settingsTransitionID, in: navigationTransitionNamespace)
                     .disabled(isCountingDown)
                 }
             }
-            .sheet(isPresented: $showGoalSheet) {
-                GoalSheetView(settings: settings)
-                    .navigationTransition(.zoom(sourceID: Self.goalTransitionID, in: navigationTransitionNamespace))
-                    .presentationDetents([.medium])
+            .sheet(isPresented: $showSettingsView) {
+                SettingsView(settings: settings)
+                    .navigationTransition(.zoom(sourceID: Self.settingsTransitionID, in: navigationTransitionNamespace))
+                    .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
                     .presentationBackground(AppColors.cardSurface)
             }
@@ -189,6 +189,10 @@ struct HomeView: View {
     private var displayedMotionSource: DeviceSource? {
         if let activeSource = appState.activeMotionSource {
             return activeSource
+        }
+        if settings.preferHeadphonesForIPhoneSessions, appState.isHeadphoneMotionAvailable {
+            // This mirrors the start decision: the user asked to stay on iPhone when headphones can track motion.
+            return .airpods
         }
         if isWatchAvailable {
             return .watch
