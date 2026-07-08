@@ -10,10 +10,20 @@ extension JumpRecState {
     // MARK: - Session Lifecycle
 
     /// Starts a new watch-tracked workout session.
-    func start(goalType: GoalType, goalCount: Int) {
+    ///
+    /// Speech preferences are copied into session state so the current workout keeps
+    /// a stable feedback policy even if settings sync while the user is jumping.
+    func start(
+        goalType: GoalType,
+        goalCount: Int,
+        shouldSpeakJumpCountAnnouncements: Bool = true,
+        shouldSpeakJumpTimeAnnouncements: Bool = true
+    ) {
         cancelPendingSpeech()
         resetSessionMetrics()
         self.goalType = goalType
+        sessionShouldSpeakJumpCountAnnouncements = shouldSpeakJumpCountAnnouncements
+        sessionShouldSpeakJumpTimeAnnouncements = shouldSpeakJumpTimeAnnouncements
         switch goalType {
         case .count:
             goal = goalCount
@@ -39,7 +49,12 @@ extension JumpRecState {
     func startFromCompanion() {
         let settings = JumpRecSettings()
         settings.loadSettings()
-        start(goalType: settings.goalType, goalCount: settings.goalCount)
+        start(
+            goalType: settings.goalType,
+            goalCount: settings.goalCount,
+            shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
+            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements
+        )
     }
 
     /// Ends the current watch workout and sends the finalized results to the phone.
@@ -109,7 +124,9 @@ extension JumpRecState {
     func handleHundredJumpsLandmark(jumpCount: Int) {
         WKInterfaceDevice.current().play(.success)
         let hundred = jumpCount / 100 * 100
-        speak(text: localizedJumpAnnouncement(for: hundred))
+        if sessionShouldSpeakJumpCountAnnouncements {
+            speak(text: localizedJumpAnnouncement(for: hundred))
+        }
     }
 
     /// Starts cancellable structured-concurrency work for minute announcements.
@@ -150,7 +167,9 @@ extension JumpRecState {
             end()
             return
         }
-        speak(text: localizedMinuteAnnouncement(for: minutesElapsed))
+        if sessionShouldSpeakJumpTimeAnnouncements {
+            speak(text: localizedMinuteAnnouncement(for: minutesElapsed))
+        }
         WKInterfaceDevice.current().play(.success)
     }
 

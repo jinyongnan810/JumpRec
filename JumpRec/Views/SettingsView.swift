@@ -40,6 +40,9 @@ struct SettingsView: View {
 
                 iPhoneSessionSection
                     .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
+
+                audioSettingsSection
+                    .staggeredAppearance(isVisible: hasContentAppeared, index: 3)
             }
 
             Spacer()
@@ -55,7 +58,7 @@ struct SettingsView: View {
                     .frame(height: 56)
             }
             .appGlassButton(prominent: true, tint: AppColors.accent)
-            .staggeredAppearance(isVisible: hasContentAppeared, index: 3)
+            .staggeredAppearance(isVisible: hasContentAppeared, index: 4)
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 32)
@@ -90,20 +93,31 @@ struct SettingsView: View {
     /// Lets the user opt into staying on the iPhone route when compatible headphones can provide motion data.
     private var iPhoneSessionSection: some View {
         settingsSection(title: String(localized: "iPhone Session")) {
-            Toggle(isOn: $settings.preferHeadphonesForIPhoneSessions) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Prefer Headphones for iPhone Sessions")
-                        .font(AppFonts.cardTitle)
-                        .foregroundStyle(AppColors.textPrimary)
+            settingsToggle(
+                isOn: $settings.preferHeadphonesForIPhoneSessions,
+                title: String(localized: "Prefer Headphones for iPhone Sessions"),
+                description: String(localized: "When compatible headphones are available, start on iPhone instead of Apple Watch.")
+            )
+        }
+    }
 
-                    Text("When compatible headphones are available, start on iPhone instead of Apple Watch.")
-                        .font(AppFonts.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            .toggleStyle(.switch)
-            .tint(AppColors.accent)
+    /// Groups spoken-feedback controls so users can mute progress cues without changing haptics or goal completion.
+    private var audioSettingsSection: some View {
+        settingsSection(title: String(localized: "Audio Settings")) {
+            settingsToggle(
+                isOn: $settings.shouldSpeakJumpCountAnnouncements,
+                title: String(localized: "Speak Jump Count"),
+                description: String(localized: "Announce every 100-jump milestone during workouts.")
+            )
+
+            Divider()
+                .overlay(AppColors.accent.opacity(0.16))
+
+            settingsToggle(
+                isOn: $settings.shouldSpeakJumpTimeAnnouncements,
+                title: String(localized: "Speak Jump Time"),
+                description: String(localized: "Announce each elapsed minute during workouts.")
+            )
         }
     }
 
@@ -127,6 +141,27 @@ struct SettingsView: View {
             }
             .clipShape(RoundedRectangle(cornerRadius: 16))
         }
+    }
+
+    /// Renders a settings row with a switch and explanatory copy.
+    ///
+    /// Keeping this as a helper avoids duplicating the typography and wrapping rules
+    /// across sections while still leaving each setting label close to its binding.
+    private func settingsToggle(isOn: Binding<Bool>, title: String, description: String) -> some View {
+        Toggle(isOn: isOn) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(AppFonts.cardTitle)
+                    .foregroundStyle(AppColors.textPrimary)
+
+                Text(description)
+                    .font(AppFonts.bodySmall)
+                    .foregroundStyle(AppColors.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .toggleStyle(.switch)
+        .tint(AppColors.accent)
     }
 
     // MARK: - Segmented Control

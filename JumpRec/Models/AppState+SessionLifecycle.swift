@@ -13,7 +13,14 @@ extension JumpRecState {
     ///
     /// `preferLocalHeadphonesOverWatch` is intentionally evaluated by the caller because only the UI layer
     /// knows whether compatible headphones are currently available and whether the user enabled that preference.
-    func start(goalType: GoalType, goalValue: Int, preferLocalHeadphonesOverWatch: Bool = false) {
+    /// Speech preferences are copied at start so mid-workout settings edits do not change feedback unexpectedly.
+    func start(
+        goalType: GoalType,
+        goalValue: Int,
+        preferLocalHeadphonesOverWatch: Bool = false,
+        shouldSpeakJumpCountAnnouncements: Bool = true,
+        shouldSpeakJumpTimeAnnouncements: Bool = true
+    ) {
         cancelPendingSpeech()
         let generation = beginSessionAttempt()
 
@@ -21,6 +28,8 @@ extension JumpRecState {
         // block duplicate taps while the watch companion workout request is in flight.
         sessionGoalType = goalType
         sessionGoalValue = goalValue
+        sessionShouldSpeakJumpCountAnnouncements = shouldSpeakJumpCountAnnouncements
+        sessionShouldSpeakJumpTimeAnnouncements = shouldSpeakJumpTimeAnnouncements
         sessionState = .starting
 
         if connectivityManager.isPaired,
@@ -31,7 +40,9 @@ extension JumpRecState {
             connectivityManager.syncSettings(
                 goalType: goalType,
                 jumpCount: Int64(goalType == .count ? goalValue : 0),
-                jumpTime: Int64(goalType == .time ? goalValue : 0)
+                jumpTime: Int64(goalType == .time ? goalValue : 0),
+                shouldSpeakJumpCountAnnouncements: shouldSpeakJumpCountAnnouncements,
+                shouldSpeakJumpTimeAnnouncements: shouldSpeakJumpTimeAnnouncements
             )
 
             companionWorkoutStartTask = Task { [weak self, workoutMirrorManager] in
@@ -133,6 +144,8 @@ extension JumpRecState {
         peakHeartRate = nil
         sessionGoalType = nil
         sessionGoalValue = nil
+        sessionShouldSpeakJumpCountAnnouncements = true
+        sessionShouldSpeakJumpTimeAnnouncements = true
         isMirroredWatchSession = false
         completedSession = nil
         pendingMirroredStart = false
@@ -257,7 +270,9 @@ extension JumpRecState {
         if jumpCount > 0, jumpCount.isMultiple(of: 100) {
             notificationFeedbackGenerator.notificationOccurred(.success)
             notificationFeedbackGenerator.prepare()
-            speak(text: localizedJumpAnnouncement(for: jumpCount))
+            if sessionShouldSpeakJumpCountAnnouncements {
+                speak(text: localizedJumpAnnouncement(for: jumpCount))
+            }
         }
     }
 
@@ -310,7 +325,9 @@ extension JumpRecState {
 
         notificationFeedbackGenerator.notificationOccurred(.success)
         notificationFeedbackGenerator.prepare()
-        speak(text: localizedMinuteAnnouncement(for: minutesElapsed))
+        if sessionShouldSpeakJumpTimeAnnouncements {
+            speak(text: localizedMinuteAnnouncement(for: minutesElapsed))
+        }
     }
 
     /// Finishes the session immediately when the goal is satisfied.

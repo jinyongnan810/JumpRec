@@ -125,20 +125,33 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             return
         }
 
+        let shouldSpeakJumpCountAnnouncements = payload["shouldSpeakJumpCountAnnouncements"] as? Bool ?? true
+        let shouldSpeakJumpTimeAnnouncements = payload["shouldSpeakJumpTimeAnnouncements"] as? Bool ?? true
+
         Task { @MainActor [weak self] in
             self?.applySettings(
                 goalTypeRawValue: goalTypeRawValue,
                 jumpCount: jumpCount,
-                jumpTime: jumpTime
+                jumpTime: jumpTime,
+                shouldSpeakJumpCountAnnouncements: shouldSpeakJumpCountAnnouncements,
+                shouldSpeakJumpTimeAnnouncements: shouldSpeakJumpTimeAnnouncements
             )
         }
     }
 
     /// Persists parsed settings and notifies main-actor observers.
-    private func applySettings(goalTypeRawValue: String, jumpCount: Int, jumpTime: Int) {
+    private func applySettings(
+        goalTypeRawValue: String,
+        jumpCount: Int,
+        jumpTime: Int,
+        shouldSpeakJumpCountAnnouncements: Bool,
+        shouldSpeakJumpTimeAnnouncements: Bool
+    ) {
         settingsStore.set(goalTypeRawValue, forKey: "goalType")
         settingsStore.set(Int64(jumpCount), forKey: "jumpCount")
         settingsStore.set(Int64(jumpTime), forKey: "jumpTime")
+        settingsStore.set(shouldSpeakJumpCountAnnouncements, forKey: "shouldSpeakJumpCountAnnouncements")
+        settingsStore.set(shouldSpeakJumpTimeAnnouncements, forKey: "shouldSpeakJumpTimeAnnouncements")
         settingsStore.synchronize()
 
         NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)

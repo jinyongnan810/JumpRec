@@ -25,7 +25,9 @@ struct MainView: View {
                         appState
                             .start(
                                 goalType: settings.goalType,
-                                goalCount: settings.goalCount
+                                goalCount: settings.goalCount,
+                                shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
+                                shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements
                             )
                     })
             case .finished:

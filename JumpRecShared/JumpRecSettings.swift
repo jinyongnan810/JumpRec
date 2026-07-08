@@ -81,6 +81,30 @@ public class JumpRecSettings {
         }
     }
 
+    /// Controls whether the app speaks jump-count milestones during a workout.
+    ///
+    /// This defaults to `true` for both new and existing installs so current audible
+    /// feedback behavior is preserved until the user explicitly turns it off.
+    public var shouldSpeakJumpCountAnnouncements: Bool {
+        didSet {
+            guard !isLoadingFromStore else { return }
+            store.set(shouldSpeakJumpCountAnnouncements, forKey: "shouldSpeakJumpCountAnnouncements")
+            store.synchronize()
+        }
+    }
+
+    /// Controls whether the app speaks elapsed-time milestones during a workout.
+    ///
+    /// Time-goal completion still works when this is disabled; only the spoken minute
+    /// cue is muted so the setting does not change workout lifecycle behavior.
+    public var shouldSpeakJumpTimeAnnouncements: Bool {
+        didSet {
+            guard !isLoadingFromStore else { return }
+            store.set(shouldSpeakJumpTimeAnnouncements, forKey: "shouldSpeakJumpTimeAnnouncements")
+            store.synchronize()
+        }
+    }
+
     // MARK: - Derived Values
 
     /// Returns the currently active goal value as an `Int`.
@@ -100,6 +124,8 @@ public class JumpRecSettings {
         jumpCount = DefaultJumpCount
         jumpTime = DefaultJumpTime
         preferHeadphonesForIPhoneSessions = false
+        shouldSpeakJumpCountAnnouncements = true
+        shouldSpeakJumpTimeAnnouncements = true
         loadSettings()
 
         NotificationCenter.default.addObserver(
@@ -139,12 +165,16 @@ public class JumpRecSettings {
         let storedJumpCount = store.longLong(forKey: "jumpCount")
         let storedJumpTime = store.longLong(forKey: "jumpTime")
         let storedPreferHeadphonesForIPhoneSessions = store.bool(forKey: "preferHeadphonesForIPhoneSessions")
+        let storedShouldSpeakJumpCountAnnouncements = store.object(forKey: "shouldSpeakJumpCountAnnouncements") as? Bool ?? true
+        let storedShouldSpeakJumpTimeAnnouncements = store.object(forKey: "shouldSpeakJumpTimeAnnouncements") as? Bool ?? true
 
         isLoadingFromStore = true
         goalType = storedGoalType
         jumpCount = storedJumpCount == 0 ? DefaultJumpCount : storedJumpCount
         jumpTime = storedJumpTime == 0 ? DefaultJumpTime : storedJumpTime
         preferHeadphonesForIPhoneSessions = storedPreferHeadphonesForIPhoneSessions
+        shouldSpeakJumpCountAnnouncements = storedShouldSpeakJumpCountAnnouncements
+        shouldSpeakJumpTimeAnnouncements = storedShouldSpeakJumpTimeAnnouncements
         isLoadingFromStore = false
     }
 }

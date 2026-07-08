@@ -646,7 +646,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iPhoneセッション"
+            "value" : "iPhoneから始めるセッション"
           }
         }
       }
@@ -973,7 +973,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iPhoneセッションでヘッドフォンを優先"
+            "value" : "ヘッドフォンを優先"
           }
         }
       }
@@ -1510,6 +1510,56 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "対応ヘッドフォンが利用可能な場合、Apple WatchではなくiPhoneで開始します。"
+          }
+        }
+      }
+    },
+    "Announce each elapsed minute during workouts." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウト中に経過した各分を読み上げます。"
+          }
+        }
+      }
+    },
+    "Announce every 100-jump milestone during workouts." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウト中に100回ごとの節目を読み上げます。"
+          }
+        }
+      }
+    },
+    "Audio Settings" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音声設定"
+          }
+        }
+      }
+    },
+    "Speak Jump Count" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ回数を読み上げる"
+          }
+        }
+      }
+    },
+    "Speak Jump Time" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ時間を読み上げる"
           }
         }
       }

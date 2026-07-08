@@ -52,6 +52,16 @@ class JumpRecState: NSObject {
     var goalType: GoalType = .count
     /// Stores the active goal value: jumps for count goals, seconds for time goals after converting from the minute-based setting.
     var goal: Int = 0
+    /// Freezes the jump-count speech preference for the active watch session.
+    ///
+    /// The value is copied from shared settings when the workout starts so a later
+    /// settings sync does not change spoken feedback halfway through the workout.
+    var sessionShouldSpeakJumpCountAnnouncements = true
+    /// Freezes the elapsed-time speech preference for the active watch session.
+    ///
+    /// The minute timer still drives time-goal completion when this is disabled; only
+    /// the spoken progress cue is muted.
+    var sessionShouldSpeakJumpTimeAnnouncements = true
     /// Returns the finished session duration formatted as `mm:ss`.
     var totalTime: String {
         guard let startTime, let endTime else { return "00:00" }

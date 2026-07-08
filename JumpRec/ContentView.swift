@@ -35,7 +35,9 @@ struct ContentView: View {
                     appState.start(
                         goalType: settings.goalType,
                         goalValue: settings.goalCount,
-                        preferLocalHeadphonesOverWatch: settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable
+                        preferLocalHeadphonesOverWatch: settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable,
+                        shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
+                        shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements
                     )
                 }
                 .tabItem {
@@ -92,6 +94,12 @@ struct ContentView: View {
             syncSettingsToWatch()
         }
         .onChange(of: settings.jumpTime) { _, _ in
+            syncSettingsToWatch()
+        }
+        .onChange(of: settings.shouldSpeakJumpCountAnnouncements) { _, _ in
+            syncSettingsToWatch()
+        }
+        .onChange(of: settings.shouldSpeakJumpTimeAnnouncements) { _, _ in
             syncSettingsToWatch()
         }
         .onChange(of: appState.completedSession?.id) { _, _ in
@@ -157,7 +165,9 @@ struct ContentView: View {
         connectivityManager.syncSettings(
             goalType: settings.goalType,
             jumpCount: settings.jumpCount,
-            jumpTime: settings.jumpTime
+            jumpTime: settings.jumpTime,
+            shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
+            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements
         )
     }
 
