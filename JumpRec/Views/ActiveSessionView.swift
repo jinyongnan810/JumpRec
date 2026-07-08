@@ -119,6 +119,24 @@ struct ActiveSessionView: View {
         return "\(averageHeartRate) bpm"
     }
 
+    /// Returns the compact symbol used in the active-session header badge.
+    private var deviceSourceIconName: String {
+        // The source can be temporarily nil before the first local motion update arrives.
+        // A generic sensor symbol keeps the badge stable instead of shifting the title layout.
+        appState.activeMotionSource?.iconName ?? "iphone.slash"
+    }
+
+    /// Returns a VoiceOver label for the icon-only source badge.
+    private var deviceSourceAccessibilityLabel: String {
+        if let activeMotionSource = appState.activeMotionSource {
+            return String(
+                format: String(localized: "Tracking with %@"),
+                activeMotionSource.shortName
+            )
+        }
+        return String(localized: "Starting motion tracking")
+    }
+
     /// Keeps the live stat cards in two equal columns so adding health metrics does not squeeze text.
     private var statColumns: [GridItem] {
         [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
@@ -131,20 +149,18 @@ struct ActiveSessionView: View {
         VStack(spacing: 28) {
             // Header
             VStack(spacing: 4) {
-                Text("JumpRec")
-                    .font(AppFonts.screenTitle)
-                    .foregroundStyle(AppColors.textPrimary)
+                HStack(spacing: 8) {
+                    Text("JumpRec")
+                        .font(AppFonts.screenTitle)
+                        .foregroundStyle(AppColors.textPrimary)
+
+                    deviceSourceBadge
+                }
 
                 Label(goalText, systemImage: "target")
                     .font(AppFonts.heroRingSubtitle)
                     .foregroundStyle(AppColors.accent)
             }
-
-            MotionSourceStatusView(
-                source: appState.activeMotionSource,
-                connectedHeadphoneName: appState.connectedHeadphoneName,
-                presentation: .activeSession
-            )
 
             // Hero Ring with progress
             HeroRingView(
@@ -201,6 +217,23 @@ struct ActiveSessionView: View {
                 syncHeroRing()
             }
         }
+    }
+
+    // MARK: - Private Subviews
+
+    /// Shows the active motion source as an icon-only badge in the header.
+    private var deviceSourceBadge: some View {
+        Image(systemName: deviceSourceIconName)
+            .font(AppFonts.bodySmall)
+            .foregroundStyle(AppColors.accent)
+            .frame(width: 28, height: 28)
+            .background(AppColors.cardSurface)
+            .overlay {
+                Circle()
+                    .stroke(AppColors.accent.opacity(0.25), lineWidth: 1)
+            }
+            .clipShape(Circle())
+            .accessibilityLabel(deviceSourceAccessibilityLabel)
     }
 
     // MARK: - Helpers

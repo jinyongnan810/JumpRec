@@ -11,12 +11,8 @@ struct HomeView: View {
 
     /// The persisted goal settings displayed on the home screen.
     @Bindable var settings: JumpRecSettings
-    /// The observable app state used to display device availability.
+    /// The observable app state used to display session-start progress.
     @Bindable var appState: JumpRecState
-    /// Indicates whether the watch path is available for this session.
-    let isWatchAvailable: Bool
-    /// Explains why the watch path is unavailable.
-    let watchUnavailableReason: String
     /// Starts a new session after the countdown completes.
     var onStart: () -> Void
     /// Controls presentation of the settings sheet.
@@ -87,12 +83,6 @@ struct HomeView: View {
                 Spacer()
                 heroRingView
                 Spacer()
-
-                MotionSourceStatusView(
-                    source: displayedMotionSource,
-                    connectedHeadphoneName: appState.connectedHeadphoneName,
-                    presentation: .preSession
-                )
 
                 // Start/Cancel Button
                 Button {
@@ -185,27 +175,6 @@ struct HomeView: View {
         isStartingSession
     }
 
-    /// Chooses the best source to display before a session starts.
-    private var displayedMotionSource: DeviceSource? {
-        if let activeSource = appState.activeMotionSource {
-            return activeSource
-        }
-        if settings.preferHeadphonesForIPhoneSessions, appState.isHeadphoneMotionAvailable {
-            // This mirrors the start decision: the user asked to stay on iPhone when headphones can track motion.
-            return .airpods
-        }
-        if isWatchAvailable {
-            return .watch
-        }
-        if appState.isHeadphoneMotionAvailable {
-            return .airpods
-        }
-        if appState.isPhoneMotionAvailable {
-            return .iPhone
-        }
-        return nil
-    }
-
     /// Returns the title for the primary button.
     private var primaryButtonTitle: String {
         if isStartingSession {
@@ -285,8 +254,6 @@ struct HomeView: View {
     HomeView(
         settings: JumpRecSettings(),
         appState: JumpRecState(),
-        isWatchAvailable: true,
-        watchUnavailableReason: "Apple Watch is ready.",
         onStart: {}
     )
     .background(AppColors.bgPrimary)

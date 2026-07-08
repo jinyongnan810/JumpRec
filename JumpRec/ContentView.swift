@@ -30,10 +30,7 @@ struct ContentView: View {
             TabView(selection: $selectedTab) {
                 HomeView(
                     settings: settings,
-                    appState: appState,
-                    isWatchAvailable: connectivityManager.isPaired &&
-                        connectivityManager.isWatchAppInstalled,
-                    watchUnavailableReason: watchUnavailableReason
+                    appState: appState
                 ) {
                     appState.start(
                         goalType: settings.goalType,
@@ -119,16 +116,6 @@ struct ContentView: View {
                 }
             }
         )
-    }
-
-    private var watchUnavailableReason: String {
-        if !connectivityManager.isPaired {
-            return String(localized: "Apple Watch is unavailable because no paired watch was found.")
-        }
-        if !connectivityManager.isWatchAppInstalled {
-            return String(localized: "Apple Watch is unavailable because the JumpRec Watch app is not installed.")
-        }
-        return String(localized: "Apple Watch is ready.")
     }
 
 //    private func configureTabBarAppearance() {

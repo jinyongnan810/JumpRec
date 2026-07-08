@@ -111,6 +111,7 @@
       }
     },
     "Apple Watch is ready." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -121,6 +122,7 @@
       }
     },
     "Apple Watch is unavailable because no paired watch was found." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -131,6 +133,7 @@
       }
     },
     "Apple Watch is unavailable because the JumpRec Watch app is not installed." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
