@@ -41,6 +41,12 @@ final class WorkoutManager: NSObject {
     private var energyBurnedQuery: HKAnchoredObjectQuery?
     /// Encodes mirrored payloads sent to the iPhone app.
     private let encoder = JSONEncoder()
+    /// Tracks whether HealthKit successfully created a companion iPhone mirror.
+    ///
+    /// Watch-only workouts must keep collecting local HealthKit data even when the user
+    /// leaves the iPhone behind. Keeping this flag false until mirroring succeeds lets
+    /// jump and metric updates avoid a stream of expected remote-send failures.
+    private var isMirroringActive = false
     /// Stores the current average heart rate for mirrored updates.
     private var averageHeartRate: Int?
     /// Stores the current peak heart rate for mirrored updates.
@@ -146,13 +152,14 @@ final class WorkoutManager: NSObject {
 
     // MARK: - Workout Session
 
-    /// Starts a jump-rope workout and begins mirroring it to the iPhone app.
+    /// Starts a jump-rope workout locally and attempts to mirror it to the iPhone app.
     func startWorkout(startDate: Date, goalType: GoalType, goalValue: Int) {
         workoutGeneration = UUID()
         let generation = workoutGeneration
         workoutLifecycleTask?.cancel()
         stopLiveQueries()
 
+        isMirroringActive = false
         averageHeartRate = nil
         peakHeartRate = nil
         heartRateSum = 0
@@ -183,8 +190,6 @@ final class WorkoutManager: NSObject {
                     try Task.checkCancellation()
                     try await builder.beginCollection(at: startDate)
                     try Task.checkCancellation()
-                    try await session.startMirroringToCompanionDevice()
-                    try Task.checkCancellation()
                 } catch is CancellationError {
                     return
                 } catch {
@@ -199,6 +204,34 @@ final class WorkoutManager: NSObject {
                     return
                 }
 
+                // Start local HealthKit queries before companion mirroring. Mirroring can be
+                // delayed or unavailable when the user leaves the iPhone behind, but the watch
+                // workout still needs live heart-rate and energy updates immediately.
+                startHeartRateQuery(startDate: startDate)
+                startEnergyBurnedQuery(startDate: startDate)
+
+                do {
+                    try await session.startMirroringToCompanionDevice()
+                    try Task.checkCancellation()
+                } catch is CancellationError {
+                    return
+                } catch {
+                    // A missing or unreachable iPhone should not break a watch-only workout.
+                    // Local collection is already running, so keep the session alive and skip
+                    // remote payloads until a future workout creates a mirror successfully.
+                    isMirroringActive = false
+                    print("[WorkoutManager] Companion mirroring unavailable: \(error.localizedDescription)")
+                    return
+                }
+
+                guard workoutGeneration == generation,
+                      self.session === session,
+                      self.builder === builder
+                else {
+                    return
+                }
+
+                isMirroringActive = true
                 sendPayload(
                     MirroredWorkoutPayload(
                         kind: .started,
@@ -207,8 +240,6 @@ final class WorkoutManager: NSObject {
                         goalValue: goalValue
                     )
                 )
-                startHeartRateQuery(startDate: startDate)
-                startEnergyBurnedQuery(startDate: startDate)
             }
         } catch {
             print("[WorkoutManager] Failed to create workout session: \(error.localizedDescription)")
@@ -232,6 +263,7 @@ final class WorkoutManager: NSObject {
                 peakHeartRate: peakHeartRate
             )
         )
+        isMirroringActive = false
 
         guard let session, let builder else {
             self.session = nil
@@ -413,7 +445,7 @@ final class WorkoutManager: NSObject {
 
     /// Encodes and sends a mirrored workout payload to the iPhone app.
     private func sendPayload(_ payload: MirroredWorkoutPayload) {
-        guard let session else { return }
+        guard isMirroringActive, let session else { return }
 
         do {
             let data = try encoder.encode(payload)

@@ -41,7 +41,30 @@ extension JumpRecState {
     /// watch behavior aligned with the iPhone app: fast first speech without holding the
     /// ducking audio session open for the rest of the app lifetime.
     func warmUpSpeechSynthesizerIfNeeded() {
-        guard !hasWarmedUpSpeechSynthesizer else { return }
+        warmUpSpeechSynthesizer(force: false)
+    }
+
+    /// Clears stale speech state after the watch app has been suspended for a long time.
+    ///
+    /// watchOS may keep the Swift process alive while tearing down the underlying audio
+    /// route. When that happens, `AVSpeechSynthesizer` can still appear initialized even
+    /// though queued utterances will not play until much later. Resetting before the next
+    /// workout prevents old prompts from bursting out together and gives the first real
+    /// cue a fresh audio session.
+    func recoverSpeechAudioPipelineAfterExtendedBackground() {
+        cancelPendingSpeech()
+        if synthesizer.isSpeaking || synthesizer.isPaused {
+            synthesizer.stopSpeaking(at: .immediate)
+        }
+        isSpeechWarmupInProgress = false
+        hasWarmedUpSpeechSynthesizer = false
+        deactivateSpeechAudioSession()
+        warmUpSpeechSynthesizer(force: true)
+    }
+
+    /// Performs the silent speech warmup, optionally forcing it after a stale background resume.
+    private func warmUpSpeechSynthesizer(force: Bool) {
+        guard force || !hasWarmedUpSpeechSynthesizer else { return }
 
         hasWarmedUpSpeechSynthesizer = true
         isSpeechWarmupInProgress = true
@@ -79,9 +102,10 @@ extension JumpRecState {
 
             pendingSpeechTask = nil
 
-            // Cancel the silent warmup if it is still running so the spoken workout cue
-            // can start immediately instead of being queued behind setup work.
-            if isSpeechWarmupInProgress {
+            // Workout cues should represent the latest session state. Replacing anything
+            // still queued in AVSpeechSynthesizer prevents stale announcements from piling
+            // up while watchOS is waking the audio route after a long suspension.
+            if isSpeechWarmupInProgress || synthesizer.isSpeaking || synthesizer.isPaused {
                 synthesizer.stopSpeaking(at: .immediate)
                 isSpeechWarmupInProgress = false
             }
