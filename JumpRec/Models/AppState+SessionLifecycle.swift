@@ -265,14 +265,14 @@ extension JumpRecState {
         guard !isMirroredWatchSession else { return }
 
         // Count landmarks are useful progress cues regardless of whether the user
-        // is chasing a jump target or a time target, so the announcement is no
-        // longer restricted to count-goal sessions.
+        // is chasing a jump target or a time target. When the user disables this
+        // cue, skip both speech and haptics so the milestone stays fully silent.
+        guard sessionShouldSpeakJumpCountAnnouncements else { return }
+
         if jumpCount > 0, jumpCount.isMultiple(of: 100) {
             notificationFeedbackGenerator.notificationOccurred(.success)
             notificationFeedbackGenerator.prepare()
-            if sessionShouldSpeakJumpCountAnnouncements {
-                speak(text: localizedJumpAnnouncement(for: jumpCount))
-            }
+            speak(text: localizedJumpAnnouncement(for: jumpCount))
         }
     }
 
@@ -323,11 +323,13 @@ extension JumpRecState {
             return
         }
 
+        // Time-goal completion above still runs when this cue is disabled. Only the
+        // optional minute feedback is skipped, including the haptic pulse.
+        guard sessionShouldSpeakJumpTimeAnnouncements else { return }
+
         notificationFeedbackGenerator.notificationOccurred(.success)
         notificationFeedbackGenerator.prepare()
-        if sessionShouldSpeakJumpTimeAnnouncements {
-            speak(text: localizedMinuteAnnouncement(for: minutesElapsed))
-        }
+        speak(text: localizedMinuteAnnouncement(for: minutesElapsed))
     }
 
     /// Finishes the session immediately when the goal is satisfied.

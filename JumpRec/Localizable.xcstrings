@@ -1514,22 +1514,22 @@
         }
       }
     },
-    "Announce each elapsed minute during workouts." : {
+    "Play speech and haptics for each elapsed minute." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ワークアウト中に経過した各分を読み上げます。"
+            "value" : "経過した各分で音声とハプティクスを再生します。"
           }
         }
       }
     },
-    "Announce every 100-jump milestone during workouts." : {
+    "Play speech and haptics for every 100-jump milestone." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ワークアウト中に100回ごとの節目を読み上げます。"
+            "value" : "100回ごとの節目で音声とハプティクスを再生します。"
           }
         }
       }

@@ -107,7 +107,7 @@ struct SettingsView: View {
             settingsToggle(
                 isOn: $settings.shouldSpeakJumpCountAnnouncements,
                 title: String(localized: "Speak Jump Count"),
-                description: String(localized: "Announce every 100-jump milestone during workouts.")
+                description: String(localized: "Play speech and haptics for every 100-jump milestone.")
             )
 
             Divider()
@@ -116,7 +116,7 @@ struct SettingsView: View {
             settingsToggle(
                 isOn: $settings.shouldSpeakJumpTimeAnnouncements,
                 title: String(localized: "Speak Jump Time"),
-                description: String(localized: "Announce each elapsed minute during workouts.")
+                description: String(localized: "Play speech and haptics for each elapsed minute.")
             )
         }
     }

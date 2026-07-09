@@ -122,11 +122,13 @@ extension JumpRecState {
 
     /// Announces each 100-jump landmark during count-based sessions.
     func handleHundredJumpsLandmark(jumpCount: Int) {
+        // A disabled count cue should be fully quiet on Watch as well as iPhone,
+        // so skip the haptic and spoken announcement together.
+        guard sessionShouldSpeakJumpCountAnnouncements else { return }
+
         WKInterfaceDevice.current().play(.success)
         let hundred = jumpCount / 100 * 100
-        if sessionShouldSpeakJumpCountAnnouncements {
-            speak(text: localizedJumpAnnouncement(for: hundred))
-        }
+        speak(text: localizedJumpAnnouncement(for: hundred))
     }
 
     /// Starts cancellable structured-concurrency work for minute announcements.
@@ -167,9 +169,12 @@ extension JumpRecState {
             end()
             return
         }
-        if sessionShouldSpeakJumpTimeAnnouncements {
-            speak(text: localizedMinuteAnnouncement(for: minutesElapsed))
-        }
+
+        // Keep time-goal completion above active, but make the optional elapsed-minute
+        // cue fully silent when the user disables it.
+        guard sessionShouldSpeakJumpTimeAnnouncements else { return }
+
+        speak(text: localizedMinuteAnnouncement(for: minutesElapsed))
         WKInterfaceDevice.current().play(.success)
     }
 
