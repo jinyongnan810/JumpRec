@@ -75,24 +75,37 @@ struct StartView: View {
                                 duration: 3.0
                             ), value: isAnimating)
                     }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text("Session countdown"))
+                    .accessibilityValue(
+                        Text(
+                            String(
+                                format: String(localized: "%lld seconds remaining"),
+                                Int64(countdown)
+                            )
+                        )
+                    )
                     .task {
                         await runCountdown()
                     }
                 } else {
                     VStack(spacing: 12) {
-                        Text("START")
-                            .font(AppFonts.watchPrimaryButton)
-                            .tracking(2)
-                            .foregroundStyle(AppColors.bgPrimary)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(AppColors.accent)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                            .onTapGesture {
-                                withAnimation {
-                                    isCountingDown.toggle()
-                                }
+                        Button {
+                            withAnimation {
+                                isCountingDown.toggle()
                             }
+                        } label: {
+                            Text("START")
+                                .font(AppFonts.watchPrimaryButton)
+                                .tracking(2)
+                                .foregroundStyle(AppColors.bgPrimary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(AppColors.accent)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityHint(Text("Starts a three second countdown before the workout begins."))
 
                         HStack(spacing: 4) {
                             Image(systemName: "target")
@@ -101,6 +114,7 @@ struct StartView: View {
                                 .font(AppFonts.watchGoalLabel)
                         }
                         .foregroundStyle(AppColors.textSecondary)
+                        .accessibilityElement(children: .combine)
                     }
                     .padding(.horizontal, 8)
                 }
@@ -113,6 +127,7 @@ struct StartView: View {
                         Image(systemName: "gearshape.fill")
                             .foregroundStyle(AppColors.textMuted)
                     }
+                    .accessibilityLabel(Text("Settings"))
                 }
             }
             .navigationDestination(isPresented: $showSettings) {

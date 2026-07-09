@@ -408,6 +408,8 @@ private struct SessionRowView: View {
         .padding(.horizontal, 16)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement(children: .combine)
+        .accessibilityHint(Text("Opens session details."))
     }
 
     private var jumpsChip: some View {

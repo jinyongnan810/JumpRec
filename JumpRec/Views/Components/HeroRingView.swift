@@ -15,6 +15,10 @@ struct HeroRingView: View {
     var centerText: String
     /// The supporting label shown below the center text.
     var subtitle: String
+    /// Optional VoiceOver label for screens where the ring's visual text needs more context.
+    var accessibilityLabel: String?
+    /// Optional VoiceOver value for the ring's current progress or state.
+    var accessibilityValue: String?
 
     // MARK: - View
 
@@ -25,6 +29,7 @@ struct HeroRingView: View {
             Circle()
                 .stroke(AppColors.cardSurface, lineWidth: 14)
                 .frame(width: 200, height: 200)
+                .accessibilityHidden(true)
 
             // Foreground ring
             Circle()
@@ -32,6 +37,7 @@ struct HeroRingView: View {
                 .stroke(color, style: StrokeStyle(lineWidth: 14, lineCap: .round))
                 .frame(width: 200, height: 200)
                 .rotationEffect(.degrees(-90))
+                .accessibilityHidden(true)
 
             // Center content
             VStack(spacing: 4) {
@@ -45,6 +51,9 @@ struct HeroRingView: View {
                     .foregroundStyle(AppColors.textSecondary)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel ?? centerText)
+        .accessibilityValue(accessibilityValue ?? subtitle)
     }
 }
 

@@ -76,6 +76,8 @@ struct HistoryCalendarView: View {
                 }
                 .appGlassButton()
                 .buttonBorderShape(.circle)
+                .accessibilityLabel(Text("Previous month"))
+                .accessibilityHint(Text("Shows the previous month of sessions."))
 
                 Spacer()
 
@@ -93,6 +95,8 @@ struct HistoryCalendarView: View {
                 }
                 .appGlassButton()
                 .buttonBorderShape(.circle)
+                .accessibilityLabel(Text("Next month"))
+                .accessibilityHint(Text("Shows the next month of sessions."))
             }
 
             HStack(spacing: 0) {
@@ -212,9 +216,43 @@ private struct HistoryCalendarDayCellView: View {
             }
         }
         .frame(height: 48)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityValue(accessibilityValue)
     }
 
     // MARK: - Formatting
+
+    /// Describes the day number and status for VoiceOver without requiring the visual color treatment.
+    private var accessibilityLabel: String {
+        if isToday {
+            return String(
+                format: String(localized: "Day %lld, today"),
+                Int64(day)
+            )
+        }
+        if isFuture {
+            return String(
+                format: String(localized: "Day %lld, future day"),
+                Int64(day)
+            )
+        }
+        return String(
+            format: String(localized: "Day %lld"),
+            Int64(day)
+        )
+    }
+
+    /// Describes the recorded activity for the day, including the absence of sessions.
+    private var accessibilityValue: String {
+        guard let jumpCount else {
+            return String(localized: "No sessions")
+        }
+        return String(
+            format: String(localized: "%@ jumps"),
+            jumpCount.formatted()
+        )
+    }
 
     /// Shortens large jump counts for the compact calendar layout.
     private func formatJumpCount(_ count: Int) -> String {

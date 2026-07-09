@@ -24,6 +24,8 @@ struct TimerView: View {
             Text(diff.minutesSecondsMilliseconds)
                 .font(AppFonts.watchTimer)
                 .foregroundStyle(AppColors.textSecondary)
+                .accessibilityLabel(Text("Elapsed time"))
+                .accessibilityValue(Text(diff.minutesSecondsMilliseconds))
         }
     }
 }

@@ -63,13 +63,31 @@ struct HomeView: View {
         isCountingDown ? AppColors.accent : AppColors.textMuted
     }
 
+    /// Returns a VoiceOver label that explains the ring's current purpose instead of only reading its visible text.
+    private var heroRingAccessibilityLabel: String {
+        isCountingDown ? String(localized: "Session countdown") : String(localized: "Ready to start session")
+    }
+
+    /// Returns the current ring state in a short form that works well as an accessibility value.
+    private var heroRingAccessibilityValue: String {
+        if let countdownValue {
+            return String(
+                format: String(localized: "%lld seconds remaining"),
+                Int64(countdownValue)
+            )
+        }
+        return goalText
+    }
+
     /// Builds the hero ring for the current home-screen state.
     private var heroRingView: some View {
         HeroRingView(
             progress: heroRingProgress,
             color: heroRingColor,
             centerText: heroRingCenterText,
-            subtitle: heroRingSubtitle
+            subtitle: heroRingSubtitle,
+            accessibilityLabel: heroRingAccessibilityLabel,
+            accessibilityValue: heroRingAccessibilityValue
         )
     }
 

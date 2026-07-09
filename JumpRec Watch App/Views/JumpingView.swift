@@ -11,6 +11,18 @@ import SwiftUI
 struct JumpingView: View {
     /// The watch app state providing live workout values.
     let appState: JumpRecState
+
+    /// Returns a spoken heart-rate value that distinguishes a missing sample from a real zero.
+    private var heartRateAccessibilityValue: String {
+        guard appState.heartrate > 0 else {
+            return String(localized: "No reading")
+        }
+        return String(
+            format: String(localized: "%lld beats per minute"),
+            Int64(appState.heartrate)
+        )
+    }
+
     /// Renders the active workout metrics and stop control.
     var body: some View {
         VStack(spacing: 4) {
@@ -24,6 +36,8 @@ struct JumpingView: View {
                 .foregroundStyle(AppColors.accent)
                 .contentTransition(.numericText())
                 .animation(.bouncy, value: appState.jumpCount)
+                .accessibilityLabel(Text("Jumps"))
+                .accessibilityValue(Text(appState.jumpCount.formatted()))
 
             Spacer()
 
@@ -41,6 +55,9 @@ struct JumpingView: View {
                         .font(AppFonts.watchMetricDetail)
                 }
                 .foregroundStyle(AppColors.heartRate)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Text("Heart rate"))
+                .accessibilityValue(Text(heartRateAccessibilityValue))
             }
 
             // Stop button

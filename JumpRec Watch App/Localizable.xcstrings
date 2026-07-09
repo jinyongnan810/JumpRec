@@ -27,8 +27,28 @@
     "%@ kcal/min" : {
 
     },
+    "%@, selected" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@、選択中"
+          }
+        }
+      }
+    },
     "%lld" : {
       "shouldTranslate" : false
+    },
+    "%lld beats per minute" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 拍/分"
+          }
+        }
+      }
     },
     "%lld min" : {
       "localizations" : {
@@ -40,11 +60,41 @@
         }
       }
     },
+    "%lld minutes" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 分"
+          }
+        }
+      }
+    },
+    "%lld seconds remaining" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "残り %lld 秒"
+          }
+        }
+      }
+    },
     "cal" : {
 
     },
     "Checking iCloud availability for your saved sessions." : {
 
+    },
+    "Close results" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "結果を閉じる"
+          }
+        }
+      }
     },
     "Confirm" : {
       "localizations" : {
@@ -76,6 +126,16 @@
         }
       }
     },
+    "Elapsed time" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "経過時間"
+          }
+        }
+      }
+    },
     "Goal" : {
       "localizations" : {
         "ja" : {
@@ -86,10 +146,43 @@
         }
       }
     },
+    "Heart rate" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心拍数"
+          }
+        }
+      }
+    },
     "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now." : {
 
     },
     "iCloud is temporarily unavailable. Previously synced sessions may reappear once the account becomes reachable again." : {
+
+    },
+    "Jump count goal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ回数目標"
+          }
+        }
+      }
+    },
+    "Jump time goal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ時間目標"
+          }
+        }
+      }
+    },
+    "Jumps" : {
 
     },
     "JUMPS" : {
@@ -118,6 +211,16 @@
     "No iCloud account is currently signed in, so previous cloud-backed sessions cannot be restored on this device yet." : {
 
     },
+    "No reading" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "読み取りなし"
+          }
+        }
+      }
+    },
     "SESSION COMPLETE" : {
       "localizations" : {
         "ja" : {
@@ -128,12 +231,35 @@
         }
       }
     },
+    "Session countdown" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション開始カウントダウン"
+          }
+        }
+      }
+    },
+    "Settings" : {
+
+    },
     "START" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "開始"
+          }
+        }
+      }
+    },
+    "Starts a three second countdown before the workout begins." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウト開始前に3秒のカウントダウンを開始します。"
           }
         }
       }
@@ -170,6 +296,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "時間目標"
+          }
+        }
+      }
+    },
+    "Total jumps" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "合計ジャンプ数"
+          }
+        }
+      }
+    },
+    "Turn the Digital Crown to adjust the count." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digital Crownを回して回数を調整します。"
+          }
+        }
+      }
+    },
+    "Turn the Digital Crown to adjust the time." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Digital Crownを回して時間を調整します。"
           }
         }
       }

@@ -28,12 +28,15 @@ struct ResultView: View {
                     .font(AppFonts.watchResultValue)
                     .foregroundStyle(AppColors.accent)
                     .staggeredAppearance(isVisible: hasContentAppeared, index: 1)
+                    .accessibilityLabel(Text("Total jumps"))
+                    .accessibilityValue(Text(appState.jumpCount.formatted()))
 
                 Text("JUMPS")
                     .font(AppFonts.watchMetricLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
                     .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
+                    .accessibilityHidden(true)
 
                 Divider()
                     .background(AppColors.textMuted.opacity(0.3))
@@ -63,6 +66,7 @@ struct ResultView: View {
                     }
                 }
                 .staggeredAppearance(isVisible: hasContentAppeared, index: 4)
+                .accessibilityElement(children: .combine)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -72,6 +76,7 @@ struct ResultView: View {
                         Image(systemName: "xmark")
                             .foregroundStyle(AppColors.textSecondary)
                     }
+                    .accessibilityLabel(Text("Close results"))
                 }
             }
         }

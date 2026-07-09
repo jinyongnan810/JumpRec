@@ -90,6 +90,27 @@ struct ActiveSessionView: View {
         }
     }
 
+    /// Returns a VoiceOver label that names the active progress metric rather than exposing only the large number.
+    private var ringAccessibilityLabel: String {
+        goalType == .count ? String(localized: "Jump progress") : String(localized: "Time progress")
+    }
+
+    /// Returns the current progress in a full sentence so VoiceOver users can hear both current and target values.
+    private var ringAccessibilityValue: String {
+        if goalType == .count {
+            return String(
+                format: String(localized: "%@ of %@ jumps"),
+                appState.jumpCount.formatted(),
+                goalValue.formatted()
+            )
+        }
+        return String(
+            format: String(localized: "%lld of %lld minutes"),
+            Int64(elapsedSeconds / 60),
+            goalValue
+        )
+    }
+
     /// Returns the leading stat label based on the goal type.
     private var leadingStatLabel: LocalizedStringKey {
         goalType == .count ? "TIME" : "JUMPS"
@@ -166,7 +187,9 @@ struct ActiveSessionView: View {
             HeroRingView(
                 progress: animatedProgress,
                 centerText: animatedCenterText,
-                subtitle: animatedRingSubtitle
+                subtitle: animatedRingSubtitle,
+                accessibilityLabel: ringAccessibilityLabel,
+                accessibilityValue: ringAccessibilityValue
             )
 
             // Live metrics are a grid instead of a single row because health values can be wider
@@ -194,6 +217,7 @@ struct ActiveSessionView: View {
             }
             .appGlassButton(prominent: true, tint: AppColors.danger)
             .disabled(appState.isMirroredWatchSession)
+            .accessibilityHint(appState.isMirroredWatchSession ? Text("Stop the workout from Apple Watch.") : Text("Ends the current jump session."))
         }
         .padding(.horizontal, 24)
         .task {

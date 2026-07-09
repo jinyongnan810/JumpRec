@@ -269,6 +269,10 @@ private struct RecordCardView: View {
         // The larger negative Y offset preserves the original art direction where the
         // badge sits above the compact record row rather than directly on its edge.
         .dotIndicatorOverlay(isVisible: isHighlighted)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityValue(accessibilityValue)
+        .accessibilityHint(isHighlighted ? Text("New personal record.") : Text(""))
     }
 
     private static let dateFormatter: DateFormatter = {
@@ -277,6 +281,16 @@ private struct RecordCardView: View {
         formatter.setLocalizedDateFormatFromTemplate("yMMMd")
         return formatter
     }()
+
+    /// Names the record type for VoiceOver using the same localized title shown visually.
+    private var accessibilityLabel: Text {
+        Text(LocalizedStringKey(record.kind.title))
+    }
+
+    /// Combines the record value and date so the compact row is understandable without relying on layout.
+    private var accessibilityValue: Text {
+        Text("\(displayValue), achieved \(Self.dateFormatter.string(from: record.achievedAt))")
+    }
 
     private var displayValue: String {
         switch record.kind {

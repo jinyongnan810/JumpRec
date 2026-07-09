@@ -162,6 +162,8 @@ struct SettingsView: View {
         }
         .toggleStyle(.switch)
         .tint(AppColors.accent)
+        .accessibilityLabel(Text(title))
+        .accessibilityHint(Text(description))
     }
 
     // MARK: - Segmented Control
@@ -193,6 +195,8 @@ struct SettingsView: View {
             }
             .appGlassButton(tint: AppColors.accent)
             .buttonBorderShape(.circle)
+            .accessibilityLabel(decrementButtonAccessibilityLabel)
+            .accessibilityHint(stepperAccessibilityHint)
 
             VStack(spacing: 4) {
                 Text(displayValue)
@@ -216,8 +220,23 @@ struct SettingsView: View {
             }
             .appGlassButton(tint: AppColors.accent)
             .buttonBorderShape(.circle)
+            .accessibilityLabel(incrementButtonAccessibilityLabel)
+            .accessibilityHint(stepperAccessibilityHint)
         }
         .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(goalValueAccessibilityLabel)
+        .accessibilityValue(goalValueAccessibilityValue)
+        .accessibilityAdjustableAction { direction in
+            switch direction {
+            case .increment:
+                adjustValue(by: stepAmount)
+            case .decrement:
+                adjustValue(by: -stepAmount)
+            @unknown default:
+                break
+            }
+        }
     }
 
     // MARK: - Helpers
@@ -242,6 +261,40 @@ struct SettingsView: View {
     /// Returns the step size used when adjusting the current goal.
     private var stepAmount: Int64 {
         selectedType == .count ? 100 : 1
+    }
+
+    /// Names the editable goal value for VoiceOver adjustable gestures.
+    private var goalValueAccessibilityLabel: String {
+        selectedType == .count ? String(localized: "Jump count goal") : String(localized: "Jump time goal")
+    }
+
+    /// Formats the current staged value with its unit so VoiceOver announces the full setting.
+    private var goalValueAccessibilityValue: String {
+        if selectedType == .count {
+            return String(
+                format: String(localized: "%@ jumps"),
+                countValue.formatted()
+            )
+        }
+        return String(
+            format: String(localized: "%lld minutes"),
+            timeValue
+        )
+    }
+
+    /// Explains that the circular buttons and adjustable gesture change the staged goal before confirmation.
+    private var stepperAccessibilityHint: Text {
+        Text("Adjusts the goal value before you confirm settings.")
+    }
+
+    /// Names the decrement button with the same unit the visible control is editing.
+    private var decrementButtonAccessibilityLabel: Text {
+        Text(selectedType == .count ? "Decrease jump count goal" : "Decrease jump time goal")
+    }
+
+    /// Names the increment button with the same unit the visible control is editing.
+    private var incrementButtonAccessibilityLabel: Text {
+        Text(selectedType == .count ? "Increase jump count goal" : "Increase jump time goal")
     }
 
     /// Increments or decrements the active goal value while respecting minimums.

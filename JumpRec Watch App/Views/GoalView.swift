@@ -66,6 +66,15 @@ struct GoalView: View {
     /// The row delays its selection animation slightly to wait for screen navigation
     private static let selectionAnimationDelay = 0.2
 
+    /// Formats the row value so selected state is announced without relying on the checkmark symbol alone.
+    private func accessibilityValue(detail: String, isSelected: Bool) -> String {
+        guard isSelected else { return detail }
+        return String(
+            format: String(localized: "%@, selected"),
+            detail
+        )
+    }
+
     /// Renders a goal option row with active-state feedback.
     @ViewBuilder
     private func goalRow(titleKey: LocalizedStringKey, systemImage: String, detail: String, isSelected: Bool) -> some View {
@@ -96,6 +105,9 @@ struct GoalView: View {
             value: isSelected
         )
         .padding(.vertical, 4)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(titleKey))
+        .accessibilityValue(Text(accessibilityValue(detail: detail, isSelected: isSelected)))
     }
 }
 
@@ -217,6 +229,17 @@ struct CountView: View {
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("Jump count goal"))
+            .accessibilityValue(
+                Text(
+                    String(
+                        format: String(localized: "%@ jumps"),
+                        count.formatted()
+                    )
+                )
+            )
+            .accessibilityHint(Text("Turn the Digital Crown to adjust the count."))
 
             Button("Confirm") {
                 onConfirm(count)
@@ -272,6 +295,17 @@ struct TimeView: View {
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("Jump time goal"))
+            .accessibilityValue(
+                Text(
+                    String(
+                        format: String(localized: "%lld minutes"),
+                        Int64(scaledTimeValue.rounded())
+                    )
+                )
+            )
+            .accessibilityHint(Text("Turn the Digital Crown to adjust the time."))
 
             Button("Confirm") {
                 // The rest of the app persists integer minute goals, so the scaled

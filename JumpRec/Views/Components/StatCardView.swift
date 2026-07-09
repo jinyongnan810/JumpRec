@@ -32,6 +32,8 @@ struct StatCardView: View {
         .padding(14)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        // Treat the compact label/value pair as one metric so VoiceOver reads the value with its context.
+        .accessibilityElement(children: .combine)
     }
 }
 

@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "/ %@ jumps" : {
       "localizations" : {
         "ja" : {
@@ -41,6 +44,26 @@
         }
       }
     },
+    "%@ of %@ jumps" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ / %2$@ 回"
+          }
+        }
+      }
+    },
+    "%@, achieved %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, achieved %2$@"
+          }
+        }
+      }
+    },
     "%@. %@" : {
       "localizations" : {
         "en" : {
@@ -60,6 +83,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld 分"
+          }
+        }
+      }
+    },
+    "%lld minutes" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 分"
+          }
+        }
+      }
+    },
+    "%lld of %lld minutes" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld 分"
+          }
+        }
+      }
+    },
+    "%lld seconds remaining" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "残り %lld 秒"
           }
         }
       }
@@ -110,6 +163,16 @@
         }
       }
     },
+    "Adjusts the goal value before you confirm settings." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定を確定する前に目標値を調整します。"
+          }
+        }
+      }
+    },
     "Apple Watch is ready." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -150,6 +213,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このセッションでは Apple Watchを利用できません。"
+          }
+        }
+      }
+    },
+    "Audio Settings" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音声設定"
           }
         }
       }
@@ -340,6 +413,56 @@
         }
       }
     },
+    "Day %lld" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 日"
+          }
+        }
+      }
+    },
+    "Day %lld, future day" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 日、未来の日付"
+          }
+        }
+      }
+    },
+    "Day %lld, today" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 日、今日"
+          }
+        }
+      }
+    },
+    "Decrease jump count goal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ回数目標を減らす"
+          }
+        }
+      }
+    },
+    "Decrease jump time goal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ時間目標を減らす"
+          }
+        }
+      }
+    },
     "Delete" : {
       "localizations" : {
         "ja" : {
@@ -449,6 +572,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "経過時間"
+          }
+        }
+      }
+    },
+    "Ends the current jump session." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のジャンプセッションを終了します。"
           }
         }
       }
@@ -630,6 +763,26 @@
     "Inbox" : {
 
     },
+    "Increase jump count goal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ回数目標を増やす"
+          }
+        }
+      }
+    },
+    "Increase jump time goal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ時間目標を増やす"
+          }
+        }
+      }
+    },
     "iPhone motion is not available on this device." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -671,12 +824,42 @@
         }
       }
     },
+    "Jump count goal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ回数目標"
+          }
+        }
+      }
+    },
+    "Jump progress" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ進捗"
+          }
+        }
+      }
+    },
     "Jump Time" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "時間"
+          }
+        }
+      }
+    },
+    "Jump time goal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ時間目標"
           }
         }
       }
@@ -835,6 +1018,16 @@
         }
       }
     },
+    "New personal record." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しい自己記録です。"
+          }
+        }
+      }
+    },
     "New personal records" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -853,6 +1046,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新記録"
+          }
+        }
+      }
+    },
+    "Next month" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次の月"
           }
         }
       }
@@ -918,6 +1121,16 @@
         }
       }
     },
+    "No sessions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションなし"
+          }
+        }
+      }
+    },
     "No sessions in this month." : {
       "localizations" : {
         "ja" : {
@@ -937,6 +1150,9 @@
           }
         }
       }
+    },
+    "Opens session details." : {
+
     },
     "Peak Heart Rate" : {
       "localizations" : {
@@ -968,12 +1184,42 @@
         }
       }
     },
+    "Play speech and haptics for each elapsed minute." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "経過した各分で音声とハプティクスを再生します。"
+          }
+        }
+      }
+    },
+    "Play speech and haptics for every 100-jump milestone." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "100回ごとの節目で音声とハプティクスを再生します。"
+          }
+        }
+      }
+    },
     "Prefer Headphones for iPhone Sessions" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "ヘッドフォンを優先"
+          }
+        }
+      }
+    },
+    "Previous month" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前の月"
           }
         }
       }
@@ -1005,6 +1251,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "レート(平均)"
+          }
+        }
+      }
+    },
+    "Ready to start session" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション開始準備完了"
           }
         }
       }
@@ -1087,6 +1343,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッション完了！"
+          }
+        }
+      }
+    },
+    "Session countdown" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション開始カウントダウン"
           }
         }
       }
@@ -1224,6 +1490,36 @@
         }
       }
     },
+    "Shows an explanation for this metric." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この指標の説明を表示します。"
+          }
+        }
+      }
+    },
+    "Shows the next month of sessions." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次の月のセッションを表示します。"
+          }
+        }
+      }
+    },
+    "Shows the previous month of sessions." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前の月のセッションを表示します。"
+          }
+        }
+      }
+    },
     "Shows why this device is unavailable" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1242,6 +1538,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "高効率カロリーバーン"
+          }
+        }
+      }
+    },
+    "Speak Jump Count" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ回数を読み上げる"
+          }
+        }
+      }
+    },
+    "Speak Jump Time" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ時間を読み上げる"
           }
         }
       }
@@ -1325,6 +1641,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ストップ"
+          }
+        }
+      }
+    },
+    "Stop the workout from Apple Watch." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watchからワークアウトを停止してください。"
           }
         }
       }
@@ -1450,6 +1776,16 @@
         }
       }
     },
+    "Time progress" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時間進捗"
+          }
+        }
+      }
+    },
     "Tracking on Apple Watch" : {
       "localizations" : {
         "ja" : {
@@ -1510,56 +1846,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "対応ヘッドフォンが利用可能な場合、Apple WatchではなくiPhoneで開始します。"
-          }
-        }
-      }
-    },
-    "Play speech and haptics for each elapsed minute." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "経過した各分で音声とハプティクスを再生します。"
-          }
-        }
-      }
-    },
-    "Play speech and haptics for every 100-jump milestone." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "100回ごとの節目で音声とハプティクスを再生します。"
-          }
-        }
-      }
-    },
-    "Audio Settings" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "音声設定"
-          }
-        }
-      }
-    },
-    "Speak Jump Count" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ジャンプ回数を読み上げる"
-          }
-        }
-      }
-    },
-    "Speak Jump Time" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ジャンプ時間を読み上げる"
           }
         }
       }
