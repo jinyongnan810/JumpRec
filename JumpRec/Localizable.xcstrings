@@ -4,9 +4,6 @@
     "" : {
 
     },
-    "-50%" : {
-
-    },
     "/ %@ jumps" : {
       "localizations" : {
         "ja" : {
@@ -129,12 +126,6 @@
           }
         }
       }
-    },
-    "+50%" : {
-
-    },
-    "0%" : {
-
     },
     "3 unread" : {
 
@@ -717,26 +708,6 @@
         }
       }
     },
-    "If there are many false detections, try make the threshold higher. " : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "誤検知が多い場合、しきい値を高く設定してみてください。"
-          }
-        }
-      }
-    },
-    "If jumps are not detected, try lowering the threshold." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ジャンプが検知されない場合、しきい値を低く設定してみてください。"
-          }
-        }
-      }
-    },
     "Highest Jump Count" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -805,6 +776,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apple Watchを開始できない場合は、iPhoneを使用します。"
+          }
+        }
+      }
+    },
+    "If jumps are not detected, try lowering the threshold." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプが検知されない場合、しきい値を低く設定してみてください。"
+          }
+        }
+      }
+    },
+    "If there are many false detections, try make the threshold higher. " : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "誤検知が多い場合、しきい値を高く設定してみてください。"
           }
         }
       }
@@ -1948,6 +1939,12 @@
           }
         }
       }
+    },
+    "より敏感" : {
+
+    },
+    "より鈍感" : {
+
     }
   },
   "version" : "1.1"

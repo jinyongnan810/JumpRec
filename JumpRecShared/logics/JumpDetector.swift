@@ -125,6 +125,12 @@ public final class JumpDetector {
     /// signed threshold keeps negative troughs intuitive: `50%` turns `-1.2` into
     /// `-1.8`, which requires a deeper negative motion event.
     private var thresholdAdjustmentPercentage: Double
+    /// Cached threshold used by the hot sample-processing path.
+    ///
+    /// Motion samples arrive many times per second, while settings change only at
+    /// session boundaries. Caching keeps `thresholdSatisfied(value:)` to a direct
+    /// comparison and makes that lifecycle assumption explicit.
+    private var adjustedThreshold: Double
     /// Timestamp of the last jump that passed threshold and refractory checks.
     private var lastAcceptedJumpTimestamp: TimeInterval?
 
@@ -138,6 +144,10 @@ public final class JumpDetector {
         self.profile = profile
         config = .profile(profile)
         self.thresholdAdjustmentPercentage = Self.clampedThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+        adjustedThreshold = Self.adjustedThreshold(
+            baseThreshold: config.threshold,
+            adjustmentPercentage: self.thresholdAdjustmentPercentage
+        )
         debugState = JumpDetectorDebugState(
             profile: profile,
             dominantAxis: config.axis,
@@ -153,6 +163,10 @@ public final class JumpDetector {
     /// even if settings are changed later while motion samples are still arriving.
     public func updateThresholdAdjustmentPercentage(_ percentage: Double) {
         thresholdAdjustmentPercentage = Self.clampedThresholdAdjustmentPercentage(percentage)
+        adjustedThreshold = Self.adjustedThreshold(
+            baseThreshold: config.threshold,
+            adjustmentPercentage: thresholdAdjustmentPercentage
+        )
     }
 
     /// Processes one raw motion sample.
@@ -212,20 +226,19 @@ public final class JumpDetector {
         }
     }
 
-    /// Applies the adjusted threshold rule for the active profile.
+    /// Applies the cached threshold rule for the active profile.
     private func thresholdSatisfied(value: Double) -> Bool {
-        let threshold = adjustedThreshold
         switch config.polarity {
         case .positivePeak, .positiveMagnitude:
-            return value > threshold
+            return value > adjustedThreshold
         case .negativeTrough:
-            return value < threshold
+            return value < adjustedThreshold
         }
     }
 
-    /// Returns the signed threshold after applying the user-selected percentage.
-    private var adjustedThreshold: Double {
-        config.threshold * (1 + (thresholdAdjustmentPercentage / 100))
+    /// Calculates the signed threshold once whenever user tuning changes.
+    private static func adjustedThreshold(baseThreshold: Double, adjustmentPercentage: Double) -> Double {
+        baseThreshold * (1 + (adjustmentPercentage / 100))
     }
 
     /// Restricts sensitivity tuning to the supported settings range.
