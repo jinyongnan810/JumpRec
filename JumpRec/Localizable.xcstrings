@@ -1620,7 +1620,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ストップ"
+            "value" : "終了する"
           }
         }
       }
@@ -1630,7 +1630,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Watchでストップする"
+            "value" : "Watchで終了できます"
           }
         }
       }
@@ -1640,7 +1640,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ストップ"
+            "value" : "終了する"
           }
         }
       }

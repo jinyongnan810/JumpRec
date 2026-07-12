@@ -163,6 +163,29 @@ struct ActiveSessionView: View {
         [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
     }
 
+    /// Returns the localized slider prompt for the current session ownership.
+    private var stopSliderText: String {
+        if appState.isMirroredWatchSession {
+            return String(localized: "STOP ON WATCH")
+        }
+        return String(localized: "STOP SESSION")
+    }
+
+    /// Returns the localized hint that explains where the stop action should happen.
+    private var stopSliderAccessibilityHint: String {
+        if appState.isMirroredWatchSession {
+            return String(localized: "Stop the workout from Apple Watch.")
+        }
+        return String(localized: "Ends the current jump session.")
+    }
+
+    /// Returns the slider tint for the current session source.
+    private var stopSliderTint: Color {
+        // Watch-owned sessions cannot be ended from the phone, so gray communicates
+        // the disabled state while local iOS sessions use the warmer warning color.
+        appState.isMirroredWatchSession ? AppColors.textMuted : AppColors.warning
+    }
+
     // MARK: - View
 
     /// Renders the active-session layout and live-updating metrics.
@@ -203,21 +226,29 @@ struct ActiveSessionView: View {
 
             Spacer()
 
-            // Stop Button
-            Button(action: onStop) {
-                HStack(spacing: 8) {
-                    Image(systemName: "stop.fill")
-                        .font(AppFonts.sectionIcon)
-                    Text(appState.isMirroredWatchSession ? "STOP ON WATCH" : "STOP SESSION")
-                        .font(AppFonts.cardTitle)
+            // Stop Slider
+            GlassSlider(
+                text: stopSliderText,
+                iconName: "stop.fill",
+                config: GlassSlider.Config(tint: stopSliderTint, size: 64),
+                onProgressChanged: { _ in },
+                onFinished: {
+                    // Mirrored sessions are owned by watchOS. The phone mirrors state only,
+                    // so a completed local slide must not try to end the Watch workout.
+                    guard !appState.isMirroredWatchSession else { return }
+                    onStop()
                 }
-                .foregroundStyle(AppColors.textPrimary)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
+            )
+            .allowsHitTesting(!appState.isMirroredWatchSession)
+            .accessibilityLabel(Text(stopSliderText))
+            .accessibilityHint(Text(stopSliderAccessibilityHint))
+            .accessibilityAddTraits(appState.isMirroredWatchSession ? [] : .isButton)
+            .accessibilityAction {
+                // VoiceOver users need an explicit action because the visual control
+                // depends on a drag gesture that may be difficult to perform precisely.
+                guard !appState.isMirroredWatchSession else { return }
+                onStop()
             }
-            .appGlassButton(prominent: true, tint: AppColors.danger)
-            .disabled(appState.isMirroredWatchSession)
-            .accessibilityHint(appState.isMirroredWatchSession ? Text("Stop the workout from Apple Watch.") : Text("Ends the current jump session."))
         }
         .padding(.horizontal, 24)
         .task {
