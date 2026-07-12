@@ -11,13 +11,14 @@ extension JumpRecState {
 
     /// Starts a new watch-tracked workout session.
     ///
-    /// Speech preferences are copied into session state so the current workout keeps
-    /// a stable feedback policy even if settings sync while the user is jumping.
+    /// Speech and detector preferences are copied into session state so the current workout keeps
+    /// stable behavior even if settings sync while the user is jumping.
     func start(
         goalType: GoalType,
         goalCount: Int,
         shouldSpeakJumpCountAnnouncements: Bool = true,
-        shouldSpeakJumpTimeAnnouncements: Bool = true
+        shouldSpeakJumpTimeAnnouncements: Bool = true,
+        jumpDetectorThresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage
     ) {
         cancelPendingSpeech()
         resetSessionMetrics()
@@ -34,7 +35,12 @@ extension JumpRecState {
         }
         startTime = Date()
         if let startTime {
-            motionManager?.startTracking(startDate: startTime, goalType: goalType, goalValue: goal)
+            motionManager?.startTracking(
+                startDate: startTime,
+                goalType: goalType,
+                goalValue: goal,
+                thresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage
+            )
         }
         jumpState = .jumping
         // Start minute announcements for every workout so elapsed-time feedback
@@ -53,7 +59,8 @@ extension JumpRecState {
             goalType: settings.goalType,
             goalCount: settings.goalCount,
             shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
-            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements
+            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
+            jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
         )
     }
 

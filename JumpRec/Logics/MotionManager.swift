@@ -157,10 +157,14 @@ final class MotionManager: NSObject {
     // MARK: - Tracking
 
     /// Starts local motion tracking for both iPhone and headphone sources when available.
-    func startTracking() {
+    /// - Parameter thresholdAdjustmentPercentage: Relative sensitivity tuning applied to both local detector profiles.
+    func startTracking(thresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage) {
         guard !isTracking else { return }
 
         isTracking = true
+        // Apply the setting before samples start flowing so every detector keeps a stable threshold for this session.
+        phoneDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+        headphoneDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
         // Reset detector state at session start so old peaks / cadence hints do not bleed into a new workout.
         phoneDetector.reset()
         headphoneDetector.reset()

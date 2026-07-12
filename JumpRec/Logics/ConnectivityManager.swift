@@ -130,6 +130,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
         let shouldSpeakJumpCountAnnouncements = applicationContext["shouldSpeakJumpCountAnnouncements"] as? Bool ?? true
         let shouldSpeakJumpTimeAnnouncements = applicationContext["shouldSpeakJumpTimeAnnouncements"] as? Bool ?? true
+        let jumpDetectorThresholdAdjustmentPercentage = NumberParser.double(applicationContext["jumpDetectorThresholdAdjustmentPercentage"])
+            ?? 0.0
 
         Task { @MainActor [weak self] in
             self?.applySettings(
@@ -137,7 +139,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
                 jumpCount: jumpCount,
                 jumpTime: jumpTime,
                 shouldSpeakJumpCountAnnouncements: shouldSpeakJumpCountAnnouncements,
-                shouldSpeakJumpTimeAnnouncements: shouldSpeakJumpTimeAnnouncements
+                shouldSpeakJumpTimeAnnouncements: shouldSpeakJumpTimeAnnouncements,
+                jumpDetectorThresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage
             )
         }
     }
@@ -251,7 +254,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         jumpCount: Int64,
         jumpTime: Int64,
         shouldSpeakJumpCountAnnouncements: Bool,
-        shouldSpeakJumpTimeAnnouncements: Bool
+        shouldSpeakJumpTimeAnnouncements: Bool,
+        jumpDetectorThresholdAdjustmentPercentage: Double
     ) {
         let payload: [String: Any] = [
             "type": "goalSettings",
@@ -260,6 +264,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             "jumpTime": jumpTime,
             "shouldSpeakJumpCountAnnouncements": shouldSpeakJumpCountAnnouncements,
             "shouldSpeakJumpTimeAnnouncements": shouldSpeakJumpTimeAnnouncements,
+            "jumpDetectorThresholdAdjustmentPercentage": jumpDetectorThresholdAdjustmentPercentage,
         ]
 
         do {
@@ -276,13 +281,18 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         jumpCount: Int,
         jumpTime: Int,
         shouldSpeakJumpCountAnnouncements: Bool,
-        shouldSpeakJumpTimeAnnouncements: Bool
+        shouldSpeakJumpTimeAnnouncements: Bool,
+        jumpDetectorThresholdAdjustmentPercentage: Double
     ) {
         settingsStore.set(goalTypeRawValue, forKey: "goalType")
         settingsStore.set(Int64(jumpCount), forKey: "jumpCount")
         settingsStore.set(Int64(jumpTime), forKey: "jumpTime")
         settingsStore.set(shouldSpeakJumpCountAnnouncements, forKey: "shouldSpeakJumpCountAnnouncements")
         settingsStore.set(shouldSpeakJumpTimeAnnouncements, forKey: "shouldSpeakJumpTimeAnnouncements")
+        settingsStore.set(
+            JumpRecSettings.clampedJumpDetectorThresholdAdjustmentPercentage(jumpDetectorThresholdAdjustmentPercentage),
+            forKey: "jumpDetectorThresholdAdjustmentPercentage"
+        )
         settingsStore.synchronize()
 
         NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)

@@ -4,6 +4,9 @@
     "" : {
 
     },
+    "-50%" : {
+
+    },
     "/ %@ jumps" : {
       "localizations" : {
         "ja" : {
@@ -50,6 +53,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ / %2$@ 回"
+          }
+        }
+      }
+    },
+    "%@ threshold adjustment" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ のしきい値調整"
           }
         }
       }
@@ -117,6 +130,12 @@
         }
       }
     },
+    "+50%" : {
+
+    },
+    "0%" : {
+
+    },
     "3 unread" : {
 
     },
@@ -159,6 +178,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "使用中のデバイス"
+          }
+        }
+      }
+    },
+    "Adjusts every detector threshold as a percentage of its default value." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各検出しきい値をデフォルト値に対する割合で調整します。"
           }
         }
       }
@@ -688,6 +717,26 @@
         }
       }
     },
+    "If there are many false detections, try make the threshold higher. " : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "誤検知が多い場合、しきい値を高く設定してみてください。"
+          }
+        }
+      }
+    },
+    "If jumps are not detected, try lowering the threshold." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプが検知されない場合、しきい値を低く設定してみてください。"
+          }
+        }
+      }
+    },
     "Highest Jump Count" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -830,6 +879,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプ回数目標"
+          }
+        }
+      }
+    },
+    "Jump Detection" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ検出"
           }
         }
       }
@@ -1751,6 +1810,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このセッションは開始後にiPhoneへ切り替えられません。"
+          }
+        }
+      }
+    },
+    "Threshold adjustment" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "しきい値調整"
+          }
+        }
+      }
+    },
+    "Threshold Adjustment" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "しきい値調整"
           }
         }
       }

@@ -24,6 +24,12 @@ public extension Notification.Name {
 public let DefaultJumpCount: Int64 = 1000
 /// Default time goal used for new installs and resets.
 public let DefaultJumpTime: Int64 = 10
+/// Default relative threshold adjustment for jump detection.
+public let DefaultJumpDetectorThresholdAdjustmentPercentage = 0.0
+/// Lowest supported relative threshold adjustment for jump detection.
+public let MinimumJumpDetectorThresholdAdjustmentPercentage = -50.0
+/// Highest supported relative threshold adjustment for jump detection.
+public let MaximumJumpDetectorThresholdAdjustmentPercentage = 50.0
 
 /// Stores and synchronizes user-selected workout settings across devices.
 ///
@@ -105,6 +111,25 @@ public class JumpRecSettings {
         }
     }
 
+    /// Stores the relative sensitivity adjustment applied to the shared jump detector thresholds.
+    ///
+    /// This is intentionally a percentage instead of a raw acceleration value. Keeping settings
+    /// relative to each detector profile lets the app improve default calibration later without
+    /// migrating user data or exposing implementation details in the UI.
+    public var jumpDetectorThresholdAdjustmentPercentage: Double {
+        didSet {
+            let clampedValue = Self.clampedJumpDetectorThresholdAdjustmentPercentage(jumpDetectorThresholdAdjustmentPercentage)
+            if jumpDetectorThresholdAdjustmentPercentage != clampedValue {
+                jumpDetectorThresholdAdjustmentPercentage = clampedValue
+                return
+            }
+
+            guard !isLoadingFromStore else { return }
+            store.set(jumpDetectorThresholdAdjustmentPercentage, forKey: "jumpDetectorThresholdAdjustmentPercentage")
+            store.synchronize()
+        }
+    }
+
     // MARK: - Derived Values
 
     /// Returns the currently active goal value as an `Int`.
@@ -126,6 +151,7 @@ public class JumpRecSettings {
         preferHeadphonesForIPhoneSessions = false
         shouldSpeakJumpCountAnnouncements = true
         shouldSpeakJumpTimeAnnouncements = true
+        jumpDetectorThresholdAdjustmentPercentage = DefaultJumpDetectorThresholdAdjustmentPercentage
         loadSettings()
 
         NotificationCenter.default.addObserver(
@@ -167,6 +193,8 @@ public class JumpRecSettings {
         let storedPreferHeadphonesForIPhoneSessions = store.bool(forKey: "preferHeadphonesForIPhoneSessions")
         let storedShouldSpeakJumpCountAnnouncements = store.object(forKey: "shouldSpeakJumpCountAnnouncements") as? Bool ?? true
         let storedShouldSpeakJumpTimeAnnouncements = store.object(forKey: "shouldSpeakJumpTimeAnnouncements") as? Bool ?? true
+        let storedThresholdAdjustmentPercentage = (store.object(forKey: "jumpDetectorThresholdAdjustmentPercentage") as? NSNumber)?.doubleValue
+            ?? DefaultJumpDetectorThresholdAdjustmentPercentage
 
         isLoadingFromStore = true
         goalType = storedGoalType
@@ -175,6 +203,15 @@ public class JumpRecSettings {
         preferHeadphonesForIPhoneSessions = storedPreferHeadphonesForIPhoneSessions
         shouldSpeakJumpCountAnnouncements = storedShouldSpeakJumpCountAnnouncements
         shouldSpeakJumpTimeAnnouncements = storedShouldSpeakJumpTimeAnnouncements
+        jumpDetectorThresholdAdjustmentPercentage = Self.clampedJumpDetectorThresholdAdjustmentPercentage(storedThresholdAdjustmentPercentage)
         isLoadingFromStore = false
+    }
+
+    /// Clamps persisted and synced threshold adjustments to the range supported by the settings UI.
+    public static func clampedJumpDetectorThresholdAdjustmentPercentage(_ percentage: Double) -> Double {
+        min(
+            MaximumJumpDetectorThresholdAdjustmentPercentage,
+            max(MinimumJumpDetectorThresholdAdjustmentPercentage, percentage)
+        )
     }
 }

@@ -70,8 +70,14 @@ class MotionManager: NSObject {
 
     // MARK: - Public Methods
 
-    /// Start motion tracking and jump detection
-    func startTracking(startDate: Date, goalType: GoalType, goalValue: Int) {
+    /// Start motion tracking and jump detection.
+    /// - Parameter thresholdAdjustmentPercentage: Relative sensitivity tuning applied to the watch detector profile.
+    func startTracking(
+        startDate: Date,
+        goalType: GoalType,
+        goalValue: Int,
+        thresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage
+    ) {
         guard motionManager.isDeviceMotionAvailable else {
             print("Device motion is not available")
             return
@@ -79,6 +85,8 @@ class MotionManager: NSObject {
 
         workoutManager.startWorkout(startDate: startDate, goalType: goalType, goalValue: goalValue)
 
+        // Apply tuning before `resetSession()` so the detector starts the workout with a stable threshold.
+        jumpDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
         resetSession()
         isTracking = true
         motionRecording = [csvHeader]

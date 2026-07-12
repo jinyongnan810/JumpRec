@@ -113,6 +113,34 @@ struct JumpRecTests {
         #expect(detector.debugState.chosenPolarity == .positivePeak)
     }
 
+    @Test func testPositiveThresholdAdjustmentRaisesPositiveProfileThreshold() async throws {
+        let detector = JumpDetector(profile: .iPhonePocket, thresholdAdjustmentPercentage: 50)
+
+        #expect(!detector.processMotionSample(makeSample(y: 1.79, timestamp: 0.00)))
+        #expect(detector.processMotionSample(makeSample(y: 1.81, timestamp: 0.30)))
+    }
+
+    @Test func testPositiveThresholdAdjustmentMakesNegativeProfileMoreNegative() async throws {
+        let detector = JumpDetector(profile: .headphones, thresholdAdjustmentPercentage: 50)
+
+        #expect(!detector.processMotionSample(makeSample(z: -1.79, timestamp: 0.00)))
+        #expect(detector.processMotionSample(makeSample(z: -1.81, timestamp: 0.30)))
+    }
+
+    @Test func testNegativeThresholdAdjustmentLowersPositiveProfileThreshold() async throws {
+        let detector = JumpDetector(profile: .watch, thresholdAdjustmentPercentage: -50)
+
+        #expect(!detector.processMotionSample(makeSample(y: 0.39, timestamp: 0.00)))
+        #expect(detector.processMotionSample(makeSample(y: 0.41, timestamp: 0.30)))
+    }
+
+    @Test func testThresholdAdjustmentIsClampedToSupportedRange() async throws {
+        let detector = JumpDetector(profile: .iPhonePocket, thresholdAdjustmentPercentage: 100)
+
+        #expect(!detector.processMotionSample(makeSample(y: 1.79, timestamp: 0.00)))
+        #expect(detector.processMotionSample(makeSample(y: 1.81, timestamp: 0.30)))
+    }
+
     @Test func testAllProfilesUse250MillisecondMinimumInterval() async throws {
         let iPhoneDetector = JumpDetector(profile: .iPhonePocket)
         let headphoneDetector = JumpDetector(profile: .headphones)

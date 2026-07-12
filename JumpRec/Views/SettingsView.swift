@@ -34,18 +34,24 @@ struct SettingsView: View {
                 .foregroundStyle(AppColors.textPrimary)
                 .staggeredAppearance(isVisible: hasContentAppeared, index: 0)
 
-            VStack(spacing: 16) {
-                goalSettingsSection
-                    .staggeredAppearance(isVisible: hasContentAppeared, index: 1)
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 16) {
+                    goalSettingsSection
+                        .staggeredAppearance(isVisible: hasContentAppeared, index: 1)
 
-                iPhoneSessionSection
-                    .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
+                    jumpDetectionSection
+                        .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
 
-                audioSettingsSection
-                    .staggeredAppearance(isVisible: hasContentAppeared, index: 3)
+                    audioSettingsSection
+                        .staggeredAppearance(isVisible: hasContentAppeared, index: 3)
+
+                    iPhoneSessionSection
+                        .staggeredAppearance(isVisible: hasContentAppeared, index: 4)
+                }
+                .padding(.bottom, 8)
             }
 
-            Spacer()
+            Spacer(minLength: 0)
 
             Button {
                 applyGoal()
@@ -58,7 +64,7 @@ struct SettingsView: View {
                     .frame(height: 56)
             }
             .appGlassButton(prominent: true, tint: AppColors.accent)
-            .staggeredAppearance(isVisible: hasContentAppeared, index: 4)
+            .staggeredAppearance(isVisible: hasContentAppeared, index: 5)
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 32)
@@ -98,6 +104,59 @@ struct SettingsView: View {
                 title: String(localized: "Prefer Headphones for iPhone Sessions"),
                 description: String(localized: "When compatible headphones are available, start on iPhone instead of Apple Watch.")
             )
+        }
+    }
+
+    /// Lets the user tune jump counting without exposing raw acceleration thresholds.
+    private var jumpDetectionSection: some View {
+        settingsSection(title: String(localized: "Jump Detection")) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Threshold Adjustment")
+                            .font(AppFonts.cardTitle)
+                            .foregroundStyle(AppColors.textPrimary)
+
+                        Text("If there are many false detections, try make the threshold higher. ")
+                            .font(AppFonts.bodySmall)
+                            .foregroundStyle(AppColors.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Text("If jumps are not detected, try lowering the threshold.")
+                            .font(AppFonts.bodySmall)
+                            .foregroundStyle(AppColors.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 12)
+
+                    Text(thresholdAdjustmentDisplayValue)
+                        .font(AppFonts.metricDetailMonospaced)
+                        .foregroundStyle(AppColors.accent)
+                        .contentTransition(.numericText())
+                        .animation(.bouncy, value: thresholdAdjustmentDisplayValue)
+                        .accessibilityHidden(true)
+                }
+
+                Slider(
+                    value: $settings.jumpDetectorThresholdAdjustmentPercentage,
+                    in: MinimumJumpDetectorThresholdAdjustmentPercentage ... MaximumJumpDetectorThresholdAdjustmentPercentage,
+                    step: 5
+                )
+                .tint(AppColors.accent)
+                .accessibilityLabel(Text("Threshold adjustment"))
+                .accessibilityValue(Text(thresholdAdjustmentAccessibilityValue))
+                .accessibilityHint(Text("Adjusts every detector threshold as a percentage of its default value."))
+
+                HStack {
+                    Text("より敏感")
+                    Spacer()
+                    Text("より鈍感")
+                }
+                .font(AppFonts.supportingMonospaced)
+                .foregroundStyle(AppColors.textMuted)
+                .accessibilityHidden(true)
+            }
         }
     }
 
@@ -240,6 +299,23 @@ struct SettingsView: View {
     }
 
     // MARK: - Helpers
+
+    /// Formats the detector threshold adjustment with a sign so neutral and tuned states are easy to scan.
+    private var thresholdAdjustmentDisplayValue: String {
+        let roundedPercentage = Int(settings.jumpDetectorThresholdAdjustmentPercentage.rounded())
+        if roundedPercentage > 0 {
+            return "+\(roundedPercentage)%"
+        }
+        return "\(roundedPercentage)%"
+    }
+
+    /// Formats the current threshold adjustment for assistive technologies.
+    private var thresholdAdjustmentAccessibilityValue: String {
+        String(
+            format: String(localized: "%@ threshold adjustment"),
+            thresholdAdjustmentDisplayValue
+        )
+    }
 
     /// Returns the value currently shown in the editor.
     private var displayValue: String {

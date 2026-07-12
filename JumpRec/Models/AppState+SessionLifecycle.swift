@@ -13,13 +13,14 @@ extension JumpRecState {
     ///
     /// `preferLocalHeadphonesOverWatch` is intentionally evaluated by the caller because only the UI layer
     /// knows whether compatible headphones are currently available and whether the user enabled that preference.
-    /// Speech preferences are copied at start so mid-workout settings edits do not change feedback unexpectedly.
+    /// Speech and detector preferences are copied at start so mid-workout settings edits do not change feedback or counting unexpectedly.
     func start(
         goalType: GoalType,
         goalValue: Int,
         preferLocalHeadphonesOverWatch: Bool = false,
         shouldSpeakJumpCountAnnouncements: Bool = true,
-        shouldSpeakJumpTimeAnnouncements: Bool = true
+        shouldSpeakJumpTimeAnnouncements: Bool = true,
+        jumpDetectorThresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage
     ) {
         cancelPendingSpeech()
         let generation = beginSessionAttempt()
@@ -42,7 +43,8 @@ extension JumpRecState {
                 jumpCount: Int64(goalType == .count ? goalValue : 0),
                 jumpTime: Int64(goalType == .time ? goalValue : 0),
                 shouldSpeakJumpCountAnnouncements: shouldSpeakJumpCountAnnouncements,
-                shouldSpeakJumpTimeAnnouncements: shouldSpeakJumpTimeAnnouncements
+                shouldSpeakJumpTimeAnnouncements: shouldSpeakJumpTimeAnnouncements,
+                jumpDetectorThresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage
             )
 
             companionWorkoutStartTask = Task { [weak self, workoutMirrorManager] in
@@ -64,6 +66,7 @@ extension JumpRecState {
                     startLocalSession(
                         goalType: goalType,
                         goalValue: goalValue,
+                        thresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage,
                         generation: generation
                     )
                 }
@@ -71,7 +74,12 @@ extension JumpRecState {
             return
         }
 
-        startLocalSession(goalType: goalType, goalValue: goalValue, generation: generation)
+        startLocalSession(
+            goalType: goalType,
+            goalValue: goalValue,
+            thresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage,
+            generation: generation
+        )
     }
 
     /// Finishes the active local session and persists its results.
@@ -173,7 +181,12 @@ extension JumpRecState {
     }
 
     /// Starts a session that is tracked directly on the iPhone.
-    private func startLocalSession(goalType: GoalType, goalValue: Int, generation: UUID) {
+    private func startLocalSession(
+        goalType: GoalType,
+        goalValue: Int,
+        thresholdAdjustmentPercentage: Double,
+        generation: UUID
+    ) {
         guard sessionGeneration == generation else { return }
 
         companionWorkoutStartTask?.cancel()
@@ -192,7 +205,7 @@ extension JumpRecState {
         isMirroredWatchSession = false
         pendingMirroredStart = false
         sessionState = .active
-        motionManager?.startTracking()
+        motionManager?.startTracking(thresholdAdjustmentPercentage: thresholdAdjustmentPercentage)
         // Start minute announcements for every session so users hear elapsed time
         // even when the selected goal is jump-based. Goal completion still remains
         // controlled by `isGoalReached(referenceDate:)`.

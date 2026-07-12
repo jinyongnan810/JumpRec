@@ -37,7 +37,8 @@ struct ContentView: View {
                         goalValue: settings.goalCount,
                         preferLocalHeadphonesOverWatch: settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable,
                         shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
-                        shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements
+                        shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
+                        jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
                     )
                 }
                 .tabItem {
@@ -100,6 +101,9 @@ struct ContentView: View {
             syncSettingsToWatch()
         }
         .onChange(of: settings.shouldSpeakJumpTimeAnnouncements) { _, _ in
+            syncSettingsToWatch()
+        }
+        .onChange(of: settings.jumpDetectorThresholdAdjustmentPercentage) { _, _ in
             syncSettingsToWatch()
         }
         .onChange(of: appState.completedSession?.id) { _, _ in
@@ -167,7 +171,8 @@ struct ContentView: View {
             jumpCount: settings.jumpCount,
             jumpTime: settings.jumpTime,
             shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
-            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements
+            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
+            jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
         )
     }
 
