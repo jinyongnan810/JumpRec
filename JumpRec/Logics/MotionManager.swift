@@ -109,10 +109,17 @@ final class MotionManager: NSObject {
         phoneMotionManager.deviceMotionUpdateInterval = updateInterval
     }
 
-    /// Stops route-change observation when the manager is released.
+    /// Stops route-change observation and Core Motion callbacks when the manager is released.
     isolated deinit {
         NotificationCenter.default.removeObserver(self)
         headphoneActivityManager.stopStatusUpdates()
+        headphoneMotionManager.stopDeviceMotionUpdates()
+        headphoneMotionManager.stopConnectionStatusUpdates()
+        headphoneMotionManager.delegate = nil
+        // Core Motion may already have enqueued sample or status callbacks when teardown begins.
+        // Cancelling the serial queue prevents stale work from touching this manager after its
+        // system observers and delegates have been disconnected.
+        queue.cancelAllOperations()
     }
 
     // MARK: - Availability
