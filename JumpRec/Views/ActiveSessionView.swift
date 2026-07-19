@@ -223,6 +223,8 @@ struct ActiveSessionView: View {
 
                 settingsButton
             }
+            
+            Spacer()
 
             // Hero Ring with progress
             HeroRingView(
@@ -248,7 +250,7 @@ struct ActiveSessionView: View {
             GlassSlider(
                 text: stopSliderText,
                 iconName: "stop.fill",
-                config: GlassSlider.Config(tint: stopSliderTint, size: 64),
+                config: GlassSlider.Config(tint: stopSliderTint, size: 80),
                 onProgressChanged: { _ in },
                 onFinished: {
                     // Mirrored sessions are owned by watchOS. The phone mirrors state only,
