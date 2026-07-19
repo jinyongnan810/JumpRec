@@ -11,8 +11,8 @@ extension JumpRecState {
 
     /// Starts a new watch-tracked workout session.
     ///
-    /// Speech and detector preferences are copied into session state so the current workout keeps
-    /// stable behavior even if settings sync while the user is jumping.
+    /// Speech and detector preferences seed session state at start and can later be
+    /// refreshed when settings sync from the paired iPhone during a workout.
     func start(
         goalType: GoalType,
         goalCount: Int,
@@ -62,6 +62,54 @@ extension JumpRecState {
             shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
             jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
         )
+    }
+
+    /// Applies synced settings edits to the active watch workout.
+    ///
+    /// iPhone can present settings while a mirrored Watch workout is running. Updating
+    /// these session fields lets a changed goal, muted cue, or detector threshold affect
+    /// the workout in progress without resetting HealthKit collection or jump history.
+    func applyActiveSessionSettings(
+        goalType: GoalType,
+        goalCount: Int,
+        shouldSpeakJumpCountAnnouncements: Bool,
+        shouldSpeakJumpTimeAnnouncements: Bool,
+        jumpDetectorThresholdAdjustmentPercentage: Double
+    ) {
+        guard jumpState == .jumping else { return }
+
+        self.goalType = goalType
+        sessionShouldSpeakJumpCountAnnouncements = shouldSpeakJumpCountAnnouncements
+        sessionShouldSpeakJumpTimeAnnouncements = shouldSpeakJumpTimeAnnouncements
+        switch goalType {
+        case .count:
+            goal = goalCount
+        case .time:
+            goal = goalCount * 60
+        @unknown default:
+            goal = goalCount
+        }
+        motionManager?.updateThresholdAdjustmentPercentage(jumpDetectorThresholdAdjustmentPercentage)
+        endIfUpdatedGoalIsReached()
+    }
+
+    /// Ends the current workout if the newly edited goal is already satisfied.
+    private func endIfUpdatedGoalIsReached() {
+        guard jumpState == .jumping else { return }
+
+        switch goalType {
+        case .count:
+            if jumpCount >= goal {
+                end()
+            }
+        case .time:
+            guard let startTime else { return }
+            if Int(Date().timeIntervalSince(startTime)) >= goal {
+                end()
+            }
+        @unknown default:
+            break
+        }
     }
 
     /// Ends the current watch workout and sends the finalized results to the phone.

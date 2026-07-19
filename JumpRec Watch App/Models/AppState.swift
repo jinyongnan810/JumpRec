@@ -52,12 +52,12 @@ class JumpRecState: NSObject {
     var goalType: GoalType = .count
     /// Stores the active goal value: jumps for count goals, seconds for time goals after converting from the minute-based setting.
     var goal: Int = 0
-    /// Freezes the jump-count speech preference for the active watch session.
+    /// Stores whether jump-count announcements should play for the active watch session.
     ///
-    /// The value is copied from shared settings when the workout starts so a later
-    /// settings sync does not change spoken feedback halfway through the workout.
+    /// The value is seeded from shared settings when the workout starts and refreshed
+    /// when the paired iPhone sends an in-session settings update.
     var sessionShouldSpeakJumpCountAnnouncements = true
-    /// Freezes the elapsed-time speech preference for the active watch session.
+    /// Stores whether elapsed-time announcements should play for the active watch session.
     ///
     /// The minute timer still drives time-goal completion when this is disabled; only
     /// the spoken progress cue is muted.
@@ -126,5 +126,45 @@ class JumpRecState: NSObject {
         // The synthesizer delegate releases the speech audio session after each spoken
         // prompt so the watch only ducks other audio while it is actively speaking.
         synthesizer.delegate = self
+        NotificationCenter.default.addObserver(
+            forName: .jumpRecSettingsDidUpdate,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            // WatchConnectivity writes the latest settings to shared storage before posting
+            // this notification. App state reads the small snapshot directly here so it does
+            // not create extra observable settings objects just to update a running workout.
+            Task { @MainActor [weak self] in
+                self?.applySyncedSettingsFromStore()
+            }
+        }
+    }
+
+    /// Reads the latest synced settings snapshot and applies it to a running workout.
+    ///
+    /// This intentionally mirrors `JumpRecSettings.loadSettings()` for the small subset
+    /// needed by active sessions, while avoiding construction of a new observable settings
+    /// object from inside every WatchConnectivity notification.
+    private func applySyncedSettingsFromStore() {
+        let store = NSUbiquitousKeyValueStore.default
+        store.synchronize()
+
+        let goalType: GoalType = store.string(forKey: "goalType") == GoalType.time.rawValue ? .time : .count
+        let storedJumpCount = store.longLong(forKey: "jumpCount")
+        let storedJumpTime = store.longLong(forKey: "jumpTime")
+        let jumpCount = storedJumpCount == 0 ? DefaultJumpCount : storedJumpCount
+        let jumpTime = storedJumpTime == 0 ? DefaultJumpTime : storedJumpTime
+        let shouldSpeakJumpCountAnnouncements = store.object(forKey: "shouldSpeakJumpCountAnnouncements") as? Bool ?? true
+        let shouldSpeakJumpTimeAnnouncements = store.object(forKey: "shouldSpeakJumpTimeAnnouncements") as? Bool ?? true
+        let thresholdAdjustmentPercentage = (store.object(forKey: "jumpDetectorThresholdAdjustmentPercentage") as? NSNumber)?.doubleValue
+            ?? DefaultJumpDetectorThresholdAdjustmentPercentage
+
+        applyActiveSessionSettings(
+            goalType: goalType,
+            goalCount: Int(goalType == .count ? jumpCount : jumpTime),
+            shouldSpeakJumpCountAnnouncements: shouldSpeakJumpCountAnnouncements,
+            shouldSpeakJumpTimeAnnouncements: shouldSpeakJumpTimeAnnouncements,
+            jumpDetectorThresholdAdjustmentPercentage: JumpRecSettings.clampedJumpDetectorThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+        )
     }
 }

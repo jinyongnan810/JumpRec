@@ -7,8 +7,11 @@ import SwiftUI
 
 /// Shows live progress, metrics, and controls while a session is running.
 struct ActiveSessionView: View {
-    /// The persisted app settings used as a fallback for goal display.
-    var settings: JumpRecSettings
+    /// Matches the home-screen settings transition source so both entry points feel like the same settings surface.
+    private static let settingsTransitionID = "settings"
+
+    /// The persisted app settings used as a fallback for goal display and edited from the in-session settings sheet.
+    @Bindable var settings: JumpRecSettings
     /// The observable app state driving live session updates.
     @Bindable var appState: JumpRecState
     /// Stops the current local session.
@@ -16,6 +19,10 @@ struct ActiveSessionView: View {
 
     // MARK: - View State
 
+    /// Controls presentation of the settings sheet while the session continues running behind it.
+    @State private var showSettingsView = false
+    /// Coordinates the gear-button zoom transition with the presented settings sheet.
+    @Namespace private var navigationTransitionNamespace
     /// Tracks the current time for live elapsed-time updates.
     @State private var now = Date()
     /// Animates the progress ring fill.
@@ -192,18 +199,29 @@ struct ActiveSessionView: View {
     var body: some View {
         VStack(spacing: 28) {
             // Header
-            VStack(spacing: 4) {
-                HStack(spacing: 8) {
-                    Text("JumpRec")
-                        .font(AppFonts.screenTitle)
-                        .foregroundStyle(AppColors.textPrimary)
+            HStack(alignment: .top, spacing: 12) {
+                // Reserve the same width as the trailing settings control so the title
+                // remains optically centered instead of shifting left when the gear appears.
+                Color.clear
+                    .frame(width: 44, height: 44)
+                    .accessibilityHidden(true)
 
-                    deviceSourceBadge
+                VStack(spacing: 4) {
+                    HStack(spacing: 8) {
+                        Text("JumpRec")
+                            .font(AppFonts.screenTitle)
+                            .foregroundStyle(AppColors.textPrimary)
+
+                        deviceSourceBadge
+                    }
+
+                    Label(goalText, systemImage: "target")
+                        .font(AppFonts.heroRingSubtitle)
+                        .foregroundStyle(AppColors.accent)
                 }
+                .frame(maxWidth: .infinity)
 
-                Label(goalText, systemImage: "target")
-                    .font(AppFonts.heroRingSubtitle)
-                    .foregroundStyle(AppColors.accent)
+                settingsButton
             }
 
             // Hero Ring with progress
@@ -251,6 +269,13 @@ struct ActiveSessionView: View {
             }
         }
         .padding(.horizontal, 24)
+        .sheet(isPresented: $showSettingsView) {
+            SettingsView(settings: settings)
+                .navigationTransition(.zoom(sourceID: Self.settingsTransitionID, in: navigationTransitionNamespace))
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(AppColors.cardSurface)
+        }
         .task {
             syncHeroRing(animated: false)
             while !Task.isCancelled, appState.sessionState == .active {
@@ -275,6 +300,19 @@ struct ActiveSessionView: View {
     }
 
     // MARK: - Private Subviews
+
+    /// Opens the same settings sheet available before a session starts.
+    private var settingsButton: some View {
+        Button {
+            showSettingsView = true
+        } label: {
+            Label("Settings", systemImage: "gearshape")
+                .labelStyle(.iconOnly)
+                .frame(width: 44, height: 44)
+        }
+        .tint(.primary)
+        .matchedTransitionSource(id: Self.settingsTransitionID, in: navigationTransitionNamespace)
+    }
 
     /// Shows the active motion source as an icon-only badge in the header.
     private var deviceSourceBadge: some View {

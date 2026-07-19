@@ -273,6 +273,13 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         } catch {
             print("[WatchConnectivityManager] Failed to update goal settings application context: \(error.localizedDescription)")
         }
+
+        guard session.isReachable else { return }
+        // Application context preserves the latest settings for eventual delivery. A reachable
+        // message gives an active Watch workout the same update immediately when both apps are awake.
+        session.sendMessage(payload, replyHandler: nil) { error in
+            print("[WatchConnectivityManager] Failed to send immediate goal settings message: \(error.localizedDescription)")
+        }
     }
 
     /// Persists a parsed goal-settings payload and notifies main-actor observers.

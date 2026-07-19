@@ -89,22 +89,22 @@ struct ContentView: View {
             }
         }
         .onChange(of: settings.goalType) { _, _ in
-            syncSettingsToWatch()
+            applySettingsChange()
         }
         .onChange(of: settings.jumpCount) { _, _ in
-            syncSettingsToWatch()
+            applySettingsChange()
         }
         .onChange(of: settings.jumpTime) { _, _ in
-            syncSettingsToWatch()
+            applySettingsChange()
         }
         .onChange(of: settings.shouldSpeakJumpCountAnnouncements) { _, _ in
-            syncSettingsToWatch()
+            applySettingsChange()
         }
         .onChange(of: settings.shouldSpeakJumpTimeAnnouncements) { _, _ in
-            syncSettingsToWatch()
+            applySettingsChange()
         }
         .onChange(of: settings.jumpDetectorThresholdAdjustmentPercentage) { _, _ in
-            syncSettingsToWatch()
+            applySettingsChange()
         }
         .onChange(of: appState.completedSession?.id) { _, _ in
             recordQualifiedCompletedSessionIfNeeded()
@@ -163,6 +163,23 @@ struct ContentView: View {
         // starts, warmups, and short test sessions do not quickly exhaust the request threshold.
         guard completedSession.jumpCount > 99 else { return }
         qualifiedFinishedSessionCount += 1
+    }
+
+    /// Applies a persisted settings edit to every active consumer.
+    ///
+    /// Settings can be changed from the active-session sheet, so this helper updates the
+    /// running iPhone session first and also sends the latest payload to Apple Watch. When
+    /// the current session is mirrored, the phone updates its displayed goal immediately
+    /// while the Watch receives the same change through WatchConnectivity.
+    private func applySettingsChange() {
+        appState.applyActiveSessionSettings(
+            goalType: settings.goalType,
+            goalValue: settings.goalCount,
+            shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
+            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
+            jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
+        )
+        syncSettingsToWatch()
     }
 
     private func syncSettingsToWatch() {

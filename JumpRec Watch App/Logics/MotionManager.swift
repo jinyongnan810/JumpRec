@@ -85,8 +85,9 @@ class MotionManager: NSObject {
 
         workoutManager.startWorkout(startDate: startDate, goalType: goalType, goalValue: goalValue)
 
-        // Apply tuning before `resetSession()` so the detector starts the workout with a stable threshold.
-        jumpDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+        // Apply the current tuning before `resetSession()` so the detector starts
+        // the workout with the same setting shown by the current settings state.
+        updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
         resetSession()
         isTracking = true
         motionRecording = [csvHeader]
@@ -96,6 +97,14 @@ class MotionManager: NSObject {
             guard let self, let motion else { return }
             processMotionData(motion)
         }
+    }
+
+    /// Updates detector sensitivity for future samples without clearing current workout progress.
+    ///
+    /// The settings sheet can change this while a workout is running. Updating only the
+    /// threshold keeps the existing jump count, CSV rows, and refractory timing intact.
+    func updateThresholdAdjustmentPercentage(_ percentage: Double) {
+        jumpDetector.updateThresholdAdjustmentPercentage(percentage)
     }
 
     /// Stop motion tracking

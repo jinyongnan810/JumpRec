@@ -13,7 +13,7 @@ extension JumpRecState {
     ///
     /// `preferLocalHeadphonesOverWatch` is intentionally evaluated by the caller because only the UI layer
     /// knows whether compatible headphones are currently available and whether the user enabled that preference.
-    /// Speech and detector preferences are copied at start so mid-workout settings edits do not change feedback or counting unexpectedly.
+    /// The remaining preferences seed session state at start and can later be refreshed by in-session settings edits.
     func start(
         goalType: GoalType,
         goalValue: Int,
@@ -80,6 +80,34 @@ extension JumpRecState {
             thresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage,
             generation: generation
         )
+    }
+
+    /// Applies settings edits to the workout that is already on screen.
+    ///
+    /// The start flow still captures a snapshot so startup is deterministic, but the active-session
+    /// settings sheet intentionally lets users correct a goal, mute cues, or tune detection without
+    /// stopping the workout. Mirrored Watch sessions update the phone UI immediately while the Watch
+    /// receives the same settings through WatchConnectivity and remains the authority for ending.
+    func applyActiveSessionSettings(
+        goalType: GoalType,
+        goalValue: Int,
+        shouldSpeakJumpCountAnnouncements: Bool,
+        shouldSpeakJumpTimeAnnouncements: Bool,
+        jumpDetectorThresholdAdjustmentPercentage: Double
+    ) {
+        guard sessionState == .active else { return }
+
+        sessionGoalType = goalType
+        sessionGoalValue = goalValue
+        sessionShouldSpeakJumpCountAnnouncements = shouldSpeakJumpCountAnnouncements
+        sessionShouldSpeakJumpTimeAnnouncements = shouldSpeakJumpTimeAnnouncements
+
+        if !isMirroredWatchSession {
+            motionManager?.updateThresholdAdjustmentPercentage(jumpDetectorThresholdAdjustmentPercentage)
+            finishIfGoalReached()
+        }
+
+        syncLiveActivity()
     }
 
     /// Finishes the active local session and persists its results.

@@ -27,7 +27,8 @@ struct MainView: View {
                                 goalType: settings.goalType,
                                 goalCount: settings.goalCount,
                                 shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
-                                shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements
+                                shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
+                                jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
                             )
                     })
             case .finished:

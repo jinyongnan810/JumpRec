@@ -162,9 +162,9 @@ final class MotionManager: NSObject {
         guard !isTracking else { return }
 
         isTracking = true
-        // Apply the setting before samples start flowing so every detector keeps a stable threshold for this session.
-        phoneDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
-        headphoneDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+        // Apply the current tuning before samples start flowing so the detector begins
+        // the session with the same setting the user saw on the start screen.
+        updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
         // Reset detector state at session start so old peaks / cadence hints do not bleed into a new workout.
         phoneDetector.reset()
         headphoneDetector.reset()
@@ -178,6 +178,16 @@ final class MotionManager: NSObject {
         startPhoneMotionUpdatesIfAvailable()
         startHeadphoneMonitoringIfAvailable()
         updatePreferredSourceIfNeeded()
+    }
+
+    /// Updates detector sensitivity for subsequent motion samples without resetting current session state.
+    ///
+    /// This is used by the in-session settings sheet. Changing the threshold should affect
+    /// new samples immediately, but it must not clear refractory state, recorded samples, or
+    /// the user's current jump count.
+    func updateThresholdAdjustmentPercentage(_ percentage: Double) {
+        phoneDetector.updateThresholdAdjustmentPercentage(percentage)
+        headphoneDetector.updateThresholdAdjustmentPercentage(percentage)
     }
 
     /// Stops local motion tracking and clears the active preferred source.

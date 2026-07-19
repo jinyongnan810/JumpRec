@@ -47,15 +47,15 @@ final class JumpRecState: NSObject {
     var sessionGoalValue: Int?
     /// Indicates whether the current session is being mirrored from Apple Watch.
     var isMirroredWatchSession = false
-    /// Freezes the jump-count speech preference for the active local session.
+    /// Stores whether jump-count announcements should play for the active local session.
     ///
-    /// Settings can change while a workout is running, but session feedback should stay
-    /// predictable from start to finish. The start flow copies the current setting here.
+    /// The start flow seeds this from settings, and the active-session settings sheet can
+    /// refresh it while a workout is running so feedback changes take effect immediately.
     var sessionShouldSpeakJumpCountAnnouncements = true
-    /// Freezes the elapsed-time speech preference for the active local session.
+    /// Stores whether elapsed-time announcements should play for the active local session.
     ///
     /// Goal completion and haptics still run when this is disabled; only spoken minute
-    /// cues are muted for the session that is already in progress.
+    /// cues are muted for the current session.
     var sessionShouldSpeakJumpTimeAnnouncements = true
     /// Stores the saved session shown on the completion screen.
     var completedSession: JumpSession?

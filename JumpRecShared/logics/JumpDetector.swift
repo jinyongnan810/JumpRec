@@ -127,9 +127,9 @@ public final class JumpDetector {
     private var thresholdAdjustmentPercentage: Double
     /// Cached threshold used by the hot sample-processing path.
     ///
-    /// Motion samples arrive many times per second, while settings change only at
-    /// session boundaries. Caching keeps `thresholdSatisfied(value:)` to a direct
-    /// comparison and makes that lifecycle assumption explicit.
+    /// Motion samples arrive many times per second, while settings change rarely.
+    /// Caching keeps `thresholdSatisfied(value:)` to a direct comparison even when
+    /// the active-session settings sheet updates the threshold during a workout.
     private var adjustedThreshold: Double
     /// Timestamp of the last jump that passed threshold and refractory checks.
     private var lastAcceptedJumpTimestamp: TimeInterval?
@@ -159,8 +159,8 @@ public final class JumpDetector {
 
     /// Updates the relative threshold adjustment used for subsequent samples.
     ///
-    /// Callers set this at session start so a workout uses one stable sensitivity value
-    /// even if settings are changed later while motion samples are still arriving.
+    /// Callers use this at session start and when the active-session settings sheet changes sensitivity.
+    /// The update affects future samples without clearing the detector's timing state.
     public func updateThresholdAdjustmentPercentage(_ percentage: Double) {
         thresholdAdjustmentPercentage = Self.clampedThresholdAdjustmentPercentage(percentage)
         adjustedThreshold = Self.adjustedThreshold(
@@ -230,9 +230,9 @@ public final class JumpDetector {
     private func thresholdSatisfied(value: Double) -> Bool {
         switch config.polarity {
         case .positivePeak, .positiveMagnitude:
-            return value > adjustedThreshold
+            value > adjustedThreshold
         case .negativeTrough:
-            return value < adjustedThreshold
+            value < adjustedThreshold
         }
     }
 

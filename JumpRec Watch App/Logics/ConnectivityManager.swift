@@ -65,6 +65,12 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    /// Applies reachable settings messages from the iPhone app.
+    nonisolated func session(_: WCSession, didReceiveMessage message: [String: Any]) {
+        print("[WatchConnectivityManager] Received message: \(message)")
+        parseSettingsPayload(message)
+    }
+
     /// Sends a reachable message directly to the iPhone app.
     func sendMessage(_ message: [String: Any]) {
         guard session.isReachable else {
