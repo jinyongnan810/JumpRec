@@ -64,9 +64,12 @@ public final class JumpDetector {
     private struct Config {
         /// The device profile this config belongs to.
         let profile: JumpDeviceProfile
-        /// The raw `MotionSample` axis to inspect.
+        /// The raw `MotionSample` signal to inspect.
+        ///
+        /// Axis values are useful when a device has a predictable placement, while `.magnitude`
+        /// keeps detection independent from how the user rotates or holds the device.
         let axis: JumpDetectorAxis
-        /// The extremum direction that represents a jump on the selected axis.
+        /// The extremum direction that represents a jump on the selected signal.
         let polarity: JumpDetectorPolarity
         /// The default raw acceleration threshold that must be crossed to count a jump.
         ///
@@ -81,8 +84,8 @@ public final class JumpDetector {
             case .iPhonePocket:
                 Config(
                     profile: .iPhonePocket,
-                    axis: .y,
-                    polarity: .positivePeak,
+                    axis: .magnitude,
+                    polarity: .positiveMagnitude,
                     threshold: 1.2,
                     minimumInterval: 0.25
                 )
@@ -170,7 +173,7 @@ public final class JumpDetector {
     }
 
     /// Processes one raw motion sample.
-    /// The detector only inspects the configured raw acceleration axis and threshold for the profile.
+    /// The detector inspects the configured raw acceleration signal and threshold for the profile.
     public func processMotionSample(_ sample: MotionSample) -> Bool {
         let value = axisValue(from: sample, axis: config.axis)
         let isCandidate = thresholdSatisfied(value: value)
@@ -208,7 +211,7 @@ public final class JumpDetector {
 
     // MARK: - Private Helpers
 
-    /// Reads the requested raw acceleration axis from a sample.
+    /// Reads the requested raw acceleration signal from a sample.
     private func axisValue(from sample: MotionSample, axis: JumpDetectorAxis) -> Double {
         switch axis {
         case .x:

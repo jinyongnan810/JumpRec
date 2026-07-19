@@ -223,7 +223,7 @@ struct ActiveSessionView: View {
 
                 settingsButton
             }
-            
+
             Spacer()
 
             // Hero Ring with progress
