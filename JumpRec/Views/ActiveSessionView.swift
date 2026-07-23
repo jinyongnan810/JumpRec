@@ -276,6 +276,7 @@ struct ActiveSessionView: View {
                 .navigationTransition(.zoom(sourceID: Self.settingsTransitionID, in: navigationTransitionNamespace))
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
+                .presentationContentInteraction(.scrolls)
                 .presentationBackground(AppColors.cardSurface)
         }
         .task {

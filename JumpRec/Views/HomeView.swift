@@ -163,6 +163,7 @@ struct HomeView: View {
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
                     .presentationBackground(AppColors.cardSurface)
+                    .presentationContentInteraction(.scrolls)
             }
             .onDisappear {
                 countdownTask?.cancel()

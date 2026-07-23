@@ -102,6 +102,7 @@ struct HistoryView: View {
                     .presentationDetents([.large, .medium])
                     .presentationDragIndicator(.visible)
                     .presentationBackground(AppColors.cardSurface)
+                    .presentationContentInteraction(.scrolls)
             }
             .deleteSessionAlert(
                 isPresented: $showingDeleteConfirmation,
