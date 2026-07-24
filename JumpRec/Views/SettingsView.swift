@@ -21,6 +21,8 @@ struct SettingsView: View {
     @State private var countValue: Int64 = DefaultJumpCount
     /// Tracks the editable time goal value in minutes.
     @State private var timeValue: Int64 = DefaultJumpTime
+    /// Controls local popover presentation for detector sensitivity explanation.
+    @State private var isShowingSensitivityExplanation = false
     /// Reveals the sheet controls in the same order that the user reads and interacts with them.
     @State private var hasContentAppeared = false
 
@@ -107,55 +109,59 @@ struct SettingsView: View {
         }
     }
 
-    /// Lets the user tune jump counting without exposing raw acceleration thresholds.
+    /// Lets the user tune jump counting sensitivity without exposing raw acceleration thresholds.
     private var jumpDetectionSection: some View {
         settingsSection(title: String(localized: "Jump Detection")) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .firstTextBaseline) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Threshold Adjustment")
-                            .font(AppFonts.cardTitle)
-                            .foregroundStyle(AppColors.textPrimary)
+                    Button {
+                        isShowingSensitivityExplanation = true
+                    } label: {
+                        HStack(spacing: 6) {
+                            Text(String(localized: "Detection Sensitivity"))
+                                .font(AppFonts.cardTitle)
+                                .foregroundStyle(AppColors.textPrimary)
 
-                        Text("If there are many false detections, try make the threshold higher. ")
-                            .font(AppFonts.bodySmall)
-                            .foregroundStyle(AppColors.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
+                            Image(systemName: "info.circle.fill")
+                                .font(AppFonts.smallValue)
+                                .foregroundStyle(AppColors.textMuted)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint(Text(String(localized: "Shows an explanation for detection sensitivity.")))
+                    .popover(isPresented: $isShowingSensitivityExplanation) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text(String(localized: "If there are false detections, try lowering the sensitivity."))
+                                .font(AppFonts.bodySmall)
+                                .fixedSize(horizontal: false, vertical: true)
 
-                        Text("If jumps are not detected, try lowering the threshold.")
-                            .font(AppFonts.bodySmall)
-                            .foregroundStyle(AppColors.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
+                            Text(String(localized: "If jumps are not detected, try increasing the sensitivity."))
+                                .font(AppFonts.bodySmall)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(16)
+                        .frame(maxWidth: 400, alignment: .leading)
+                        .presentationCompactAdaptation(.popover)
                     }
 
                     Spacer(minLength: 12)
 
                     Text(thresholdAdjustmentDisplayValue)
-                        .font(AppFonts.metricDetailMonospaced)
+                        .font(AppFonts.detailValue)
                         .foregroundStyle(AppColors.accent)
-                        .contentTransition(.numericText())
                         .animation(.bouncy, value: thresholdAdjustmentDisplayValue)
                         .accessibilityHidden(true)
                 }
 
                 Slider(
-                    value: $settings.jumpDetectorThresholdAdjustmentPercentage,
+                    value: sensitivitySliderBinding,
                     in: MinimumJumpDetectorThresholdAdjustmentPercentage ... MaximumJumpDetectorThresholdAdjustmentPercentage,
                     step: 5
                 )
                 .tint(AppColors.accent)
-                .accessibilityLabel(Text("Threshold adjustment"))
+                .accessibilityLabel(Text(String(localized: "Detection sensitivity")))
                 .accessibilityValue(Text(thresholdAdjustmentAccessibilityValue))
-                .accessibilityHint(Text("Adjusts every detector threshold as a percentage of its default value."))
-
-                HStack {
-                    Text("より敏感")
-                    Spacer()
-                    Text("より鈍感")
-                }
-                .font(AppFonts.supportingMonospaced)
-                .foregroundStyle(AppColors.textMuted)
-                .accessibilityHidden(true)
+                .accessibilityHint(Text(String(localized: "Adjusts jump detection sensitivity.")))
             }
         }
     }
@@ -300,21 +306,40 @@ struct SettingsView: View {
 
     // MARK: - Helpers
 
-    /// Formats the detector threshold adjustment with a sign so neutral and tuned states are easy to scan.
-    private var thresholdAdjustmentDisplayValue: String {
-        let roundedPercentage = Int(settings.jumpDetectorThresholdAdjustmentPercentage.rounded())
-        if roundedPercentage > 0 {
-            return "+\(roundedPercentage)%"
-        }
-        return "\(roundedPercentage)%"
+    /// Binds the UI slider to the stored threshold adjustment percentage, inverting the sign
+    /// so that moving the slider to the right increases sensitivity (lower acceleration threshold).
+    private var sensitivitySliderBinding: Binding<Double> {
+        Binding(
+            get: { -settings.jumpDetectorThresholdAdjustmentPercentage },
+            set: { settings.jumpDetectorThresholdAdjustmentPercentage = -$0 }
+        )
     }
 
-    /// Formats the current threshold adjustment for assistive technologies.
+    /// Formats the detector sensitivity tier for display in the settings section.
+    ///
+    /// Maps internal percentage offsets (-50% to +50%) to human-readable sensitivity levels:
+    /// - Negative percentages lower acceleration threshold -> Higher sensitivity
+    /// - Positive percentages raise acceleration threshold -> Lower sensitivity
+    /// - Zero percentage represents standard default sensitivity
+    private var thresholdAdjustmentDisplayValue: String {
+        let roundedPercentage = Int(settings.jumpDetectorThresholdAdjustmentPercentage.rounded())
+        switch roundedPercentage {
+        case ..<(-20):
+            return String(localized: "High")
+        case -20 ... -5:
+            return String(localized: "Slightly High")
+        case 5 ... 20:
+            return String(localized: "Slightly Low")
+        case 21...:
+            return String(localized: "Low")
+        default:
+            return String(localized: "Standard")
+        }
+    }
+
+    /// Formats the current sensitivity tier for assistive technologies.
     private var thresholdAdjustmentAccessibilityValue: String {
-        String(
-            format: String(localized: "%@ threshold adjustment"),
-            thresholdAdjustmentDisplayValue
-        )
+        thresholdAdjustmentDisplayValue
     }
 
     /// Returns the value currently shown in the editor.

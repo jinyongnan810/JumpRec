@@ -54,7 +54,24 @@
         }
       }
     },
+    "%@ sensitivity adjustment" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ sensitivity adjustment"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ の感度調整"
+          }
+        }
+      }
+    },
     "%@ threshold adjustment" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -174,11 +191,28 @@
       }
     },
     "Adjusts every detector threshold as a percentage of its default value." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "各検出しきい値をデフォルト値に対する割合で調整します。"
+          }
+        }
+      }
+    },
+    "Adjusts jump detection sensitivity." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adjusts jump detection sensitivity."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ検出の感度を調整します。"
           }
         }
       }
@@ -553,6 +587,38 @@
         }
       }
     },
+    "Detection sensitivity" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detection sensitivity"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "検出感度"
+          }
+        }
+      }
+    },
+    "Detection Sensitivity" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detection Sensitivity"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "検出感度"
+          }
+        }
+      }
+    },
     "DONE" : {
       "localizations" : {
         "ja" : {
@@ -780,7 +846,24 @@
         }
       }
     },
+    "If jumps are not detected, try increasing the sensitivity." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If jumps are not detected, try increasing the sensitivity."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプが検知されない場合は、感度を高くしてみてください。"
+          }
+        }
+      }
+    },
     "If jumps are not detected, try lowering the threshold." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -790,7 +873,24 @@
         }
       }
     },
+    "If there are false detections, try lowering the sensitivity." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If there are false detections, try lowering the sensitivity."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "誤検知が多い場合は、感度を低くしてみてください。"
+          }
+        }
+      }
+    },
     "If there are many false detections, try make the threshold higher. " : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -1806,6 +1906,7 @@
       }
     },
     "Threshold adjustment" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -1816,6 +1917,7 @@
       }
     },
     "Threshold Adjustment" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -1940,11 +2042,101 @@
         }
       }
     },
-    "より敏感" : {
-
+    "High" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高め"
+          }
+        }
+      }
     },
-    "より鈍感" : {
-
+    "Low" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Low"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "低め"
+          }
+        }
+      }
+    },
+    "Slightly High" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slightly High"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "やや高め"
+          }
+        }
+      }
+    },
+    "Slightly Low" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slightly Low"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "やや低め"
+          }
+        }
+      }
+    },
+    "Shows an explanation for detection sensitivity." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows an explanation for detection sensitivity."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "検出感度の説明を表示します。"
+          }
+        }
+      }
+    },
+    "Standard" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標準"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"
