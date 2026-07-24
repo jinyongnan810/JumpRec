@@ -149,6 +149,7 @@ struct SettingsView: View {
                     Text(thresholdAdjustmentDisplayValue)
                         .font(AppFonts.detailValue)
                         .foregroundStyle(AppColors.accent)
+                        .contentTransition(.numericText())
                         .animation(.bouncy, value: thresholdAdjustmentDisplayValue)
                         .accessibilityHidden(true)
                 }
@@ -208,27 +209,9 @@ struct SettingsView: View {
         }
     }
 
-    /// Renders a settings row with a switch and explanatory copy.
-    ///
-    /// Keeping this as a helper avoids duplicating the typography and wrapping rules
-    /// across sections while still leaving each setting label close to its binding.
+    /// Renders a settings row with a switch toggle and an info mark icon that shows explanatory copy in a popover when tapped.
     private func settingsToggle(isOn: Binding<Bool>, title: String, description: String) -> some View {
-        Toggle(isOn: isOn) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(AppFonts.cardTitle)
-                    .foregroundStyle(AppColors.textPrimary)
-
-                Text(description)
-                    .font(AppFonts.bodySmall)
-                    .foregroundStyle(AppColors.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .toggleStyle(.switch)
-        .tint(AppColors.accent)
-        .accessibilityLabel(Text(title))
-        .accessibilityHint(Text(description))
+        SettingsToggleRow(isOn: isOn, title: title, description: description)
     }
 
     // MARK: - Segmented Control
@@ -433,6 +416,55 @@ struct SettingsView: View {
         UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(AppColors.accent)
         UISegmentedControl.appearance().setTitleTextAttributes(normalTextAttributes, for: .normal)
         UISegmentedControl.appearance().setTitleTextAttributes(selectedTextAttributes, for: .selected)
+    }
+}
+
+// MARK: - Settings Subviews
+
+/// Renders a toggle setting row with an info mark icon that reveals explanatory copy inside a popover.
+private struct SettingsToggleRow: View {
+    /// Binding controlling the toggle state.
+    @Binding var isOn: Bool
+    /// Title text displayed next to the info icon.
+    let title: String
+    /// Detailed description shown in the popover when the info icon is tapped.
+    let description: String
+
+    /// Controls local popover presentation for the setting description.
+    @State private var isShowingExplanation = false
+
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            Button {
+                isShowingExplanation = true
+            } label: {
+                HStack(spacing: 6) {
+                    Text(title)
+                        .font(AppFonts.cardTitle)
+                        .foregroundStyle(AppColors.textPrimary)
+
+                    Image(systemName: "info.circle.fill")
+                        .font(AppFonts.smallValue)
+                        .foregroundStyle(AppColors.textMuted)
+                }
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(Text(description))
+            .popover(isPresented: $isShowingExplanation) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(description)
+                        .font(AppFonts.bodySmall)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(16)
+                .frame(maxWidth: 280, alignment: .leading)
+                .presentationCompactAdaptation(.popover)
+            }
+        }
+        .toggleStyle(.switch)
+        .tint(AppColors.accent)
+        .accessibilityLabel(Text(title))
+        .accessibilityHint(Text(description))
     }
 }
 

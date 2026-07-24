@@ -55,6 +55,7 @@
       }
     },
     "%@ sensitivity adjustment" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -774,6 +775,22 @@
         }
       }
     },
+    "High" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高め"
+          }
+        }
+      }
+    },
     "Highest Jump Count" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1112,6 +1129,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最長ストリーク"
+          }
+        }
+      }
+    },
+    "Low" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Low"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "低め"
           }
         }
       }
@@ -1640,6 +1673,22 @@
         }
       }
     },
+    "Shows an explanation for detection sensitivity." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows an explanation for detection sensitivity."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "検出感度の説明を表示します。"
+          }
+        }
+      }
+    },
     "Shows an explanation for this metric." : {
       "localizations" : {
         "ja" : {
@@ -1681,6 +1730,38 @@
         }
       }
     },
+    "Slightly High" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slightly High"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "やや高め"
+          }
+        }
+      }
+    },
+    "Slightly Low" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slightly Low"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "やや低め"
+          }
+        }
+      }
+    },
     "Sneaky Burn" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1708,6 +1789,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプ時間を読み上げる"
+          }
+        }
+      }
+    },
+    "Standard" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標準"
           }
         }
       }
@@ -2038,102 +2135,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッション全体を通した、平均的なカロリー消費効率です。"
-          }
-        }
-      }
-    },
-    "High" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "High"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "高め"
-          }
-        }
-      }
-    },
-    "Low" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Low"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "低め"
-          }
-        }
-      }
-    },
-    "Slightly High" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Slightly High"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "やや高め"
-          }
-        }
-      }
-    },
-    "Slightly Low" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Slightly Low"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "やや低め"
-          }
-        }
-      }
-    },
-    "Shows an explanation for detection sensitivity." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shows an explanation for detection sensitivity."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "検出感度の説明を表示します。"
-          }
-        }
-      }
-    },
-    "Standard" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Standard"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "標準"
           }
         }
       }

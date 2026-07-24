@@ -89,7 +89,9 @@ When making changes, prioritize readability, maintainability, and safety over cl
 - Keep previews simple and useful.
 - Include multiple states when helpful, such as loading, error, empty, and populated.
 
-## Testing
+## Building and Testing
+- Do NOT run unit tests unless explicitly asked by the user.
+- Always use Xcode MCP tools (`xcode` server `BuildProject` tool) for building the project instead of running shell `xcodebuild` commands with custom output directories (which create unwanted `./build` folders in the repository root).
 - Prefer code that is easy to test.
 - Add or update tests for non-trivial logic when appropriate.
 - For bug fixes, consider adding a test that covers the regression.
