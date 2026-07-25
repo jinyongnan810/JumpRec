@@ -106,6 +106,15 @@ extension JumpRecState {
                 jumps.append(jumpOffset)
             }
         }
+        if let energyBurned = payload.energyBurned {
+            caloriesBurned = energyBurned
+        }
+        if let averageHeartRate = payload.averageHeartRate {
+            self.averageHeartRate = averageHeartRate
+        }
+        if let peakHeartRate = payload.peakHeartRate {
+            self.peakHeartRate = peakHeartRate
+        }
         syncLiveActivity()
     }
 

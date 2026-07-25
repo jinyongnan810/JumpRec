@@ -288,13 +288,17 @@ final class WorkoutManager: NSObject {
         }
     }
 
-    /// Sends a mirrored jump update to the iPhone companion app.
+    /// Sends a mirrored jump update to the iPhone companion app, including latest cumulative metrics.
     func sendJumpUpdate(jumpCount: Int, jumpOffset: TimeInterval) {
+        let totalEnergyBurned = currentEnergyBurned
         sendPayload(
             MirroredWorkoutPayload(
                 kind: .jump,
                 jumpCount: jumpCount,
-                jumpOffset: jumpOffset
+                jumpOffset: jumpOffset,
+                energyBurned: totalEnergyBurned,
+                averageHeartRate: averageHeartRate,
+                peakHeartRate: peakHeartRate
             )
         )
     }
@@ -389,18 +393,20 @@ final class WorkoutManager: NSObject {
     }
 
     /// Applies energy samples and mirrors the latest aggregate metrics to iPhone.
-    private func applyEnergyValues(_ energyValues: [Double]) {
-        for energyBurned in energyValues {
-            updateEnergyBurned(energyBurned)
-            sendPayload(
-                MirroredWorkoutPayload(
-                    kind: .metrics,
-                    energyBurned: energyBurned,
-                    averageHeartRate: averageHeartRate,
-                    peakHeartRate: peakHeartRate
-                )
+    private func applyEnergyValues(_: [Double]) {
+        // Send cumulative total active energy burned from HealthKit live workout builder
+        // rather than individual sample slices, ensuring the iPhone companion app
+        // receives a running total that updates live during the active session.
+        let totalEnergyBurned = currentEnergyBurned
+        updateEnergyBurned(totalEnergyBurned)
+        sendPayload(
+            MirroredWorkoutPayload(
+                kind: .metrics,
+                energyBurned: totalEnergyBurned,
+                averageHeartRate: averageHeartRate,
+                peakHeartRate: peakHeartRate
             )
-        }
+        )
     }
 
     /// Stops and releases HealthKit queries owned by the current workout.

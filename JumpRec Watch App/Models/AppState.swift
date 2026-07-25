@@ -120,7 +120,8 @@ class JumpRecState: NSObject {
             }
         }, updateEnergyBurned: { energyBurned in
             Task { @MainActor in
-                self.energyBurned += energyBurned
+                // Assign cumulative total active energy burned received from HealthKit
+                self.energyBurned = energyBurned
             }
         })
         // The synthesizer delegate releases the speech audio session after each spoken
