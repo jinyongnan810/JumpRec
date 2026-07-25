@@ -259,7 +259,7 @@ struct ActiveSessionView: View {
                     onStop()
                 }
             )
-            .allowsHitTesting(!appState.isMirroredWatchSession)
+            .disabled(appState.isMirroredWatchSession)
             .accessibilityLabel(Text(stopSliderText))
             .accessibilityHint(Text(stopSliderAccessibilityHint))
             .accessibilityAddTraits(appState.isMirroredWatchSession ? [] : .isButton)

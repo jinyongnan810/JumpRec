@@ -20,6 +20,9 @@ struct GlassSlider: View {
     let onProgressChanged: (CGFloat) -> Void
     let onFinished: () -> Void
 
+    /// Reads the standard SwiftUI environment `isEnabled` state to hide the interactive slider thumb icon when disabled.
+    @Environment(\.isEnabled) private var isEnabled
+
     @State private var offset: CGFloat = 0
 
     var body: some View {
@@ -63,35 +66,39 @@ struct GlassSlider: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                Image(systemName: iconName)
-                    .foregroundStyle(config.tint)
-                    .font(.title)
-                    .frame(width: config.size, height: config.size)
-                    .modifier(SliderThumbGlassEffect())
-                    .offset(x: offset)
-                    .gesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { value in
-                                let maxOffset = max(sliderWidth - config.size, 0)
-                                let cappedOffset = min(max(value.translation.width, 0), maxOffset)
+                // Hide the interactive thumb icon when the slider is disabled so users clearly see
+                // that sliding is unavailable (e.g. when mirroring an Apple Watch session).
+                if isEnabled {
+                    Image(systemName: iconName)
+                        .foregroundStyle(config.tint)
+                        .font(.title)
+                        .frame(width: config.size, height: config.size)
+                        .modifier(SliderThumbGlassEffect())
+                        .offset(x: offset)
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let maxOffset = max(sliderWidth - config.size, 0)
+                                    let cappedOffset = min(max(value.translation.width, 0), maxOffset)
 
-                                offset = cappedOffset
-                                onProgressChanged(maxOffset == 0 ? 0 : cappedOffset / maxOffset)
-                            }
-                            .onEnded { value in
-                                let maxOffset = max(sliderWidth - config.size, 0)
-                                let cappedOffset = min(max(value.translation.width, 0), maxOffset)
-
-                                if maxOffset > 0, cappedOffset >= maxOffset {
-                                    onFinished()
-                                    return
+                                    offset = cappedOffset
+                                    onProgressChanged(maxOffset == 0 ? 0 : cappedOffset / maxOffset)
                                 }
+                                .onEnded { value in
+                                    let maxOffset = max(sliderWidth - config.size, 0)
+                                    let cappedOffset = min(max(value.translation.width, 0), maxOffset)
 
-                                withAnimation {
-                                    offset = 0
+                                    if maxOffset > 0, cappedOffset >= maxOffset {
+                                        onFinished()
+                                        return
+                                    }
+
+                                    withAnimation {
+                                        offset = 0
+                                    }
                                 }
-                            }
-                    )
+                        )
+                }
             }
         }
         .frame(height: config.size)
@@ -142,4 +149,27 @@ private struct SliderThumbGlassEffect: ViewModifier {
                 }
         }
     }
+}
+
+#Preview {
+    VStack(spacing: 24) {
+        GlassSlider(
+            text: "STOP SESSION",
+            iconName: "stop.fill",
+            config: GlassSlider.Config(tint: .red, size: 80),
+            onProgressChanged: { _ in },
+            onFinished: {}
+        )
+
+        GlassSlider(
+            text: "STOP ON WATCH",
+            iconName: "stop.fill",
+            config: GlassSlider.Config(tint: .gray, size: 80),
+            onProgressChanged: { _ in },
+            onFinished: {}
+        )
+        .disabled(true)
+    }
+    .padding(24)
+    .background(Color.black)
 }
