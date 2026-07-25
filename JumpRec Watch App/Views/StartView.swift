@@ -131,7 +131,7 @@ struct StartView: View {
                 }
             }
             .navigationDestination(isPresented: $showSettings) {
-                GoalView()
+                SettingsView()
             }
         }
     }

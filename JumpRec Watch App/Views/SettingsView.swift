@@ -1,5 +1,5 @@
 //
-//  GoalView.swift
+//  SettingsView.swift
 //  JumpRec Watch App
 //
 //  Created by Yuunan kin on 2025/09/15.
@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Displays watch settings including goals, jump detection sensitivity, and audio cues.
-struct GoalView: View {
+struct SettingsView: View {
     /// Provides the persisted settings being edited.
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
@@ -410,6 +410,6 @@ struct TimeView: View {
 }
 
 #Preview {
-    GoalView()
+    SettingsView()
         .environment(JumpRecSettings())
 }
