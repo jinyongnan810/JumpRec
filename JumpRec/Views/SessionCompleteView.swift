@@ -149,6 +149,7 @@ struct SessionCompleteView: View {
                 .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
             }
             .padding(.horizontal, 24)
+            .padding(.top, 24)
         }
         .scrollIndicators(.hidden)
         .padding(.horizontal, 24)

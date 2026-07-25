@@ -1913,11 +1913,32 @@
       }
     },
     "Tap Start to begin" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "はじめるボタンでスタート"
+          }
+        }
+      }
+    },
+    "Tap to Start" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タップしてスタート"
+          }
+        }
+      }
+    },
+    "Tap to start or cancel session countdown." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タップしてカウントダウンを開始／キャンセル。"
           }
         }
       }

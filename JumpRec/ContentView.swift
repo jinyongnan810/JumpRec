@@ -30,17 +30,21 @@ struct ContentView: View {
             TabView(selection: $selectedTab) {
                 HomeView(
                     settings: settings,
-                    appState: appState
-                ) {
-                    appState.start(
-                        goalType: settings.goalType,
-                        goalValue: settings.goalCount,
-                        preferLocalHeadphonesOverWatch: settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable,
-                        shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
-                        shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
-                        jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
-                    )
-                }
+                    appState: appState,
+                    onStart: {
+                        appState.start(
+                            goalType: settings.goalType,
+                            goalValue: settings.goalCount,
+                            preferLocalHeadphonesOverWatch: settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable,
+                            shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
+                            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
+                            jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
+                        )
+                    },
+                    onStop: {
+                        appState.finish()
+                    }
+                )
                 .tabItem {
                     Label("Jump", systemImage: "figure.jumprope")
                 }
@@ -55,21 +59,13 @@ struct ContentView: View {
             .tint(AppColors.accent)
             .toolbarVisibility(appState.sessionState == .idle ? .visible : .hidden, for: .tabBar)
         }
-        .fullScreenCover(isPresented: isSessionFlowPresented) {
-            Group {
-                switch appState.sessionState {
-                case .starting, .idle:
-                    EmptyView()
-                case .active:
-                    ActiveSessionView(settings: settings, appState: appState) {
-                        appState.finish()
-                    }
-                case .complete:
-                    SessionCompleteView(appState: appState) {
-                        appState.reset()
-                    }
-                }
+        .sheet(isPresented: isSessionCompletePresented) {
+            SessionCompleteView(appState: appState) {
+                appState.reset()
             }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(AppColors.cardSurface)
         }
         .preferredColorScheme(.dark)
         .onAppear {
@@ -112,15 +108,11 @@ struct ContentView: View {
         }
     }
 
-    private var isSessionFlowPresented: Binding<Bool> {
+    /// Controls presentation of the post-workout summary sheet when a session finishes.
+    private var isSessionCompletePresented: Binding<Bool> {
         Binding(
             get: {
-                switch appState.sessionState {
-                case .active, .complete:
-                    true
-                case .idle, .starting:
-                    false
-                }
+                appState.sessionState == .complete
             },
             set: { isPresented in
                 if !isPresented {

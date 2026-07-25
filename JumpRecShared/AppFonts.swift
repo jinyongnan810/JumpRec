@@ -46,8 +46,8 @@ public enum AppFonts {
 
     public static let screenTitle = system(24, weight: .semibold)
     public static let screenTitleRegular = system(24)
-    public static let heroRingValue = rounded(48, weight: .bold)
-    public static let heroRingSubtitle = system(12, weight: .medium)
+    public static let heroRingValue = rounded(60, weight: .bold)
+    public static let heroRingSubtitle = system(14, weight: .medium)
     public static let primaryButtonLabel = system(15, weight: .semibold)
     public static let secondaryActionLabel = system(13, weight: .medium)
     public static let bodyLabel = system(14, weight: .medium)
