@@ -52,24 +52,25 @@ struct SettingsView: View {
                 }
                 .padding(.bottom, 8)
             }
-
-            Spacer(minLength: 0)
-
-            Button {
-                applyGoal()
-                dismiss()
-            } label: {
-                Text("Confirm")
-                    .font(AppFonts.primaryButtonLabel)
-                    .foregroundStyle(AppColors.bgPrimary)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
+            .safeAreaInset(edge: .bottom) {
+                // Floating confirmation button pinned to bottom edge, matching SessionCompleteView floating layout.
+                Button {
+                    applyGoal()
+                    dismiss()
+                } label: {
+                    Text("Confirm")
+                        .font(AppFonts.primaryButtonLabel)
+                        .foregroundStyle(AppColors.bgPrimary)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                }
+                .appGlassButton(prominent: true, tint: AppColors.accent)
+                .staggeredAppearance(isVisible: hasContentAppeared, index: 5)
+                .padding(.top, 12)
             }
-            .appGlassButton(prominent: true, tint: AppColors.accent)
-            .staggeredAppearance(isVisible: hasContentAppeared, index: 5)
         }
         .padding(.horizontal, 24)
-        .padding(.bottom, 32)
+        .padding(.bottom, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(AppColors.cardSurface)
         .onAppear {
