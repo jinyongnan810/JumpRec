@@ -80,6 +80,16 @@
         }
       }
     },
+    "Audio Settings" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音声設定"
+          }
+        }
+      }
+    },
     "cal" : {
 
     },
@@ -156,6 +166,16 @@
         }
       }
     },
+    "High" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高め"
+          }
+        }
+      }
+    },
     "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now." : {
 
     },
@@ -168,6 +188,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプ回数目標"
+          }
+        }
+      }
+    },
+    "Jump Detection" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ検出"
           }
         }
       }
@@ -191,6 +221,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプ"
+          }
+        }
+      }
+    },
+    "Low" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "低め"
           }
         }
       }
@@ -221,6 +261,16 @@
         }
       }
     },
+    "Sensitivity" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "感度"
+          }
+        }
+      }
+    },
     "SESSION COMPLETE" : {
       "localizations" : {
         "ja" : {
@@ -242,7 +292,64 @@
       }
     },
     "Settings" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
+          }
+        }
+      }
+    },
+    "Slightly High" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "やや高め"
+          }
+        }
+      }
+    },
+    "Slightly Low" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "やや低め"
+          }
+        }
+      }
+    },
+    "Speak Jump Count" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ回数を読み上げる"
+          }
+        }
+      }
+    },
+    "Speak Jump Time" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ時間を読み上げる"
+          }
+        }
+      }
+    },
+    "Standard" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標準"
+          }
+        }
+      }
     },
     "START" : {
       "localizations" : {

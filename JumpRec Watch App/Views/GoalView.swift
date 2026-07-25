@@ -7,15 +7,44 @@
 
 import SwiftUI
 
-/// Displays the watch goal selection menu.
+/// Displays watch settings including goals, jump detection sensitivity, and audio cues.
 struct GoalView: View {
     /// Provides the persisted settings being edited.
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
-    /// Renders the watch goal selection navigation.
+
+    /// Binds the UI slider to the stored threshold adjustment percentage, inverting the sign
+    /// so that moving the slider to the right increases sensitivity (lower acceleration threshold).
+    private var sensitivitySliderBinding: Binding<Double> {
+        Binding(
+            get: { -settings.jumpDetectorThresholdAdjustmentPercentage },
+            set: { settings.jumpDetectorThresholdAdjustmentPercentage = -$0 }
+        )
+    }
+
+    /// Formats the detector sensitivity tier for display in the settings section.
+    private var thresholdAdjustmentDisplayValue: String {
+        let roundedPercentage = Int(settings.jumpDetectorThresholdAdjustmentPercentage.rounded())
+        switch roundedPercentage {
+        case ..<(-20):
+            return String(localized: "High")
+        case -20 ... -5:
+            return String(localized: "Slightly High")
+        case 5 ... 20:
+            return String(localized: "Slightly Low")
+        case 21...:
+            return String(localized: "Low")
+        default:
+            return String(localized: "Standard")
+        }
+    }
+
+    /// Renders the watch settings list.
     var body: some View {
-        NavigationStack {
-            List {
+        @Bindable var settings = settings
+
+        List {
+            Section("Goal") {
                 NavigationLink {
                     CountView(
                         initialCount: settings.jumpCount
@@ -34,7 +63,6 @@ struct GoalView: View {
                         isSelected: settings.goalType == .count
                     )
                 }
-                .listRowBackground(AppColors.cardSurface)
 
                 NavigationLink {
                     TimeView(
@@ -54,10 +82,52 @@ struct GoalView: View {
                         isSelected: settings.goalType == .time
                     )
                 }
-                .listRowBackground(AppColors.cardSurface)
             }
-            .navigationTitle("Goal")
+
+            Section("Jump Detection") {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("Sensitivity")
+                            .font(AppFonts.watchBody)
+                            .foregroundStyle(AppColors.textPrimary)
+                        Spacer()
+                        Text(thresholdAdjustmentDisplayValue)
+                            .font(AppFonts.watchGoalChip)
+                            .foregroundStyle(AppColors.accent)
+                    }
+                    Slider(
+                        value: sensitivitySliderBinding,
+                        in: MinimumJumpDetectorThresholdAdjustmentPercentage ... MaximumJumpDetectorThresholdAdjustmentPercentage,
+                        step: 5
+                    )
+                    .tint(AppColors.accent)
+                }
+                .padding(.vertical, 4)
+            }
+
+            Section("Audio Settings") {
+                Toggle(
+                    isOn: $settings.shouldSpeakJumpCountAnnouncements,
+                    label: {
+                        Text("Speak Jump Count")
+                            .font(AppFonts.watchBody)
+                            .foregroundStyle(AppColors.textPrimary)
+                    }
+                )
+                .tint(AppColors.accent)
+
+                Toggle(
+                    isOn: $settings.shouldSpeakJumpTimeAnnouncements,
+                    label: {
+                        Text("Speak Jump Time")
+                            .font(AppFonts.watchBody)
+                            .foregroundStyle(AppColors.textPrimary)
+                    }
+                )
+                .tint(AppColors.accent)
+            }
         }
+        .navigationTitle("Settings")
     }
 
     /// Matches the timing used by the row animation so follow-up symbol effects
