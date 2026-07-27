@@ -110,10 +110,19 @@ extension JumpRecState {
         syncLiveActivity()
     }
 
-    /// Finishes the active local session and persists its results.
+    /// Finishes the active session and persists its results.
+    ///
+    /// For local sessions, this stops local motion tracking and saves to HealthKit/DataStore.
+    /// For mirrored Watch sessions, this sends a remote stop command to the Apple Watch,
+    /// which then finishes its workout and transfers the finalized session back to iPhone.
     func finish() {
         guard sessionState == .active, let startTime else { return }
-        guard !isMirroredWatchSession else { return }
+
+        if isMirroredWatchSession {
+            cancelMinuteAnnouncements()
+            ConnectivityManager.shared.sendStopSessionCommand()
+            return
+        }
 
         cancelMinuteAnnouncements()
         motionManager?.stopTracking()

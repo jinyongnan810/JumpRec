@@ -116,7 +116,7 @@ struct ContentView: View {
             },
             set: { isPresented in
                 if !isPresented {
-                    appState.reset()
+                    appState.reset() // Called when sheet is dismissed via swipe
                 }
             }
         )

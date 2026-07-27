@@ -240,25 +240,19 @@ struct HomeView: View {
         [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
     }
 
-    /// Returns the localized slider prompt for the current session ownership.
+    /// Returns the localized slider prompt for ending active jump sessions.
     private var stopSliderText: String {
-        if appState.isMirroredWatchSession {
-            return String(localized: "STOP ON WATCH")
-        }
-        return String(localized: "STOP SESSION")
+        String(localized: "STOP SESSION")
     }
 
-    /// Returns the localized hint explaining where the stop action should happen.
+    /// Returns the localized hint explaining the stop slider action.
     private var stopSliderAccessibilityHint: String {
-        if appState.isMirroredWatchSession {
-            return String(localized: "Stop the workout from Apple Watch.")
-        }
-        return String(localized: "Ends the current jump session.")
+        String(localized: "Ends the current jump session.")
     }
 
-    /// Returns the slider tint for the current session source.
+    /// Returns the slider tint for active session controls.
     private var stopSliderTint: Color {
-        appState.isMirroredWatchSession ? AppColors.textMuted : AppColors.warning
+        AppColors.warning
     }
 
     // MARK: - Unified Hero Ring State Mapping
@@ -496,16 +490,13 @@ struct HomeView: View {
                 config: GlassSlider.Config(tint: stopSliderTint, size: 80),
                 onProgressChanged: { _ in },
                 onFinished: {
-                    guard !appState.isMirroredWatchSession else { return }
                     onStop()
                 }
             )
-            .disabled(appState.isMirroredWatchSession)
             .accessibilityLabel(Text(stopSliderText))
             .accessibilityHint(Text(stopSliderAccessibilityHint))
-            .accessibilityAddTraits(appState.isMirroredWatchSession ? [] : .isButton)
+            .accessibilityAddTraits(.isButton)
             .accessibilityAction {
-                guard !appState.isMirroredWatchSession else { return }
                 onStop()
             }
         }

@@ -282,6 +282,22 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    /// Sends a stop workout command to the active companion watch app over WatchConnectivity.
+    ///
+    /// When the user ends a mirrored Watch session from the iPhone UI, this sends an immediate
+    /// action payload requesting the Apple Watch to finish its active `HKWorkoutSession`. The Watch
+    /// then processes session teardown and transfers the finalized workout metrics back to iPhone.
+    func sendStopSessionCommand() {
+        guard session.isReachable else {
+            print("[WatchConnectivityManager] Watch is not reachable to receive stop command")
+            return
+        }
+        let payload: [String: Any] = ["action": "stopWorkout"]
+        session.sendMessage(payload, replyHandler: nil) { error in
+            print("[WatchConnectivityManager] Failed to send stop workout message: \(error.localizedDescription)")
+        }
+    }
+
     /// Persists a parsed goal-settings payload and notifies main-actor observers.
     private func applySettings(
         goalTypeRawValue: String,

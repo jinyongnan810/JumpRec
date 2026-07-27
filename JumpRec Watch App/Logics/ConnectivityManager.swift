@@ -65,9 +65,16 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
-    /// Applies reachable settings messages from the iPhone app.
+    /// Applies reachable settings messages or action requests from the iPhone app.
     nonisolated func session(_: WCSession, didReceiveMessage message: [String: Any]) {
         print("[WatchConnectivityManager] Received message: \(message)")
+        if let action = message["action"] as? String, action == "stopWorkout" {
+            Task { @MainActor in
+                // If the watch session is active, finish the workout upon remote iPhone request.
+                JumpRecState.shared.end()
+            }
+            return
+        }
         parseSettingsPayload(message)
     }
 
