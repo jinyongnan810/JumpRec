@@ -147,22 +147,24 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
     /// Handles incoming files transferred from the watch app.
     nonisolated func session(_: WCSession, didReceive file: WCSessionFile) {
-        let filename = file.fileURL.lastPathComponent
-        print("[WatchConnectivityManager] Received file from watch: \(filename)")
-        do {
-            // WatchConnectivity owns this temporary URL only for the callback lifetime,
-            // so copy its contents before starting any asynchronous work.
-            let data = try Data(contentsOf: file.fileURL)
-            if let csvText = String(data: data, encoding: .utf8) {
-                Task { @MainActor [weak self] in
-                    await self?.saveCSVToICloud(csvText: csvText, filename: filename)
+        #if DEBUG
+            let filename = file.fileURL.lastPathComponent
+            print("[WatchConnectivityManager] Received file from watch: \(filename)")
+            do {
+                // WatchConnectivity owns this temporary URL only for the callback lifetime,
+                // so copy its contents before starting any asynchronous work.
+                let data = try Data(contentsOf: file.fileURL)
+                if let csvText = String(data: data, encoding: .utf8) {
+                    Task { @MainActor [weak self] in
+                        await self?.saveCSVToICloud(csvText: csvText, filename: filename)
+                    }
+                } else {
+                    print("[WatchConnectivityManager] Failed to decode CSV file content")
                 }
-            } else {
-                print("[WatchConnectivityManager] Failed to decode CSV file content")
+            } catch {
+                print("[WatchConnectivityManager] Error reading received file: \(error.localizedDescription)")
             }
-        } catch {
-            print("[WatchConnectivityManager] Error reading received file: \(error.localizedDescription)")
-        }
+        #endif
     }
 
     /// Handles user-info transfers for sessions and CSV fallbacks.
@@ -174,15 +176,17 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             return
         }
 
-        guard let csvText = userInfo["csvText"] as? String,
-              let filename = userInfo["filename"] as? String
-        else {
-            print("[WatchConnectivityManager] userInfo missing csvText or filename")
-            return
-        }
-        Task { @MainActor [weak self] in
-            await self?.saveCSVToICloud(csvText: csvText, filename: filename)
-        }
+        #if DEBUG
+            guard let csvText = userInfo["csvText"] as? String,
+                  let filename = userInfo["filename"] as? String
+            else {
+                print("[WatchConnectivityManager] userInfo missing csvText or filename")
+                return
+            }
+            Task { @MainActor [weak self] in
+                await self?.saveCSVToICloud(csvText: csvText, filename: filename)
+            }
+        #endif
     }
 
     /// Parses a loosely typed completed-session payload on the delegate callback thread.
@@ -335,11 +339,13 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         filename: String,
         containerIdentifier: String = "iCloud.com.kinn.JumpRec"
     ) async {
-        await cloudCSVExporter.save(
-            csvText: csvText,
-            filename: filename,
-            containerIdentifier: containerIdentifier
-        )
+        #if DEBUG
+            await cloudCSVExporter.save(
+                csvText: csvText,
+                filename: filename,
+                containerIdentifier: containerIdentifier
+            )
+        #endif
     }
 
     /// Saves CSV text to the app's local Documents directory.
@@ -348,20 +354,24 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     ///   - filename: The filename for the CSV file
     @discardableResult
     func saveCSVToLocalDocuments(csvText: String, filename: String) -> URL? {
-        do {
-            let documentsURL = try FileManager.default.url(
-                for: .documentDirectory,
-                in: .userDomainMask,
-                appropriateFor: nil,
-                create: true
-            )
-            let fileURL = documentsURL.appendingPathComponent(filename)
-            try csvText.write(to: fileURL, atomically: true, encoding: .utf8)
-            print("[WatchConnectivityManager] Saved CSV to local Documents at \(fileURL.path)")
-            return fileURL
-        } catch {
-            print("[WatchConnectivityManager] Error saving CSV to local Documents: \(error.localizedDescription)")
+        #if DEBUG
+            do {
+                let documentsURL = try FileManager.default.url(
+                    for: .documentDirectory,
+                    in: .userDomainMask,
+                    appropriateFor: nil,
+                    create: true
+                )
+                let fileURL = documentsURL.appendingPathComponent(filename)
+                try csvText.write(to: fileURL, atomically: true, encoding: .utf8)
+                print("[WatchConnectivityManager] Saved CSV to local Documents at \(fileURL.path)")
+                return fileURL
+            } catch {
+                print("[WatchConnectivityManager] Error saving CSV to local Documents: \(error.localizedDescription)")
+                return nil
+            }
+        #else
             return nil
-        }
+        #endif
     }
 }

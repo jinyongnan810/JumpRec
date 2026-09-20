@@ -34,6 +34,16 @@ struct SessionCompleteView: View {
         appState.completedSession
     }
 
+    /// Determines whether the debug CSV share button is present so the following action
+    /// can sequence its staggered entrance without an invisible timing gap.
+    private var hasMotionCSVShareAction: Bool {
+        #if DEBUG
+            return appState.motionCSVShareURL != nil
+        #else
+            return false
+        #endif
+    }
+
     /// Provides one session-shaped value for all summary calculations on this screen.
     /// When persistence has not finished yet, we synthesize a temporary session so the
     /// summary UI still uses the exact same formatting and derived-metric logic.
@@ -155,21 +165,23 @@ struct SessionCompleteView: View {
         .padding(.horizontal, 24)
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 12) {
-                if let motionCSVShareURL = appState.motionCSVShareURL {
-                    ShareLink(item: motionCSVShareURL) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "square.and.arrow.up")
-                                .font(AppFonts.sectionIcon)
-                            Text("SHARE CSV")
-                                .font(AppFonts.cardTitle)
+                #if DEBUG
+                    if let motionCSVShareURL = appState.motionCSVShareURL {
+                        ShareLink(item: motionCSVShareURL) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(AppFonts.sectionIcon)
+                                Text("SHARE CSV")
+                                    .font(AppFonts.cardTitle)
+                            }
+                            .foregroundStyle(AppColors.textPrimary)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
                         }
-                        .foregroundStyle(AppColors.textPrimary)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
+                        .appGlassButton(prominent: false)
+                        .staggeredAppearance(isVisible: hasContentAppeared, index: 3)
                     }
-                    .appGlassButton(prominent: false)
-                    .staggeredAppearance(isVisible: hasContentAppeared, index: 3)
-                }
+                #endif
 
                 // Done Button
                 Button(action: onDone) {
@@ -187,7 +199,10 @@ struct SessionCompleteView: View {
                     prominent: true,
                     tint: AppColors.accent
                 )
-                .staggeredAppearance(isVisible: hasContentAppeared, index: 4)
+                .staggeredAppearance(
+                    isVisible: hasContentAppeared,
+                    index: hasMotionCSVShareAction ? 4 : 3
+                )
             }.padding(.horizontal, 24)
         }
         .task {
@@ -353,7 +368,9 @@ struct SessionCompleteView: View {
     appState.averageHeartRate = session.averageHeartRate
     appState.peakHeartRate = session.peakHeartRate
     appState.completedSession = session
-    appState.motionCSVShareURL = URL(fileURLWithPath: "/tmp/jumprec-preview-motion.csv")
+    #if DEBUG
+        appState.motionCSVShareURL = URL(fileURLWithPath: "/tmp/jumprec-preview-motion.csv")
+    #endif
 
     dataStore.markUnseenPersonalRecordUpdates([.highestJumpCount, .steadyRhythm, .sneakyBurn])
 

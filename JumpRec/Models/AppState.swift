@@ -78,8 +78,10 @@ final class JumpRecState: NSObject {
     var isHeadphoneMotionAvailable = false
     /// Stores the current headphone route name so the selector can show a real product label when iOS provides one.
     var connectedHeadphoneName: String?
-    /// Stores the exported motion CSV URL when debug export is enabled.
-    var motionCSVShareURL: URL?
+    #if DEBUG
+        /// Stores the exported motion CSV URL when debug export is enabled.
+        var motionCSVShareURL: URL?
+    #endif
 
     /// Provides shared persistence and session-generation helpers.
     @ObservationIgnored

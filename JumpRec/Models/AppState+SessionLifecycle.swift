@@ -158,7 +158,9 @@ extension JumpRecState {
                 averageHeartRate: averageHeartRate,
                 peakHeartRate: peakHeartRate
             )
-            exportMotionCSVIfNeeded(samples: motionSamples, startedAt: startTime, endedAt: endTime)
+            #if DEBUG
+                exportMotionCSVIfNeeded(samples: motionSamples, startedAt: startTime, endedAt: endTime)
+            #endif
         }
     }
 
@@ -184,7 +186,9 @@ extension JumpRecState {
         sessionState = .idle
         resetLiveMetrics()
         activeMotionSource = nil
-        motionCSVShareURL = nil
+        #if DEBUG
+            motionCSVShareURL = nil
+        #endif
         averageHeartRate = nil
         peakHeartRate = nil
         sessionGoalType = nil
