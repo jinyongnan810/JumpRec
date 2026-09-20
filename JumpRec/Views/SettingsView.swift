@@ -150,7 +150,7 @@ struct SettingsView: View {
                     )
                     .tint(dataStore.qualifiedSessionsCount() >= JumpRecSettings.freeWorkoutQuota ? AppColors.danger : AppColors.accent)
 
-                    Text("Includes sessions with 100+ jumps. When you complete 100 workouts, unlock lifetime unlimited tracking with a single purchase.")
+                    Text("Includes workouts with 100+ jumps. When you complete 100 workouts, unlock lifetime unlimited tracking with a single purchase.")
                         .font(AppFonts.bodySmall)
                         .foregroundStyle(AppColors.textSecondary)
 
@@ -206,10 +206,10 @@ struct SettingsView: View {
 
     /// Lets the user opt into staying on the iPhone route when compatible headphones can provide motion data.
     private var iPhoneSessionSection: some View {
-        settingsSection(title: String(localized: "iPhone Session")) {
+        settingsSection(title: String(localized: "iPhone Workout")) {
             settingsToggle(
                 isOn: $settings.preferHeadphonesForIPhoneSessions,
-                title: String(localized: "Prefer Headphones for iPhone Sessions"),
+                title: String(localized: "Prefer Headphones for iPhone Workouts"),
                 description: String(localized: "When compatible headphones are available, start on iPhone instead of Apple Watch.")
             )
         }

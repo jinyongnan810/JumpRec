@@ -37,7 +37,7 @@ struct AICommentCardView: View {
                     HStack(spacing: 12) {
                         ProgressView()
                             .tint(AppColors.accent)
-                        Text("Writing your session comment...")
+                        Text("Writing your workout comment...")
                             .font(AppFonts.bodyLabel)
                             .foregroundStyle(AppColors.textSecondary)
                         Spacer()

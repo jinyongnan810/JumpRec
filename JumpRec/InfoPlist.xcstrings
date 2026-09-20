@@ -31,7 +31,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "JumpRec reads workout data to mirror active Apple Watch sessions on iPhone."
+            "value" : "JumpRec reads workout data to mirror active Apple Watch workouts on iPhone."
           }
         },
         "ja" : {
@@ -48,7 +48,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "JumpRec saves workout sessions so your Apple Watch activity appears on iPhone."
+            "value" : "JumpRec saves workouts so your Apple Watch activity appears on iPhone."
           }
         },
         "ja" : {

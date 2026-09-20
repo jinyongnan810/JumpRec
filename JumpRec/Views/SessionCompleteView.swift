@@ -110,7 +110,7 @@ struct SessionCompleteView: View {
                             isCompletionBadgeVisible = true
                         }
                     }
-                    Text("Session Complete!")
+                    Text("Workout Complete!")
                         .font(AppFonts.screenTitle)
                         .foregroundStyle(AppColors.textPrimary)
 

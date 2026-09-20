@@ -71,7 +71,7 @@ struct SettingsView: View {
                                 .font(AppFonts.watchSupportingRegular)
                                 .foregroundStyle(AppColors.danger)
                         } else {
-                            Text("100+ jump sessions")
+                            Text("100+ jump workouts")
                                 .font(AppFonts.watchSupportingRegular)
                                 .foregroundStyle(AppColors.textMuted)
                         }

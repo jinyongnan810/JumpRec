@@ -204,7 +204,7 @@ public final class MyDataStore {
     public var cloudRestoreStatusMessage: String {
         if isAwaitingInitialCloudRestore {
             return String(
-                localized: "Syncing from iCloud. Your saved sessions may take a moment to reappear after reinstalling the app."
+                localized: "Syncing from iCloud. Your saved workouts may take a moment to reappear after reinstalling the app."
             )
         }
 
@@ -214,22 +214,22 @@ public final class MyDataStore {
                 localized: "No cloud data restored yet. If you recently reinstalled the app, leave it open for a bit longer so iCloud can finish syncing."
             )
         case .checking:
-            return String(localized: "Checking iCloud availability for your saved sessions.")
+            return String(localized: "Checking iCloud availability for your saved workouts.")
         case .unavailable:
             return String(
-                localized: "No iCloud account is currently signed in, so previous cloud-backed sessions cannot be restored on this device yet."
+                localized: "No iCloud account is currently signed in, so previous cloud-backed workouts cannot be restored on this device yet."
             )
         case .restricted:
             return String(
-                localized: "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now."
+                localized: "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now."
             )
         case .temporarilyUnavailable:
             return String(
-                localized: "iCloud is temporarily unavailable. Previously synced sessions may reappear once the account becomes reachable again."
+                localized: "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again."
             )
         case .couldNotDetermine:
             return String(
-                localized: "The app could not confirm iCloud availability, so session restore status is unknown."
+                localized: "The app could not confirm iCloud availability, so workout restore status is unknown."
             )
         }
     }

@@ -123,7 +123,7 @@ struct PaywallView: View {
     /// Dynamic subtitle: specifies current session count when under quota.
     private var headerSubtitle: String {
         if isQuotaReached {
-            String(localized: "You've logged 100 great sessions with JumpRec. Unlock unlimited workout tracking forever with a single, one-time purchase.")
+            String(localized: "You've logged 100 great workouts with JumpRec. Unlock unlimited workout tracking forever with a single, one-time purchase.")
         } else {
             String(
                 format: String(localized: "You've logged %lld of %lld free workouts. Unlock unlimited workout tracking anytime with a single, one-time purchase."),
@@ -140,7 +140,7 @@ struct PaywallView: View {
             featureRow(
                 icon: "infinity",
                 title: String(localized: "Unlimited Workouts"),
-                description: String(localized: "Start and track unlimited jump rope sessions without any future limits.")
+                description: String(localized: "Start and track unlimited jump rope workouts without any future limits.")
             )
 
             featureRow(

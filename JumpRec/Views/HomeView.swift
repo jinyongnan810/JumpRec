@@ -89,7 +89,7 @@ struct HomeView: View {
         } else if isCountingDown {
             String(localized: "CANCEL")
         } else {
-            String(localized: "START SESSION")
+            String(localized: "START WORKOUT")
         }
     }
 
@@ -247,12 +247,12 @@ struct HomeView: View {
 
     /// Returns the localized slider prompt for ending active jump sessions.
     private var stopSliderText: String {
-        String(localized: "STOP SESSION")
+        String(localized: "STOP WORKOUT")
     }
 
     /// Returns the localized hint explaining the stop slider action.
     private var stopSliderAccessibilityHint: String {
-        String(localized: "Ends the current jump session.")
+        String(localized: "Ends the current jump workout.")
     }
 
     /// Returns the slider tint for active session controls.
@@ -299,7 +299,7 @@ struct HomeView: View {
         if appState.sessionState == .active {
             return activeRingAccessibilityLabel
         }
-        return isCountingDown ? String(localized: "Session countdown") : String(localized: "Ready to start session")
+        return isCountingDown ? String(localized: "Workout countdown") : String(localized: "Ready to start workout")
     }
 
     /// Returns the current ring state in a short form for accessibility.
@@ -336,7 +336,7 @@ struct HomeView: View {
             }
         }
         .accessibilityAddTraits(appState.sessionState == .active ? [] : .isButton)
-        .accessibilityHint(appState.sessionState == .active ? "" : String(localized: "Tap to start or cancel session countdown."))
+        .accessibilityHint(appState.sessionState == .active ? "" : String(localized: "Tap to start or cancel workout countdown."))
     }
 
     // MARK: - View Body

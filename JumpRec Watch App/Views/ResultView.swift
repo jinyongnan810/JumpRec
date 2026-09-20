@@ -18,7 +18,7 @@ struct ResultView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 8) {
-                Text("SESSION COMPLETE")
+                Text("WORKOUT COMPLETE")
                     .font(AppFonts.watchMetricLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)

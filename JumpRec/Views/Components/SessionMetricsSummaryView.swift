@@ -40,7 +40,7 @@ struct SessionMetricsSummaryView: View {
     private let heartRateExplanation = SessionBreakdownExplanation(
         id: "heart-rate-availability",
         title: "Heart Rate Availability",
-        message: "Heart rate is only available when your session is recorded with Apple Watch or supported headphones that provide heart-rate data."
+        message: "Heart rate is only available when your workout is recorded with Apple Watch or supported headphones that provide heart-rate data."
     )
 
     // MARK: - View
@@ -95,7 +95,7 @@ struct SessionMetricsSummaryView: View {
 
             // Session Breakdown
             VStack(alignment: .leading, spacing: 8) {
-                Text("SESSION BREAKDOWN")
+                Text("WORKOUT BREAKDOWN")
                     .font(AppFonts.badgeLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
@@ -114,7 +114,7 @@ struct SessionMetricsSummaryView: View {
                     explanation: SessionBreakdownExplanation(
                         id: "calories-per-minute",
                         title: "Calories Per Minute",
-                        message: "Your average calorie burn efficiency across the full session duration."
+                        message: "Your average calorie burn efficiency across the full workout duration."
                     ),
                     showsBadge: achievedRecordKinds.contains(.sneakyBurn)
                 ) {
@@ -128,7 +128,7 @@ struct SessionMetricsSummaryView: View {
                     explanation: SessionBreakdownExplanation(
                         id: "rhythm-consistency",
                         title: "Rhythm Consistency",
-                        message: "A normalized score that reflects how evenly you maintained your jumping pace throughout the session."
+                        message: "A normalized score that reflects how evenly you maintained your jumping pace throughout the workout."
                     ),
                     showsBadge: achievedRecordKinds.contains(.steadyRhythm)
                 ) {

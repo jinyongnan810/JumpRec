@@ -54,7 +54,7 @@ struct RecordsSheetView: View {
                             Text("No records yet")
                                 .font(AppFonts.bodyLabelStrong)
                                 .foregroundStyle(AppColors.textSecondary)
-                            Text("Complete sessions to set personal records!")
+                            Text("Complete workouts to set personal records!")
                                 .font(AppFonts.bodySmall)
                                 .foregroundStyle(AppColors.textMuted)
                             Spacer()
@@ -103,7 +103,7 @@ struct RecordsSheetView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("This removes all personal records from this sheet. Your saved sessions stay in history.")
+                Text("This removes all personal records from this sheet. Your saved workouts stay in history.")
             }
             .onDisappear {
                 // Dismissing the records sheet counts as acknowledging any newly achieved records.

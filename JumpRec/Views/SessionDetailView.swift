@@ -93,7 +93,7 @@ struct SessionDetailView: View {
         }
         .scrollIndicators(.hidden)
         .topSoftScrollEdgeEffect()
-        .navigationTitle("Session Details")
+        .navigationTitle("Workout Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -109,7 +109,7 @@ struct SessionDetailView: View {
             await generateCommentIfNeeded()
         }
         .userActivity("com.kinn.JumpRec.viewSession") { activity in
-            activity.title = "View Jump Rope Session"
+            activity.title = "View Jump Rope Workout"
             if #available(iOS 18.2, *) {
                 activity.appEntityIdentifier = EntityIdentifier(for: JumpSessionEntity(from: session))
             }

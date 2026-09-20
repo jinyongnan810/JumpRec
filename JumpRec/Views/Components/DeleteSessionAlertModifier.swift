@@ -18,12 +18,12 @@ struct DeleteSessionAlertModifier: ViewModifier {
 
     /// Returns the alert title for the current deletion scope.
     private var title: String {
-        sessionCount == 1 ? String(localized: "Delete this session?") : String(localized: "Delete these sessions?")
+        sessionCount == 1 ? String(localized: "Delete this workout?") : String(localized: "Delete these workouts?")
     }
 
     /// Returns the destructive button label for the current deletion scope.
     private var deleteButtonTitle: String {
-        sessionCount == 1 ? String(localized: "Delete Session") : String(localized: "Delete Sessions")
+        sessionCount == 1 ? String(localized: "Delete Workout") : String(localized: "Delete Workouts")
     }
 
     // MARK: - View

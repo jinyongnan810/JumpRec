@@ -89,6 +89,7 @@
       "shouldTranslate": false
     },
     "100+ jump sessions": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -104,6 +105,16 @@
         }
       }
     },
+    "100+ jump workouts": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "100回以上のワークアウト"
+          }
+        }
+      }
+    },
     "Audio Settings": {
       "localizations": {
         "ja": {
@@ -114,7 +125,16 @@
         }
       }
     },
-    "Checking iCloud availability for your saved sessions.": {},
+    "Checking iCloud availability for your saved workouts.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存済みのワークアウトに対する iCloud の利用状況を確認しています。"
+          }
+        }
+      }
+    },
     "Close results": {
       "localizations": {
         "ja": {
@@ -321,7 +341,16 @@
       }
     },
     "No cloud data restored yet. If you recently reinstalled the app, leave it open for a bit longer so iCloud can finish syncing.": {},
-    "No iCloud account is currently signed in, so previous cloud-backed sessions cannot be restored on this device yet.": {},
+    "No iCloud account is currently signed in, so previous cloud-backed workouts cannot be restored on this device yet.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在このデバイスでは iCloud にサインインしていないため、以前 iCloud に保存されたワークアウトはまだ復元できません。"
+          }
+        }
+      }
+    },
     "No reading": {
       "localizations": {
         "ja": {
@@ -337,6 +366,7 @@
     "Purchase is pending approval.": {},
     "Purchase verification failed. Please try again.": {},
     "SESSION COMPLETE": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -377,6 +407,7 @@
       }
     },
     "Session countdown": {
+      "extractionState": "stale",
       "localizations": {
         "ja": {
           "stringUnit": {
@@ -456,8 +487,26 @@
         }
       }
     },
-    "Syncing from iCloud. Your saved sessions may take a moment to reappear after reinstalling the app.": {},
-    "The app could not confirm iCloud availability, so session restore status is unknown.": {},
+    "Syncing from iCloud. Your saved workouts may take a moment to reappear after reinstalling the app.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud から同期しています。アプリを再インストールした後は、保存済みのワークアウトが再表示されるまで少し時間がかかる場合があります。"
+          }
+        }
+      }
+    },
+    "The app could not confirm iCloud availability, so workout restore status is unknown.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アプリが iCloud の利用状況を確認できなかったため、ワークアウトの復元状況は不明です。"
+          }
+        }
+      }
+    },
     "Time": {
       "localizations": {
         "ja": {
@@ -524,6 +573,26 @@
         }
       }
     },
+    "WORKOUT COMPLETE": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウト完了"
+          }
+        }
+      }
+    },
+    "Workout countdown": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ワークアウト開始カウントダウン"
+          }
+        }
+      }
+    },
     "You've completed your 100 free workouts. Please open JumpRec on your iPhone to unlock unlimited workouts.": {
       "localizations": {
         "en": {
@@ -541,8 +610,26 @@
       }
     },
     "cal": {},
-    "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now.": {},
-    "iCloud is temporarily unavailable. Previously synced sessions may reappear once the account becomes reachable again.": {}
+    "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたワークアウトは現在復元できません。"
+          }
+        }
+      }
+    },
+    "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたワークアウトが再表示される場合があります。"
+          }
+        }
+      }
+    }
   },
   "version": "1.1"
 }

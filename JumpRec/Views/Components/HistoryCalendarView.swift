@@ -77,7 +77,7 @@ struct HistoryCalendarView: View {
                 .appGlassButton()
                 .buttonBorderShape(.circle)
                 .accessibilityLabel(Text("Previous month"))
-                .accessibilityHint(Text("Shows the previous month of sessions."))
+                .accessibilityHint(Text("Shows the previous month of workouts."))
 
                 Spacer()
 
@@ -96,7 +96,7 @@ struct HistoryCalendarView: View {
                 .appGlassButton()
                 .buttonBorderShape(.circle)
                 .accessibilityLabel(Text("Next month"))
-                .accessibilityHint(Text("Shows the next month of sessions."))
+                .accessibilityHint(Text("Shows the next month of workouts."))
             }
 
             HStack(spacing: 0) {
@@ -246,7 +246,7 @@ private struct HistoryCalendarDayCellView: View {
     /// Describes the recorded activity for the day, including the absence of sessions.
     private var accessibilityValue: String {
         guard let jumpCount else {
-            return String(localized: "No sessions")
+            return String(localized: "No workouts")
         }
         return String(
             format: String(localized: "%@ jumps"),

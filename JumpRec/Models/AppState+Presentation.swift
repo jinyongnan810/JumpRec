@@ -91,7 +91,7 @@ extension JumpRecState {
     /// Returns the goal summary shown in the live activity.
     private var liveActivityGoalSummary: String {
         guard let goalType = sessionGoalType, let goalValue = sessionGoalValue else {
-            return String(localized: "Session in progress")
+            return String(localized: "Workout in progress")
         }
 
         if goalType == .count {
@@ -294,12 +294,12 @@ extension JumpRecState {
 
     /// Returns the localized spoken phrase for session start.
     var localizedSessionStartedAnnouncement: String {
-        isJapanesePreferred ? "セッションを開始しました" : "Session Started!"
+        isJapanesePreferred ? "ワークアウトを開始しました" : "Workout Started!"
     }
 
     /// Returns the localized spoken phrase for session end.
     var localizedSessionFinishedAnnouncement: String {
-        isJapanesePreferred ? "セッションを終了しました" : "Session Finished!"
+        isJapanesePreferred ? "ワークアウトを終了しました" : "Workout Finished!"
     }
 
     /// Returns the localized spoken phrase for jump milestones.

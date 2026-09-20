@@ -154,7 +154,7 @@ private struct SliderThumbGlassEffect: ViewModifier {
 #Preview {
     VStack(spacing: 24) {
         GlassSlider(
-            text: "STOP SESSION",
+            text: "STOP WORKOUT",
             iconName: "stop.fill",
             config: GlassSlider.Config(tint: .red, size: 80),
             onProgressChanged: { _ in },

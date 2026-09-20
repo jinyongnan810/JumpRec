@@ -136,12 +136,12 @@ extension JumpRecState {
 
     /// Returns the localized spoken phrase for session start.
     var localizedSessionStartedAnnouncement: String {
-        isJapanesePreferred ? "セッションを開始しました" : "Session Started!"
+        isJapanesePreferred ? "ワークアウトを開始しました" : "Workout Started!"
     }
 
     /// Returns the localized spoken phrase for session finish.
     var localizedSessionFinishedAnnouncement: String {
-        isJapanesePreferred ? "セッションを終了しました" : "Session Finished!"
+        isJapanesePreferred ? "ワークアウトを終了しました" : "Workout Finished!"
     }
 
     /// Returns the localized spoken phrase for jump milestones.

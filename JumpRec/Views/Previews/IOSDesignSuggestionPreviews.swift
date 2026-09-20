@@ -56,7 +56,7 @@
                 compactDeviceStatus
 
                 Button(action: {}) {
-                    Text("START SESSION")
+                    Text("START WORKOUT")
                         .font(AppFonts.primaryButtonLabel)
                         .foregroundStyle(AppColors.bgPrimary)
                         .frame(maxWidth: .infinity)
@@ -80,7 +80,7 @@
                     Text("Apple Watch")
                         .font(AppFonts.cardTitle)
                         .foregroundStyle(AppColors.textPrimary)
-                    Text("Ready for this session")
+                    Text("Ready for this workout")
                         .font(AppFonts.bodySmall)
                         .foregroundStyle(AppColors.textSecondary)
                 }
@@ -108,7 +108,7 @@
             VStack(spacing: 18) {
                 HStack(alignment: .center) {
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("ACTIVE SESSION")
+                        Text("ACTIVE WORKOUT")
                             .font(AppFonts.badgeLabel)
                             .tracking(2)
                             .foregroundStyle(AppColors.textMuted)
@@ -142,7 +142,7 @@
 
                 VStack(spacing: 6) {
                     Button(action: {}) {
-                        Label("STOP SESSION", systemImage: "stop.fill")
+                        Label("STOP WORKOUT", systemImage: "stop.fill")
                             .font(AppFonts.cardTitle)
                             .foregroundStyle(AppColors.textPrimary)
                             .frame(maxWidth: .infinity)
@@ -150,7 +150,7 @@
                     }
                     .appGlassButton(prominent: true, tint: AppColors.danger)
 
-                    Text("Workout data will be saved before the session closes.")
+                    Text("Workout data will be saved before the workout closes.")
                         .font(AppFonts.bodySmall)
                         .foregroundStyle(AppColors.textMuted)
                         .multilineTextAlignment(.center)
@@ -233,7 +233,7 @@
 
         private var monthlySummary: some View {
             HStack(spacing: 10) {
-                StatCardView(label: "SESSIONS", value: "7", valueColor: AppColors.accent)
+                StatCardView(label: "WORKOUTS", value: "7", valueColor: AppColors.accent)
                 StatCardView(label: "JUMPS", value: "6.8K")
                 StatCardView(label: "TIME", value: "38m")
             }
@@ -241,7 +241,7 @@
 
         private var sessionSection: some View {
             VStack(alignment: .leading, spacing: 10) {
-                Text("SESSIONS THIS MONTH")
+                Text("WORKOUTS THIS MONTH")
                     .font(AppFonts.badgeLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
@@ -323,7 +323,7 @@
                         Image(systemName: "checkmark.circle.fill")
                             .font(AppFonts.system(56, weight: .semibold))
                             .foregroundStyle(AppColors.accent)
-                        Text("Session Complete!")
+                        Text("Workout Complete!")
                             .font(AppFonts.screenTitle)
                             .foregroundStyle(AppColors.textPrimary)
                         Text("1,248 jumps in 08:00")

@@ -25,8 +25,8 @@ public struct WorkoutStatsEntity: AppEntity, Identifiable, Sendable {
     @Property(title: "Total Jumps")
     public var totalJumps: Int
 
-    /// Total number of completed workout sessions in the period.
-    @Property(title: "Session Count")
+    /// Total number of completed workouts in the period.
+    @Property(title: "Workout Count")
     public var sessionCount: Int
 
     /// Specific calendar year if queried for a specific year, or nil for all-time.

@@ -69,7 +69,7 @@ struct MotionSourceStatusView: View {
     private var sectionTitle: String {
         switch presentation {
         case .preSession:
-            String(localized: "SESSION DEVICE")
+            String(localized: "WORKOUT DEVICE")
         case .activeSession:
             String(localized: "TRACKING SOURCE")
         }
@@ -79,12 +79,12 @@ struct MotionSourceStatusView: View {
     private var statusTitle: String {
         switch (presentation, source) {
         case (.preSession, .watch):
-            String(localized: "Session will start on Apple Watch")
+            String(localized: "Workout will start on Apple Watch")
         case (.preSession, .iPhone):
-            String(localized: "Session will use iPhone")
+            String(localized: "Workout will use iPhone")
         case (.preSession, .airpods):
             String(
-                format: String(localized: "Session will use %@ when available"),
+                format: String(localized: "Workout will use %@ when available"),
                 displayName
             )
         case (.preSession, nil):
@@ -111,13 +111,13 @@ struct MotionSourceStatusView: View {
         case (.preSession, .airpods):
             String(localized: "Headphone motion is preferred; iPhone will be used if it becomes unavailable.")
         case (.preSession, .iPhone):
-            String(localized: "Selected automatically when the session starts.")
+            String(localized: "Selected automatically when the workout starts.")
         case (.preSession, nil):
             String(localized: "Check Apple Watch, headphone, or iPhone motion availability.")
         case (.activeSession, .watch):
-            String(localized: "This session cannot switch to iPhone after it starts.")
+            String(localized: "This workout cannot switch to iPhone after it starts.")
         case (.activeSession, .airpods), (.activeSession, .iPhone), (.activeSession, nil):
-            String(localized: "The motion source is managed automatically during this iPhone session.")
+            String(localized: "The motion source is managed automatically during this iPhone workout.")
         }
     }
 

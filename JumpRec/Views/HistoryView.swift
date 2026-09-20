@@ -122,7 +122,7 @@ struct HistoryView: View {
     /// This keeps the history screen from looking permanently blank while the local store is still waiting on iCloud.
     private var emptyLibraryState: some View {
         ContentUnavailableView {
-            Label("No sessions yet", systemImage: "icloud")
+            Label("No workouts yet", systemImage: "icloud")
         } description: {
             Text(dataStore.cloudRestoreStatusMessage)
         }
@@ -256,7 +256,7 @@ private struct MonthSessionsList: View {
 
             Section {
                 HStack(spacing: 12) {
-                    StatCardView(label: "SESSIONS", value: "\(sessions.count)", valueColor: AppColors.accent)
+                    StatCardView(label: "WORKOUTS", value: "\(sessions.count)", valueColor: AppColors.accent)
                     StatCardView(label: "JUMPS", value: formatCount(totalJumps))
                     StatCardView(label: "TIME", value: formatDuration(totalDuration))
                 }
@@ -266,7 +266,7 @@ private struct MonthSessionsList: View {
 
             Section {
                 if sessions.isEmpty {
-                    Text("No sessions in this month.")
+                    Text("No workouts in this month.")
                         .font(AppFonts.bodyRegular)
                         .foregroundStyle(AppColors.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -291,7 +291,7 @@ private struct MonthSessionsList: View {
                     .onDelete(perform: deleteSessions)
                 }
             } header: {
-                Text("SESSIONS THIS MONTH")
+                Text("WORKOUTS THIS MONTH")
                     .font(AppFonts.badgeLabel)
                     .tracking(2)
                     .foregroundStyle(AppColors.textMuted)
@@ -410,7 +410,7 @@ private struct SessionRowView: View {
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .accessibilityElement(children: .combine)
-        .accessibilityHint(Text("Opens session details."))
+        .accessibilityHint(Text("Opens workout details."))
     }
 
     private var jumpsChip: some View {

@@ -78,7 +78,7 @@ struct StartView: View {
                             ), value: isAnimating)
                     }
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(Text("Session countdown"))
+                    .accessibilityLabel(Text("Workout countdown"))
                     .accessibilityValue(
                         Text(
                             String(
