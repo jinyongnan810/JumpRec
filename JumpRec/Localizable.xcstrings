@@ -3966,6 +3966,38 @@
           }
         }
       }
+    },
+    "Opens the privacy policy in your browser.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens the privacy policy in your browser."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ブラウザでプライバシーポリシーを開きます。"
+          }
+        }
+      }
+    },
+    "Privacy Policy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy Policy"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プライバシーポリシー"
+          }
+        }
+      }
     }
   },
   "version": "1.1"

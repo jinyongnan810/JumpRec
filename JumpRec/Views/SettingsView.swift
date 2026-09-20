@@ -61,6 +61,9 @@ struct SettingsView: View {
 
                     iPhoneSessionSection
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 5)
+
+                    privacyPolicyLink
+                        .staggeredAppearance(isVisible: hasContentAppeared, index: 6)
                 }
                 .padding(.bottom, 8)
             }
@@ -77,7 +80,7 @@ struct SettingsView: View {
                         .frame(height: 56)
                 }
                 .appGlassButton(prominent: true, tint: AppColors.accent)
-                .staggeredAppearance(isVisible: hasContentAppeared, index: 6)
+                .staggeredAppearance(isVisible: hasContentAppeared, index: 7)
                 .padding(.top, 12)
             }
         }
@@ -213,6 +216,32 @@ struct SettingsView: View {
                 description: String(localized: "When compatible headphones are available, start on iPhone instead of Apple Watch.")
             )
         }
+    }
+
+    /// Links out to the hosted Privacy Policy markdown in the user's preferred language.
+    private var privacyPolicyLink: some View {
+        Link(destination: privacyPolicyURL) {
+            HStack(spacing: 4) {
+                Text(String(localized: "Privacy Policy"))
+                    .font(AppFonts.secondaryActionLabel)
+                Image(systemName: "arrow.up.right")
+                    .font(AppFonts.iconLabel)
+            }
+            .foregroundStyle(AppColors.textMuted)
+            .underline()
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 4)
+        .padding(.bottom, 8)
+        .accessibilityLabel(Text(String(localized: "Privacy Policy")))
+        .accessibilityHint(Text(String(localized: "Opens the privacy policy in your browser.")))
+    }
+
+    /// Resolves the hosted privacy policy URL according to the user's current locale.
+    private var privacyPolicyURL: URL {
+        let isJapanese = Locale.current.language.languageCode?.identifier == "ja"
+        let filename = isJapanese ? "PRIVACY_POLICY_ja.md" : "PRIVACY_POLICY.md"
+        return URL(string: "https://github.com/jinyongnan810/JumpRec/blob/main/\(filename)")!
     }
 
     /// Lets the user tune jump counting sensitivity without exposing raw acceleration thresholds.
