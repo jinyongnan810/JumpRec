@@ -77,11 +77,13 @@ struct ContentView: View {
             appState.warmUpSpeechSynthesizerIfNeeded()
             dataStore.refreshCloudDiagnostics()
             syncSettingsToWatch()
+            processPendingIntentStartIfNeeded()
         }
         .onChange(of: scenePhase) { _, newValue in
             appState.updateSceneActive(newValue == .active)
             if newValue == .active {
                 dataStore.refreshCloudDiagnostics()
+                processPendingIntentStartIfNeeded()
             }
         }
         .onChange(of: settings.goalType) { _, _ in
@@ -203,6 +205,23 @@ struct ContentView: View {
             requestReview()
             hasRequestedReviewAfterTenSessions = true
             pendingReviewTask = nil
+        }
+    }
+
+    /// Checks if an App Intent requested a workout start before or while the view was loading.
+    private func processPendingIntentStartIfNeeded() {
+        guard let pending = JumpRecState.pendingStartGoal else { return }
+        JumpRecState.pendingStartGoal = nil
+        if appState.sessionState == .idle {
+            selectedTab = .jump
+            appState.start(
+                goalType: pending.type,
+                goalValue: pending.value,
+                preferLocalHeadphonesOverWatch: settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable,
+                shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
+                shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
+                jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
+            )
         }
     }
 }

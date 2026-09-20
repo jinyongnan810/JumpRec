@@ -96,6 +96,7 @@ When making changes, prioritize readability, maintainability, and safety over cl
 - Add or update tests for non-trivial logic when appropriate.
 - For bug fixes, consider adding a test that covers the regression.
 - Do not add fragile tests with little long-term value.
+- Run `make lint` after editing.
 
 ## Editing existing code
 - Match the style of the existing codebase unless it is clearly harmful.

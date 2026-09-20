@@ -331,7 +331,6 @@
 				3FF03B042F604A5400D83A85 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				3FCE404A2E758A82009C271D /* JumpRecShared */,
 				3FF03B002F604A5400D83A85 /* JumpRecTests */,
 			);
 			name = JumpRecTests;

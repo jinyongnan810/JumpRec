@@ -23,6 +23,14 @@ final class JumpRecState: NSObject {
         #endif
     }()
 
+    // MARK: - App Intents Coordination
+
+    /// Holds a weak reference to the active `JumpRecState` instance so foreground App Intents can start or coordinate workouts.
+    weak static var current: JumpRecState?
+
+    /// Stores a pending start goal requested by an App Intent before the UI has finished loading.
+    static var pendingStartGoal: (type: GoalType, value: Int)?
+
     // MARK: - Session State
 
     /// Tracks the current lifecycle state of the session UI.
@@ -159,6 +167,7 @@ final class JumpRecState: NSObject {
     /// Configures managers, callback wiring, audio, and haptics.
     override init() {
         super.init()
+        Self.current = self
         motionManager = MotionManager(
             shouldRecordMotionSamples: isMotionCSVExportEnabled,
             onJumpDetected: { [weak self] source in

@@ -3,6 +3,7 @@
 //  JumpRec
 //
 
+import AppIntents
 import SwiftData
 import SwiftUI
 
@@ -106,6 +107,12 @@ struct SessionDetailView: View {
         .deleteSessionAlert(isPresented: $showingDeleteConfirmation, onDelete: deleteSession)
         .task(id: session.id) {
             await generateCommentIfNeeded()
+        }
+        .userActivity("com.kinn.JumpRec.viewSession") { activity in
+            activity.title = "View Jump Rope Session"
+            if #available(iOS 18.2, *) {
+                activity.appEntityIdentifier = EntityIdentifier(for: JumpSessionEntity(from: session))
+            }
         }
     }
 

@@ -4,26 +4,6 @@
     "" : {
 
     },
-    "/ %@ jumps" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "/ %@ 回"
-          }
-        }
-      }
-    },
-    "/ %lld min" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "/ %lld 分"
-          }
-        }
-      }
-    },
     "%@ jumps" : {
       "localizations" : {
         "ja" : {
@@ -82,6 +62,16 @@
         }
       }
     },
+    "%@ • %@ • %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ • %2$@ • %3$@"
+          }
+        }
+      }
+    },
     "%@, achieved %@" : {
       "localizations" : {
         "en" : {
@@ -98,6 +88,26 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@. %2$@"
+          }
+        }
+      }
+    },
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "%@: %@ jumps" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@ jumps"
           }
         }
       }
@@ -145,6 +155,26 @@
         }
       }
     },
+    "/ %@ jumps" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "/ %@ 回"
+          }
+        }
+      }
+    },
+    "/ %lld min" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "/ %lld 分"
+          }
+        }
+      }
+    },
     "3 unread" : {
 
     },
@@ -154,6 +184,77 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッション全体を通して、どれだけ一定のペースで跳び続けられたかを示す正規化スコアです。"
+          }
+        }
+      }
+    },
+    "ACTIVE SOURCE" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用中のデバイス"
+          }
+        }
+      }
+    },
+    "AI Recap" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Recap"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AIサマリー"
+          }
+        }
+      }
+    },
+    "AVG RATE" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均レート"
+          }
+        }
+      }
+    },
+    "Achieved %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achieved %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@に達成"
+          }
+        }
+      }
+    },
+    "Achieved Date" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achieved Date"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "達成日時"
           }
         }
       }
@@ -170,17 +271,6 @@
       }
     },
     "Active source" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使用中のデバイス"
-          }
-        }
-      }
-    },
-    "ACTIVE SOURCE" : {
       "extractionState" : "stale",
       "localizations" : {
         "ja" : {
@@ -224,6 +314,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定を確定する前に目標値を調整します。"
+          }
+        }
+      }
+    },
+    "All time, you have completed %1$@ with %2$@ total jumps, burning %3$lld kcal." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All time, you have completed %1$@ with %2$@ total jumps, burning %3$lld kcal."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通算で%1$@完了し、合計%2$@回、%3$lld kcal消費しました。"
+          }
+        }
+      }
+    },
+    "All-Time Stats" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All-Time Stats"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通算統計"
           }
         }
       }
@@ -314,8 +438,14 @@
         }
       }
     },
-    "AVG RATE" : {
+    "Average Rate" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Average Rate"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -346,12 +476,38 @@
         }
       }
     },
-    "cal" : {
+    "CALORIES" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "kcal"
+            "value" : "カロリー"
+          }
+        }
+      }
+    },
+    "CANCEL" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
+          }
+        }
+      }
+    },
+    "Calculates total jump count, workout count, and calories for all time or a specific year in JumpRec." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculates total jump count, workout count, and calories for all time or a specific year in JumpRec."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecの通算または指定した年の総ジャンプ回数、ワークアウト数、消費カロリーを計算します。"
           }
         }
       }
@@ -366,12 +522,18 @@
         }
       }
     },
-    "CALORIES" : {
+    "Calories Burned" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calories Burned"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "カロリー"
+            "value" : "消費カロリー"
           }
         }
       }
@@ -396,16 +558,6 @@
         }
       }
     },
-    "CANCEL" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "キャンセル"
-          }
-        }
-      }
-    },
     "Check Apple Watch, headphone, or iPhone motion availability." : {
       "localizations" : {
         "ja" : {
@@ -416,12 +568,44 @@
         }
       }
     },
+    "Check Personal Records" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check Personal Records"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自己ベストを確認"
+          }
+        }
+      }
+    },
     "Checking iCloud availability for your saved sessions." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存済みのセッションに対する iCloud の利用状況を確認しています。"
+          }
+        }
+      }
+    },
+    "Checks how many jumps and workouts you have completed today." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checks how many jumps and workouts you have completed today."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日完了した縄跳びの回数とワークアウト数を確認します。"
           }
         }
       }
@@ -464,6 +648,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在選択中"
+          }
+        }
+      }
+    },
+    "DONE" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        }
+      }
+    },
+    "DURATION" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時間"
           }
         }
       }
@@ -528,16 +732,6 @@
         }
       }
     },
-    "Delete all records?" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべての記録を削除しますか？"
-          }
-        }
-      }
-    },
     "Delete Records" : {
       "localizations" : {
         "ja" : {
@@ -568,6 +762,16 @@
         }
       }
     },
+    "Delete all records?" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての記録を削除しますか？"
+          }
+        }
+      }
+    },
     "Delete these sessions?" : {
       "localizations" : {
         "ja" : {
@@ -588,22 +792,6 @@
         }
       }
     },
-    "Detection sensitivity" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Detection sensitivity"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "検出感度"
-          }
-        }
-      }
-    },
     "Detection Sensitivity" : {
       "localizations" : {
         "en" : {
@@ -620,12 +808,18 @@
         }
       }
     },
-    "DONE" : {
+    "Detection sensitivity" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detection sensitivity"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "完了"
+            "value" : "検出感度"
           }
         }
       }
@@ -643,12 +837,18 @@
         }
       }
     },
-    "DURATION" : {
+    "Duration Seconds" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duration Seconds"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "時間"
+            "value" : "時間（秒）"
           }
         }
       }
@@ -669,6 +869,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在のジャンプセッションを終了します。"
+          }
+        }
+      }
+    },
+    "Get Latest Workout" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Latest Workout"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新のワークアウトを取得"
+          }
+        }
+      }
+    },
+    "Get Today's Jump Stats" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Today's Jump Stats"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日の縄跳び記録を取得"
+          }
+        }
+      }
+    },
+    "Get Workout Stats" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Workout Stats"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウト統計を取得"
           }
         }
       }
@@ -696,6 +944,12 @@
     },
     "Goal Type" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Goal Type"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -720,6 +974,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "目標: %lld 分"
+          }
+        }
+      }
+    },
+    "HR(AVG)" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平均心拍"
           }
         }
       }
@@ -823,36 +1087,6 @@
         }
       }
     },
-    "HR(AVG)" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "平均心拍"
-          }
-        }
-      }
-    },
-    "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたセッションは現在復元できません。"
-          }
-        }
-      }
-    },
-    "iCloud is temporarily unavailable. Previously synced sessions may reappear once the account becomes reachable again." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたセッションが再表示される場合があります。"
-          }
-        }
-      }
-    },
     "If Apple Watch cannot start, iPhone will be used." : {
       "localizations" : {
         "ja" : {
@@ -917,6 +1151,23 @@
         }
       }
     },
+    "In %1$lld, you completed %2$@ with %3$@ total jumps, burning %4$lld kcal." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %1$lld, you completed %2$@ with %3$@ total jumps, burning %4$lld kcal."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld年は%2$@完了し、合計%3$@回、%4$lld kcal消費しました。"
+          }
+        }
+      }
+    },
     "Inbox" : {
 
     },
@@ -940,23 +1191,38 @@
         }
       }
     },
-    "iPhone motion is not available on this device." : {
-      "extractionState" : "stale",
+    "Inspects your personal records and milestones in JumpRec." : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspects your personal records and milestones in JumpRec."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このデバイスでは iPhoneのモーションを利用できません。"
+            "value" : "JumpRecで達成した自己ベストや記録を確認します。"
           }
         }
       }
     },
-    "iPhone Session" : {
+    "JUMPING RATE" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iPhoneから始めるセッション"
+            "value" : "ジャンプレート"
+          }
+        }
+      }
+    },
+    "JUMPS" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ"
           }
         }
       }
@@ -981,12 +1247,18 @@
         }
       }
     },
-    "Jump count goal" : {
+    "Jump Count Goal" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jump Count Goal"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ジャンプ回数目標"
+            "value" : "回数目標"
           }
         }
       }
@@ -1001,12 +1273,18 @@
         }
       }
     },
-    "Jump progress" : {
+    "Jump Rope Workout" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jump Rope Workout"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ジャンプ進捗"
+            "value" : "縄跳びワークアウト"
           }
         }
       }
@@ -1021,22 +1299,32 @@
         }
       }
     },
+    "Jump count goal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ回数目標"
+          }
+        }
+      }
+    },
+    "Jump progress" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ進捗"
+          }
+        }
+      }
+    },
     "Jump time goal" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプ時間目標"
-          }
-        }
-      }
-    },
-    "JUMPING RATE" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ジャンプレート"
           }
         }
       }
@@ -1051,16 +1339,6 @@
         }
       }
     },
-    "jumps" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "回"
-          }
-        }
-      }
-    },
     "Jumps" : {
       "localizations" : {
         "ja" : {
@@ -1071,12 +1349,18 @@
         }
       }
     },
-    "JUMPS" : {
+    "Latest Workout" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Latest Workout"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ジャンプ"
+            "value" : "最新のワークアウト"
           }
         }
       }
@@ -1125,6 +1409,12 @@
     },
     "Longest Streak" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Longest Streak"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1145,26 +1435,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "低め"
-          }
-        }
-      }
-    },
-    "minute" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分"
-          }
-        }
-      }
-    },
-    "minutes" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分"
           }
         }
       }
@@ -1201,6 +1471,17 @@
         }
       }
     },
+    "New Record" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新記録"
+          }
+        }
+      }
+    },
     "New personal record." : {
       "localizations" : {
         "ja" : {
@@ -1218,17 +1499,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今回更新した自己ベスト"
-          }
-        }
-      }
-    },
-    "New Record" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新記録"
           }
         }
       }
@@ -1273,6 +1543,56 @@
         }
       }
     },
+    "No jump rope workouts found in JumpRec." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No jump rope workouts found in JumpRec."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecに縄跳びワークアウトの履歴がありません。"
+          }
+        }
+      }
+    },
+    "No jump rope workouts recorded for %lld in JumpRec." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No jump rope workouts recorded for %lld in JumpRec."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecに%lld年の縄跳びワークアウト記録はありません。"
+          }
+        }
+      }
+    },
+    "No jump rope workouts recorded in JumpRec yet." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No jump rope workouts recorded in JumpRec yet."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecにまだ縄跳びワークアウトの記録がありません。"
+          }
+        }
+      }
+    },
     "No motion source available" : {
       "localizations" : {
         "ja" : {
@@ -1290,6 +1610,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "利用できるデバイス検索中"
+          }
+        }
+      }
+    },
+    "No personal records achieved yet. Complete a workout to set your first records!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No personal records achieved yet. Complete a workout to set your first records!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "まだ自己ベストがありません。ワークアウトを完了して記録を作りましょう！"
           }
         }
       }
@@ -1334,6 +1670,41 @@
         }
       }
     },
+    "No workouts found matching \"%@\"." : {
+
+    },
+    "Open Workout" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Workout"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フリーワークアウト"
+          }
+        }
+      }
+    },
+    "Opens JumpRec and begins a jump rope workout." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens JumpRec and begins a jump rope workout."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecを開いて縄跳びワークアウトを開始します。"
+          }
+        }
+      }
+    },
     "Opens session details." : {
 
     },
@@ -1349,6 +1720,12 @@
     },
     "Peak Rate" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peak Rate"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1357,8 +1734,17 @@
         }
       }
     },
+    "Personal Record" : {
+
+    },
     "Personal Records" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personal Records"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1407,16 +1793,6 @@
         }
       }
     },
-    "Rate" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "レート"
-          }
-        }
-      }
-    },
     "RATE" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1434,6 +1810,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "レート(平均)"
+          }
+        }
+      }
+    },
+    "Rate" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レート"
           }
         }
       }
@@ -1458,6 +1844,38 @@
         }
       }
     },
+    "Record Type" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record Type"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記録の種類"
+          }
+        }
+      }
+    },
+    "Record Value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record Value"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記録値"
+          }
+        }
+      }
+    },
     "Records" : {
       "localizations" : {
         "ja" : {
@@ -1468,33 +1886,28 @@
         }
       }
     },
+    "Retrieves your most recent jump rope workout from JumpRec." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retrieves your most recent jump rope workout from JumpRec."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecから直近の縄跳びワークアウトを取得します。"
+          }
+        }
+      }
+    },
     "Rhythm Consistency" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "リズム安定度"
-          }
-        }
-      }
-    },
-    "Searching" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "検索中"
-          }
-        }
-      }
-    },
-    "Selected automatically when the session starts." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション開始時に自動で選択されます。"
           }
         }
       }
@@ -1520,6 +1933,168 @@
         }
       }
     },
+    "SESSION DEVICE" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションデバイス"
+          }
+        }
+      }
+    },
+    "SESSIONS" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション"
+          }
+        }
+      }
+    },
+    "SESSIONS THIS MONTH" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今月のセッション"
+          }
+        }
+      }
+    },
+    "SHARE CSV" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CSVを共有"
+          }
+        }
+      }
+    },
+    "START" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "はじめる"
+          }
+        }
+      }
+    },
+    "START SESSION" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "はじめる"
+          }
+        }
+      }
+    },
+    "STOP" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "終了する"
+          }
+        }
+      }
+    },
+    "STOP ON WATCH" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Watchで終了できます"
+          }
+        }
+      }
+    },
+    "STOP SESSION" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "終了する"
+          }
+        }
+      }
+    },
+    "Search Query" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search Query"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "検索ワード"
+          }
+        }
+      }
+    },
+    "Search Workouts" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search Workouts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトを検索"
+          }
+        }
+      }
+    },
+    "Searches your jump rope workout history in JumpRec." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Searches your jump rope workout history in JumpRec."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecの縄跳びワークアウト履歴を検索します。"
+          }
+        }
+      }
+    },
+    "Searching" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "検索中"
+          }
+        }
+      }
+    },
+    "Selected automatically when the session starts." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション開始時に自動で選択されます。"
+          }
+        }
+      }
+    },
     "Session Complete!" : {
       "localizations" : {
         "ja" : {
@@ -1530,12 +2105,18 @@
         }
       }
     },
-    "Session countdown" : {
+    "Session Count" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session Count"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッション開始カウントダウン"
+            "value" : "ワークアウト数"
           }
         }
       }
@@ -1550,12 +2131,12 @@
         }
       }
     },
-    "SESSION DEVICE" : {
+    "Session countdown" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッションデバイス"
+            "value" : "セッション開始カウントダウン"
           }
         }
       }
@@ -1600,26 +2181,6 @@
         }
       }
     },
-    "SESSIONS" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション"
-          }
-        }
-      }
-    },
-    "SESSIONS THIS MONTH" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "今月のセッション"
-          }
-        }
-      }
-    },
     "Set Goal" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1648,16 +2209,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定"
-          }
-        }
-      }
-    },
-    "SHARE CSV" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CSVを共有"
           }
         }
       }
@@ -1809,23 +2360,50 @@
         }
       }
     },
-    "START" : {
-      "extractionState" : "stale",
+    "Start Jump Rope Workout" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Jump Rope Workout"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "はじめる"
+            "value" : "縄跳びワークアウトを開始"
           }
         }
       }
     },
-    "START SESSION" : {
+    "Start Time" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Time"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "はじめる"
+            "value" : "開始時間"
+          }
+        }
+      }
+    },
+    "Start Workout" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Workout"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウト開始"
           }
         }
       }
@@ -1861,38 +2439,6 @@
         }
       }
     },
-    "STOP" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "終了する"
-          }
-        }
-      }
-    },
-    "STOP ON WATCH" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Watchで終了できます"
-          }
-        }
-      }
-    },
-    "STOP SESSION" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "終了する"
-          }
-        }
-      }
-    },
     "Stop the workout from Apple Watch." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1910,6 +2456,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloud から同期しています。アプリを再インストールした後は、保存済みのセッションが再表示されるまで少し時間がかかる場合があります。"
+          }
+        }
+      }
+    },
+    "TIME" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時間"
+          }
+        }
+      }
+    },
+    "TRACKING SOURCE" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "計測デバイス"
           }
         }
       }
@@ -1945,6 +2511,22 @@
         }
       }
     },
+    "Target Value" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Target Value"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目標値"
+          }
+        }
+      }
+    },
     "The app could not confirm iCloud availability, so session restore status is unknown." : {
       "localizations" : {
         "ja" : {
@@ -1975,22 +2557,22 @@
         }
       }
     },
-    "The number of detected pauses longer than 5 seconds and up to 15 seconds between jumps." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "5秒以上、15秒以下の休憩・中断が検出された回数です。"
-          }
-        }
-      }
-    },
     "The number of detected pauses longer than 15 seconds between jumps." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "15秒以上の休憩・中断が検出された回数です。"
+          }
+        }
+      }
+    },
+    "The number of detected pauses longer than 5 seconds and up to 15 seconds between jumps." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5秒以上、15秒以下の休憩・中断が検出された回数です。"
           }
         }
       }
@@ -2025,7 +2607,7 @@
         }
       }
     },
-    "Threshold adjustment" : {
+    "Threshold Adjustment" : {
       "extractionState" : "stale",
       "localizations" : {
         "ja" : {
@@ -2036,7 +2618,7 @@
         }
       }
     },
-    "Threshold Adjustment" : {
+    "Threshold adjustment" : {
       "extractionState" : "stale",
       "localizations" : {
         "ja" : {
@@ -2058,12 +2640,18 @@
         }
       }
     },
-    "TIME" : {
+    "Time Duration Goal" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time Duration Goal"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "時間"
+            "value" : "時間目標"
           }
         }
       }
@@ -2078,22 +2666,44 @@
         }
       }
     },
+    "Today's Jumps" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's Jumps"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日の縄跳び"
+          }
+        }
+      }
+    },
+    "Total Jumps" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Jumps"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "総ジャンプ回数"
+          }
+        }
+      }
+    },
     "Tracking on Apple Watch" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apple Watchで計測中"
-          }
-        }
-      }
-    },
-    "TRACKING SOURCE" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "計測デバイス"
           }
         }
       }
@@ -2132,12 +2742,77 @@
         }
       }
     },
+    "View Jump Rope Session" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Jump Rope Session"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "縄跳びセッションを表示"
+          }
+        }
+      }
+    },
     "When compatible headphones are available, start on iPhone instead of Apple Watch." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "対応ヘッドフォンが利用可能な場合、Apple WatchではなくiPhoneで開始します。"
+          }
+        }
+      }
+    },
+    "Workout Goal Type" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Workout Goal Type"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウト目標タイプ"
+          }
+        }
+      }
+    },
+    "Workout Statistics" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Workout Statistics"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウト統計"
+          }
+        }
+      }
+    },
+    "Workout Stats" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Workout Stats"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウト統計"
           }
         }
       }
@@ -2152,12 +2827,125 @@
         }
       }
     },
+    "Year" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Year"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "年"
+          }
+        }
+      }
+    },
+    "You haven't logged any jump rope workouts today yet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You haven't logged any jump rope workouts today yet."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日はまだ縄跳びワークアウトを記録していません。"
+          }
+        }
+      }
+    },
     "Your average calorie burn efficiency across the full session duration." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッション全体を通した、平均的なカロリー消費効率です。"
+          }
+        }
+      }
+    },
+    "cal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kcal"
+          }
+        }
+      }
+    },
+    "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたセッションは現在復元できません。"
+          }
+        }
+      }
+    },
+    "iCloud is temporarily unavailable. Previously synced sessions may reappear once the account becomes reachable again." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたセッションが再表示される場合があります。"
+          }
+        }
+      }
+    },
+    "iPhone Session" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhoneから始めるセッション"
+          }
+        }
+      }
+    },
+    "iPhone motion is not available on this device." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスでは iPhoneのモーションを利用できません。"
+          }
+        }
+      }
+    },
+    "jumps" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回"
+          }
+        }
+      }
+    },
+    "minute" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分"
+          }
+        }
+      }
+    },
+    "minutes" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分"
           }
         }
       }
