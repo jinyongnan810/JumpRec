@@ -142,6 +142,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         let shouldSpeakJumpTimeAnnouncements = payload["shouldSpeakJumpTimeAnnouncements"] as? Bool ?? true
         let jumpDetectorThresholdAdjustmentPercentage = (payload["jumpDetectorThresholdAdjustmentPercentage"] as? NSNumber)?.doubleValue
             ?? 0.0
+        let hasUnlockedUnlimitedWorkouts = payload["hasUnlockedUnlimitedWorkouts"] as? Bool
+        let qualifiedWorkoutCount = (payload["qualifiedWorkoutCount"] as? NSNumber)?.intValue
 
         Task { @MainActor [weak self] in
             self?.applySettings(
@@ -150,7 +152,9 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
                 jumpTime: jumpTime,
                 shouldSpeakJumpCountAnnouncements: shouldSpeakJumpCountAnnouncements,
                 shouldSpeakJumpTimeAnnouncements: shouldSpeakJumpTimeAnnouncements,
-                jumpDetectorThresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage
+                jumpDetectorThresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage,
+                hasUnlockedUnlimitedWorkouts: hasUnlockedUnlimitedWorkouts,
+                qualifiedWorkoutCount: qualifiedWorkoutCount
             )
         }
     }
@@ -162,7 +166,9 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         jumpTime: Int,
         shouldSpeakJumpCountAnnouncements: Bool,
         shouldSpeakJumpTimeAnnouncements: Bool,
-        jumpDetectorThresholdAdjustmentPercentage: Double
+        jumpDetectorThresholdAdjustmentPercentage: Double,
+        hasUnlockedUnlimitedWorkouts: Bool?,
+        qualifiedWorkoutCount: Int?
     ) {
         settingsStore.set(goalTypeRawValue, forKey: "goalType")
         settingsStore.set(Int64(jumpCount), forKey: "jumpCount")
@@ -173,6 +179,12 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             JumpRecSettings.clampedJumpDetectorThresholdAdjustmentPercentage(jumpDetectorThresholdAdjustmentPercentage),
             forKey: "jumpDetectorThresholdAdjustmentPercentage"
         )
+        if let hasUnlockedUnlimitedWorkouts {
+            settingsStore.set(hasUnlockedUnlimitedWorkouts, forKey: "hasUnlockedUnlimitedWorkouts")
+        }
+        if let qualifiedWorkoutCount {
+            settingsStore.set(Int64(qualifiedWorkoutCount), forKey: "qualifiedWorkoutCount")
+        }
         settingsStore.synchronize()
 
         NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)

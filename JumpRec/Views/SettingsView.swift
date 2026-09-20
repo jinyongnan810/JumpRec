@@ -12,8 +12,17 @@ struct SettingsView: View {
     @Bindable var settings: JumpRecSettings
     /// Dismisses the sheet after changes are applied.
     @Environment(\.dismiss) private var dismiss
+    @Environment(MyDataStore.self) private var dataStore
+    @State private var purchaseManager = PurchaseManager.shared
 
     // MARK: - View State
+
+    /// Controls presentation of the paywall sheet.
+    @State private var showPaywall = false
+    /// Controls presentation of restore feedback alerts.
+    @State private var isShowingRestoreAlert = false
+    /// Feedback message displayed in restore alert.
+    @State private var restoreAlertMessage = ""
 
     /// Tracks the selected goal type while editing so the user can cancel by closing the sheet.
     @State private var selectedType: GoalType = .count
@@ -38,17 +47,20 @@ struct SettingsView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
-                    goalSettingsSection
+                    membershipSection
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 1)
 
-                    jumpDetectionSection
+                    goalSettingsSection
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
 
-                    audioSettingsSection
+                    jumpDetectionSection
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 3)
 
-                    iPhoneSessionSection
+                    audioSettingsSection
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 4)
+
+                    iPhoneSessionSection
+                        .staggeredAppearance(isVisible: hasContentAppeared, index: 5)
                 }
                 .padding(.bottom, 8)
             }
@@ -65,7 +77,7 @@ struct SettingsView: View {
                         .frame(height: 56)
                 }
                 .appGlassButton(prominent: true, tint: AppColors.accent)
-                .staggeredAppearance(isVisible: hasContentAppeared, index: 5)
+                .staggeredAppearance(isVisible: hasContentAppeared, index: 6)
                 .padding(.top, 12)
             }
         }
@@ -73,6 +85,17 @@ struct SettingsView: View {
         .padding(.bottom, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(AppColors.cardSurface)
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
+        }
+        .alert(
+            String(localized: "Restore Purchases"),
+            isPresented: $isShowingRestoreAlert
+        ) {
+            Button(String(localized: "OK"), role: .cancel) {}
+        } message: {
+            Text(restoreAlertMessage)
+        }
         .onAppear {
             configureSegmentedControlAppearance()
             selectedType = settings.goalType
@@ -88,6 +111,88 @@ struct SettingsView: View {
     }
 
     // MARK: - Sections
+
+    /// Displays the one-time license unlock status and free workout quota progress.
+    private var membershipSection: some View {
+        settingsSection(title: String(localized: "Membership & Quota")) {
+            if purchaseManager.hasUnlockedUnlimitedWorkouts {
+                HStack(spacing: 12) {
+                    Image(systemName: "checkmark.seal.fill")
+                        .font(AppFonts.system(22))
+                        .foregroundStyle(AppColors.accent)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Unlimited Workouts Active")
+                            .font(AppFonts.bodyLabelStrong)
+                            .foregroundStyle(AppColors.textPrimary)
+
+                        Text("You have unlocked lifetime unlimited workout tracking.")
+                            .font(AppFonts.bodySmall)
+                            .foregroundStyle(AppColors.textSecondary)
+                    }
+                    Spacer()
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 14) {
+                    HStack {
+                        Text("Free Workouts")
+                            .font(AppFonts.bodyLabelStrong)
+                            .foregroundStyle(AppColors.textPrimary)
+                        Spacer()
+                        Text("\(dataStore.qualifiedSessionsCount()) / \(JumpRecSettings.freeWorkoutQuota)")
+                            .font(AppFonts.bodyLabelStrong)
+                            .foregroundStyle(dataStore.qualifiedSessionsCount() >= JumpRecSettings.freeWorkoutQuota ? AppColors.danger : AppColors.accent)
+                    }
+
+                    ProgressView(
+                        value: min(Double(dataStore.qualifiedSessionsCount()), Double(JumpRecSettings.freeWorkoutQuota)),
+                        total: Double(JumpRecSettings.freeWorkoutQuota)
+                    )
+                    .tint(dataStore.qualifiedSessionsCount() >= JumpRecSettings.freeWorkoutQuota ? AppColors.danger : AppColors.accent)
+
+                    Text("Includes sessions with 100+ jumps. When you complete 100 workouts, unlock lifetime unlimited tracking with a single purchase.")
+                        .font(AppFonts.bodySmall)
+                        .foregroundStyle(AppColors.textSecondary)
+
+                    HStack(spacing: 12) {
+                        Button {
+                            showPaywall = true
+                        } label: {
+                            Text("Unlock Unlimited")
+                                .font(AppFonts.primaryButtonLabel)
+                                .foregroundStyle(AppColors.bgPrimary)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 44)
+                        }
+                        .appGlassButton(prominent: true, tint: AppColors.accent)
+
+                        Button {
+                            Task {
+                                await purchaseManager.restorePurchases()
+                                if purchaseManager.hasUnlockedUnlimitedWorkouts {
+                                    restoreAlertMessage = String(localized: "Your previous purchase was successfully restored!")
+                                    isShowingRestoreAlert = true
+                                } else if purchaseManager.errorMessage != nil {
+                                    restoreAlertMessage = purchaseManager.errorMessage ?? String(localized: "Could not restore purchases.")
+                                    isShowingRestoreAlert = true
+                                } else {
+                                    restoreAlertMessage = String(localized: "No previous purchase was found for this Apple ID.")
+                                    isShowingRestoreAlert = true
+                                }
+                            }
+                        } label: {
+                            Text("Restore")
+                                .font(AppFonts.secondaryActionLabel)
+                                .foregroundStyle(AppColors.textSecondary)
+                                .frame(height: 44)
+                                .padding(.horizontal, 12)
+                        }
+                        .appGlassButton(tint: AppColors.textMuted)
+                    }
+                }
+            }
+        }
+    }
 
     /// Groups goal controls so this sheet can grow into a broader settings surface without mixing concerns.
     private var goalSettingsSection: some View {

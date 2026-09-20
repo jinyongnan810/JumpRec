@@ -1,129 +1,139 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "%@ jumps" : {
-
+  "sourceLanguage": "en",
+  "strings": {
+    "%@ jumps": {},
+    "%@ kcal/min": {},
+    "%lld": {
+      "shouldTranslate": false
     },
-    "%@ kcal/min" : {
-
-    },
-    "%lld" : {
-      "shouldTranslate" : false
-    },
-    "AirPods" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AirPods"
+    "AirPods": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AirPods"
           }
         }
       }
     },
-    "cal" : {
-
-    },
-    "Calories" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "カロリー"
+    "Calories": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カロリー"
           }
         }
       }
     },
-    "Checking iCloud availability for your saved sessions." : {
-
-    },
-    "Headphone" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ヘッドフォン"
+    "Checking iCloud availability for your saved sessions.": {},
+    "Headphone": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ヘッドフォン"
           }
         }
       }
     },
-    "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now." : {
-
-    },
-    "iCloud is temporarily unavailable. Previously synced sessions may reappear once the account becomes reachable again." : {
-
-    },
-    "iPhone" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone"
+    "JumpRec": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JumpRec"
           }
         }
       }
     },
-    "JumpRec" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JumpRec"
+    "Jumps": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ジャンプ"
           }
         }
       }
     },
-    "Jumps" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ジャンプ"
+    "No cloud data restored yet. If you recently reinstalled the app, leave it open for a bit longer so iCloud can finish syncing.": {},
+    "No iCloud account is currently signed in, so previous cloud-backed sessions cannot be restored on this device yet.": {},
+    "Product details could not be loaded from the App Store. Please check your internet connection.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Storeから製品情報を読み込めませんでした。通信環境をご確認ください。"
           }
         }
       }
     },
-    "No cloud data restored yet. If you recently reinstalled the app, leave it open for a bit longer so iCloud can finish syncing." : {
-
-    },
-    "No iCloud account is currently signed in, so previous cloud-backed sessions cannot be restored on this device yet." : {
-
-    },
-    "Rate" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "レート"
+    "Purchase is pending approval.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入の承認待ちです。"
           }
         }
       }
     },
-    "Source" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "デバイス"
+    "Purchase verification failed. Please try again.": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "購入の検証に失敗しました。もう一度お試しください。"
           }
         }
       }
     },
-    "Syncing from iCloud. Your saved sessions may take a moment to reappear after reinstalling the app." : {
-
+    "Rate": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レート"
+          }
+        }
+      }
     },
-    "The app could not confirm iCloud availability, so session restore status is unknown." : {
-
+    "Source": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デバイス"
+          }
+        }
+      }
     },
-    "Watch" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Watch"
+    "Syncing from iCloud. Your saved sessions may take a moment to reappear after reinstalling the app.": {},
+    "The app could not confirm iCloud availability, so session restore status is unknown.": {},
+    "Watch": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Watch"
+          }
+        }
+      }
+    },
+    "cal": {},
+    "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now.": {},
+    "iCloud is temporarily unavailable. Previously synced sessions may reappear once the account becomes reachable again.": {},
+    "iPhone": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone"
           }
         }
       }
     }
   },
-  "version" : "1.1"
+  "version": "1.1"
 }

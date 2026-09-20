@@ -17,6 +17,8 @@ struct ContentView: View {
     @AppStorage("hasRequestedReviewAfterTenSessions") private var hasRequestedReviewAfterTenSessions = false
     @AppStorage("qualifiedFinishedSessionCount") private var qualifiedFinishedSessionCount = 0
     @State private var connectivityManager = ConnectivityManager.shared
+    @State private var purchaseManager = PurchaseManager.shared
+    @State private var showPaywall = false
 
     @State private var selectedTab: Tab = .jump
     @State private var settings = JumpRecSettings()
@@ -67,6 +69,9 @@ struct ContentView: View {
             .presentationDragIndicator(.visible)
             .presentationBackground(AppColors.cardSurface)
         }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
+        }
         .preferredColorScheme(.dark)
         .onAppear {
 //            configureTabBarAppearance()
@@ -76,6 +81,8 @@ struct ContentView: View {
             // internal one-time initialization work.
             appState.warmUpSpeechSynthesizerIfNeeded()
             dataStore.refreshCloudDiagnostics()
+            settings.qualifiedWorkoutCount = dataStore.qualifiedSessionsCount()
+            settings.hasUnlockedUnlimitedWorkouts = purchaseManager.hasUnlockedUnlimitedWorkouts
             syncSettingsToWatch()
             processPendingIntentStartIfNeeded()
         }
@@ -83,6 +90,9 @@ struct ContentView: View {
             appState.updateSceneActive(newValue == .active)
             if newValue == .active {
                 dataStore.refreshCloudDiagnostics()
+                settings.qualifiedWorkoutCount = dataStore.qualifiedSessionsCount()
+                settings.hasUnlockedUnlimitedWorkouts = purchaseManager.hasUnlockedUnlimitedWorkouts
+                syncSettingsToWatch()
                 processPendingIntentStartIfNeeded()
             }
         }
@@ -106,6 +116,8 @@ struct ContentView: View {
         }
         .onChange(of: appState.completedSession?.id) { _, _ in
             recordQualifiedCompletedSessionIfNeeded()
+            settings.qualifiedWorkoutCount = dataStore.qualifiedSessionsCount()
+            syncSettingsToWatch()
             scheduleReviewRequestIfNeeded()
         }
     }
@@ -183,7 +195,9 @@ struct ContentView: View {
             jumpTime: settings.jumpTime,
             shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
             shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
-            jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
+            jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage,
+            hasUnlockedUnlimitedWorkouts: purchaseManager.hasUnlockedUnlimitedWorkouts,
+            qualifiedWorkoutCount: settings.qualifiedWorkoutCount
         )
     }
 
@@ -214,6 +228,10 @@ struct ContentView: View {
         JumpRecState.pendingStartGoal = nil
         if appState.sessionState == .idle {
             selectedTab = .jump
+            if !dataStore.canStartNewWorkout(isLicenseUnlocked: purchaseManager.hasUnlockedUnlimitedWorkouts) {
+                showPaywall = true
+                return
+            }
             appState.start(
                 goalType: pending.type,
                 goalValue: pending.value,

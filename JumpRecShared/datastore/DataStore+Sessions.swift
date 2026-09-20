@@ -31,6 +31,28 @@ public extension MyDataStore {
         #endif
     }
 
+    /// Returns the number of completed sessions that have at least 100 jumps.
+    /// This count is used to evaluate the 100-workout free usage quota.
+    func qualifiedSessionsCount() -> Int {
+        let minimumJumpCount = JumpRecSettings.minimumJumpsForQuotaQualification
+        let descriptor = FetchDescriptor<JumpSession>(
+            predicate: #Predicate { session in
+                session.jumpCount >= minimumJumpCount
+            }
+        )
+        return (try? modelContext.fetchCount(descriptor)) ?? 0
+    }
+
+    /// Evaluates whether the user is permitted to start a new workout session.
+    /// Returns true if the one-time unlimited license is unlocked, or if the user has
+    /// completed fewer than 100 qualified workouts.
+    func canStartNewWorkout(isLicenseUnlocked: Bool) -> Bool {
+        if isLicenseUnlocked {
+            return true
+        }
+        return qualifiedSessionsCount() < JumpRecSettings.freeWorkoutQuota
+    }
+
     /// Inserts a session and its encoded rate series into the model context.
     func addSession(session: JumpSession, rateSamples: [RateSamplePoint] = []) {
         modelContext.insert(session)

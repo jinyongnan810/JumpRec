@@ -23,6 +23,8 @@ struct StartView: View {
     private var settings: JumpRecSettings
     /// Controls navigation to the goal settings screen.
     @State var showSettings: Bool = false
+    /// Controls presentation of the quota reached alert.
+    @State private var showQuotaAlert: Bool = false
 
     /// Returns the formatted goal text shown under the start button.
     var goal: Text {
@@ -91,8 +93,12 @@ struct StartView: View {
                 } else {
                     VStack(spacing: 12) {
                         Button {
-                            withAnimation {
-                                isCountingDown.toggle()
+                            if settings.isQuotaExceeded {
+                                showQuotaAlert = true
+                            } else {
+                                withAnimation {
+                                    isCountingDown.toggle()
+                                }
                             }
                         } label: {
                             Text("START")
@@ -132,6 +138,14 @@ struct StartView: View {
             }
             .navigationDestination(isPresented: $showSettings) {
                 SettingsView()
+            }
+            .alert(
+                String(localized: "Free Limit Reached"),
+                isPresented: $showQuotaAlert
+            ) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text("You've completed your 100 free workouts. Please open JumpRec on your iPhone to unlock unlimited workouts.")
             }
         }
     }

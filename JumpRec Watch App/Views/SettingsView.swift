@@ -44,6 +44,42 @@ struct SettingsView: View {
         @Bindable var settings = settings
 
         List {
+            Section("Membership") {
+                if settings.hasUnlockedUnlimitedWorkouts {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(AppFonts.watchBody)
+                            .foregroundStyle(AppColors.accent)
+                        Text("Unlimited Active")
+                            .font(AppFonts.watchBody)
+                            .foregroundStyle(AppColors.textPrimary)
+                    }
+                } else {
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text("Free Workouts")
+                                .font(AppFonts.watchBody)
+                                .foregroundStyle(AppColors.textPrimary)
+                            Spacer()
+                            Text("\(settings.qualifiedWorkoutCount) / \(JumpRecSettings.freeWorkoutQuota)")
+                                .font(AppFonts.watchGoalChip)
+                                .foregroundStyle(settings.isQuotaExceeded ? AppColors.danger : AppColors.accent)
+                        }
+
+                        if settings.isQuotaExceeded {
+                            Text("Limit reached. Unlock on iPhone.")
+                                .font(AppFonts.watchSupportingRegular)
+                                .foregroundStyle(AppColors.danger)
+                        } else {
+                            Text("100+ jump sessions")
+                                .font(AppFonts.watchSupportingRegular)
+                                .foregroundStyle(AppColors.textMuted)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+
             Section("Goal") {
                 NavigationLink {
                     CountView(

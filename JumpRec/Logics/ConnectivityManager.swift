@@ -248,14 +248,16 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         print("[WatchConnectivityManager] Saved completed session from watch: \(jumpCount) jumps")
     }
 
-    /// Syncs the selected workout settings to Apple Watch.
+    /// Syncs the selected workout settings, quota, and license state to Apple Watch.
     func syncSettings(
         goalType: GoalType,
         jumpCount: Int64,
         jumpTime: Int64,
         shouldSpeakJumpCountAnnouncements: Bool,
         shouldSpeakJumpTimeAnnouncements: Bool,
-        jumpDetectorThresholdAdjustmentPercentage: Double
+        jumpDetectorThresholdAdjustmentPercentage: Double,
+        hasUnlockedUnlimitedWorkouts: Bool = false,
+        qualifiedWorkoutCount: Int = 0
     ) {
         let payload: [String: Any] = [
             "type": "goalSettings",
@@ -265,6 +267,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             "shouldSpeakJumpCountAnnouncements": shouldSpeakJumpCountAnnouncements,
             "shouldSpeakJumpTimeAnnouncements": shouldSpeakJumpTimeAnnouncements,
             "jumpDetectorThresholdAdjustmentPercentage": jumpDetectorThresholdAdjustmentPercentage,
+            "hasUnlockedUnlimitedWorkouts": hasUnlockedUnlimitedWorkouts,
+            "qualifiedWorkoutCount": qualifiedWorkoutCount,
         ]
 
         do {

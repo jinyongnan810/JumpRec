@@ -130,6 +130,35 @@ public class JumpRecSettings {
         }
     }
 
+    /// Free workout quota allowed before requiring a one-time license.
+    public static let freeWorkoutQuota = 100
+    /// Minimum jump count for a session to qualify toward the 100-workout quota.
+    public static let minimumJumpsForQuotaQualification = 100
+
+    /// Indicates whether the user has unlocked the one-time license for unlimited workouts.
+    public var hasUnlockedUnlimitedWorkouts: Bool {
+        didSet {
+            guard !isLoadingFromStore else { return }
+            store.set(hasUnlockedUnlimitedWorkouts, forKey: "hasUnlockedUnlimitedWorkouts")
+            store.synchronize()
+        }
+    }
+
+    /// The number of qualified workouts completed (workouts with >= 100 jumps).
+    /// Synced between iPhone and Apple Watch so both devices know the current quota state.
+    public var qualifiedWorkoutCount: Int {
+        didSet {
+            guard !isLoadingFromStore else { return }
+            store.set(Int64(qualifiedWorkoutCount), forKey: "qualifiedWorkoutCount")
+            store.synchronize()
+        }
+    }
+
+    /// Whether the user has exceeded their free workout quota and needs to unlock the license.
+    public var isQuotaExceeded: Bool {
+        !hasUnlockedUnlimitedWorkouts && qualifiedWorkoutCount >= Self.freeWorkoutQuota
+    }
+
     // MARK: - Derived Values
 
     /// Returns the currently active goal value as an `Int`.
@@ -152,6 +181,8 @@ public class JumpRecSettings {
         shouldSpeakJumpCountAnnouncements = true
         shouldSpeakJumpTimeAnnouncements = true
         jumpDetectorThresholdAdjustmentPercentage = DefaultJumpDetectorThresholdAdjustmentPercentage
+        hasUnlockedUnlimitedWorkouts = false
+        qualifiedWorkoutCount = 0
         loadSettings()
 
         NotificationCenter.default.addObserver(
@@ -195,6 +226,8 @@ public class JumpRecSettings {
         let storedShouldSpeakJumpTimeAnnouncements = store.object(forKey: "shouldSpeakJumpTimeAnnouncements") as? Bool ?? true
         let storedThresholdAdjustmentPercentage = (store.object(forKey: "jumpDetectorThresholdAdjustmentPercentage") as? NSNumber)?.doubleValue
             ?? DefaultJumpDetectorThresholdAdjustmentPercentage
+        let storedHasUnlockedUnlimitedWorkouts = store.bool(forKey: "hasUnlockedUnlimitedWorkouts")
+        let storedQualifiedWorkoutCount = Int(store.longLong(forKey: "qualifiedWorkoutCount"))
 
         isLoadingFromStore = true
         goalType = storedGoalType
@@ -204,6 +237,8 @@ public class JumpRecSettings {
         shouldSpeakJumpCountAnnouncements = storedShouldSpeakJumpCountAnnouncements
         shouldSpeakJumpTimeAnnouncements = storedShouldSpeakJumpTimeAnnouncements
         jumpDetectorThresholdAdjustmentPercentage = Self.clampedJumpDetectorThresholdAdjustmentPercentage(storedThresholdAdjustmentPercentage)
+        hasUnlockedUnlimitedWorkouts = storedHasUnlockedUnlimitedWorkouts
+        qualifiedWorkoutCount = storedQualifiedWorkoutCount
         isLoadingFromStore = false
     }
 

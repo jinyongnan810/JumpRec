@@ -19,8 +19,13 @@ struct HomeView: View {
     /// Stops the active local session.
     var onStop: () -> Void
 
+    @Environment(MyDataStore.self) private var dataStore
+    @State private var purchaseManager = PurchaseManager.shared
+
     // MARK: - View State
 
+    /// Controls presentation of the paywall sheet when the 100-workout quota is reached.
+    @State private var showPaywall = false
     /// Controls presentation of the settings sheet.
     @State private var showSettingsView = false
     /// Coordinates the gear-button zoom transition with the presented settings sheet.
@@ -416,6 +421,9 @@ struct HomeView: View {
                     .presentationBackground(AppColors.cardSurface)
                     .presentationContentInteraction(.scrolls)
             }
+            .sheet(isPresented: $showPaywall) {
+                PaywallView()
+            }
             .task(id: appState.sessionState) {
                 guard appState.sessionState == .active else { return }
                 syncHeroRing(animated: true)
@@ -454,13 +462,24 @@ struct HomeView: View {
 
     // MARK: - Private Subviews
 
+    /// Returns whether the user is permitted to start a new workout.
+    /// Unlimited workouts are available if the user has completed fewer than 100
+    /// qualified sessions or has unlocked the one-time license.
+    private var canStartWorkout: Bool {
+        dataStore.canStartNewWorkout(isLicenseUnlocked: purchaseManager.hasUnlockedUnlimitedWorkouts)
+    }
+
     /// Renders the start/cancel button when the session is idle or counting down.
     private var idleControls: some View {
         Button {
             if isCountingDown {
                 cancelCountdown()
             } else {
-                startWithCountdown()
+                if !canStartWorkout {
+                    showPaywall = true
+                } else {
+                    startWithCountdown()
+                }
             }
         } label: {
             Text(primaryButtonTitle)

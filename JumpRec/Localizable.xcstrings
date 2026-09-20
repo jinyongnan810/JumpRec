@@ -115,6 +115,16 @@
     "%lld" : {
       "shouldTranslate" : false
     },
+    "%lld / %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld / %2$lld"
+          }
+        }
+      }
+    },
     "%lld min" : {
       "localizations" : {
         "ja" : {
@@ -171,6 +181,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "/ %lld 分"
+          }
+        }
+      }
+    },
+    "100 Workouts Milestone! 🎉" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "100 Workouts Milestone! 🎉"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "100回ワークアウト達成！🎉"
           }
         }
       }
@@ -314,6 +340,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定を確定する前に目標値を調整します。"
+          }
+        }
+      }
+    },
+    "All past workout history, personal records, and stats remain fully readable." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All past workout history, personal records, and stats remain fully readable."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "過去のワークアウト履歴や自己記録、統計データはいつでも閲覧できます。"
           }
         }
       }
@@ -610,6 +652,22 @@
         }
       }
     },
+    "Close" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "閉じる"
+          }
+        }
+      }
+    },
     "Complete sessions to set personal records!" : {
       "localizations" : {
         "ja" : {
@@ -626,6 +684,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "確認"
+          }
+        }
+      }
+    },
+    "Continue reviewing past workouts" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue reviewing past workouts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "過去のワークアウトを確認する"
+          }
+        }
+      }
+    },
+    "Could not restore purchases." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not restore purchases."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入を復元できませんでした。"
           }
         }
       }
@@ -869,6 +959,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在のジャンプセッションを終了します。"
+          }
+        }
+      }
+    },
+    "Family Sharing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Family Sharing"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファミリー共有"
+          }
+        }
+      }
+    },
+    "Free Workouts" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free Workouts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料ワークアウト"
           }
         }
       }
@@ -1171,6 +1293,22 @@
     "Inbox" : {
 
     },
+    "Includes sessions with 100+ jumps. When you complete 100 workouts, unlock lifetime unlimited tracking with a single purchase." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Includes sessions with 100+ jumps. When you complete 100 workouts, unlock lifetime unlimited tracking with a single purchase."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "100回以上のジャンプを完了したセッションが対象です。100回完了後は、1回の購入で無制限記録をアンロックできます。"
+          }
+        }
+      }
+    },
     "Increase jump count goal" : {
       "localizations" : {
         "ja" : {
@@ -1450,6 +1588,22 @@
         }
       }
     },
+    "Membership & Quota" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Membership & Quota"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メンバーシップ & 利用状況"
+          }
+        }
+      }
+    },
     "Most Calories" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1630,6 +1784,22 @@
         }
       }
     },
+    "No previous purchase was found for this Apple ID." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No previous purchase was found for this Apple ID."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このApple IDに関連付けられた購入履歴が見つかりませんでした。"
+          }
+        }
+      }
+    },
     "No records yet" : {
       "localizations" : {
         "ja" : {
@@ -1670,8 +1840,59 @@
         }
       }
     },
+    "No subscriptions and no recurring fees. Pay once and keep forever." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No subscriptions and no recurring fees. Pay once and keep forever."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サブスクリプションや追加料金はありません。1度の支払いでずっと使えます。"
+          }
+        }
+      }
+    },
     "No workouts found matching \"%@\"." : {
 
+    },
+    "OK" : {
+
+    },
+    "One-Time Purchase" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One-Time Purchase"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1回限りの買い切り"
+          }
+        }
+      }
+    },
+    "One-time payment charged to your Apple ID account. Family Sharing supported." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One-time payment charged to your Apple ID account. Family Sharing supported."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple IDアカウントに課金される1回限りの支払いです。ファミリー共有対応。"
+          }
+        }
+      }
     },
     "Open Workout" : {
       "localizations" : {
@@ -1793,6 +2014,54 @@
         }
       }
     },
+    "Product details could not be loaded from the App Store. Please check your internet connection." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Product details could not be loaded from the App Store. Please check your internet connection."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Storeから製品情報を読み込めませんでした。通信環境をご確認ください。"
+          }
+        }
+      }
+    },
+    "Purchase is pending approval." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase is pending approval."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入の承認待ちです。"
+          }
+        }
+      }
+    },
+    "Purchase verification failed. Please try again." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purchase verification failed. Please try again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入の検証に失敗しました。もう一度お試しください。"
+          }
+        }
+      }
+    },
     "RATE" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1882,6 +2151,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "記録"
+          }
+        }
+      }
+    },
+    "Restore" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元"
+          }
+        }
+      }
+    },
+    "Restore Purchases" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restore Purchases"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入を復元"
           }
         }
       }
@@ -2213,6 +2514,22 @@
         }
       }
     },
+    "Share unlimited access across your family members via iCloud." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share unlimited access across your family members via iCloud."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudを通じてご家族と無制限アクセスを共有できます。"
+          }
+        }
+      }
+    },
     "Short Breaks" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2404,6 +2721,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト開始"
+          }
+        }
+      }
+    },
+    "Start and track unlimited jump rope sessions without any future limits." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start and track unlimited jump rope sessions without any future limits."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "制限なく何度でもなわとびセッションを開始・記録することができます。"
           }
         }
       }
@@ -2742,6 +3075,104 @@
         }
       }
     },
+    "Unlimited Workouts" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlimited Workouts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無制限ワークアウト"
+          }
+        }
+      }
+    },
+    "Unlimited Workouts Active" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlimited Workouts Active"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無制限ワークアウト有効"
+          }
+        }
+      }
+    },
+    "Unlock Unlimited" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock Unlimited"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無制限をアンロック"
+          }
+        }
+      }
+    },
+    "Unlock Unlimited Workouts" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock Unlimited Workouts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無制限ワークアウトをアンロック"
+          }
+        }
+      }
+    },
+    "Unlock Unlimited Workouts — ¥100" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock Unlimited Workouts — ¥100"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無制限ワークアウトをアンロック — ¥100"
+          }
+        }
+      }
+    },
+    "Unlock Unlimited — %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock Unlimited — %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無制限をアンロック — %@"
+          }
+        }
+      }
+    },
     "View Jump Rope Session" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2843,6 +3274,22 @@
         }
       }
     },
+    "You have unlocked lifetime unlimited workout tracking." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have unlocked lifetime unlimited workout tracking."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無制限のワークアウト記録が有効になっています。"
+          }
+        }
+      }
+    },
     "You haven't logged any jump rope workouts today yet." : {
       "localizations" : {
         "en" : {
@@ -2859,12 +3306,76 @@
         }
       }
     },
+    "You've logged %lld of %lld free workouts. Unlock unlimited workout tracking anytime with a single, one-time purchase." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You've logged %1$lld of %2$lld free workouts. Unlock unlimited workout tracking anytime with a single, one-time purchase."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無料枠%2$lld回のうち%1$lld回のワークアウトを記録しました。1回限りの購入でいつでも無制限にアップグレードできます。"
+          }
+        }
+      }
+    },
+    "You've logged 100 great sessions with JumpRec. Unlock unlimited workout tracking forever with a single, one-time purchase." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You've logged 100 great sessions with JumpRec. Unlock unlimited workout tracking forever with a single, one-time purchase."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecで100回のセッションを記録しました。1回限りの購入で、無制限のワークアウト記録をアンロックできます。"
+          }
+        }
+      }
+    },
+    "Your Data is Always Yours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Data is Always Yours"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データはいつでも確認可能"
+          }
+        }
+      }
+    },
     "Your average calorie burn efficiency across the full session duration." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "セッション全体を通した、平均的なカロリー消費効率です。"
+          }
+        }
+      }
+    },
+    "Your previous purchase was successfully restored!" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your previous purchase was successfully restored!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以前の購入が正常に復元されました！"
           }
         }
       }
