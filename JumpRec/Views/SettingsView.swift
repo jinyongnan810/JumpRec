@@ -3,6 +3,7 @@
 //  JumpRec
 //
 
+import SwiftData
 import SwiftUI
 import UIKit
 
@@ -166,8 +167,10 @@ struct SettingsView: View {
                                 .foregroundStyle(AppColors.bgPrimary)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 44)
+                                .background(AppColors.accent)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
-                        .appGlassButton(prominent: true, tint: AppColors.accent)
+                        .buttonStyle(.plain)
 
                         Button {
                             Task {
@@ -188,9 +191,15 @@ struct SettingsView: View {
                                 .font(AppFonts.secondaryActionLabel)
                                 .foregroundStyle(AppColors.textSecondary)
                                 .frame(height: 44)
-                                .padding(.horizontal, 12)
+                                .padding(.horizontal, 16)
+                                .background(AppColors.cardSurface)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(AppColors.textMuted.opacity(0.3), lineWidth: 1)
+                                )
                         }
-                        .appGlassButton(tint: AppColors.textMuted)
+                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -604,7 +613,10 @@ private struct SettingsToggleRow: View {
 }
 
 #Preview {
-    SettingsView(settings: JumpRecSettings())
+    let dataStore = MyDataStore.shared
+    return SettingsView(settings: JumpRecSettings())
+        .environment(dataStore)
+        .modelContainer(dataStore.modelContainer)
         .presentationDetents([.large])
         .preferredColorScheme(.dark)
 }

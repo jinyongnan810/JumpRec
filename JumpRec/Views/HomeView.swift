@@ -616,6 +616,7 @@ struct HomeView: View {
         onStart: {},
         onStop: {}
     )
+    .environment(MyDataStore.shared)
     .background(AppColors.bgPrimary)
     .preferredColorScheme(.dark)
 }
