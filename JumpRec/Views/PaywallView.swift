@@ -43,8 +43,6 @@ struct PaywallView: View {
                         featuresSection
 
                         pricingAndActionSection
-
-                        footerSection
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 16)
@@ -52,18 +50,6 @@ struct PaywallView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(AppFonts.system(20))
-                            .foregroundStyle(AppColors.textMuted)
-                    }
-                    .accessibilityLabel(Text("Close"))
-                }
-            }
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
@@ -255,26 +241,19 @@ struct PaywallView: View {
             }
             .disabled(purchaseManager.isPurchasing || purchaseManager.isRestoring)
             .padding(.top, 4)
-        }
-    }
 
-    // MARK: - Footer Section
-
-    private var footerSection: some View {
-        VStack(spacing: 6) {
-            Text("One-time payment charged to your Apple ID account. Family Sharing supported.")
-                .font(AppFonts.system(11))
-                .foregroundStyle(AppColors.textMuted)
-                .multilineTextAlignment(.center)
-
+            // Dismisses the paywall sheet without completing a purchase.
+            // Styled identically to Restore Purchases with an explicit top gap separating it from the action above.
             Button {
                 dismiss()
             } label: {
-                Text("Continue reviewing past workouts")
-                    .font(AppFonts.bodySmall)
-                    .foregroundStyle(AppColors.textMuted)
+                Text("Maybe Later")
+                    .font(AppFonts.secondaryActionLabel)
+                    .foregroundStyle(AppColors.textSecondary)
+                    .underline()
             }
-            .padding(.top, 4)
+            .disabled(purchaseManager.isPurchasing || purchaseManager.isRestoring)
+            .padding(.top, 12)
         }
     }
 }
