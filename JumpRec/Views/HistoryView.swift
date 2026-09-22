@@ -41,10 +41,22 @@ struct HistoryView: View {
         return DateInterval(start: start, end: end)
     }
 
+    /// Determines whether any sessions exist across the whole store.
+    /// Checking both the local probe query and the data store's reactive counter ensures
+    /// newly imported CloudKit records trigger an immediate transition to the history list.
+    private var hasSessions: Bool {
+        !sessionExistenceProbe.isEmpty || dataStore.hasLocalSessions
+    }
+
+    /// Whether an iCloud synchronization operation is actively in-flight or waiting for initial import.
+    private var isSyncing: Bool {
+        dataStore.isCloudSyncActive || dataStore.isAwaitingInitialCloudRestore
+    }
+
     var body: some View {
         NavigationStack {
             Group {
-                if sessionExistenceProbe.isEmpty {
+                if !hasSessions {
                     emptyLibraryState
                 } else if let displayedMonthRange {
                     MonthSessionsList(
@@ -58,7 +70,10 @@ struct HistoryView: View {
                         onNextMonth: {
                             displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
                         },
-                        onDeleteSessions: promptDeleteSessions
+                        onDeleteSessions: promptDeleteSessions,
+                        onRefresh: {
+                            await dataStore.manualSyncCheck()
+                        }
                     )
                 } else {
                     ContentUnavailableView("Unable to load this month.", systemImage: "calendar")
@@ -111,23 +126,129 @@ struct HistoryView: View {
             )
         }
         .onAppear {
-            dataStore.updateInitialCloudRestoreState(hasSessions: !sessionExistenceProbe.isEmpty)
+            dataStore.refreshLocalSessionCount()
+            dataStore.updateInitialCloudRestoreState(hasSessions: hasSessions)
         }
         .onChange(of: sessionExistenceProbe.isEmpty) { _, isEmpty in
             dataStore.updateInitialCloudRestoreState(hasSessions: !isEmpty)
         }
+        .onChange(of: dataStore.hasLocalSessions) { _, hasLocalSessions in
+            dataStore.updateInitialCloudRestoreState(hasSessions: hasLocalSessions)
+        }
+    }
+
+    /// Title header for the current active sync state.
+    private var syncStatusTitle: String {
+        switch dataStore.cloudSyncPhase {
+        case .importing:
+            String(localized: "Downloading from iCloud...")
+        case .exporting:
+            String(localized: "Uploading to iCloud...")
+        case .connecting:
+            String(localized: "Connecting to iCloud...")
+        case .failed:
+            String(localized: "Sync Failed")
+        case .idle:
+            String(localized: "Syncing from iCloud...")
+        }
+    }
+
+    /// Active synchronization view with animated spinner and informative status.
+    private var syncingState: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+                .controlSize(.large)
+                .tint(AppColors.accent)
+                .padding(.bottom, 8)
+
+            Text(syncStatusTitle)
+                .font(AppFonts.sectionTitle)
+                .foregroundStyle(AppColors.textPrimary)
+
+            Text(dataStore.cloudRestoreStatusMessage)
+                .font(AppFonts.bodyRegular)
+                .foregroundStyle(AppColors.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 16)
+
+            Text("Keep the app open while iCloud downloads your history.")
+                .font(AppFonts.bodySmall)
+                .foregroundStyle(AppColors.textMuted)
+                .multilineTextAlignment(.center)
+                .padding(.top, 4)
+        }
+    }
+
+    /// Idle state when no sessions are found locally, offering a manual refresh option.
+    private var idleEmptyState: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "figure.jumprope")
+                .font(.system(size: 52))
+                .foregroundStyle(AppColors.accent.opacity(0.8))
+                .padding(.bottom, 8)
+
+            Text("No workouts yet")
+                .font(AppFonts.sectionTitle)
+                .foregroundStyle(AppColors.textPrimary)
+
+            Text(dataStore.cloudRestoreStatusMessage)
+                .font(AppFonts.bodyRegular)
+                .foregroundStyle(AppColors.textSecondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 16)
+
+            if dataStore.cloudAccountAvailability == .available {
+                Button {
+                    Task {
+                        await dataStore.manualSyncCheck()
+                    }
+                } label: {
+                    Label("Check iCloud Again", systemImage: "arrow.clockwise")
+                        .font(AppFonts.primaryButtonLabel)
+                        .foregroundStyle(AppColors.accent)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .background(AppColors.cardSurface)
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule().stroke(AppColors.accent.opacity(0.3), lineWidth: 1)
+                        )
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 12)
+            }
+
+            if let lastSync = dataStore.lastSyncDate {
+                Text("Last checked: \(lastSync.formatted(date: .omitted, time: .shortened))")
+                    .font(AppFonts.supportingMonospaced)
+                    .foregroundStyle(AppColors.textMuted)
+                    .padding(.top, 4)
+            }
+        }
     }
 
     /// Explains why a freshly installed app can appear empty even though SwiftData is CloudKit-backed.
-    /// This keeps the history screen from looking permanently blank while the local store is still waiting on iCloud.
+    /// Provides live progress while sync is in flight, and manual refresh controls when idle.
     private var emptyLibraryState: some View {
-        ContentUnavailableView {
-            Label("No workouts yet", systemImage: "icloud")
-        } description: {
-            Text(dataStore.cloudRestoreStatusMessage)
+        ScrollView {
+            VStack {
+                Spacer()
+                if isSyncing {
+                    syncingState
+                } else {
+                    idleEmptyState
+                }
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, minHeight: 480)
+            .padding(.horizontal, 24)
         }
+        .scrollBounceBehavior(.always)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColors.bgPrimary)
+        .refreshable {
+            await dataStore.manualSyncCheck()
+        }
     }
 
     private func promptDeleteSessions(_ sessions: [JumpSession]) {
@@ -185,6 +306,7 @@ private struct MonthSessionsList: View {
     let onPreviousMonth: () -> Void
     let onNextMonth: () -> Void
     let onDeleteSessions: ([JumpSession]) -> Void
+    let onRefresh: () async -> Void
 
     private var calendar: Calendar { Calendar.current }
 
@@ -195,7 +317,8 @@ private struct MonthSessionsList: View {
         selectedSession: Binding<JumpSession?>,
         onPreviousMonth: @escaping () -> Void,
         onNextMonth: @escaping () -> Void,
-        onDeleteSessions: @escaping ([JumpSession]) -> Void
+        onDeleteSessions: @escaping ([JumpSession]) -> Void,
+        onRefresh: @escaping () async -> Void
     ) {
         self.displayedMonth = displayedMonth
         self.monthRange = monthRange
@@ -204,6 +327,7 @@ private struct MonthSessionsList: View {
         self.onPreviousMonth = onPreviousMonth
         self.onNextMonth = onNextMonth
         self.onDeleteSessions = onDeleteSessions
+        self.onRefresh = onRefresh
 
         let start = monthRange.start
         let end = monthRange.end
@@ -302,6 +426,9 @@ private struct MonthSessionsList: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .topSoftScrollEdgeEffect()
+        .refreshable {
+            await onRefresh()
+        }
         .task {
             // The calendar enters with the rest of the screen initially, but this state is
             // intentionally independent from displayedMonth so navigation does not replay it.

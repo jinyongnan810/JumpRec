@@ -631,6 +631,22 @@
         }
       }
     },
+    "Check iCloud Again" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check iCloud Again"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudを再確認"
+          }
+        }
+      }
+    },
     "Check Personal Records" : {
       "localizations" : {
         "en" : {
@@ -728,6 +744,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "確認"
+          }
+        }
+      }
+    },
+    "Connecting to iCloud..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecting to iCloud..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudに接続中..."
           }
         }
       }
@@ -995,6 +1027,38 @@
     },
     "Dot Indicator" : {
 
+    },
+    "Downloading from iCloud..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading from iCloud..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudからダウンロード中..."
+          }
+        }
+      }
+    },
+    "Downloading workouts from iCloud. This may take a moment depending on your connection." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading workouts from iCloud. This may take a moment depending on your connection."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudからワークアウトをダウンロードしています。通信環境によって少し時間がかかる場合があります。"
+          }
+        }
+      }
     },
     "Duration" : {
       "localizations" : {
@@ -1362,6 +1426,38 @@
         }
       }
     },
+    "iCloud sync encountered an issue: %@. Tap 'Check iCloud Again' to retry." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud sync encountered an issue: %@. Tap 'Check iCloud Again' to retry."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud同期で問題が発生しました: %@。「iCloudを再確認」をタップして再試行してください。"
+          }
+        }
+      }
+    },
+    "Idle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "待機中"
+          }
+        }
+      }
+    },
     "If Apple Watch cannot start, iPhone will be used." : {
       "localizations" : {
         "ja" : {
@@ -1689,6 +1785,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプ"
+          }
+        }
+      }
+    },
+    "Keep the app open while iCloud downloads your history." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep the app open while iCloud downloads your history."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudが履歴をダウンロードする間、アプリを開いたままにしてください。"
+          }
+        }
+      }
+    },
+    "Last checked: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last checked: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最終確認: %@"
           }
         }
       }
@@ -3217,6 +3345,22 @@
         }
       }
     },
+    "Sync Failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync Failed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同期に失敗しました"
+          }
+        }
+      }
+    },
     "Syncing from iCloud. Your saved sessions may take a moment to reappear after reinstalling the app." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3234,6 +3378,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloud から同期しています。アプリを再インストールした後は、保存済みのワークアウトが再表示されるまで少し時間がかかる場合があります。"
+          }
+        }
+      }
+    },
+    "Syncing from iCloud..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Syncing from iCloud..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudから同期中..."
           }
         }
       }
@@ -3669,6 +3829,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無制限ワークアウトをアンロック — ¥100"
+          }
+        }
+      }
+    },
+    "Uploading to iCloud..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uploading to iCloud..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudにアップロード中..."
+          }
+        }
+      }
+    },
+    "Uploading workouts to iCloud..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uploading workouts to iCloud..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudにワークアウトをアップロード中..."
           }
         }
       }
