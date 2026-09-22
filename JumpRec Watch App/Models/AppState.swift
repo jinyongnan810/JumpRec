@@ -15,9 +15,13 @@ enum JumpState {
 }
 
 /// Owns the watch app's session lifecycle, motion tracking, and mirrored workout updates.
+///
+/// `JumpRecState` inherits from `NSObject` to serve as an `AVSpeechSynthesizerDelegate`.
+/// Since its mutable state is completely isolated to the `@MainActor`, it is marked `@unchecked Sendable`
+/// here in its primary declaration to satisfy concurrency requirements for delegate protocols.
 @Observable
 @MainActor
-class JumpRecState: NSObject {
+class JumpRecState: NSObject, @unchecked Sendable {
     // MARK: - Shared Instance
 
     /// Provides the single shared app state used across watch views.

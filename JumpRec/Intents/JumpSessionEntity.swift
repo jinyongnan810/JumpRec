@@ -13,10 +13,10 @@ import SwiftData
 /// so Siri voice queries, App Shortcuts, and Apple Intelligence can display and interact with individual workout records.
 public struct JumpSessionEntity: AppEntity, Identifiable, Sendable {
     /// Localized display representation for the entity type in Shortcuts and Siri interfaces.
-    public static var typeDisplayRepresentation: TypeDisplayRepresentation = "Jump Rope Workout"
+    public static let typeDisplayRepresentation: TypeDisplayRepresentation = "Jump Rope Workout"
 
     /// The default entity query used by the system to look up workouts by ID or search criteria.
-    public static var defaultQuery = JumpSessionQuery()
+    public static let defaultQuery = JumpSessionQuery()
 
     /// Unique identifier of the workout session.
     public var id: UUID

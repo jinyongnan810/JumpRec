@@ -15,9 +15,9 @@ public enum WorkoutGoalType: String, AppEnum, Sendable {
     case count
     case time
 
-    public static var typeDisplayRepresentation: TypeDisplayRepresentation = "Workout Goal Type"
+    public static let typeDisplayRepresentation: TypeDisplayRepresentation = "Workout Goal Type"
 
-    public static var caseDisplayRepresentations: [WorkoutGoalType: DisplayRepresentation] = [
+    public static let caseDisplayRepresentations: [WorkoutGoalType: DisplayRepresentation] = [
         .openTarget: "Open Workout",
         .count: "Jump Count Goal",
         .time: "Time Duration Goal",
@@ -28,8 +28,8 @@ public enum WorkoutGoalType: String, AppEnum, Sendable {
 
 /// Siri App Intent to inspect the user's most recent jump rope workout session.
 public struct GetLatestWorkoutIntent: AppIntent {
-    public static var title: LocalizedStringResource = "Get Latest Workout"
-    public static var description = IntentDescription("Retrieves your most recent jump rope workout from JumpRec.")
+    public static let title: LocalizedStringResource = "Get Latest Workout"
+    public static let description = IntentDescription("Retrieves your most recent jump rope workout from JumpRec.")
 
     public init() {}
 
@@ -66,8 +66,8 @@ public struct GetLatestWorkoutIntent: AppIntent {
 
 /// Siri App Intent to query today's aggregated jump rope metrics.
 public struct GetTodayJumpStatsIntent: AppIntent {
-    public static var title: LocalizedStringResource = "Get Today's Jump Stats"
-    public static var description = IntentDescription("Checks how many jumps and workouts you have completed today.")
+    public static let title: LocalizedStringResource = "Get Today's Jump Stats"
+    public static let description = IntentDescription("Checks how many jumps and workouts you have completed today.")
 
     public init() {}
 
@@ -111,8 +111,8 @@ public struct GetTodayJumpStatsIntent: AppIntent {
 
 /// Siri App Intent to query aggregated workout metrics (total jumps and workout sessions) for all time or a specific calendar year.
 public struct GetWorkoutStatsIntent: AppIntent {
-    public static var title: LocalizedStringResource = "Get Workout Stats"
-    public static var description = IntentDescription("Calculates total jump count, workout count, and calories for all time or a specific year in JumpRec.")
+    public static let title: LocalizedStringResource = "Get Workout Stats"
+    public static let description = IntentDescription("Calculates total jump count, workout count, and calories for all time or a specific year in JumpRec.")
 
     @Parameter(title: "Year")
     public var year: Int?
@@ -185,8 +185,8 @@ public struct GetWorkoutStatsIntent: AppIntent {
 
 /// Siri App Intent to inspect the user's best personal records.
 public struct GetPersonalRecordsIntent: AppIntent {
-    public static var title: LocalizedStringResource = "Check Personal Records"
-    public static var description = IntentDescription("Inspects your personal records and milestones in JumpRec.")
+    public static let title: LocalizedStringResource = "Check Personal Records"
+    public static let description = IntentDescription("Inspects your personal records and milestones in JumpRec.")
 
     public init() {}
 
@@ -238,8 +238,8 @@ public struct GetPersonalRecordsIntent: AppIntent {
 
 /// Siri App Intent to search past jump rope sessions.
 public struct SearchWorkoutsIntent: AppIntent {
-    public static var title: LocalizedStringResource = "Search Workouts"
-    public static var description = IntentDescription("Searches your jump rope workout history in JumpRec.")
+    public static let title: LocalizedStringResource = "Search Workouts"
+    public static let description = IntentDescription("Searches your jump rope workout history in JumpRec.")
 
     @Parameter(title: "Search Query")
     public var query: String
@@ -278,11 +278,11 @@ public struct SearchWorkoutsIntent: AppIntent {
 
 /// Siri App Intent to launch the app and start a jump rope workout.
 public struct StartWorkoutIntent: AppIntent {
-    public static var title: LocalizedStringResource = "Start Jump Rope Workout"
-    public static var description = IntentDescription("Opens JumpRec and begins a jump rope workout.")
+    public static let title: LocalizedStringResource = "Start Jump Rope Workout"
+    public static let description = IntentDescription("Opens JumpRec and begins a jump rope workout.")
 
     /// Opening the app is required so CoreMotion sensors and audio cues can run in the active session.
-    public static var openAppWhenRun: Bool = true
+    public static let openAppWhenRun: Bool = true
 
     @Parameter(title: "Goal Type", default: .openTarget)
     public var goalType: WorkoutGoalType

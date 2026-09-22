@@ -9,9 +9,13 @@ import Observation
 import UIKit
 
 /// Owns the iPhone app's session lifecycle, live metrics, and companion-device coordination.
+///
+/// `JumpRecState` inherits from `NSObject` to serve as an `AVSpeechSynthesizerDelegate`.
+/// Since its mutable state is completely isolated to the `@MainActor`, it is marked `@unchecked Sendable`
+/// here in its primary declaration to satisfy concurrency requirements for delegate protocols.
 @Observable
 @MainActor
-final class JumpRecState: NSObject {
+final class JumpRecState: NSObject, @unchecked Sendable {
     // MARK: - Configuration
 
     /// Enables CSV motion export for debug builds.

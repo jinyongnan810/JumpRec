@@ -11,7 +11,7 @@ import AppIntents
 /// configure anything in the Shortcuts app first.
 public struct JumpRecShortcutsProvider: AppShortcutsProvider {
     /// Background color theme for JumpRec shortcuts tiles.
-    public static var shortcutTileColor: ShortcutTileColor = .orange
+    public static let shortcutTileColor: ShortcutTileColor = .orange
 
     /// Defines the zero-setup App Shortcuts available to Siri, Spotlight, and the Shortcuts app.
     public static var appShortcuts: [AppShortcut] {

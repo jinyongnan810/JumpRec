@@ -13,10 +13,10 @@ import SwiftData
 /// total jumps, total session count, and calories burned for all time or a specific calendar year.
 public struct WorkoutStatsEntity: AppEntity, Identifiable, Sendable {
     /// Localized display representation for the entity type in Shortcuts.
-    public static var typeDisplayRepresentation: TypeDisplayRepresentation = "Workout Statistics"
+    public static let typeDisplayRepresentation: TypeDisplayRepresentation = "Workout Statistics"
 
     /// The default entity query used by the system to look up workout stats.
-    public static var defaultQuery = WorkoutStatsQuery()
+    public static let defaultQuery = WorkoutStatsQuery()
 
     /// Unique identifier: either the year string (e.g. "2026") or "all_time".
     public var id: String

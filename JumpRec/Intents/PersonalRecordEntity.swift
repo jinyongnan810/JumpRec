@@ -13,10 +13,10 @@ import SwiftData
 /// so users can ask Siri about their records or use them in automated shortcuts.
 public struct PersonalRecordEntity: AppEntity, Identifiable, Sendable {
     /// Localized display representation for the entity type in Shortcuts and Siri interfaces.
-    public static var typeDisplayRepresentation: TypeDisplayRepresentation = "Personal Record"
+    public static let typeDisplayRepresentation: TypeDisplayRepresentation = "Personal Record"
 
     /// The default entity query used by the system to look up personal records.
-    public static var defaultQuery = PersonalRecordQuery()
+    public static let defaultQuery = PersonalRecordQuery()
 
     /// Unique string identifier corresponding to the personal record kind (e.g. "highestJumpCount").
     public var id: String

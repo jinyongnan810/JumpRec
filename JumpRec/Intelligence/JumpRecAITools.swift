@@ -18,7 +18,7 @@ import SwiftData
         public let description = "Retrieves recent jump rope workout sessions from JumpRec with key metrics including date, jump count, duration, calories, average rate, peak rate, longest streak, and AI recap."
 
         @Generable
-        public struct Arguments {
+        public struct Arguments: Sendable {
             @Guide(description: "Maximum number of recent workouts to retrieve", .range(1 ... 20))
             public var count: Int
 
@@ -59,7 +59,7 @@ import SwiftData
         public let description = "Retrieves all-time personal records and milestones in JumpRec (highest jumps, best pace, longest duration, longest streak, calories)."
 
         @Generable
-        public struct Arguments {
+        public struct Arguments: Sendable {
             public init() {}
         }
 
@@ -90,7 +90,7 @@ import SwiftData
         public let description = "Calculates aggregated jump rope workout statistics (total jumps, total sessions, total calories, total active time) across a specified time window in days."
 
         @Generable
-        public struct Arguments {
+        public struct Arguments: Sendable {
             @Guide(description: "Number of days back from today to include in summary (e.g. 1 for today, 7 for past week, 30 for past month)", .range(1 ... 365))
             public var days: Int
 
@@ -145,7 +145,7 @@ import SwiftData
         public let description = "Searches workout history for sessions meeting specific criteria like minimum jump count."
 
         @Generable
-        public struct Arguments {
+        public struct Arguments: Sendable {
             @Guide(description: "Minimum jumps completed in session", .range(1 ... 10000))
             public var minimumJumps: Int
 
@@ -187,7 +187,7 @@ import SwiftData
         public let description = "Calculates total jump count, workout session count, total active time, and calories for either all-time or a specific calendar year (e.g. 2026, 2025)."
 
         @Generable
-        public struct Arguments {
+        public struct Arguments: Sendable {
             @Guide(description: "Specific calendar year to query (e.g. 2026, 2025), or leave nil for all-time stats")
             public var year: Int?
 
