@@ -164,12 +164,16 @@ final class PhoneWorkoutManager: NSObject {
         // Keep this list as the union of local-workout and mirrored-workout requirements. HealthKit
         // does not reveal read authorization for privacy reasons, so the request-status API is the
         // supported way to determine whether the system still needs to ask about any read type.
-        let typesToRead: Set<HKObjectType> = [
+        var typesToRead: Set<HKObjectType> = [
             HKObjectType.workoutType(),
-            HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
-            HKQuantityType.quantityType(forIdentifier: .heartRate)!,
             HKObjectType.activitySummaryType(),
         ]
+        if let activeEnergy = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned) {
+            typesToRead.insert(activeEnergy)
+        }
+        if let heartRate = HKQuantityType.quantityType(forIdentifier: .heartRate) {
+            typesToRead.insert(heartRate)
+        }
 
         let requestStatus = try await authorizationRequestStatus(
             toShare: typesToShare,
