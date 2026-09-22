@@ -48,11 +48,6 @@ struct HistoryView: View {
         !sessionExistenceProbe.isEmpty || dataStore.hasLocalSessions
     }
 
-    /// Whether an iCloud synchronization operation is actively in-flight or waiting for initial import.
-    private var isSyncing: Bool {
-        dataStore.isCloudSyncActive || dataStore.isAwaitingInitialCloudRestore
-    }
-
     var body: some View {
         NavigationStack {
             Group {
@@ -127,13 +122,12 @@ struct HistoryView: View {
         }
         .onAppear {
             dataStore.refreshLocalSessionCount()
-            dataStore.updateInitialCloudRestoreState(hasSessions: hasSessions)
         }
-        .onChange(of: sessionExistenceProbe.isEmpty) { _, isEmpty in
-            dataStore.updateInitialCloudRestoreState(hasSessions: !isEmpty)
+        .onChange(of: sessionExistenceProbe.isEmpty) { _, _ in
+            dataStore.refreshLocalSessionCount()
         }
-        .onChange(of: dataStore.hasLocalSessions) { _, hasLocalSessions in
-            dataStore.updateInitialCloudRestoreState(hasSessions: hasLocalSessions)
+        .onChange(of: dataStore.hasLocalSessions) { _, _ in
+            dataStore.refreshLocalSessionCount()
         }
     }
 
@@ -153,95 +147,48 @@ struct HistoryView: View {
         }
     }
 
-    /// Active synchronization view with animated spinner and informative status.
-    private var syncingState: some View {
-        VStack(spacing: 16) {
-            ProgressView()
-                .controlSize(.large)
-                .tint(AppColors.accent)
-                .padding(.bottom, 8)
-
-            Text(syncStatusTitle)
-                .font(AppFonts.sectionTitle)
-                .foregroundStyle(AppColors.textPrimary)
-
-            Text(dataStore.cloudRestoreStatusMessage)
-                .font(AppFonts.bodyRegular)
-                .foregroundStyle(AppColors.textSecondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 16)
-
-            Text("Keep the app open while iCloud downloads your history.")
-                .font(AppFonts.bodySmall)
-                .foregroundStyle(AppColors.textMuted)
-                .multilineTextAlignment(.center)
-                .padding(.top, 4)
-        }
-    }
-
-    /// Idle state when no sessions are found locally, offering a manual refresh option.
-    private var idleEmptyState: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "figure.jumprope")
-                .font(.system(size: 52))
-                .foregroundStyle(AppColors.accent.opacity(0.8))
-                .padding(.bottom, 8)
-
-            Text("No workouts yet")
-                .font(AppFonts.sectionTitle)
-                .foregroundStyle(AppColors.textPrimary)
-
-            Text(dataStore.cloudRestoreStatusMessage)
-                .font(AppFonts.bodyRegular)
-                .foregroundStyle(AppColors.textSecondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 16)
-
-            if dataStore.cloudAccountAvailability == .available {
-                Button {
-                    Task {
-                        await dataStore.manualSyncCheck()
-                    }
-                } label: {
-                    Label("Check iCloud Again", systemImage: "arrow.clockwise")
-                        .font(AppFonts.primaryButtonLabel)
-                        .foregroundStyle(AppColors.accent)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
-                        .background(AppColors.cardSurface)
-                        .clipShape(Capsule())
-                        .overlay(
-                            Capsule().stroke(AppColors.accent.opacity(0.3), lineWidth: 1)
-                        )
-                }
-                .buttonStyle(.plain)
-                .padding(.top, 12)
-            }
-
-            if let lastSync = dataStore.lastSyncDate {
-                Text("Last checked: \(lastSync.formatted(date: .omitted, time: .shortened))")
-                    .font(AppFonts.supportingMonospaced)
-                    .foregroundStyle(AppColors.textMuted)
-                    .padding(.top, 4)
-            }
-        }
-    }
-
-    /// Explains why a freshly installed app can appear empty even though SwiftData is CloudKit-backed.
-    /// Provides live progress while sync is in flight, and manual refresh controls when idle.
+    /// Clean, native empty state shown when no workouts have been recorded yet.
+    /// Evaluates immediately without any artificial delay or blocking wait screens.
+    /// Supports pull-to-refresh, and unobtrusively displays a subtle sync indicator if CloudKit is actively transferring data.
     private var emptyLibraryState: some View {
         ScrollView {
-            VStack {
+            VStack(spacing: 16) {
                 Spacer()
-                if isSyncing {
-                    syncingState
-                } else {
-                    idleEmptyState
+
+                Image(systemName: "figure.jumprope")
+                    .font(.system(size: 52))
+                    .foregroundStyle(AppColors.accent.opacity(0.85))
+                    .padding(.bottom, 4)
+
+                Text("No workouts yet")
+                    .font(AppFonts.sectionTitle)
+                    .foregroundStyle(AppColors.textPrimary)
+
+                Text("Workouts recorded on your Apple Watch or iPhone will appear here.")
+                    .font(AppFonts.bodyRegular)
+                    .foregroundStyle(AppColors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+
+                if dataStore.isCloudSyncActive {
+                    HStack(spacing: 6) {
+                        ProgressView()
+                            .controlSize(.small)
+                            .tint(AppColors.accent)
+                        Text(syncStatusTitle)
+                            .font(AppFonts.bodySmall)
+                            .foregroundStyle(AppColors.textSecondary)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(AppColors.cardSurface)
+                    .clipShape(Capsule())
+                    .padding(.top, 8)
                 }
+
                 Spacer()
             }
-            .frame(maxWidth: .infinity, minHeight: 480)
-            .padding(.horizontal, 24)
+            .frame(maxWidth: .infinity, minHeight: 440)
         }
         .scrollBounceBehavior(.always)
         .frame(maxWidth: .infinity, maxHeight: .infinity)

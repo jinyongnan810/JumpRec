@@ -131,6 +131,7 @@
 
     },
     "Checking iCloud availability for your saved workouts." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -184,9 +185,6 @@
       }
     },
     "Downloading from iCloud..." : {
-
-    },
-    "Downloading workouts from iCloud. This may take a moment depending on your connection." : {
 
     },
     "Elapsed time" : {
@@ -262,6 +260,7 @@
       }
     },
     "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -272,6 +271,7 @@
       }
     },
     "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -280,9 +280,6 @@
           }
         }
       }
-    },
-    "iCloud sync encountered an issue: %@. Tap 'Check iCloud Again' to retry." : {
-
     },
     "Idle" : {
 
@@ -382,10 +379,8 @@
         }
       }
     },
-    "No cloud data restored yet. If you recently reinstalled the app, leave it open for a bit longer so iCloud can finish syncing." : {
-
-    },
     "No iCloud account is currently signed in, so previous cloud-backed workouts cannot be restored on this device yet." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -543,6 +538,7 @@
 
     },
     "Syncing from iCloud. Your saved workouts may take a moment to reappear after reinstalling the app." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -553,6 +549,7 @@
       }
     },
     "The app could not confirm iCloud availability, so workout restore status is unknown." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -629,9 +626,6 @@
       }
     },
     "Uploading to iCloud..." : {
-
-    },
-    "Uploading workouts to iCloud..." : {
 
     },
     "WORKOUT COMPLETE" : {

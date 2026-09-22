@@ -139,9 +139,6 @@ public final class MyDataStore {
     /// Tracks the current CloudKit account status so empty-state UI can explain why history may be missing.
     public private(set) var cloudAccountAvailability: CloudAccountAvailability = .checking
 
-    /// Reflects whether the app is still giving CloudKit time to repopulate an empty local store.
-    public private(set) var isAwaitingInitialCloudRestore = false
-
     /// Detailed phase of CloudKit synchronization.
     public private(set) var cloudSyncPhase: CloudSyncPhase = .idle
 
@@ -167,8 +164,6 @@ public final class MyDataStore {
     public private(set) var unseenPersonalRecordKinds: [PersonalRecordKind] = []
 
     @ObservationIgnored
-    private var cloudRestoreTask: Task<Void, Never>?
-    @ObservationIgnored
     private let defaults: UserDefaults
 
     /// Creates the shared store and applies one-time bootstrap work.
@@ -185,7 +180,6 @@ public final class MyDataStore {
         store.observeCloudKitEvents()
         store.observeRemoteStoreChanges()
         store.refreshCloudDiagnostics()
-        store.startInitialCloudRestoreWindowIfNeeded()
         print("[DataStore] ModelContainer and ModelContext initialized successfully")
         return store
     }
@@ -200,10 +194,6 @@ public final class MyDataStore {
         let initialCount = (try? modelContainer.mainContext.fetchCount(FetchDescriptor<JumpSession>())) ?? 0
         localSessionCount = initialCount
         hasLocalSessions = initialCount > 0
-    }
-
-    deinit {
-        cloudRestoreTask?.cancel()
     }
 
     /// Saves pending context changes when needed.
@@ -242,113 +232,29 @@ public final class MyDataStore {
         }
     }
 
-    /// Tells the history screen whether it should show a sync-in-progress explanation while the library is still empty.
-    /// Cancels any waiting timer if local sessions are present.
-    public func updateInitialCloudRestoreState(hasSessions: Bool) {
-        refreshLocalSessionCount()
-        if hasSessions || hasLocalSessions {
-            cloudRestoreTask?.cancel()
-            cloudRestoreTask = nil
-            isAwaitingInitialCloudRestore = false
-        } else if cloudAccountAvailability == .available {
-            startInitialCloudRestoreWindowIfNeeded()
-        } else {
-            isAwaitingInitialCloudRestore = false
-        }
-    }
-
     /// Refreshes the local session count from the persistent store and updates observable flags.
     /// This is called whenever a CloudKit import finishes, a remote change notification fires, or manual refresh runs.
     public func refreshLocalSessionCount() {
         let count = fetchSessionCount()
         localSessionCount = count
-        let wasEmpty = !hasLocalSessions
         hasLocalSessions = count > 0
-
-        // If sessions just appeared after being empty, immediately end the waiting window
-        if count > 0, wasEmpty {
-            print("[DataStore] Local session count updated: \(count) (transitioned from empty)")
-            isAwaitingInitialCloudRestore = false
-            cloudRestoreTask?.cancel()
-            cloudRestoreTask = nil
-        }
     }
 
-    /// Manually triggers a re-check of the iCloud account and model store,
-    /// giving CloudKit a fresh window to sync remote data.
-    /// This is invoked by pull-to-refresh or the 'Check iCloud Again' button.
+    /// Manually triggers a re-check of the iCloud account and model store.
+    /// This is invoked by pull-to-refresh on history views.
     public func manualSyncCheck() async {
         isCloudSyncActive = true
         cloudSyncPhase = .connecting
         await updateCloudAccountAvailability()
         refreshLocalSessionCount()
 
-        // Wait a brief duration so any pending CloudKit network activity or local imports can dispatch
-        try? await Task.sleep(for: .seconds(2))
+        // Brief delay so pull-to-refresh animation feels natural
+        try? await Task.sleep(for: .milliseconds(400))
 
         refreshLocalSessionCount()
         if cloudSyncPhase == .connecting {
             cloudSyncPhase = .idle
             isCloudSyncActive = false
-        }
-    }
-
-    /// Returns copy tailored for empty-library messaging, taking into account active sync phase and errors.
-    public var cloudRestoreStatusMessage: String {
-        // Active CloudKit sync takes priority so users see live progress
-        if isAwaitingInitialCloudRestore || isCloudSyncActive {
-            switch cloudSyncPhase {
-            case .importing:
-                return String(
-                    localized: "Downloading workouts from iCloud. This may take a moment depending on your connection."
-                )
-            case .exporting:
-                return String(
-                    localized: "Uploading workouts to iCloud..."
-                )
-            case .connecting:
-                return String(
-                    localized: "Connecting to iCloud..."
-                )
-            case .idle:
-                return String(
-                    localized: "Syncing from iCloud. Your saved workouts may take a moment to reappear after reinstalling the app."
-                )
-            case .failed:
-                break
-            }
-        }
-
-        // If a sync failure occurred, surface it so the user can take corrective action
-        if let lastSyncErrorDescription {
-            return String(
-                localized: "iCloud sync encountered an issue: \(lastSyncErrorDescription). Tap 'Check iCloud Again' to retry."
-            )
-        }
-
-        switch cloudAccountAvailability {
-        case .available:
-            return String(
-                localized: "No cloud data restored yet. If you recently reinstalled the app, leave it open for a bit longer so iCloud can finish syncing."
-            )
-        case .checking:
-            return String(localized: "Checking iCloud availability for your saved workouts.")
-        case .unavailable:
-            return String(
-                localized: "No iCloud account is currently signed in, so previous cloud-backed workouts cannot be restored on this device yet."
-            )
-        case .restricted:
-            return String(
-                localized: "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now."
-            )
-        case .temporarilyUnavailable:
-            return String(
-                localized: "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again."
-            )
-        case .couldNotDetermine:
-            return String(
-                localized: "The app could not confirm iCloud availability, so workout restore status is unknown."
-            )
         }
     }
 
@@ -375,36 +281,6 @@ public final class MyDataStore {
         guard unseenPersonalRecordKinds != kinds else { return }
         unseenPersonalRecordKinds = kinds
         defaults.set(kinds.map(\.rawValue), forKey: DefaultsKey.unseenPersonalRecordKinds)
-    }
-
-    /// Starts a grace period for CloudKit to repopulate an empty store after app install or reinstall.
-    /// SwiftData mirroring is eventual, so immediately showing a permanent empty state is misleading when data is still downloading.
-    private func startInitialCloudRestoreWindowIfNeeded() {
-        guard cloudAccountAvailability == .available else {
-            isAwaitingInitialCloudRestore = false
-            cloudRestoreTask?.cancel()
-            cloudRestoreTask = nil
-            return
-        }
-
-        refreshLocalSessionCount()
-        guard !hasLocalSessions else {
-            isAwaitingInitialCloudRestore = false
-            cloudRestoreTask?.cancel()
-            cloudRestoreTask = nil
-            return
-        }
-
-        guard cloudRestoreTask == nil else { return }
-
-        isAwaitingInitialCloudRestore = true
-        cloudRestoreTask = Task { @MainActor [weak self] in
-            // Allow up to 45 seconds on fresh install while keeping UI informed of progress
-            try? await Task.sleep(for: .seconds(45))
-            guard let self, !Task.isCancelled else { return }
-            isAwaitingInitialCloudRestore = false
-            cloudRestoreTask = nil
-        }
     }
 
     /// Updates observable state and diagnostics in response to NSPersistentCloudKitContainer lifecycle events.
@@ -495,8 +371,6 @@ public final class MyDataStore {
             cloudAccountAvailability = .couldNotDetermine
             print("[DataStore] Failed to determine CloudKit account status: \(error.localizedDescription)")
         }
-
-        startInitialCloudRestoreWindowIfNeeded()
     }
 
     /// Listens for account changes so diagnostics stay accurate if the user signs in or out while the app is installed.
