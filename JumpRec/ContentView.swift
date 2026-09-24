@@ -81,8 +81,7 @@ struct ContentView: View {
             // internal one-time initialization work.
             appState.warmUpSpeechSynthesizerIfNeeded()
             dataStore.refreshCloudDiagnostics()
-            settings.qualifiedWorkoutCount = dataStore.qualifiedSessionsCount()
-            settings.hasUnlockedUnlimitedWorkouts = purchaseManager.hasUnlockedUnlimitedWorkouts
+            refreshQuotaAndEntitlements()
             syncSettingsToWatch()
             processPendingIntentStartIfNeeded()
         }
@@ -90,8 +89,7 @@ struct ContentView: View {
             appState.updateSceneActive(newValue == .active)
             if newValue == .active {
                 dataStore.refreshCloudDiagnostics()
-                settings.qualifiedWorkoutCount = dataStore.qualifiedSessionsCount()
-                settings.hasUnlockedUnlimitedWorkouts = purchaseManager.hasUnlockedUnlimitedWorkouts
+                refreshQuotaAndEntitlements()
                 syncSettingsToWatch()
                 processPendingIntentStartIfNeeded()
             }
@@ -116,7 +114,7 @@ struct ContentView: View {
         }
         .onChange(of: appState.completedSession?.id) { _, _ in
             recordQualifiedCompletedSessionIfNeeded()
-            settings.qualifiedWorkoutCount = dataStore.qualifiedSessionsCount()
+            refreshQuotaAndEntitlements()
             syncSettingsToWatch()
             scheduleReviewRequestIfNeeded()
         }
@@ -186,6 +184,21 @@ struct ContentView: View {
             jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
         )
         syncSettingsToWatch()
+    }
+
+    /// Refreshes quota and license entitlements for the local device and paired Watch.
+    ///
+    /// If the user has already unlocked lifetime unlimited workouts, querying SQLite for the
+    /// qualified sessions count is intentionally skipped to avoid synchronous main-thread disk I/O
+    /// during screen activation and app resume.
+    private func refreshQuotaAndEntitlements() {
+        let isUnlimited = purchaseManager.hasUnlockedUnlimitedWorkouts
+        settings.hasUnlockedUnlimitedWorkouts = isUnlimited
+
+        // Only query SQLite to count qualified workouts if the user is on the free tier.
+        if !isUnlimited {
+            settings.qualifiedWorkoutCount = dataStore.qualifiedSessionsCount()
+        }
     }
 
     private func syncSettingsToWatch() {
