@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// Displays a high-frequency timer for the active watch workout.
+/// Displays an elapsed workout timer for the active watch workout using system low-power rendering.
 struct TimerView: View {
     /// The time when the current session started.
     let startTime: Date
@@ -17,28 +17,15 @@ struct TimerView: View {
         self.startTime = startTime
     }
 
-    /// Renders the continuously updating elapsed time.
+    /// Renders the continuously updating elapsed time using system compositor rendering.
+    ///
+    /// Using `Text(_:style: .timer)` lets watchOS handle counter updates in the system compositor
+    /// without waking SwiftUI view bodies, string allocations, or CPU timers every 100ms.
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 0.1)) { timeline in
-            let diff = timeline.date.timeIntervalSince(startTime)
-            Text(diff.minutesSecondsMilliseconds)
-                .font(AppFonts.watchTimer)
-                .foregroundStyle(AppColors.textSecondary)
-                .accessibilityLabel(Text("Elapsed time"))
-                .accessibilityValue(Text(diff.minutesSecondsMilliseconds))
-        }
-    }
-}
-
-extension TimeInterval {
-    /// Formats a time interval as `mm:ss.d` for live display.
-    var minutesSecondsMilliseconds: String {
-        let totalSeconds = Int(self)
-        let minutes = totalSeconds / 60
-        let seconds = totalSeconds % 60
-        let milliseconds = Int(truncatingRemainder(dividingBy: 1) * 10)
-
-        return String(format: "%02d:%02d.%01d", minutes, seconds, milliseconds)
+        Text(startTime, style: .timer)
+            .font(AppFonts.watchTimer)
+            .foregroundStyle(AppColors.textSecondary)
+            .accessibilityLabel(Text("Elapsed time"))
     }
 }
 
