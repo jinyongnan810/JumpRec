@@ -35,10 +35,6 @@ final class WorkoutManager: NSObject {
     private var session: HKWorkoutSession?
     /// Tracks the active live workout builder.
     private var builder: HKLiveWorkoutBuilder?
-    /// Streams live heart-rate samples during the workout.
-    private var heartRateQuery: HKAnchoredObjectQuery?
-    /// Streams active-energy samples during the workout.
-    private var energyBurnedQuery: HKAnchoredObjectQuery?
     /// Encodes mirrored payloads sent to the iPhone app.
     private let encoder = JSONEncoder()
     /// Tracks whether HealthKit successfully created a companion iPhone mirror.
@@ -51,10 +47,6 @@ final class WorkoutManager: NSObject {
     private var averageHeartRate: Int?
     /// Stores the current peak heart rate for mirrored updates.
     private var peakHeartRate: Int?
-    /// Accumulates heart-rate values for averaging.
-    private var heartRateSum = 0
-    /// Counts heart-rate samples for averaging.
-    private var heartRateSamples = 0
     /// Deduplicates an in-flight HealthKit authorization request.
     private var authorizationTask: Task<Void, Error>?
     /// Owns asynchronous startup or finishing work for the current workout.
@@ -165,7 +157,6 @@ final class WorkoutManager: NSObject {
         workoutGeneration = UUID()
         let generation = workoutGeneration
         workoutLifecycleTask?.cancel()
-        stopLiveQueries()
         throttledJumpTask?.cancel()
         throttledJumpTask = nil
         pendingMirroredJumpPayload = nil
@@ -174,8 +165,6 @@ final class WorkoutManager: NSObject {
         isMirroringActive = false
         averageHeartRate = nil
         peakHeartRate = nil
-        heartRateSum = 0
-        heartRateSamples = 0
 
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .jumpRope
@@ -215,12 +204,6 @@ final class WorkoutManager: NSObject {
                 else {
                     return
                 }
-
-                // Start local HealthKit queries before companion mirroring. Mirroring can be
-                // delayed or unavailable when the user leaves the iPhone behind, but the watch
-                // workout still needs live heart-rate and energy updates immediately.
-                startHeartRateQuery(startDate: startDate)
-                startEnergyBurnedQuery(startDate: startDate)
 
                 do {
                     try await session.startMirroringToCompanionDevice()
@@ -263,7 +246,6 @@ final class WorkoutManager: NSObject {
         workoutGeneration = UUID()
         workoutLifecycleTask?.cancel()
         workoutLifecycleTask = nil
-        stopLiveQueries()
         throttledJumpTask?.cancel()
         throttledJumpTask = nil
         pendingMirroredJumpPayload = nil
@@ -346,71 +328,7 @@ final class WorkoutManager: NSObject {
         }
     }
 
-    // MARK: - Live Queries
-
-    /// Starts the live heart-rate query for the active workout.
-    private func startHeartRateQuery(startDate: Date) {
-        let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
-        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: nil, options: .strictStartDate)
-        heartRateQuery = HKAnchoredObjectQuery(
-            type: heartRateType,
-            predicate: predicate,
-            anchor: nil,
-            limit: HKObjectQueryNoLimit
-        ) { _, _, _, _, _ in
-        }
-
-        heartRateQuery?.updateHandler = { [weak self] _, samples, _, _, error in
-            if let error {
-                print("[WorkoutManager] Heart-rate query failed: \(error.localizedDescription)")
-                return
-            }
-
-            let heartRates = (samples as? [HKQuantitySample])?.map { sample in
-                Int(sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute())))
-            } ?? []
-            guard !heartRates.isEmpty else { return }
-
-            Task { @MainActor [weak self] in
-                self?.applyHeartRates(heartRates)
-            }
-        }
-        if let heartRateQuery {
-            healthStore.execute(heartRateQuery)
-        }
-    }
-
-    /// Starts the live energy-burned query for the active workout.
-    private func startEnergyBurnedQuery(startDate: Date) {
-        let energyBurnedType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!
-        let predicate = HKQuery.predicateForSamples(withStart: startDate, end: nil, options: .strictStartDate)
-        energyBurnedQuery = HKAnchoredObjectQuery(
-            type: energyBurnedType,
-            predicate: predicate,
-            anchor: nil,
-            limit: HKObjectQueryNoLimit
-        ) { _, _, _, _, _ in
-        }
-
-        energyBurnedQuery?.updateHandler = { [weak self] _, samples, _, _, error in
-            if let error {
-                print("[WorkoutManager] Energy query failed: \(error.localizedDescription)")
-                return
-            }
-
-            let energyValues = (samples as? [HKQuantitySample])?.map { sample in
-                sample.quantity.doubleValue(for: .kilocalorie())
-            } ?? []
-            guard !energyValues.isEmpty else { return }
-
-            Task { @MainActor [weak self] in
-                self?.applyEnergyValues(energyValues)
-            }
-        }
-        if let energyBurnedQuery {
-            healthStore.execute(energyBurnedQuery)
-        }
-    }
+    // MARK: - HealthKit Metrics Processing
 
     /// Returns the total active energy burned so far in the workout.
     private var currentEnergyBurned: Double {
@@ -424,43 +342,53 @@ final class WorkoutManager: NSObject {
             .doubleValue(for: .kilocalorie()) ?? 0
     }
 
-    /// Applies heart-rate samples after crossing back from HealthKit's query callback.
-    private func applyHeartRates(_ heartRates: [Int]) {
-        for heartRate in heartRates {
-            heartRateSum += heartRate
-            heartRateSamples += 1
-            averageHeartRate = heartRateSum / heartRateSamples
-            peakHeartRate = max(peakHeartRate ?? 0, heartRate)
-            updateHeartRate(heartRate)
-        }
-    }
+    /// Processes newly collected health samples delivered by HKLiveWorkoutBuilder.
+    ///
+    /// Relying on HKLiveWorkoutDataSource and HKLiveWorkoutBuilder's native statistics calculations
+    /// avoids running redundant HKAnchoredObjectQuery instances against the HealthKit store,
+    /// significantly reducing background database queries and CPU wakeups on Apple Watch.
+    func processCollectedData(from workoutBuilder: HKLiveWorkoutBuilder, types: Set<HKSampleType>) {
+        guard builder === workoutBuilder else { return }
 
-    /// Applies energy samples and mirrors the latest aggregate metrics to iPhone.
-    private func applyEnergyValues(_: [Double]) {
-        // Send cumulative total active energy burned from HealthKit live workout builder
-        // rather than individual sample slices, ensuring the iPhone companion app
-        // receives a running total that updates live during the active session.
-        let totalEnergyBurned = currentEnergyBurned
-        updateEnergyBurned(totalEnergyBurned)
-        sendPayload(
-            MirroredWorkoutPayload(
-                kind: .metrics,
-                energyBurned: totalEnergyBurned,
-                averageHeartRate: averageHeartRate,
-                peakHeartRate: peakHeartRate
+        var metricsChanged = false
+
+        if let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate),
+           types.contains(heartRateType),
+           let statistics = workoutBuilder.statistics(for: heartRateType)
+        {
+            let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
+            if let mostRecent = statistics.mostRecentQuantity() {
+                let latestHR = Int(mostRecent.doubleValue(for: heartRateUnit))
+                updateHeartRate(latestHR)
+            }
+            if let average = statistics.averageQuantity() {
+                averageHeartRate = Int(average.doubleValue(for: heartRateUnit))
+            }
+            if let maximum = statistics.maximumQuantity() {
+                peakHeartRate = Int(maximum.doubleValue(for: heartRateUnit))
+            }
+            metricsChanged = true
+        }
+
+        if let energyType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned),
+           types.contains(energyType),
+           let statistics = workoutBuilder.statistics(for: energyType),
+           let sum = statistics.sumQuantity()
+        {
+            let totalEnergy = sum.doubleValue(for: .kilocalorie())
+            updateEnergyBurned(totalEnergy)
+            metricsChanged = true
+        }
+
+        if metricsChanged {
+            sendPayload(
+                MirroredWorkoutPayload(
+                    kind: .metrics,
+                    energyBurned: currentEnergyBurned,
+                    averageHeartRate: averageHeartRate,
+                    peakHeartRate: peakHeartRate
+                )
             )
-        )
-    }
-
-    /// Stops and releases HealthKit queries owned by the current workout.
-    private func stopLiveQueries() {
-        if let heartRateQuery {
-            healthStore.stop(heartRateQuery)
-            self.heartRateQuery = nil
-        }
-        if let energyBurnedQuery {
-            healthStore.stop(energyBurnedQuery)
-            self.energyBurnedQuery = nil
         }
     }
 
@@ -539,13 +467,14 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
 // MARK: - HKLiveWorkoutBuilderDelegate
 
 extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
-    nonisolated func workoutBuilder(_: HKLiveWorkoutBuilder,
-                                    didCollectDataOf collectedTypes: Set<HKSampleType>)
-    {
-        print("1: collected health data types: \(collectedTypes)")
+    nonisolated func workoutBuilder(
+        _ workoutBuilder: HKLiveWorkoutBuilder,
+        didCollectDataOf collectedTypes: Set<HKSampleType>
+    ) {
+        Task { @MainActor [weak self] in
+            self?.processCollectedData(from: workoutBuilder, types: collectedTypes)
+        }
     }
 
-    nonisolated func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {
-        print("2: collected health data: \(workoutBuilder)")
-    }
+    nonisolated func workoutBuilderDidCollectEvent(_: HKLiveWorkoutBuilder) {}
 }
