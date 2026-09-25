@@ -55,13 +55,11 @@ class MotionManager: NSObject {
 
     /// Sets up Core Motion update intervals and processing queue configuration.
     private func setupMotionManager() {
-        // Device motion provides both acceleration and gyro data in one stream, which is the only input
-        // the shared detector needs once it is converted into `MotionSample`.
+        // Device motion provides fused user acceleration and gyro data in one stream at 40Hz,
+        // which provides the required userAcceleration.y input for the watch jump detector profile.
+        // Magnetometer calibration (showsDeviceMovementDisplay) is omitted to prevent unnecessary
+        // sensor wakeups and compass calibration prompts during workouts.
         motionManager.deviceMotionUpdateInterval = updateInterval
-        motionManager.accelerometerUpdateInterval = updateInterval
-
-        // Enable background motion updates
-        motionManager.showsDeviceMovementDisplay = true
 
         // Set up operation queue
         queue.maxConcurrentOperationCount = 1
@@ -111,7 +109,6 @@ class MotionManager: NSObject {
     func stopTracking() {
         isTracking = false
         motionManager.stopDeviceMotionUpdates()
-        motionManager.stopAccelerometerUpdates()
         workoutManager.stopWorkout()
         motionRecording.removeAll()
     }
