@@ -61,6 +61,14 @@ final class WorkoutManager: NSObject {
     private var workoutLifecycleTask: Task<Void, Never>?
     /// Identifies the workout that owns asynchronous HealthKit completions.
     private var workoutGeneration = UUID()
+    /// Minimum time interval between mirrored jump updates to prevent continuous radio transmission.
+    private let minMirroredJumpInterval: TimeInterval = 1.0
+    /// Timestamp of the last mirrored jump update transmitted to the companion device.
+    private var lastMirroredJumpSentAt: Date = .distantPast
+    /// Stores the latest pending jump payload when updates are throttled.
+    private var pendingMirroredJumpPayload: MirroredWorkoutPayload?
+    /// Owns the timer task that delivers the latest pending jump update after the throttle window elapses.
+    private var throttledJumpTask: Task<Void, Never>?
 
     // MARK: - Initialization
 
@@ -158,6 +166,10 @@ final class WorkoutManager: NSObject {
         let generation = workoutGeneration
         workoutLifecycleTask?.cancel()
         stopLiveQueries()
+        throttledJumpTask?.cancel()
+        throttledJumpTask = nil
+        pendingMirroredJumpPayload = nil
+        lastMirroredJumpSentAt = .distantPast
 
         isMirroringActive = false
         averageHeartRate = nil
@@ -252,6 +264,9 @@ final class WorkoutManager: NSObject {
         workoutLifecycleTask?.cancel()
         workoutLifecycleTask = nil
         stopLiveQueries()
+        throttledJumpTask?.cancel()
+        throttledJumpTask = nil
+        pendingMirroredJumpPayload = nil
 
         let endDate = Date()
         sendPayload(
@@ -289,18 +304,46 @@ final class WorkoutManager: NSObject {
     }
 
     /// Sends a mirrored jump update to the iPhone companion app, including latest cumulative metrics.
+    ///
+    /// Jumps occur multiple times per second (e.g., 2–3 Hz). Transmitting Bluetooth radio packets on
+    /// every single jump keeps the watch wireless chip continuously powered on. This method throttles
+    /// transmissions to at most once per second while ensuring the trailing jump count is always delivered.
     func sendJumpUpdate(jumpCount: Int, jumpOffset: TimeInterval) {
         let totalEnergyBurned = currentEnergyBurned
-        sendPayload(
-            MirroredWorkoutPayload(
-                kind: .jump,
-                jumpCount: jumpCount,
-                jumpOffset: jumpOffset,
-                energyBurned: totalEnergyBurned,
-                averageHeartRate: averageHeartRate,
-                peakHeartRate: peakHeartRate
-            )
+        let payload = MirroredWorkoutPayload(
+            kind: .jump,
+            jumpCount: jumpCount,
+            jumpOffset: jumpOffset,
+            energyBurned: totalEnergyBurned,
+            averageHeartRate: averageHeartRate,
+            peakHeartRate: peakHeartRate
         )
+
+        pendingMirroredJumpPayload = payload
+
+        let elapsed = Date().timeIntervalSince(lastMirroredJumpSentAt)
+        if elapsed >= minMirroredJumpInterval, throttledJumpTask == nil {
+            lastMirroredJumpSentAt = Date()
+            pendingMirroredJumpPayload = nil
+            sendPayload(payload)
+        } else if throttledJumpTask == nil {
+            let remainingDelay = max(0.1, minMirroredJumpInterval - elapsed)
+            throttledJumpTask = Task { [weak self] in
+                do {
+                    try await Task.sleep(for: .seconds(remainingDelay))
+                } catch {
+                    return
+                }
+
+                guard let self, !Task.isCancelled else { return }
+                throttledJumpTask = nil
+                if let pending = pendingMirroredJumpPayload {
+                    pendingMirroredJumpPayload = nil
+                    lastMirroredJumpSentAt = Date()
+                    sendPayload(pending)
+                }
+            }
+        }
     }
 
     // MARK: - Live Queries
