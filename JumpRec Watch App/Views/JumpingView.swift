@@ -14,6 +14,9 @@ struct JumpingView: View {
     /// Provides persisted goal settings.
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
+    /// Detects when the watch enters Always-On Display (wrist-down) dimmed state.
+    @Environment(\.isLuminanceReduced)
+    private var isLuminanceReduced
     /// Controls navigation to settings screen.
     @State private var showSettings: Bool = false
 
@@ -39,7 +42,8 @@ struct JumpingView: View {
 
                 Text("\(appState.jumpCount)")
                     .font(AppFonts.watchMetricValue)
-                    .foregroundStyle(AppColors.accent)
+                    // Dim bright saturated cyan to neutral textPrimary in AOD mode to reduce OLED subpixel draw.
+                    .foregroundStyle(isLuminanceReduced ? AppColors.textPrimary : AppColors.accent)
                     .accessibilityLabel(Text("Jumps"))
                     .accessibilityValue(Text(appState.jumpCount.formatted()))
 
@@ -58,7 +62,8 @@ struct JumpingView: View {
                         Text(appState.heartrate == 0 ? "--" : "\(appState.heartrate)")
                             .font(AppFonts.watchMetricDetail)
                     }
-                    .foregroundStyle(AppColors.heartRate)
+                    // Mute bright red heart icon in dimmed mode to conserve display energy.
+                    .foregroundStyle(isLuminanceReduced ? AppColors.textSecondary : AppColors.heartRate)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(Text("Heart rate"))
                     .accessibilityValue(Text(heartRateAccessibilityValue))
@@ -71,24 +76,28 @@ struct JumpingView: View {
                     Text("STOP")
                         .font(AppFonts.watchMetricCompact)
                         .tracking(1)
-                        .foregroundStyle(AppColors.textPrimary)
+                        .foregroundStyle(isLuminanceReduced ? AppColors.textMuted : AppColors.textPrimary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
-                        .background(AppColors.danger)
+                        // Replace large saturated red background block with dark muted surface during wrist-down state.
+                        .background(isLuminanceReduced ? AppColors.cardSurface : AppColors.danger)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
                 .buttonStyle(.plain)
+                .disabled(isLuminanceReduced)
             }
             .padding(.horizontal, 4)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showSettings.toggle()
-                    } label: {
-                        Image(systemName: "gearshape.fill")
-                            .foregroundStyle(AppColors.textMuted)
+                if !isLuminanceReduced {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            showSettings.toggle()
+                        } label: {
+                            Image(systemName: "gearshape.fill")
+                                .foregroundStyle(AppColors.textMuted)
+                        }
+                        .accessibilityLabel(Text("Settings"))
                     }
-                    .accessibilityLabel(Text("Settings"))
                 }
             }
             .navigationDestination(isPresented: $showSettings) {
