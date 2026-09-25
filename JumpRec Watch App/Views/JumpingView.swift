@@ -40,8 +40,6 @@ struct JumpingView: View {
                 Text("\(appState.jumpCount)")
                     .font(AppFonts.watchMetricValue)
                     .foregroundStyle(AppColors.accent)
-                    .contentTransition(.numericText())
-                    .animation(.bouncy, value: appState.jumpCount)
                     .accessibilityLabel(Text("Jumps"))
                     .accessibilityValue(Text(appState.jumpCount.formatted()))
 
