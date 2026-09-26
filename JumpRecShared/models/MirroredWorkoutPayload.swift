@@ -37,6 +37,8 @@ public struct MirroredWorkoutPayload: Codable, Sendable {
     public let jumpOffset: TimeInterval?
     /// The latest active energy burned value.
     public let energyBurned: Double?
+    /// The most recently sampled current heart rate value.
+    public let heartRate: Int?
     /// The latest average heart rate value.
     public let averageHeartRate: Int?
     /// The latest peak heart rate value.
@@ -54,6 +56,7 @@ public struct MirroredWorkoutPayload: Codable, Sendable {
         jumpCount: Int? = nil,
         jumpOffset: TimeInterval? = nil,
         energyBurned: Double? = nil,
+        heartRate: Int? = nil,
         averageHeartRate: Int? = nil,
         peakHeartRate: Int? = nil
     ) {
@@ -65,6 +68,7 @@ public struct MirroredWorkoutPayload: Codable, Sendable {
         self.jumpCount = jumpCount
         self.jumpOffset = jumpOffset
         self.energyBurned = energyBurned
+        self.heartRate = heartRate
         self.averageHeartRate = averageHeartRate
         self.peakHeartRate = peakHeartRate
     }

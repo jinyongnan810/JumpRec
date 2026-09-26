@@ -77,6 +77,7 @@ extension JumpRecState {
         cancelMinuteAnnouncements()
         pendingMirroredStart = false
         resetLiveMetrics()
+        heartRate = nil
         averageHeartRate = nil
         peakHeartRate = nil
         completedSession = nil
@@ -109,6 +110,9 @@ extension JumpRecState {
         if let energyBurned = payload.energyBurned {
             caloriesBurned = energyBurned
         }
+        if let heartRate = payload.heartRate {
+            self.heartRate = heartRate
+        }
         if let averageHeartRate = payload.averageHeartRate {
             self.averageHeartRate = averageHeartRate
         }
@@ -124,6 +128,9 @@ extension JumpRecState {
 
         if let energyBurned = payload.energyBurned {
             caloriesBurned = energyBurned
+        }
+        if let heartRate = payload.heartRate {
+            self.heartRate = heartRate
         }
         if let averageHeartRate = payload.averageHeartRate {
             self.averageHeartRate = averageHeartRate
@@ -142,6 +149,9 @@ extension JumpRecState {
         endTime = payload.endTime ?? Date()
         if let energyBurned = payload.energyBurned {
             caloriesBurned = energyBurned
+        }
+        if let heartRate = payload.heartRate {
+            self.heartRate = heartRate
         }
         if let averageHeartRate = payload.averageHeartRate {
             self.averageHeartRate = averageHeartRate

@@ -43,6 +43,8 @@ final class WorkoutManager: NSObject {
     /// leaves the iPhone behind. Keeping this flag false until mirroring succeeds lets
     /// jump and metric updates avoid a stream of expected remote-send failures.
     private var isMirroringActive = false
+    /// Stores the current (latest) heart rate for mirrored updates.
+    private var currentHeartRate: Int?
     /// Stores the current average heart rate for mirrored updates.
     private var averageHeartRate: Int?
     /// Stores the current peak heart rate for mirrored updates.
@@ -163,6 +165,7 @@ final class WorkoutManager: NSObject {
         lastMirroredJumpSentAt = .distantPast
 
         isMirroringActive = false
+        currentHeartRate = nil
         averageHeartRate = nil
         peakHeartRate = nil
 
@@ -256,11 +259,15 @@ final class WorkoutManager: NSObject {
                 kind: .ended,
                 endTime: endDate,
                 energyBurned: currentEnergyBurned,
+                heartRate: currentHeartRate,
                 averageHeartRate: averageHeartRate,
                 peakHeartRate: peakHeartRate
             )
         )
         isMirroringActive = false
+        currentHeartRate = nil
+        averageHeartRate = nil
+        peakHeartRate = nil
 
         guard let session, let builder else {
             self.session = nil
@@ -297,6 +304,7 @@ final class WorkoutManager: NSObject {
             jumpCount: jumpCount,
             jumpOffset: jumpOffset,
             energyBurned: totalEnergyBurned,
+            heartRate: currentHeartRate,
             averageHeartRate: averageHeartRate,
             peakHeartRate: peakHeartRate
         )
@@ -359,6 +367,7 @@ final class WorkoutManager: NSObject {
             let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
             if let mostRecent = statistics.mostRecentQuantity() {
                 let latestHR = Int(mostRecent.doubleValue(for: heartRateUnit))
+                currentHeartRate = latestHR
                 updateHeartRate(latestHR)
             }
             if let average = statistics.averageQuantity() {
@@ -385,6 +394,7 @@ final class WorkoutManager: NSObject {
                 MirroredWorkoutPayload(
                     kind: .metrics,
                     energyBurned: currentEnergyBurned,
+                    heartRate: currentHeartRate,
                     averageHeartRate: averageHeartRate,
                     peakHeartRate: peakHeartRate
                 )

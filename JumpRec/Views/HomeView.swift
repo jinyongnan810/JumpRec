@@ -218,10 +218,10 @@ struct HomeView: View {
         return max(0, Int(now.timeIntervalSince(startTime)))
     }
 
-    /// Returns the live average heart-rate text, or a placeholder until HealthKit delivers samples.
-    private var averageHeartRateText: String {
-        guard let averageHeartRate = appState.averageHeartRate else { return "--" }
-        return "\(averageHeartRate) bpm"
+    /// Returns the live current heart-rate text, or a placeholder until HealthKit delivers samples.
+    private var heartRateText: String {
+        guard let heartRate = appState.heartRate else { return "--" }
+        return "\(heartRate) bpm"
     }
 
     /// Returns the compact symbol used in the active-session header badge.
@@ -499,7 +499,7 @@ struct HomeView: View {
             LazyVGrid(columns: statColumns, spacing: 10) {
                 StatCardView(label: leadingStatLabel, value: leadingStatValue)
                 StatCardView(label: "CALORIES", value: "\(Int(appState.caloriesBurned.rounded()))")
-                StatCardView(label: "HR(AVG)", value: averageHeartRateText, valueColor: AppColors.accent)
+                StatCardView(label: "HR", value: heartRateText, valueColor: AppColors.accent)
                 StatCardView(label: "RATE(AVG)", value: localizedRateText(appState.averageRate))
             }
 

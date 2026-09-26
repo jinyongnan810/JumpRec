@@ -49,6 +49,8 @@ final class JumpRecState: NSObject, @unchecked Sendable {
     var jumps: [TimeInterval] = []
     /// Stores the latest calorie estimate for the session.
     var caloriesBurned = 0.0
+    /// Stores the most recently sampled current heart rate in bpm during an active session.
+    var heartRate: Int?
     /// Stores the average heart rate for the completed session when available.
     var averageHeartRate: Int?
     /// Stores the peak heart rate for the completed session when available.
@@ -195,11 +197,12 @@ final class JumpRecState: NSObject, @unchecked Sendable {
         workoutMirrorManager.onMirroredSessionEnded = { [weak self] in
             self?.handleMirroredSessionEnded()
         }
-        phoneWorkoutManager.onMetricsUpdated = { [weak self] caloriesBurned, averageHeartRate, peakHeartRate in
+        phoneWorkoutManager.onMetricsUpdated = { [weak self] caloriesBurned, heartRate, averageHeartRate, peakHeartRate in
             guard let self else { return }
             guard sessionState == .active, !isMirroredWatchSession else { return }
 
             self.caloriesBurned = caloriesBurned
+            self.heartRate = heartRate
             self.averageHeartRate = averageHeartRate
             self.peakHeartRate = peakHeartRate
             syncLiveActivity()

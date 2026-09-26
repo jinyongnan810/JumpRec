@@ -1377,7 +1377,18 @@
         }
       }
     },
+    "HR" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心拍数"
+          }
+        }
+      }
+    },
     "HR(AVG)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {

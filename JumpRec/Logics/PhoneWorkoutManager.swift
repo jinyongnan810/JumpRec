@@ -10,7 +10,7 @@ import HealthKit
 @MainActor
 final class PhoneWorkoutManager: NSObject {
     /// Publishes live iPhone workout metrics back to app state.
-    var onMetricsUpdated: ((_ caloriesBurned: Double, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
+    var onMetricsUpdated: ((_ caloriesBurned: Double, _ heartRate: Int?, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
 
     /// Errors thrown when workout authorization is missing.
     private enum AuthorizationError: LocalizedError {
@@ -217,13 +217,13 @@ final class PhoneWorkoutManager: NSObject {
 @available(iOS 26.0, *)
 private final class PhoneWorkoutStore: NSObject {
     private let healthStore: HKHealthStore
-    private let onMetricsUpdated: ((_ caloriesBurned: Double, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
+    private let onMetricsUpdated: ((_ caloriesBurned: Double, _ heartRate: Int?, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
 
     init(
         healthStore: HKHealthStore,
-        onMetricsUpdated: ((_ caloriesBurned: Double, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
+        onMetricsUpdated: ((_ caloriesBurned: Double, _ heartRate: Int?, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
     ) {
         self.healthStore = healthStore
         self.onMetricsUpdated = onMetricsUpdated
@@ -284,8 +284,8 @@ private final class PhoneWorkoutStore: NSObject {
     }
 
     @MainActor
-    private func publishMetrics(caloriesBurned: Double, averageHeartRate: Int?, peakHeartRate: Int?) {
-        onMetricsUpdated?(caloriesBurned, averageHeartRate, peakHeartRate)
+    private func publishMetrics(caloriesBurned: Double, heartRate: Int?, averageHeartRate: Int?, peakHeartRate: Int?) {
+        onMetricsUpdated?(caloriesBurned, heartRate, averageHeartRate, peakHeartRate)
     }
 }
 
@@ -316,6 +316,10 @@ extension PhoneWorkoutStore: HKLiveWorkoutBuilderDelegate {
 
         let heartRateUnit = HKUnit.count().unitDivided(by: .minute())
         let heartRateStatistics = heartRateType.flatMap { workoutBuilder.statistics(for: $0) }
+        let heartRate = heartRateStatistics?
+            .mostRecentQuantity()?
+            .doubleValue(for: heartRateUnit)
+            .rounded()
         let averageHeartRate = heartRateStatistics?
             .averageQuantity()?
             .doubleValue(for: heartRateUnit)
@@ -332,6 +336,7 @@ extension PhoneWorkoutStore: HKLiveWorkoutBuilderDelegate {
         Task { @MainActor [weak self] in
             self?.publishMetrics(
                 caloriesBurned: caloriesBurned,
+                heartRate: heartRate.map(Int.init),
                 averageHeartRate: averageHeartRate.map(Int.init),
                 peakHeartRate: peakHeartRate.map(Int.init)
             )

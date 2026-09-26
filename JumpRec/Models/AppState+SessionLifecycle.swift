@@ -189,6 +189,7 @@ extension JumpRecState {
         #if DEBUG
             motionCSVShareURL = nil
         #endif
+        heartRate = nil
         averageHeartRate = nil
         peakHeartRate = nil
         sessionGoalType = nil
@@ -239,6 +240,7 @@ extension JumpRecState {
         completedSession = nil
         startTime = sessionStartDate
         endTime = nil
+        heartRate = nil
         averageHeartRate = nil
         peakHeartRate = nil
         sessionGoalType = goalType

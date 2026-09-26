@@ -86,9 +86,9 @@ Used exclusively for low-latency live streaming during an active workout session
 | Event / Kind | Data Sent | iPhone Action |
 | :--- | :--- | :--- |
 | **`.started`** | `startTime`, initial `jumpCount`, `goalType`, `goalValue` | Sets iPhone session state to `.active`, source to `.watch`, and initializes live UI ring. |
-| **`.jump`** | `jumpCount`, `jumpOffset`, `energyBurned`, `averageHeartRate`, `peakHeartRate` | Increments jump count ring, appends jump timestamp offset, updates active stat cards. |
-| **`.metrics`** | `energyBurned`, `averageHeartRate`, `peakHeartRate` | Updates heart rate and calorie metrics on iPhone stat grid. |
-| **`.ended`** | `endTime`, final `energyBurned`, `averageHeartRate`, `peakHeartRate` | Transitions iPhone UI to `.complete` state and displays session summary. |
+| **`.jump`** | `jumpCount`, `jumpOffset`, `energyBurned`, `heartRate`, `averageHeartRate`, `peakHeartRate` | Increments jump count ring, appends jump timestamp offset, updates active stat cards with current heart rate. |
+| **`.metrics`** | `energyBurned`, `heartRate`, `averageHeartRate`, `peakHeartRate` | Updates current heart rate and calorie metrics on iPhone stat grid. |
+| **`.ended`** | `endTime`, final `energyBurned`, `heartRate`, `averageHeartRate`, `peakHeartRate` | Transitions iPhone UI to `.complete` state and displays session summary. |
 
 ---
 
