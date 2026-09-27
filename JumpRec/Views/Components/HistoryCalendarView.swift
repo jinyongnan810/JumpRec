@@ -283,3 +283,91 @@ private struct HistoryCalendarDayCellView: View {
         return .medium
     }
 }
+
+// MARK: - Preview
+
+/// Interactive container that allows toggling and navigating months in Xcode Previews.
+/// This allows validating swipe gestures, month transitions, today highlights,
+/// badge formatting (<1k vs >=1k), and empty day cell alignments.
+private struct HistoryCalendarInteractivePreview: View {
+    @State private var displayedMonth = Date()
+
+    /// The calendar used for date calculations.
+    private var calendar: Calendar { Calendar.current }
+
+    /// Returns sample jump counts for the displayed month to showcase various visual states:
+    /// standard counts (< 1K), formatted counts (>= 1K), and days with or without sessions.
+    private var sampleJumpsByDay: [Int: Int] {
+        let now = Date()
+        let isCurrentMonth = calendar.isDate(displayedMonth, equalTo: now, toGranularity: .month)
+        let today = calendar.component(.day, from: now)
+
+        if isCurrentMonth {
+            var jumps: [Int: Int] = [:]
+            // Spread workouts across the month prior to today
+            let candidateDays = [1, 3, 5, 8, 12, 15, 20]
+            for day in candidateDays where day < today {
+                // Alternate between counts below 1000 and counts >= 1000 to demonstrate formatting
+                jumps[day] = (day % 2 == 0) ? 650 : (1000 + day * 100)
+            }
+            // Always showcase today with a completed workout badge
+            jumps[today] = 1850
+            return jumps
+        } else {
+            // For other months, provide fixed sample days showcasing varied jump counts
+            return [
+                3: 450,
+                8: 1200,
+                14: 2850,
+                19: 720,
+                25: 1650,
+            ]
+        }
+    }
+
+    /// Set of day numbers that have recorded sessions.
+    private var sampleSessionDays: Set<Int> {
+        Set(sampleJumpsByDay.keys)
+    }
+
+    var body: some View {
+        HistoryCalendarView(
+            displayedMonth: displayedMonth,
+            sessionDays: sampleSessionDays,
+            jumpsByDay: sampleJumpsByDay,
+            onPreviousMonth: {
+                changeMonth(by: -1)
+            },
+            onNextMonth: {
+                changeMonth(by: 1)
+            }
+        )
+        .padding()
+        .background(AppColors.bgPrimary)
+    }
+
+    /// Moves the displayed month forward or backward by the specified number of months.
+    private func changeMonth(by value: Int) {
+        if let newMonth = calendar.date(byAdding: .month, value: value, to: displayedMonth) {
+            displayedMonth = newMonth
+        }
+    }
+}
+
+#Preview("Interactive") {
+    HistoryCalendarInteractivePreview()
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Empty Month") {
+    HistoryCalendarView(
+        displayedMonth: Date(),
+        sessionDays: [],
+        jumpsByDay: [:],
+        onPreviousMonth: {},
+        onNextMonth: {}
+    )
+    .padding()
+    .background(AppColors.bgPrimary)
+    .preferredColorScheme(.dark)
+}
