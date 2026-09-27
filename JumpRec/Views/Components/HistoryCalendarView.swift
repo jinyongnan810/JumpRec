@@ -7,6 +7,8 @@ import SwiftUI
 
 /// Displays the month grid used on the history screen.
 struct HistoryCalendarView: View {
+    @Environment(\.locale) private var locale
+
     /// The month currently being displayed.
     let displayedMonth: Date
     /// The set of day numbers that contain sessions.
@@ -58,7 +60,24 @@ struct HistoryCalendarView: View {
     }
 
     /// The day-of-week headers shown above the grid.
-    private let dayHeaders = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]
+    /// The calendar grid is fixed with Sunday at column 0. For Japanese locales,
+    /// we display single-kanji abbreviations ("日", "月", "火", "水", "木", "金", "土")
+    /// to follow standard Japanese calendar conventions. Other locales use 2-letter uppercase
+    /// English abbreviations ("SU", "MO", etc.) to avoid single-letter ambiguity (e.g. S for Sun/Sat).
+    private var dayHeaders: [String] {
+        if isJapaneseLocale {
+            return ["日", "月", "火", "水", "木", "金", "土"]
+        }
+        return ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]
+    }
+
+    /// Indicates whether the active locale corresponds to Japanese.
+    /// Uses languageCode identifier rather than exact locale string to match
+    /// any Japanese variant (such as "ja", "ja_JP", or "ja-US").
+    private var isJapaneseLocale: Bool {
+        locale.language.languageCode?.identifier == "ja"
+    }
+
     /// The minimum horizontal drag distance used to change months.
     private let swipeThreshold: CGFloat = 50
 
@@ -100,12 +119,13 @@ struct HistoryCalendarView: View {
             }
 
             HStack(spacing: 0) {
-                ForEach(dayHeaders, id: \.self) { header in
+                ForEach(Array(dayHeaders.enumerated()), id: \.offset) { index, header in
                     Text(header)
                         .font(AppFonts.graphLabelMonospaced)
                         .tracking(1)
                         .foregroundStyle(AppColors.tabInactive)
                         .frame(maxWidth: .infinity)
+                        .accessibilityLabel(weekdayAccessibilityLabel(at: index, fallback: header))
                 }
             }
 
@@ -164,9 +184,21 @@ struct HistoryCalendarView: View {
     /// Returns the localized month title shown in the header.
     private var monthTitle: String {
         let formatter = DateFormatter()
-        formatter.locale = .autoupdatingCurrent
+        formatter.locale = locale
         formatter.setLocalizedDateFormatFromTemplate("yMMMM")
         return formatter.string(from: displayedMonth)
+    }
+
+    /// Returns the full weekday name for accessibility (e.g. "Sunday" or "日曜日") so screen readers
+    /// do not read abbreviated letters or standalone kanji ambiguously.
+    private func weekdayAccessibilityLabel(at index: Int, fallback: String) -> String {
+        var localizedCalendar = calendar
+        localizedCalendar.locale = locale
+        let symbols = localizedCalendar.standaloneWeekdaySymbols
+        guard symbols.indices.contains(index) else {
+            return fallback
+        }
+        return symbols[index]
     }
 }
 
@@ -356,6 +388,12 @@ private struct HistoryCalendarInteractivePreview: View {
 
 #Preview("Interactive") {
     HistoryCalendarInteractivePreview()
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Japanese Locale") {
+    HistoryCalendarInteractivePreview()
+        .environment(\.locale, Locale(identifier: "ja"))
         .preferredColorScheme(.dark)
 }
 
