@@ -25,7 +25,23 @@ struct HistoryView: View {
 
     @Namespace private var navigationTransitionNamespace
     private static let recordsTransitionID = "records"
+    private enum HistoryScope: String, CaseIterable {
+        case month = "Month"
+        case year = "Year"
+
+        var localizedTitle: LocalizedStringKey {
+            switch self {
+            case .month:
+                "Month"
+            case .year:
+                "Year"
+            }
+        }
+    }
+
+    @State private var selectedScope: HistoryScope = .month
     @State private var displayedMonth = Date()
+    @State private var displayedYear = Date()
     @State private var showRecords = false
     @State private var selectedSession: JumpSession?
     @State private var sessionsPendingDeletion: [JumpSession] = []
@@ -41,6 +57,14 @@ struct HistoryView: View {
         return DateInterval(start: start, end: end)
     }
 
+    private var displayedYearRange: DateInterval? {
+        let year = calendar.component(.year, from: displayedYear)
+        let comps = DateComponents(year: year, month: 1, day: 1)
+        guard let start = calendar.date(from: comps),
+              let end = calendar.date(byAdding: .year, value: 1, to: start) else { return nil }
+        return DateInterval(start: start, end: end)
+    }
+
     /// Determines whether any sessions exist across the whole store.
     /// Checking both the local probe query and the data store's reactive counter ensures
     /// newly imported CloudKit records trigger an immediate transition to the history list.
@@ -53,27 +77,71 @@ struct HistoryView: View {
             Group {
                 if !hasSessions {
                     emptyLibraryState
-                } else if let displayedMonthRange {
-                    MonthSessionsList(
-                        displayedMonth: displayedMonth,
-                        monthRange: displayedMonthRange,
-                        navigationTransitionNamespace: navigationTransitionNamespace,
-                        selectedSession: $selectedSession,
-                        onPreviousMonth: {
-                            displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth) ?? displayedMonth
-                        },
-                        onNextMonth: {
-                            displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
-                        },
-                        onDeleteSessions: promptDeleteSessions,
-                        onRefresh: {
-                            await dataStore.manualSyncCheck()
-                        }
-                    )
                 } else {
-                    ContentUnavailableView("Unable to load this month.", systemImage: "calendar")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    VStack(spacing: 0) {
+                        Picker("Scope", selection: $selectedScope) {
+                            ForEach(HistoryScope.allCases, id: \.self) { scope in
+                                Text(scope.localizedTitle).tag(scope)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 8)
                         .background(AppColors.bgPrimary)
+
+                        if selectedScope == .month {
+                            if let displayedMonthRange {
+                                MonthSessionsList(
+                                    displayedMonth: displayedMonth,
+                                    monthRange: displayedMonthRange,
+                                    navigationTransitionNamespace: navigationTransitionNamespace,
+                                    selectedSession: $selectedSession,
+                                    onPreviousMonth: {
+                                        displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth) ?? displayedMonth
+                                    },
+                                    onNextMonth: {
+                                        displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
+                                    },
+                                    onDeleteSessions: promptDeleteSessions,
+                                    onRefresh: {
+                                        await dataStore.manualSyncCheck()
+                                    }
+                                )
+                            } else {
+                                ContentUnavailableView(String(localized: "Unable to load this month."), systemImage: "calendar")
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .background(AppColors.bgPrimary)
+                            }
+                        } else {
+                            if let displayedYearRange {
+                                YearSessionsList(
+                                    displayedYear: displayedYear,
+                                    yearRange: displayedYearRange,
+                                    navigationTransitionNamespace: navigationTransitionNamespace,
+                                    selectedSession: $selectedSession,
+                                    onPreviousYear: {
+                                        displayedYear = calendar.date(byAdding: .year, value: -1, to: displayedYear) ?? displayedYear
+                                    },
+                                    onNextYear: {
+                                        displayedYear = calendar.date(byAdding: .year, value: 1, to: displayedYear) ?? displayedYear
+                                    },
+                                    onDeleteSessions: promptDeleteSessions,
+                                    onRefresh: {
+                                        await dataStore.manualSyncCheck()
+                                    }
+                                )
+                            } else {
+                                ContentUnavailableView(String(localized: "Unable to load this year."), systemImage: "calendar")
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .background(AppColors.bgPrimary)
+                            }
+                        }
+                    }
+                }
+            }
+            .onChange(of: selectedScope) { _, newScope in
+                if newScope == .year {
+                    syncDisplayedYearWithMonth()
                 }
             }
             .navigationDestination(item: $selectedSession) { session in
@@ -233,6 +301,15 @@ struct HistoryView: View {
         isDeletingAllSessions = true
         sessionsPendingDeletion = sessions
         showingDeleteConfirmation = true
+    }
+
+    /// Synchronizes `displayedYear` to match the year currently shown in `displayedMonth`.
+    private func syncDisplayedYearWithMonth() {
+        let yearComp = calendar.component(.year, from: displayedMonth)
+        let comps = DateComponents(year: yearComp, month: 1, day: 1)
+        if let syncedDate = calendar.date(from: comps) {
+            displayedYear = syncedDate
+        }
     }
 }
 
@@ -404,6 +481,168 @@ private struct MonthSessionsList: View {
     }
 
     // ⭐️ Format localize string with unit
+    private func formatDuration(_ duration: TimeInterval) -> String {
+        let totalSeconds = Int(duration)
+        let hours = totalSeconds / 3600
+        let allowedUnits: Set<Duration.UnitsFormatStyle.Unit> = hours > 0 ? [.hours, .minutes] : [.minutes]
+
+        return Duration.seconds(duration).formatted(
+            .units(allowed: allowedUnits, width: .abbreviated)
+        )
+    }
+}
+
+// MARK: - Year Sessions List
+
+private struct YearSessionsList: View {
+    @Query private var sessions: [JumpSession]
+
+    @State private var hasHeaderAppeared = false
+    @State private var hasAppeared = false
+
+    let displayedYear: Date
+    let yearRange: DateInterval
+    let navigationTransitionNamespace: Namespace.ID
+    @Binding var selectedSession: JumpSession?
+    let onPreviousYear: () -> Void
+    let onNextYear: () -> Void
+    let onDeleteSessions: ([JumpSession]) -> Void
+    let onRefresh: () async -> Void
+
+    private var calendar: Calendar { Calendar.current }
+
+    init(
+        displayedYear: Date,
+        yearRange: DateInterval,
+        navigationTransitionNamespace: Namespace.ID,
+        selectedSession: Binding<JumpSession?>,
+        onPreviousYear: @escaping () -> Void,
+        onNextYear: @escaping () -> Void,
+        onDeleteSessions: @escaping ([JumpSession]) -> Void,
+        onRefresh: @escaping () async -> Void
+    ) {
+        self.displayedYear = displayedYear
+        self.yearRange = yearRange
+        self.navigationTransitionNamespace = navigationTransitionNamespace
+        _selectedSession = selectedSession
+        self.onPreviousYear = onPreviousYear
+        self.onNextYear = onNextYear
+        self.onDeleteSessions = onDeleteSessions
+        self.onRefresh = onRefresh
+
+        let start = yearRange.start
+        let end = yearRange.end
+        let predicate = #Predicate<JumpSession> { session in
+            session.startedAt >= start && session.startedAt < end
+        }
+        _sessions = Query(filter: predicate, sort: \JumpSession.startedAt, order: .reverse)
+    }
+
+    /// The calendar year integer (e.g. 2026).
+    private var yearNumber: Int {
+        calendar.component(.year, from: displayedYear)
+    }
+
+    /// Total jumps for the displayed year
+    private var totalJumps: Int {
+        sessions.reduce(0) { $0 + $1.jumpCount }
+    }
+
+    /// Total time for the displayed year
+    private var totalDuration: TimeInterval {
+        sessions.reduce(0) { total, session in
+            total + session.endedAt.timeIntervalSince(session.startedAt)
+        }
+    }
+
+    var body: some View {
+        List {
+            Section {
+                HistoryYearSummaryCard(
+                    year: yearNumber,
+                    totalJumps: totalJumps,
+                    workoutCount: sessions.count,
+                    onPreviousYear: onPreviousYear,
+                    onNextYear: onNextYear
+                )
+                .listRowSeparator(.hidden)
+                .staggeredAppearance(isVisible: hasHeaderAppeared, index: 0)
+            }
+
+            Section {
+                HStack(spacing: 12) {
+                    StatCardView(label: "WORKOUTS", value: "\(sessions.count)", valueColor: AppColors.accent)
+                    StatCardView(label: "JUMPS", value: formatCount(totalJumps))
+                    StatCardView(label: "TIME", value: formatDuration(totalDuration))
+                }
+                .listRowSeparator(.hidden)
+                .staggeredAppearance(isVisible: hasAppeared, index: 1)
+            }
+
+            Section {
+                if sessions.isEmpty {
+                    Text(String(format: String(localized: "No workouts in %d."), yearNumber))
+                        .font(AppFonts.bodyRegular)
+                        .foregroundStyle(AppColors.textSecondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 24)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 24, bottom: 0, trailing: 24))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                        .staggeredAppearance(isVisible: hasAppeared, index: 2)
+                } else {
+                    ForEach(Array(sessions.enumerated()), id: \.element.id) { index, session in
+                        Button {
+                            selectedSession = session
+                        } label: {
+                            SessionRowView(session: session)
+                                .matchedTransitionSource(id: session.id, in: navigationTransitionNamespace)
+                        }
+                        .buttonStyle(.plain)
+                        .listRowInsets(EdgeInsets(top: 4, leading: 24, bottom: 4, trailing: 24))
+                        .listRowSeparator(.hidden)
+                        .staggeredAppearance(isVisible: hasAppeared, index: index + 2)
+                    }
+                    .onDelete(perform: deleteSessions)
+                }
+            } header: {
+                Text(String(format: String(localized: "WORKOUTS IN %d"), yearNumber))
+                    .font(AppFonts.badgeLabel)
+                    .tracking(2)
+                    .foregroundStyle(AppColors.textMuted)
+                    .textCase(nil)
+                    .padding(.horizontal, 24)
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .topSoftScrollEdgeEffect()
+        .refreshable {
+            await onRefresh()
+        }
+        .task {
+            await Task.yield()
+            hasHeaderAppeared = true
+        }
+        .task(id: displayedYear) {
+            hasAppeared = false
+            await Task.yield()
+            hasAppeared = true
+        }
+    }
+
+    private func deleteSessions(at offsets: IndexSet) {
+        onDeleteSessions(offsets.map { sessions[$0] })
+    }
+
+    private func formatCount(_ value: Int) -> String {
+        if value >= 10000 {
+            let k = Double(value) / 1000.0
+            return String(format: "%.1fK", k)
+        }
+        return value.formatted()
+    }
+
     private func formatDuration(_ duration: TimeInterval) -> String {
         let totalSeconds = Int(duration)
         let hours = totalSeconds / 3600
