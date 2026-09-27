@@ -408,6 +408,8 @@ private struct MonthSessionsList: View {
                     StatCardView(label: "JUMPS", value: formatCount(totalJumps))
                     StatCardView(label: "TIME", value: formatDuration(totalDuration))
                 }
+                // Sizing the HStack to its tallest child's ideal height guarantees matching card heights across all languages.
+                .fixedSize(horizontal: false, vertical: true)
                 .listRowSeparator(.hidden)
                 .staggeredAppearance(isVisible: hasAppeared, index: 1)
             }
@@ -487,7 +489,7 @@ private struct MonthSessionsList: View {
         let allowedUnits: Set<Duration.UnitsFormatStyle.Unit> = hours > 0 ? [.hours, .minutes] : [.minutes]
 
         return Duration.seconds(duration).formatted(
-            .units(allowed: allowedUnits, width: .abbreviated)
+            .units(allowed: allowedUnits, width: .narrow)
         )
     }
 }
@@ -575,6 +577,8 @@ private struct YearSessionsList: View {
                     StatCardView(label: "JUMPS", value: formatCount(totalJumps))
                     StatCardView(label: "TIME", value: formatDuration(totalDuration))
                 }
+                // Sizing the HStack to its tallest child's ideal height guarantees matching card heights across all languages.
+                .fixedSize(horizontal: false, vertical: true)
                 .listRowSeparator(.hidden)
                 .staggeredAppearance(isVisible: hasAppeared, index: 1)
             }
@@ -649,7 +653,7 @@ private struct YearSessionsList: View {
         let allowedUnits: Set<Duration.UnitsFormatStyle.Unit> = hours > 0 ? [.hours, .minutes] : [.minutes]
 
         return Duration.seconds(duration).formatted(
-            .units(allowed: allowedUnits, width: .abbreviated)
+            .units(allowed: allowedUnits, width: .narrow)
         )
     }
 }

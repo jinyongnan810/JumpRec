@@ -27,8 +27,12 @@ struct StatCardView: View {
             Text(value)
                 .font(AppFonts.metricValueMonospaced)
                 .foregroundStyle(valueColor)
+                // Keep values on a single line and scale font down cleanly when text is longer (e.g. Japanese "1時間35分").
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        // Expand vertically to fill the container's height so sibling cards in an HStack always share identical heights.
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding(14)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -39,10 +43,11 @@ struct StatCardView: View {
 
 #Preview {
     HStack(spacing: 10) {
-        StatCardView(label: "TIME", value: "04:32")
+        StatCardView(label: "TIME", value: "1時間35分")
         StatCardView(label: "CALORIES", value: "86")
         StatCardView(label: "RATE", value: "128/m", valueColor: AppColors.accent)
     }
+    .fixedSize(horizontal: false, vertical: true)
     .padding()
     .background(AppColors.bgPrimary)
     .preferredColorScheme(.dark)

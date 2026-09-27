@@ -369,6 +369,7 @@
                         value: "34m"
                     )
                 }
+                .fixedSize(horizontal: false, vertical: true)
 
                 // 3. Workouts List Header
                 HStack {
@@ -431,6 +432,7 @@
                         value: currentYearSummary.formattedDuration
                     )
                 }
+                .fixedSize(horizontal: false, vertical: true)
 
                 // 3. Workouts List Header
                 HStack {
@@ -542,6 +544,7 @@
                                 value: selectedYearSummary.formattedDuration
                             )
                         }
+                        .fixedSize(horizontal: false, vertical: true)
 
                         // Workouts List
                         HStack {
