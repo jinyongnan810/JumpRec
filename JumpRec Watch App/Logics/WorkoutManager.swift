@@ -2,7 +2,7 @@
 //  WorkoutManager.swift
 //  JumpRec
 //
-//  Created by Yuunan kin on 2026/03/01.
+//  Created by kinn on 2026/03/01.
 //
 
 import Foundation

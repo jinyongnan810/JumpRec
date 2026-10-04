@@ -2,7 +2,7 @@
 //  MotionSample.swift
 //  JumpRec
 //
-//  Created by Yuunan kin on 2026/02/28.
+//  Created by kinn on 2026/02/28.
 //
 
 import Foundation

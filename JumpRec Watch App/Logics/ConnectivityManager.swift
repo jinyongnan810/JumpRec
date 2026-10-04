@@ -2,7 +2,7 @@
 //  ConnectivityManager.swift
 //  JumpRec
 //
-//  Created by Yuunan kin on 2025/09/23.
+//  Created by kinn on 2025/09/23.
 //
 
 import Foundation

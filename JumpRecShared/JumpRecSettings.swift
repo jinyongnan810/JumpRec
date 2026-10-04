@@ -2,7 +2,7 @@
 //  JumpRecSettings.swift
 //  JumpRec
 //
-//  Created by Yuunan kin on 2025/09/15.
+//  Created by kinn on 2025/09/15.
 //
 import Foundation
 import Observation

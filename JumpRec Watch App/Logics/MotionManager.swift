@@ -2,7 +2,7 @@
 //  MotionManager.swift
 //  JumpRec
 //
-//  Created by Yuunan kin on 2025/09/14.
+//  Created by kinn on 2025/09/14.
 //
 
 import CoreMotion

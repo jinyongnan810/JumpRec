@@ -2,7 +2,7 @@
 //  JumpSessionDetails.swift
 //  JumpRec
 //
-//  Created by Yuunan kin on 2025/12/27.
+//  Created by kinn on 2025/12/27.
 //
 
 import Foundation

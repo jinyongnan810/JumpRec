@@ -2,7 +2,7 @@
 //  JumpingView.swift
 //  JumpRec Watch App
 //
-//  Created by Yuunan kin on 2025/10/05.
+//  Created by kinn on 2025/10/05.
 //
 
 import SwiftUI

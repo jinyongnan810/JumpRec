@@ -2,7 +2,7 @@
 //  JumpRecApp.swift
 //  JumpRec
 //
-//  Created by Yuunan kin on 2025/09/13.
+//  Created by kinn on 2025/09/13.
 //
 
 import SwiftData

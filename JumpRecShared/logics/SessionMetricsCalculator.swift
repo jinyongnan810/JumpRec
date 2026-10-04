@@ -2,7 +2,7 @@
 //  SessionMetricsCalculator.swift
 //  JumpRec
 //
-//  Created by Codex on 2026/03/09.
+//  Created by kinn on 2026/03/09.
 //
 
 import Foundation

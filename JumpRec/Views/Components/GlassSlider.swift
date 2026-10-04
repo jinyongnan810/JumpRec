@@ -2,7 +2,7 @@
 //  GlassSlider.swift
 //  SwiftUIPractices
 //
-//  Created by Yuunan kin on 2026/07/12.
+//  Created by kinn on 2026/07/12.
 //
 
 import SwiftUI

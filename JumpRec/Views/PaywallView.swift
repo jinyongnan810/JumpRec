@@ -2,7 +2,7 @@
 //  PaywallView.swift
 //  JumpRec
 //
-//  Created by Codex on 2026/09/20.
+//  Created by kinn on 2026/09/20.
 //
 
 import StoreKit

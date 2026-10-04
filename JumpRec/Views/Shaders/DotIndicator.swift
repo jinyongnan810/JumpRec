@@ -2,7 +2,7 @@
 //  DotIndicator.swift
 //  JumpRec
 //
-//  Created by Yuunan kin on 2026/04/07.
+//  Created by kinn on 2026/04/07.
 //
 
 import SwiftUI

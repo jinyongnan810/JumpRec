@@ -2,7 +2,7 @@
 //  JumpRecTests.swift
 //  JumpRecTests
 //
-//  Created by Yuunan kin on 2026/03/10.
+//  Created by kinn on 2026/03/10.
 //
 
 import Foundation
