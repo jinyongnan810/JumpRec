@@ -262,3 +262,12 @@ struct ContentView: View {
         .modelContainer(MyDataStore.shared.modelContainer)
         .environment(MyDataStore.shared)
 }
+
+#Preview("100 Free Workouts Used") {
+    // Seed 100 qualifying workouts in an isolated database so the existing quota check
+    // presents the milestone paywall when Start Workout is tapped on the free tier.
+    let dataStore = try! MyDataStore.makePreviewStore(qualifiedWorkoutCount: JumpRecSettings.freeWorkoutQuota)
+    ContentView()
+        .modelContainer(dataStore.modelContainer)
+        .environment(dataStore)
+}

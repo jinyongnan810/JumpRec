@@ -196,6 +196,40 @@ public final class MyDataStore {
         hasLocalSessions = initialCount > 0
     }
 
+    #if DEBUG
+        /// Creates isolated preview history using the production schema and quota rules.
+        /// In-memory storage with CloudKit disabled prevents sample workouts from reaching real history.
+        public static func makePreviewStore(qualifiedWorkoutCount: Int) throws -> MyDataStore {
+            let schema = ModelContainer.makeSharedSchema()
+            let configuration = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: true,
+                groupContainer: .none,
+                cloudKitDatabase: .none
+            )
+            let container = try ModelContainer(for: schema, configurations: [configuration])
+            let store = MyDataStore(modelContainer: container)
+            let latestStart = Date(timeIntervalSince1970: 1_791_417_600)
+
+            // Each sample meets the minimum jump count; spacing them a day apart also makes
+            // the history tab useful when inspecting this exhausted-quota preview interactively.
+            for index in 0 ..< qualifiedWorkoutCount {
+                let startedAt = latestStart.addingTimeInterval(-Double(index) * 86400)
+                store.modelContext.insert(JumpSession(
+                    startedAt: startedAt,
+                    endedAt: startedAt.addingTimeInterval(60),
+                    jumpCount: JumpRecSettings.minimumJumpsForQuotaQualification,
+                    peakRate: 100,
+                    averageRate: 100,
+                    caloriesBurned: 10
+                ))
+            }
+            try store.modelContext.save()
+            store.refreshLocalSessionCount()
+            return store
+        }
+    #endif
+
     /// Saves pending context changes when needed.
     func saveContextIfNeeded() {
         guard modelContext.hasChanges else { return }
