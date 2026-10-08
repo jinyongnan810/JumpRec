@@ -475,11 +475,7 @@ struct HomeView: View {
             if isCountingDown {
                 cancelCountdown()
             } else {
-                if !canStartWorkout {
-                    showPaywall = true
-                } else {
-                    startWithCountdown()
-                }
+                startWithCountdown()
             }
         } label: {
             Text(primaryButtonTitle)
@@ -542,6 +538,14 @@ struct HomeView: View {
     /// Starts the animated pre-session countdown.
     private func startWithCountdown() {
         guard !isCountingDown, !isStartingSession else { return }
+
+        // Both the hero ring and the start button enter through this helper. Check the
+        // saved workout quota here so neither control can bypass the free-tier limit.
+        // Cancellation remains available because it does not enter this start path.
+        guard canStartWorkout else {
+            showPaywall = true
+            return
+        }
 
         countdownTask = Task {
             await MainActor.run {
