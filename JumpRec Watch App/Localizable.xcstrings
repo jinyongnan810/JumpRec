@@ -401,7 +401,14 @@
       }
     },
     "OK" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
     },
     "Product details could not be loaded from the App Store. Please check your internet connection." : {
 
@@ -659,7 +666,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無料の100回ワークアウトが完了しました。iPhoneのJumpRecから無制限ワークアウトをアンロックしてください。"
+            "value" : "無料の100回ワークアウトが完了しました。iPhoneのJumpRecから無制限ワークアウトのアンロックをご検討ください。"
           }
         }
       }

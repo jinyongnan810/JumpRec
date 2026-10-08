@@ -171,6 +171,25 @@ public class JumpRecSettings {
 
     // MARK: - Initialization
 
+    #if DEBUG
+        /// Supplies a free-tier quota snapshot for Watch previews without reading or writing iCloud.
+        /// The Watch uses synced settings for quota checks rather than querying workout history.
+        /// Keeping write-back suppressed and omitting sync observers isolates canvas interactions
+        /// from real settings and prevents incoming sync updates from replacing the sample quota.
+        public init(previewQualifiedWorkoutCount: Int) {
+            isLoadingFromStore = true
+            goalType = .count
+            jumpCount = DefaultJumpCount
+            jumpTime = DefaultJumpTime
+            preferHeadphonesForIPhoneSessions = false
+            shouldSpeakJumpCountAnnouncements = true
+            shouldSpeakJumpTimeAnnouncements = true
+            jumpDetectorThresholdAdjustmentPercentage = DefaultJumpDetectorThresholdAdjustmentPercentage
+            hasUnlockedUnlimitedWorkouts = false
+            qualifiedWorkoutCount = previewQualifiedWorkoutCount
+        }
+    #endif
+
     /// Loads the initial settings and starts observing sync updates.
     public init() {
         store.synchronize()

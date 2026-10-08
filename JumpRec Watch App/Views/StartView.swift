@@ -23,8 +23,8 @@ struct StartView: View {
     private var settings: JumpRecSettings
     /// Controls navigation to the goal settings screen.
     @State var showSettings: Bool = false
-    /// Controls presentation of the quota reached alert.
-    @State private var showQuotaAlert: Bool = false
+    /// Controls presentation of the quota reached explanation.
+    @State private var showQuotaExplanation: Bool = false
 
     /// Returns the formatted goal text shown under the start button.
     var goal: Text {
@@ -90,11 +90,13 @@ struct StartView: View {
                     .task {
                         await runCountdown()
                     }
+                } else if showQuotaExplanation {
+                    quotaReachedExplanation
                 } else {
                     VStack(spacing: 12) {
                         Button {
                             if settings.isQuotaExceeded {
-                                showQuotaAlert = true
+                                showQuotaExplanation = true
                             } else {
                                 withAnimation {
                                     isCountingDown.toggle()
@@ -139,15 +141,36 @@ struct StartView: View {
             .navigationDestination(isPresented: $showSettings) {
                 SettingsView()
             }
-            .alert(
-                String(localized: "Free Limit Reached"),
-                isPresented: $showQuotaAlert
-            ) {
-                Button(String(localized: "OK"), role: .cancel) {}
-            } message: {
-                Text("You've completed your 100 free workouts. Please open JumpRec on your iPhone to unlock unlimited workouts.")
-            }
         }
+    }
+
+    /// Explains how to unlock more workouts using existing localized quota-message strings.
+    /// Rendering in place avoids the watchOS preview runtime's CoreUI layout crash with
+    /// system presentations, while keeping the workout idle and allowing an explicit return.
+    private var quotaReachedExplanation: some View {
+        VStack(spacing: 12) {
+            Text("Free Limit Reached")
+                .font(AppFonts.watchSectionTitle)
+                .multilineTextAlignment(.center)
+
+            Text("You've completed your 100 free workouts. Please open JumpRec on your iPhone to unlock unlimited workouts.")
+                .font(AppFonts.watchSupporting)
+                .multilineTextAlignment(.center)
+
+            Button {
+                showQuotaExplanation = false
+            } label: {
+                Text("OK")
+                    .font(AppFonts.watchGoalLabel)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(AppColors.accent)
+                    .foregroundStyle(AppColors.bgPrimary)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 8)
     }
 
     // MARK: - Countdown
