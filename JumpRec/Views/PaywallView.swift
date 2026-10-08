@@ -109,10 +109,10 @@ struct PaywallView: View {
     /// Dynamic subtitle: specifies current session count when under quota.
     private var headerSubtitle: String {
         if isQuotaReached {
-            String(localized: "You've logged 100 great workouts with JumpRec. Unlock unlimited workout tracking forever with a single, one-time purchase.")
+            String(localized: "You've logged 100 great workouts with JumpRec. Consider unlocking unlimited workout tracking forever with a single, one-time purchase.")
         } else {
             String(
-                format: String(localized: "You've logged %lld of %lld free workouts. Unlock unlimited workout tracking anytime with a single, one-time purchase."),
+                format: String(localized: "You've logged %lld of %lld free workouts. Consider unlocking unlimited workout tracking with a single, one-time purchase."),
                 Int64(qualifiedCount),
                 Int64(JumpRecSettings.freeWorkoutQuota)
             )

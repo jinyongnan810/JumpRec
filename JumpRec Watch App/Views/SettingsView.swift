@@ -63,13 +63,14 @@ struct SettingsView: View {
                             Spacer()
                             Text("\(settings.qualifiedWorkoutCount) / \(JumpRecSettings.freeWorkoutQuota)")
                                 .font(AppFonts.watchGoalChip)
-                                .foregroundStyle(settings.isQuotaExceeded ? AppColors.danger : AppColors.accent)
+                                // Match the iPhone quota milestone styling even when all workouts are used.
+                                .foregroundStyle(AppColors.accent)
                         }
 
                         if settings.isQuotaExceeded {
-                            Text("Limit reached. Unlock on iPhone.")
+                            Text("Limit reached. Consider unlocking on iPhone.")
                                 .font(AppFonts.watchSupportingRegular)
-                                .foregroundStyle(AppColors.danger)
+                                .foregroundStyle(AppColors.accent)
                         } else {
                             Text("100+ jump workouts")
                                 .font(AppFonts.watchSupportingRegular)

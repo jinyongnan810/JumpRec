@@ -145,14 +145,15 @@ struct SettingsView: View {
                         Spacer()
                         Text("\(dataStore.qualifiedSessionsCount()) / \(JumpRecSettings.freeWorkoutQuota)")
                             .font(AppFonts.bodyLabelStrong)
-                            .foregroundStyle(dataStore.qualifiedSessionsCount() >= JumpRecSettings.freeWorkoutQuota ? AppColors.danger : AppColors.accent)
+                            // Completing the free quota is a milestone, so keep the usual accent color.
+                            .foregroundStyle(AppColors.accent)
                     }
 
                     ProgressView(
                         value: min(Double(dataStore.qualifiedSessionsCount()), Double(JumpRecSettings.freeWorkoutQuota)),
                         total: Double(JumpRecSettings.freeWorkoutQuota)
                     )
-                    .tint(dataStore.qualifiedSessionsCount() >= JumpRecSettings.freeWorkoutQuota ? AppColors.danger : AppColors.accent)
+                    .tint(AppColors.accent)
 
                     Text("Includes workouts with 100+ jumps. When you complete 100 workouts, unlock lifetime unlimited tracking with a single purchase.")
                         .font(AppFonts.bodySmall)

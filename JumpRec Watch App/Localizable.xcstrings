@@ -327,18 +327,18 @@
         }
       }
     },
-    "Limit reached. Unlock on iPhone." : {
+    "Limit reached. Consider unlocking on iPhone." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Limit reached. Unlock on iPhone."
+            "value" : "Limit reached. Consider unlocking on iPhone."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "上限到達。iPhoneでアンロック"
+            "value" : "上限到達しました。iPhoneでアンロックをご検討ください。"
           }
         }
       }
@@ -655,12 +655,12 @@
         }
       }
     },
-    "You've completed your 100 free workouts. Please open JumpRec on your iPhone to unlock unlimited workouts." : {
+    "You've completed your 100 free workouts. Please consider open JumpRec on your iPhone to unlock unlimited workouts." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You've completed your 100 free workouts. Please open JumpRec on your iPhone to unlock unlimited workouts."
+            "value" : "You've completed your 100 free workouts. Please consider open JumpRec on your iPhone to unlock unlimited workouts."
           }
         },
         "ja" : {
