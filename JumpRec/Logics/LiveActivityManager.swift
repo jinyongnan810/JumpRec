@@ -42,7 +42,8 @@ import Foundation
                     jumpCount: jumpCount,
                     caloriesBurned: Int(caloriesBurned.rounded()),
                     averageRate: averageRate,
-                    sourceLabel: sourceLabel
+                    sourceLabel: sourceLabel,
+                    goalSummary: goalSummary
                 ),
                 staleDate: Date().addingTimeInterval(120),
                 relevanceScore: 100
@@ -68,7 +69,7 @@ import Foundation
         /// Ends the current live activity with final metrics.
         func end(
             startedAt _: Date?,
-            goalSummary _: String,
+            goalSummary: String,
             jumpCount: Int,
             caloriesBurned: Double,
             averageRate: Int,
@@ -83,7 +84,8 @@ import Foundation
                     caloriesBurned: Int(caloriesBurned.rounded()),
                     averageRate: averageRate,
                     sourceLabel: sourceLabel,
-                    endedAt: endedAt
+                    endedAt: endedAt,
+                    goalSummary: goalSummary
                 ),
                 staleDate: nil,
                 relevanceScore: 100

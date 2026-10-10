@@ -13,6 +13,10 @@ import Foundation
     public nonisolated struct JumpRecLiveActivityAttributes {
         /// Defines the live-updating content for the activity.
         public struct ContentState: Codable, Hashable {
+            /// Current goal text, updated when settings change during a workout.
+            /// Optional for decoding activities created by an older app version;
+            /// those activities fall back to the original static attribute.
+            public var goalSummary: String?
             /// The current jump count.
             public var jumpCount: Int
             /// The rounded calories burned value.
@@ -30,8 +34,10 @@ import Foundation
                 caloriesBurned: Int,
                 averageRate: Int,
                 sourceLabel: String,
-                endedAt: Date? = nil
+                endedAt: Date? = nil,
+                goalSummary: String? = nil
             ) {
+                self.goalSummary = goalSummary
                 self.jumpCount = jumpCount
                 self.caloriesBurned = caloriesBurned
                 self.averageRate = averageRate
@@ -42,7 +48,8 @@ import Foundation
 
         /// The time when the session started.
         public var startedAt: Date
-        /// A short summary of the session goal.
+        /// Initial goal retained as a decoding/display fallback for older activities.
+        /// New updates carry the current goal in ContentState.
         public var goalSummary: String
 
         /// Creates the static attributes for a live activity.

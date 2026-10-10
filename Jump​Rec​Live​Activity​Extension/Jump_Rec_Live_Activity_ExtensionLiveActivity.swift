@@ -44,7 +44,7 @@ struct JumpRecLiveActivityWidget: Widget {
 
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text(context.attributes.goalSummary)
+                        Text(context.state.goalSummary ?? context.attributes.goalSummary)
                             .font(AppFonts.liveActivityCaption)
                             .foregroundStyle(.secondary)
 
@@ -123,7 +123,7 @@ private struct JumpRecLiveActivityView: View {
                     Text("JumpRec")
                         .font(AppFonts.liveActivityHeadline)
                         .foregroundStyle(AppColors.textPrimary)
-                    Text(context.attributes.goalSummary)
+                    Text(context.state.goalSummary ?? context.attributes.goalSummary)
                         .font(AppFonts.liveActivityCaption)
                         .foregroundStyle(AppColors.textSecondary)
                 }
