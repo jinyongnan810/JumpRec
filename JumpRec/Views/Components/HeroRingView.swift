@@ -50,15 +50,21 @@ struct HeroRingView: View {
                 Text(centerText)
                     .font(AppFonts.heroRingValue(size: centerFontSize))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                    .minimumScaleFactor(0.3)
                     .foregroundStyle(AppColors.accent)
                     .contentTransition(.numericText())
 
                 Text(subtitle)
                     .font(AppFonts.heroRingSubtitle)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.5)
                     .foregroundStyle(AppColors.textSecondary)
                     .contentTransition(.opacity)
             }
+            // The ring has a fixed diameter even when text scales. Give its labels
+            // an explicit interior proposal so long translations shrink or wrap
+            // inside the stroke instead of expanding the whole ZStack.
+            .frame(width: max(0, diameter - lineWidth * 3), height: max(0, diameter - lineWidth * 3))
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel ?? centerText)

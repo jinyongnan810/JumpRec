@@ -295,8 +295,13 @@ struct HomeView: View {
             Text(primaryButtonTitle)
                 .font(AppFonts.primaryButtonLabel)
                 .foregroundStyle(primaryButtonTextColor)
+                // Accessibility fonts and longer translations need more than one
+                // line. Let the button grow vertically within the scrolling Home.
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.vertical, 14)
                 .frame(maxWidth: .infinity)
-                .frame(height: 56)
+                .frame(minHeight: 56)
         }
         .appGlassButton(prominent: true, tint: primaryButtonTint)
         .disabled(isPrimaryButtonDisabled)
