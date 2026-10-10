@@ -36,11 +36,11 @@ public struct PersonalRecordEntity: AppEntity, Identifiable, Sendable {
     /// Formats the record entity for Siri dialogs and Shortcuts list views.
     public var displayRepresentation: DisplayRepresentation {
         let dateString = achievedAt?.formatted(date: .abbreviated, time: .shortened) ?? ""
-        let subtitle = dateString.isEmpty ? "" : "Achieved \(dateString)"
+        let subtitle: LocalizedStringResource = dateString.isEmpty ? "" : "Achieved \(dateString)"
 
         return DisplayRepresentation(
             title: "\(title): \(displayValue)",
-            subtitle: LocalizedStringResource(stringLiteral: subtitle)
+            subtitle: subtitle
         )
     }
 

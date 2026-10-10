@@ -102,16 +102,6 @@
         }
       }
     },
-    "%@: %@ jumps" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@: %2$@ jumps"
-          }
-        }
-      }
-    },
     "%lld" : {
       "shouldTranslate" : false
     },
@@ -121,6 +111,17 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$lld / %2$lld"
+          }
+        }
+      }
+    },
+    "%lld Stats: %@ jumps" : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld年の統計：%@回"
           }
         }
       }
@@ -280,7 +281,7 @@
       }
     },
     "Achieved %@" : {
-      "extractionState" : "stale",
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -417,6 +418,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "通算統計"
+          }
+        }
+      }
+    },
+    "All-Time Stats: %@ jumps" : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "累計統計：%@回"
+          }
+        }
+      }
+    },
+    "All-time workout count: %lld. Total jumps: %@. Calories burned: %lld kcal." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "累計ワークアウトは%lld回、合計%@回のジャンプ、消費カロリーは%lld kcalです。"
           }
         }
       }
@@ -907,6 +930,18 @@
         }
       }
     },
+    "Delete All" : {
+      "comment" : "Debug history toolbar delete-all accessibility label.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて削除"
+          }
+        }
+      }
+    },
     "Delete Records" : {
       "localizations" : {
         "ja" : {
@@ -1383,6 +1418,17 @@
         }
       }
     },
+    "Highest jump count: %@" : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高ジャンプ回数：%@"
+          }
+        }
+      }
+    },
     "History" : {
       "localizations" : {
         "ja" : {
@@ -1817,6 +1863,17 @@
         }
       }
     },
+    "Longest streak: %@" : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最長連続ジャンプ：%@"
+          }
+        }
+      }
+    },
     "Low" : {
       "localizations" : {
         "en" : {
@@ -1840,6 +1897,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分"
+          }
+        }
+      }
+    },
+    "Matching workout count: %lld." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一致するワークアウトは%lld件です。"
           }
         }
       }
@@ -2015,6 +2083,7 @@
       }
     },
     "No jump rope workouts found in JumpRec." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2025,13 +2094,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "JumpRecに縄跳びワークアウトの履歴がありません。"
+            "value" : "JumpRecに縄跳びワークアウトがありません。"
           }
         }
       }
     },
     "No jump rope workouts recorded for %lld in JumpRec." : {
-      "extractionState" : "stale",
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2042,13 +2111,13 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "JumpRecに%lld年の縄跳びワークアウト記録はありません。"
+            "value" : "JumpRecには%lld年の縄跳びワークアウトが記録されていません。"
           }
         }
       }
     },
     "No jump rope workouts recorded in JumpRec yet." : {
-      "extractionState" : "stale",
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2059,7 +2128,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "JumpRecにまだ縄跳びワークアウトの記録がありません。"
+            "value" : "JumpRecにはまだ縄跳びワークアウトが記録されていません。"
           }
         }
       }
@@ -2086,6 +2155,7 @@
       }
     },
     "No personal records achieved yet. Complete a workout to set your first records!" : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2096,7 +2166,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "まだ自己ベストがありません。ワークアウトを完了して記録を作りましょう！"
+            "value" : "まだ自己ベストがありません。ワークアウトを完了して最初の記録を作りましょう！"
           }
         }
       }
@@ -2187,11 +2257,12 @@
       }
     },
     "No workouts found matching \"%@\"." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "「%@」に一致するワークアウトは見つかりませんでした。"
+            "value" : "「%@」に一致するワークアウトがありません。"
           }
         }
       }
@@ -2348,6 +2419,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最高レート"
+          }
+        }
+      }
+    },
+    "Peak rate: %@" : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高ペース：%@"
           }
         }
       }
@@ -3306,6 +3388,39 @@
         }
       }
     },
+    "Starting a %lld jump workout in JumpRec." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecで%lld回のジャンプワークアウトを開始します。"
+          }
+        }
+      }
+    },
+    "Starting a %lld minute jump rope workout in JumpRec." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecで%lld分の縄跳びワークアウトを開始します。"
+          }
+        }
+      }
+    },
+    "Starting jump rope workout in JumpRec." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecで縄跳びワークアウトを開始します。"
+          }
+        }
+      }
+    },
     "Starting motion tracking" : {
       "localizations" : {
         "ja" : {
@@ -3680,6 +3795,17 @@
         }
       }
     },
+    "Today's workout count: %lld. Total jumps: %@. Calories burned: %lld kcal." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日のワークアウトは%lld回、合計%@回のジャンプ、消費カロリーは%lld kcalです。"
+          }
+        }
+      }
+    },
     "Total Jumps" : {
       "localizations" : {
         "en" : {
@@ -4048,6 +4174,17 @@
         }
       }
     },
+    "Workout count: %lld • %lld kcal" : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウト：%lld回 • %lld kcal"
+          }
+        }
+      }
+    },
     "Workout countdown" : {
       "localizations" : {
         "ja" : {
@@ -4151,6 +4288,17 @@
         }
       }
     },
+    "Year %lld. Workout count: %lld. Total jumps: %@. Calories burned: %lld kcal." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld年のワークアウトは%lld回、合計%@回のジャンプ、消費カロリーは%lld kcalです。"
+          }
+        }
+      }
+    },
     "You have unlocked lifetime unlimited workout tracking." : {
       "localizations" : {
         "en" : {
@@ -4168,6 +4316,7 @@
       }
     },
     "You haven't logged any jump rope workouts today yet." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4178,7 +4327,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "今日はまだ縄跳びワークアウトを記録していません。"
+            "value" : "今日はまだ縄跳びワークアウトが記録されていません。"
           }
         }
       }
@@ -4201,7 +4350,7 @@
     },
     "You've logged 100 great workouts with JumpRec. Consider unlocking unlimited workout tracking forever with a single, one-time purchase." : {
       "localizations" : {
-         "en" : {
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "You've logged 100 great workouts with JumpRec. Consider unlocking unlimited workout tracking forever with a single, one-time purchase."
@@ -4248,6 +4397,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト全体を通した、平均的なカロリー消費効率です。"
+          }
+        }
+      }
+    },
+    "Your last workout was on %@: %@ jumps in %@, burning %lld kcal." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前回のワークアウトは%@でした。%@回、時間は%@、消費カロリーは%lld kcalです。"
+          }
+        }
+      }
+    },
+    "Your personal record count: %lld." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記録されている自己ベストは%lld件です。"
+          }
+        }
+      }
+    },
+    "Your personal records: %@." : {
+      "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "あなたの自己ベスト：%@。"
           }
         }
       }

@@ -24,13 +24,6 @@ struct SessionDetailView: View {
 
     // MARK: - Derived Values
 
-    /// Returns the formatted date and start time of the session.
-    private var dateText: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d, yyyy, h:mm a"
-        return formatter.string(from: session.startedAt)
-    }
-
     /// Returns the session duration formatted as `mm:ss`.
     private var durationText: String {
         session.formattedDuration
@@ -58,7 +51,7 @@ struct SessionDetailView: View {
             VStack(spacing: 20) {
                 // Date Row
                 HStack {
-                    Text(dateText)
+                    Text(session.startedAt, format: .dateTime.year().month(.abbreviated).day().hour().minute())
                         .font(AppFonts.bodyLabelStrong)
                         .foregroundStyle(AppColors.textSecondary)
 

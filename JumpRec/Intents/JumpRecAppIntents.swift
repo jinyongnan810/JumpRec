@@ -53,11 +53,10 @@ public struct GetLatestWorkoutIntent: AppIntent {
         let jumps = latest.jumpCount.formatted()
         let duration = latest.formattedDuration
         let calories = Int(latest.caloriesBurned.rounded())
-        let dialogMessage = "Your last workout was on \(date): \(jumps) jumps in \(duration), burning \(calories) kcal."
 
         return .result(
             value: entity,
-            dialog: IntentDialog(stringLiteral: dialogMessage)
+            dialog: IntentDialog("Your last workout was on \(date): \(jumps) jumps in \(duration), burning \(calories) kcal.")
         )
     }
 }
@@ -97,12 +96,9 @@ public struct GetTodayJumpStatsIntent: AppIntent {
         let totalCalories = Int(todaySessions.reduce(0.0) { $0 + $1.caloriesBurned }.rounded())
         let count = todaySessions.count
 
-        let sessionLabel = count == 1 ? "1 workout" : "\(count) workouts"
-        let dialogMessage = "Today you've completed \(sessionLabel) with \(totalJumps.formatted()) total jumps, burning \(totalCalories) kcal."
-
         return .result(
             value: totalJumps,
-            dialog: IntentDialog(stringLiteral: dialogMessage)
+            dialog: IntentDialog("Today's workout count: \(count). Total jumps: \(totalJumps.formatted()). Calories burned: \(totalCalories) kcal.")
         )
     }
 }
@@ -141,29 +137,20 @@ public struct GetWorkoutStatsIntent: AppIntent {
             caloriesBurned: totalCalories
         )
 
-        if filteredSessions.isEmpty {
-            let emptyMessage = if let targetYear {
+        // Keep complete literal templates at the dialog boundary so Xcode can
+        // extract them and translators can reorder the values without English fragments.
+        let dialog: IntentDialog = if filteredSessions.isEmpty {
+            if let targetYear {
                 "No jump rope workouts recorded for \(targetYear) in JumpRec."
             } else {
                 "No jump rope workouts recorded in JumpRec yet."
             }
-            return .result(
-                value: statsEntity,
-                dialog: IntentDialog(stringLiteral: emptyMessage)
-            )
-        }
-
-        let sessionLabel = sessionCount == 1 ? "1 workout" : "\(sessionCount) workouts"
-        let dialogMessage = if let targetYear {
-            "In \(targetYear), you completed \(sessionLabel) with \(totalJumps.formatted()) total jumps, burning \(totalCalories) kcal."
+        } else if let targetYear {
+            "Year \(targetYear). Workout count: \(sessionCount). Total jumps: \(totalJumps.formatted()). Calories burned: \(totalCalories) kcal."
         } else {
-            "All time, you have completed \(sessionLabel) with \(totalJumps.formatted()) total jumps, burning \(totalCalories) kcal."
+            "All-time workout count: \(sessionCount). Total jumps: \(totalJumps.formatted()). Calories burned: \(totalCalories) kcal."
         }
-
-        return .result(
-            value: statsEntity,
-            dialog: IntentDialog(stringLiteral: dialogMessage)
-        )
+        return .result(value: statsEntity, dialog: dialog)
     }
 }
 
@@ -198,25 +185,21 @@ public struct GetPersonalRecordsIntent: AppIntent {
 
         var highlights: [String] = []
         if let highest = highestJumpRecord, let val = highest.displayValue {
-            highlights.append("highest count is \(val)")
+            highlights.append(String(localized: "Highest jump count: \(val)"))
         }
         if let streak = longestStreakRecord, let val = streak.displayValue {
-            highlights.append("longest streak is \(val)")
+            highlights.append(String(localized: "Longest streak: \(val)"))
         }
         if let rate = bestRateRecord, let val = rate.displayValue {
-            highlights.append("peak rate is \(val)")
+            highlights.append(String(localized: "Peak rate: \(val)"))
         }
 
-        let dialogMessage = if !highlights.isEmpty {
-            "Your personal records: " + highlights.joined(separator: ", ") + "."
+        let dialog: IntentDialog = if !highlights.isEmpty {
+            "Your personal records: \(highlights.formatted())."
         } else {
-            "You have \(records.count) personal records recorded in JumpRec."
+            "Your personal record count: \(records.count)."
         }
-
-        return .result(
-            value: entities,
-            dialog: IntentDialog(stringLiteral: dialogMessage)
-        )
+        return .result(value: entities, dialog: dialog)
     }
 }
 
@@ -249,13 +232,7 @@ public struct SearchWorkoutsIntent: AppIntent {
             )
         } else {
             let count = results.count
-            let message = count == 1
-                ? "Found 1 matching jump rope workout."
-                : "Found \(count) matching jump rope workouts."
-            return .result(
-                value: results,
-                dialog: IntentDialog(stringLiteral: message)
-            )
+            return .result(value: results, dialog: IntentDialog("Matching workout count: \(count)."))
         }
     }
 }
@@ -314,7 +291,7 @@ public struct StartWorkoutIntent: AppIntent {
             JumpRecState.pendingStartGoal = (type: resolvedGoalType, value: resolvedGoalValue)
         }
 
-        let dialogMessage = switch goalType {
+        let dialog: IntentDialog = switch goalType {
         case .count:
             "Starting a \(resolvedGoalValue) jump workout in JumpRec."
         case .time:
@@ -323,6 +300,6 @@ public struct StartWorkoutIntent: AppIntent {
             "Starting jump rope workout in JumpRec."
         }
 
-        return .result(dialog: IntentDialog(stringLiteral: dialogMessage))
+        return .result(dialog: dialog)
     }
 }

@@ -39,13 +39,15 @@ public struct WorkoutStatsEntity: AppEntity, Identifiable, Sendable {
 
     /// Formats the statistics for presentation in Siri dialogs and Shortcuts results.
     public var displayRepresentation: DisplayRepresentation {
-        let label = year.map { "\($0) Stats" } ?? "All-Time Stats"
-        let sessionLabel = sessionCount == 1 ? "1 workout" : "\(sessionCount) workouts"
-        let subtitle = "\(sessionLabel) • \(caloriesBurned) kcal"
-
+        if let year {
+            return DisplayRepresentation(
+                title: "\(year) Stats: \(totalJumps.formatted()) jumps",
+                subtitle: "Workout count: \(sessionCount) • \(caloriesBurned) kcal"
+            )
+        }
         return DisplayRepresentation(
-            title: "\(label): \(totalJumps.formatted()) jumps",
-            subtitle: LocalizedStringResource(stringLiteral: subtitle)
+            title: "All-Time Stats: \(totalJumps.formatted()) jumps",
+            subtitle: "Workout count: \(sessionCount) • \(caloriesBurned) kcal"
         )
     }
 
