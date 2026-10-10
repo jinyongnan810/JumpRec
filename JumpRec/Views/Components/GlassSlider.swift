@@ -34,13 +34,17 @@ struct GlassSlider: View {
 
                 ZStack(alignment: .leading) {
                     Text(text)
-                        .font(.title)
+                        .font(AppFonts.sectionTitle)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
                         .foregroundStyle(config.tint.secondary)
 
                     // The moving mask gives the label a subtle shimmer while keeping
                     // the base text visible for legibility on every supported OS.
                     Text(text)
-                        .font(.title)
+                        .font(AppFonts.sectionTitle)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
                         .foregroundStyle(config.tint)
                         .mask(alignment: .leading) {
                             GeometryReader { proxy in
@@ -71,7 +75,9 @@ struct GlassSlider: View {
                 if isEnabled {
                     Image(systemName: iconName)
                         .foregroundStyle(config.tint)
-                        .font(.title)
+                        .font(AppFonts.sectionTitle)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
                         .frame(width: config.size, height: config.size)
                         .modifier(SliderThumbGlassEffect())
                         .offset(x: offset)

@@ -32,6 +32,8 @@ struct JumpingView: View {
     }
 
     /// Renders the active workout metrics and stop control.
+    @ScaledMetric(relativeTo: .largeTitle) private var displaySize = AppFonts.watchMetricValueBaseSize
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 4) {
@@ -41,7 +43,9 @@ struct JumpingView: View {
                     .foregroundStyle(AppColors.textMuted)
 
                 Text("\(appState.jumpCount)")
-                    .font(AppFonts.watchMetricValue)
+                    .font(AppFonts.monospaced(displaySize, weight: .bold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
                     // Dim bright saturated cyan to neutral textPrimary in AOD mode to reduce OLED subpixel draw.
                     .foregroundStyle(isLuminanceReduced ? AppColors.textPrimary : AppColors.accent)
                     .accessibilityLabel(Text("Jumps"))

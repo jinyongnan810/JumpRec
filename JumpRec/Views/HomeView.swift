@@ -19,6 +19,7 @@ struct HomeView: View {
     /// Stops the active local session.
     var onStop: () -> Void
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(MyDataStore.self) private var dataStore
     @State private var purchaseManager = PurchaseManager.shared
 
@@ -242,7 +243,7 @@ struct HomeView: View {
 
     /// Keeps the live stat cards in two equal columns.
     private var statColumns: [GridItem] {
-        [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
+        dynamicTypeSize.isAccessibilitySize ? [GridItem(.flexible())] : [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
     }
 
     /// Returns the localized slider prompt for ending active jump sessions.
@@ -344,32 +345,39 @@ struct HomeView: View {
     /// Renders the home screen, transitioning in-place between idle readiness, countdown, and active tracking.
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // Fixed top spacer clamps Hero Ring at a constant offset from top navigation bar
-                Spacer(minLength: 8)
-                    .frame(maxHeight: 28)
+            GeometryReader { geometry in
+                // Scrolling preserves access to the stop control on small screens and
+                // at accessibility sizes; the minimum height keeps the usual ring placement.
+                ScrollView {
+                    VStack(spacing: 0) {
+                        // Fixed top spacer clamps Hero Ring at a constant offset from top navigation bar
+                        Spacer(minLength: 8)
+                            .frame(maxHeight: 28)
 
-                // Hero Ring remains centered in-place across all session states without shifting
-                heroRingView
+                        // Hero Ring remains centered in-place across all session states without shifting
+                        heroRingView
 
-                // Flexible spacer absorbs bottom safe area / tab bar transitions below the ring
-                Spacer(minLength: 16)
+                        // Flexible spacer absorbs bottom safe area / tab bar transitions below the ring
+                        Spacer(minLength: 16)
 
-                // Dynamic bottom controls housed in a fixed-height container so statistics slide in below the ring
-                Group {
-                    if appState.sessionState == .active {
-                        activeSessionMetricsAndControls
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                    } else {
-                        idleControls
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                        // Dynamic bottom controls housed in a fixed-height container so statistics slide in below the ring
+                        Group {
+                            if appState.sessionState == .active {
+                                activeSessionMetricsAndControls
+                                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                            } else {
+                                idleControls
+                                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                            }
+                        }
+                        .frame(height: dynamicTypeSize.isAccessibilitySize ? nil : 270, alignment: .bottom)
+                        .animation(.spring(duration: 0.4, bounce: 0.15), value: appState.sessionState)
                     }
+                    .padding(.horizontal, 24)
+                    .frame(minHeight: geometry.size.height)
                 }
-                .frame(height: 270, alignment: .bottom)
-                .clipped()
-                .animation(.spring(duration: 0.4, bounce: 0.15), value: appState.sessionState)
+                .scrollIndicators(.hidden)
             }
-            .padding(.horizontal, 24)
             .toolbarVisibility(appState.sessionState == .idle ? .visible : .hidden, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {

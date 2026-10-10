@@ -42,37 +42,46 @@ public enum AppFonts {
         system(size, weight: weight, design: .rounded)
     }
 
+    /// Text styles participate in Dynamic Type. Fixed-size helpers above remain useful
+    /// for decorative icons and chart geometry, where scaling would obscure the data.
+    private static func text(_ style: Font.TextStyle, weight: Font.Weight = .regular,
+                             design: Font.Design = .default) -> Font
+    {
+        .system(style, design: design).weight(weight)
+    }
+
     // MARK: - Shared iPhone Fonts
 
-    public static let screenTitle = system(24, weight: .semibold)
-    public static let screenTitleRegular = system(24)
-    public static let heroRingValue = rounded(60, weight: .bold)
-    public static let heroRingSubtitle = system(14, weight: .medium)
-    public static let primaryButtonLabel = system(15, weight: .semibold)
-    public static let secondaryActionLabel = system(13, weight: .medium)
-    public static let bodyLabel = system(14, weight: .medium)
-    public static let bodyLabelStrong = system(15, weight: .medium)
-    public static let bodySmall = system(13)
-    public static let bodyRegular = system(14)
-    public static let sectionTitle = system(18, weight: .semibold)
+    public static let screenTitle = text(.title2, weight: .semibold)
+    public static let screenTitleRegular = text(.title2)
+    public static let heroRingBaseSize: CGFloat = 60
+    public static func heroRingValue(size: CGFloat) -> Font { rounded(size, weight: .bold) }
+    public static let heroRingSubtitle = text(.subheadline, weight: .medium)
+    public static let primaryButtonLabel = text(.body, weight: .semibold)
+    public static let secondaryActionLabel = text(.subheadline, weight: .medium)
+    public static let bodyLabel = text(.subheadline, weight: .medium)
+    public static let bodyLabelStrong = text(.body, weight: .medium)
+    public static let bodySmall = text(.subheadline)
+    public static let bodyRegular = text(.subheadline)
+    public static let sectionTitle = text(.title3, weight: .semibold)
     public static let sectionIcon = system(18)
-    public static let cardTitle = system(15, weight: .semibold)
-    public static let badgeLabel = system(11, weight: .semibold)
-    public static let eyebrowLabel = system(10, weight: .semibold)
-    public static let iconLabel = system(11)
+    public static let cardTitle = text(.body, weight: .semibold)
+    public static let badgeLabel = text(.caption, weight: .semibold)
+    public static let eyebrowLabel = text(.caption2, weight: .semibold)
+    public static let iconLabel = text(.caption)
     public static let badgeIconLabel = system(13, weight: .semibold)
-    public static let smallValue = system(12, weight: .semibold)
-    public static let smallValueMonospaced = monospaced(12, weight: .semibold)
-    public static let smallActionLabel = system(14, weight: .semibold)
+    public static let smallValue = text(.caption, weight: .semibold)
+    public static let smallValueMonospaced = text(.caption, weight: .semibold, design: .monospaced)
+    public static let smallActionLabel = text(.subheadline, weight: .semibold)
     public static let largeControlIcon = system(22)
-    public static let detailValue = system(16, weight: .semibold)
-    public static let largeDisplay = system(28, weight: .bold)
-    public static let metricValueMonospaced = monospaced(20, weight: .bold)
-    public static let metricValueLargeMonospaced = monospaced(22, weight: .bold)
-    public static let metricValueXLMonospaced = monospaced(32, weight: .bold)
-    public static let statValueMonospaced = monospaced(18, weight: .bold)
-    public static let supportingMonospaced = monospaced(11)
-    public static let metricDetailMonospaced = monospaced(13, weight: .semibold)
+    public static let detailValue = text(.body, weight: .semibold)
+    public static let largeDisplay = text(.largeTitle, weight: .bold)
+    public static let metricValueMonospaced = text(.title3, weight: .bold, design: .monospaced)
+    public static let metricValueLargeMonospaced = text(.title2, weight: .bold, design: .monospaced)
+    public static let metricValueXLMonospaced = text(.largeTitle, weight: .bold, design: .monospaced)
+    public static let statValueMonospaced = text(.title3, weight: .bold, design: .monospaced)
+    public static let supportingMonospaced = text(.caption, design: .monospaced)
+    public static let metricDetailMonospaced = text(.subheadline, weight: .semibold, design: .monospaced)
     public static let graphAxisMonospaced = monospaced(10, weight: .medium)
     public static let graphLabelMonospaced = monospaced(10, weight: .semibold)
     public static let calendarBadgeMonospaced = monospaced(8, weight: .semibold)
@@ -86,24 +95,27 @@ public enum AppFonts {
 
     // MARK: - Watch Fonts
 
-    public static let watchCountdown = monospaced(48, weight: .bold)
-    public static let watchPrimaryButton = monospaced(20, weight: .bold)
+    public static let watchCountdownBaseSize: CGFloat = 48
+    public static let watchCountdown = monospaced(watchCountdownBaseSize, weight: .bold)
+    public static let watchPrimaryButton = text(.title3, weight: .bold, design: .monospaced)
     public static let watchGoalValue = monospaced(28, weight: .bold)
-    public static let watchResultValue = monospaced(36, weight: .bold)
-    public static let watchMetricValue = monospaced(40, weight: .bold)
-    public static let watchMetricLabel = monospaced(10, weight: .semibold)
-    public static let watchMetricDetail = monospaced(14, weight: .medium)
-    public static let watchMetricDetailBold = monospaced(14, weight: .bold)
-    public static let watchMetricCompact = monospaced(12, weight: .bold)
-    public static let watchTimer = monospaced(14, weight: .medium)
-    public static let watchGoalLabel = system(12, weight: .medium)
-    public static let watchGoalChip = rounded(12, weight: .medium)
-    public static let watchSectionTitle = system(15, weight: .semibold)
-    public static let watchBody = system(12)
-    public static let watchBodySmall = system(10)
-    public static let watchBodyTiny = system(9, weight: .medium)
-    public static let watchSupporting = system(11)
-    public static let watchSupportingRegular = system(14)
+    public static let watchResultValueBaseSize: CGFloat = 36
+    public static let watchResultValue = monospaced(watchResultValueBaseSize, weight: .bold)
+    public static let watchMetricValueBaseSize: CGFloat = 40
+    public static let watchMetricValue = monospaced(watchMetricValueBaseSize, weight: .bold)
+    public static let watchMetricLabel = text(.caption2, weight: .semibold, design: .monospaced)
+    public static let watchMetricDetail = text(.subheadline, weight: .medium, design: .monospaced)
+    public static let watchMetricDetailBold = text(.subheadline, weight: .bold, design: .monospaced)
+    public static let watchMetricCompact = text(.caption, weight: .bold, design: .monospaced)
+    public static let watchTimer = text(.subheadline, weight: .medium, design: .monospaced)
+    public static let watchGoalLabel = text(.caption, weight: .medium)
+    public static let watchGoalChip = text(.caption, weight: .medium, design: .rounded)
+    public static let watchSectionTitle = text(.body, weight: .semibold)
+    public static let watchBody = text(.caption)
+    public static let watchBodySmall = text(.caption2)
+    public static let watchBodyTiny = text(.caption2, weight: .medium)
+    public static let watchSupporting = text(.caption)
+    public static let watchSupportingRegular = text(.subheadline)
 
     // MARK: - Live Activity Fonts
 

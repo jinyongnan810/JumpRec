@@ -54,13 +54,17 @@ struct StartView: View {
     }
 
     /// Renders the start screen or active countdown.
+    @ScaledMetric(relativeTo: .largeTitle) private var displaySize = AppFonts.watchCountdownBaseSize
+
     var body: some View {
         NavigationStack {
             ZStack {
                 if isCountingDown {
                     ZStack {
                         Text(countdown.formatted())
-                            .font(AppFonts.watchCountdown)
+                            .font(AppFonts.monospaced(displaySize, weight: .bold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                             .foregroundStyle(AppColors.textPrimary)
                             .contentTransition(.numericText())
                         Circle()

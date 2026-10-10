@@ -24,6 +24,8 @@ struct HeroRingView: View {
     /// Optional VoiceOver value for the ring's current progress or state.
     var accessibilityValue: String?
 
+    @ScaledMetric(relativeTo: .largeTitle) private var centerFontSize = AppFonts.heroRingBaseSize
+
     // MARK: - View
 
     /// Renders the ring, progress stroke, and center content.
@@ -46,7 +48,9 @@ struct HeroRingView: View {
             // Center content
             VStack(spacing: 6) {
                 Text(centerText)
-                    .font(AppFonts.heroRingValue)
+                    .font(AppFonts.heroRingValue(size: centerFontSize))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
                     .foregroundStyle(AppColors.accent)
                     .contentTransition(.numericText())
 

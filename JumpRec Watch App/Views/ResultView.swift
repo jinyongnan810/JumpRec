@@ -15,6 +15,8 @@ struct ResultView: View {
     @State private var hasContentAppeared = false
 
     /// Renders the compact results layout.
+    @ScaledMetric(relativeTo: .largeTitle) private var displaySize = AppFonts.watchResultValueBaseSize
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 8) {
@@ -25,7 +27,9 @@ struct ResultView: View {
                     .staggeredAppearance(isVisible: hasContentAppeared, index: 0)
 
                 Text("\(appState.jumpCount)")
-                    .font(AppFonts.watchResultValue)
+                    .font(AppFonts.monospaced(displaySize, weight: .bold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
                     .foregroundStyle(AppColors.accent)
                     .staggeredAppearance(isVisible: hasContentAppeared, index: 1)
                     .accessibilityLabel(Text("Total jumps"))
