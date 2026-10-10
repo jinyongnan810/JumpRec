@@ -159,6 +159,7 @@ struct SessionDetailView: View {
 
         do {
             try modelContext.save()
+            dataStore.refreshLocalSessionCount()
             dismiss()
         } catch {
             print("Failed to delete session: \(error)")

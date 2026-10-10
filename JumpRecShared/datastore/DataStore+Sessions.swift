@@ -7,6 +7,20 @@ import Foundation
 import SwiftData
 
 public extension MyDataStore {
+    /// Fetches only the requested calendar year's scalar session rows for Shortcuts.
+    /// Half-open date bounds include January 1 and exclude the following year;
+    /// omitting the year deliberately returns all-time history.
+    func sessionsForStatistics(year: Int?) throws -> [JumpSession] {
+        var descriptor = FetchDescriptor<JumpSession>()
+        if let year {
+            let calendar = Calendar.current
+            guard let start = calendar.date(from: DateComponents(year: year, month: 1, day: 1)),
+                  let end = calendar.date(byAdding: .year, value: 1, to: start) else { return [] }
+            descriptor.predicate = #Predicate { $0.startedAt >= start && $0.startedAt < end }
+        }
+        return try modelContext.fetch(descriptor)
+    }
+
     /// Removes short sessions that are usually created during local development and manual testing.
     /// This runs only in debug builds during store bootstrap so release users never lose history and
     /// developers start each launch from a cleaner dataset without having to clear the entire store.

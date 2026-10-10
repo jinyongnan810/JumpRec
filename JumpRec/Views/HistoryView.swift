@@ -287,6 +287,7 @@ struct HistoryView: View {
 
         do {
             try modelContext.save()
+            dataStore.refreshLocalSessionCount()
             sessionsPendingDeletion = []
             isDeletingAllSessions = false
         } catch {

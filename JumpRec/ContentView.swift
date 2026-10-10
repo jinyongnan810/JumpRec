@@ -87,6 +87,10 @@ struct ContentView: View {
                 processPendingIntentStartIfNeeded()
             }
         }
+        .onChange(of: dataStore.qualifiedWorkoutCount) { _, count in
+            settings.qualifiedWorkoutCount = count
+            syncSettingsToWatch()
+        }
         .onChange(of: appState.requestedStartGoal) { _, _ in
             processPendingIntentStartIfNeeded()
         }

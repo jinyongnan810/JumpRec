@@ -127,22 +127,8 @@ public struct GetWorkoutStatsIntent: AppIntent {
 
     @MainActor
     public func perform() async throws -> some IntentResult & ReturnsValue<WorkoutStatsEntity> & ProvidesDialog {
-        let context = MyDataStore.shared.modelContainer.mainContext
-        let calendar = Calendar.current
-
-        let descriptor = FetchDescriptor<JumpSession>(
-            sortBy: [SortDescriptor(\.startedAt, order: .reverse)]
-        )
-        let allSessions = (try? context.fetch(descriptor)) ?? []
-
         let targetYear = year
-        let filteredSessions: [JumpSession] = if let targetYear {
-            allSessions.filter { session in
-                calendar.component(.year, from: session.startedAt) == targetYear
-            }
-        } else {
-            allSessions
-        }
+        let filteredSessions = try MyDataStore.shared.sessionsForStatistics(year: targetYear)
 
         let totalJumps = filteredSessions.reduce(0) { $0 + $1.jumpCount }
         let sessionCount = filteredSessions.count

@@ -70,18 +70,9 @@ public struct WorkoutStatsQuery: EntityQuery, Sendable {
 
     @MainActor
     public func entities(for identifiers: [String]) async throws -> [WorkoutStatsEntity] {
-        let context = MyDataStore.shared.modelContainer.mainContext
-        let calendar = Calendar.current
-        let descriptor = FetchDescriptor<JumpSession>()
-        let allSessions = (try? context.fetch(descriptor)) ?? []
-
-        return identifiers.map { id in
+        try identifiers.map { id in
             let year = Int(id)
-            let filtered: [JumpSession] = if let year {
-                allSessions.filter { calendar.component(.year, from: $0.startedAt) == year }
-            } else {
-                allSessions
-            }
+            let filtered = try MyDataStore.shared.sessionsForStatistics(year: year)
 
             let jumps = filtered.reduce(0) { $0 + $1.jumpCount }
             let calories = Int(filtered.reduce(0.0) { $0 + $1.caloriesBurned }.rounded())

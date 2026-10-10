@@ -143,14 +143,14 @@ struct SettingsView: View {
                             .font(AppFonts.bodyLabelStrong)
                             .foregroundStyle(AppColors.textPrimary)
                         Spacer()
-                        Text("\(dataStore.qualifiedSessionsCount()) / \(JumpRecSettings.freeWorkoutQuota)")
+                        Text("\(dataStore.qualifiedWorkoutCount) / \(JumpRecSettings.freeWorkoutQuota)")
                             .font(AppFonts.bodyLabelStrong)
                             // Completing the free quota is a milestone, so keep the usual accent color.
                             .foregroundStyle(AppColors.accent)
                     }
 
                     ProgressView(
-                        value: min(Double(dataStore.qualifiedSessionsCount()), Double(JumpRecSettings.freeWorkoutQuota)),
+                        value: min(Double(dataStore.qualifiedWorkoutCount), Double(JumpRecSettings.freeWorkoutQuota)),
                         total: Double(JumpRecSettings.freeWorkoutQuota)
                     )
                     .tint(AppColors.accent)

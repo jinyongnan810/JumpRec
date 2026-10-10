@@ -105,14 +105,14 @@ public struct JumpSessionQuery: EntityQuery, EntityStringQuery, Sendable {
     @MainActor
     public func entities(for identifiers: [UUID]) async throws -> [JumpSessionEntity] {
         let context = MyDataStore.shared.modelContainer.mainContext
-        let targetIDs = Set(identifiers)
+        guard !identifiers.isEmpty else { return [] }
+        let targetIDs = identifiers
+        // Resolve the batch in SQLite rather than materializing the entire history.
         let descriptor = FetchDescriptor<JumpSession>(
+            predicate: #Predicate { targetIDs.contains($0.id) },
             sortBy: [SortDescriptor(\.startedAt, order: .reverse)]
         )
-        let sessions = try context.fetch(descriptor)
-        return sessions
-            .filter { targetIDs.contains($0.id) }
-            .map { JumpSessionEntity(from: $0) }
+        return try context.fetch(descriptor).map { JumpSessionEntity(from: $0) }
     }
 
     /// Provides suggested workout entities for parameter pickers (returns up to 20 most recent).

@@ -154,6 +154,10 @@ public final class MyDataStore {
     /// Count of local JumpSession records currently present in the database.
     public private(set) var localSessionCount: Int = 0
 
+    /// Cached quota count for rendering. Refreshes after local saves and CloudKit
+    /// changes; actual start authorization still performs a fresh database count.
+    public private(set) var qualifiedWorkoutCount = 0
+
     /// Tracks whether at least one session exists locally.
     public private(set) var hasLocalSessions: Bool = false
 
@@ -194,6 +198,7 @@ public final class MyDataStore {
         let initialCount = (try? modelContainer.mainContext.fetchCount(FetchDescriptor<JumpSession>())) ?? 0
         localSessionCount = initialCount
         hasLocalSessions = initialCount > 0
+        qualifiedWorkoutCount = qualifiedSessionsCount()
     }
 
     #if DEBUG
@@ -236,6 +241,7 @@ public final class MyDataStore {
 
         do {
             try modelContext.save()
+            refreshLocalSessionCount()
         } catch {
             print("Failed to save context: \(error)")
         }
@@ -272,6 +278,7 @@ public final class MyDataStore {
         let count = fetchSessionCount()
         localSessionCount = count
         hasLocalSessions = count > 0
+        qualifiedWorkoutCount = qualifiedSessionsCount()
     }
 
     /// Manually triggers a re-check of the iCloud account and model store.
