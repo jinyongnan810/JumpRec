@@ -332,41 +332,34 @@ struct HomeView: View {
             return
         }
 
-        countdownTask = Task {
-            await MainActor.run {
-                withAnimation(.easeInOut(duration: 0.35)) {
-                    countdownValue = 3
-                    countdownProgress = 1
-                }
+        // SwiftUI actions and countdown state stay on the main actor. Cancellation
+        // exits immediately at each suspension rather than being swallowed by try?.
+        countdownTask = Task { @MainActor in
+            withAnimation(.easeInOut(duration: 0.35)) {
+                countdownValue = 3
+                countdownProgress = 1
             }
-
-            // Let SwiftUI render the full ring once before starting the trim animation.
+            // Render the full ring before beginning the three-second trim animation.
             await Task.yield()
-
-            await MainActor.run {
-                withAnimation(.linear(duration: 3.0)) {
-                    countdownProgress = 0
-                }
-            }
+            guard !Task.isCancelled else { return }
+            withAnimation(.linear(duration: 3)) { countdownProgress = 0 }
 
             for value in stride(from: 3, through: 1, by: -1) {
-                if Task.isCancelled { return }
-                await MainActor.run {
-                    withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                        countdownValue = value
-                    }
+                guard !Task.isCancelled else { return }
+                withAnimation(.spring(duration: 0.35, bounce: 0.15)) { countdownValue = value }
+                do {
+                    try await Task.sleep(for: .seconds(1))
+                } catch {
+                    // A cancelled countdown must never invoke its workout start action.
+                    return
                 }
-                try? await Task.sleep(for: .seconds(1))
             }
-
-            if Task.isCancelled { return }
-            await MainActor.run {
-                withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
-                    countdownValue = nil
-                    countdownProgress = 1
-                    countdownTask = nil
-                    onStart()
-                }
+            guard !Task.isCancelled else { return }
+            withAnimation(.spring(duration: 0.35, bounce: 0.15)) {
+                countdownValue = nil
+                countdownProgress = 1
+                countdownTask = nil
+                onStart()
             }
         }
     }
