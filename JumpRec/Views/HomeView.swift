@@ -38,15 +38,6 @@ struct HomeView: View {
     /// Animates the countdown ring progress.
     @State private var countdownProgress: Double = 1.0
 
-    /// Tracks the current time for live active elapsed-time updates.
-    @State private var now = Date()
-    /// Animates the progress ring fill during an active session.
-    @State private var animatedProgress: Double = 0
-    /// Animates the primary ring text during an active session.
-    @State private var animatedCenterText = "0"
-    /// Animates the ring subtitle text during an active session.
-    @State private var animatedRingSubtitle = ""
-
     // MARK: - Derived Values: Pre-Session & Shared
 
     /// Returns the formatted goal summary shown under the app title when idle.
@@ -125,17 +116,6 @@ struct HomeView: View {
         appState.sessionGoalType ?? settings.goalType
     }
 
-    /// Returns normalized progress toward the session goal during an active session.
-    private var activeProgress: Double {
-        guard goalValue > 0 else { return 0 }
-        if goalType == .count {
-            return min(1.0, Double(appState.jumpCount) / Double(goalValue))
-        } else {
-            let goalSeconds = goalValue * 60
-            return min(1.0, Double(elapsedSeconds) / Double(goalSeconds))
-        }
-    }
-
     /// Returns the active goal text shown in the header while a session is running.
     private var activeGoalText: String {
         if goalType == .count {
@@ -149,80 +129,6 @@ struct HomeView: View {
                 goalValue
             )
         }
-    }
-
-    /// Returns the subtitle shown below the hero-ring value during an active session.
-    private var activeRingSubtitle: String {
-        if goalType == .count {
-            String(
-                format: String(localized: "/ %@ jumps"),
-                goalValue.formatted()
-            )
-        } else {
-            String(
-                format: String(localized: "/ %lld min"),
-                goalValue
-            )
-        }
-    }
-
-    /// Returns the main value shown in the hero ring during an active session.
-    private var activeRingCenterText: String {
-        if goalType == .count {
-            "\(appState.jumpCount)"
-        } else {
-            "\(elapsedSeconds / 60)"
-        }
-    }
-
-    /// Returns a VoiceOver label for the active hero ring.
-    private var activeRingAccessibilityLabel: String {
-        goalType == .count ? String(localized: "Jump progress") : String(localized: "Time progress")
-    }
-
-    /// Returns a VoiceOver value describing the active ring's numerical progress.
-    private var activeRingAccessibilityValue: String {
-        if goalType == .count {
-            return String(
-                format: String(localized: "%@ of %@ jumps"),
-                appState.jumpCount.formatted(),
-                goalValue.formatted()
-            )
-        }
-        return String(
-            format: String(localized: "%lld of %lld minutes"),
-            Int64(elapsedSeconds / 60),
-            goalValue
-        )
-    }
-
-    /// Returns the leading stat card label based on the active goal type.
-    private var leadingStatLabel: LocalizedStringKey {
-        goalType == .count ? "TIME" : "JUMPS"
-    }
-
-    /// Returns the leading stat card value based on the active goal type.
-    private var leadingStatValue: String {
-        goalType == .count ? elapsedFormatted : appState.jumpCount.formatted()
-    }
-
-    /// Returns the live elapsed time formatted as `mm:ss`.
-    private var elapsedFormatted: String {
-        let m = elapsedSeconds / 60
-        let s = elapsedSeconds % 60
-        return String(format: "%02d:%02d", m, s)
-    }
-
-    /// Returns the live elapsed time in seconds.
-    private var elapsedSeconds: Int {
-        guard let startTime = appState.startTime else { return 0 }
-        return max(0, Int(now.timeIntervalSince(startTime)))
-    }
-
-    /// Returns the live current heart-rate text, or a placeholder until HealthKit delivers samples.
-    private var heartRateText: String {
-        guard let heartRate = appState.heartRate else { return "--" }
-        return "\(heartRate) bpm"
     }
 
     /// Returns the compact symbol used in the active-session header badge.
@@ -241,103 +147,31 @@ struct HomeView: View {
         return String(localized: "Starting motion tracking")
     }
 
-    /// Keeps the live stat cards in two equal columns.
-    private var statColumns: [GridItem] {
-        dynamicTypeSize.isAccessibilitySize ? [GridItem(.flexible())] : [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
-    }
-
-    /// Returns the localized slider prompt for ending active jump sessions.
-    private var stopSliderText: String {
-        String(localized: "STOP WORKOUT")
-    }
-
-    /// Returns the localized hint explaining the stop slider action.
-    private var stopSliderAccessibilityHint: String {
-        String(localized: "Ends the current jump workout.")
-    }
-
-    /// Returns the slider tint for active session controls.
-    private var stopSliderTint: Color {
-        AppColors.warning
-    }
-
     // MARK: - Unified Hero Ring State Mapping
 
-    /// Returns the ring progress for the current home-screen state.
-    private var heroRingProgress: Double {
-        if appState.sessionState == .active {
-            return animatedProgress
-        }
-        return isCountingDown ? countdownProgress : 1
-    }
-
-    /// Returns the primary ring text for the current home-screen state.
-    private var heroRingCenterText: String {
-        if appState.sessionState == .active {
-            return animatedCenterText
-        }
-        return isCountingDown ? "\(countdownValue ?? 3)" : String(localized: "Ready?")
-    }
-
-    /// Returns the supporting ring label for the current home-screen state.
-    private var heroRingSubtitle: String {
-        if appState.sessionState == .active {
-            return animatedRingSubtitle
-        }
-        return isCountingDown ? String(localized: "Starting...") : String(localized: "Tap to Start")
-    }
-
-    /// Returns the ring color for the current home-screen state.
-    private var heroRingColor: Color {
-        if appState.sessionState == .active {
-            return AppColors.accent
-        }
-        return isCountingDown ? AppColors.accent : AppColors.textMuted
-    }
-
-    /// Returns a VoiceOver label for the current hero-ring state.
-    private var heroRingAccessibilityLabel: String {
-        if appState.sessionState == .active {
-            return activeRingAccessibilityLabel
-        }
-        return isCountingDown ? String(localized: "Workout countdown") : String(localized: "Ready to start workout")
-    }
-
-    /// Returns the current ring state in a short form for accessibility.
-    private var heroRingAccessibilityValue: String {
-        if appState.sessionState == .active {
-            return activeRingAccessibilityValue
-        }
-        if let countdownValue {
-            return String(
-                format: String(localized: "%lld seconds remaining"),
-                Int64(countdownValue)
-            )
-        }
-        return goalText
-    }
-
     /// Builds the hero ring for the current state.
+    @ViewBuilder
     private var heroRingView: some View {
-        HeroRingView(
-            progress: heroRingProgress,
-            color: heroRingColor,
-            centerText: heroRingCenterText,
-            subtitle: heroRingSubtitle,
-            accessibilityLabel: heroRingAccessibilityLabel,
-            accessibilityValue: heroRingAccessibilityValue
-        )
-        .contentShape(Circle())
-        .onTapGesture {
-            guard appState.sessionState != .active else { return }
-            if isCountingDown {
-                cancelCountdown()
-            } else {
-                startWithCountdown()
+        if appState.sessionState == .active {
+            ActiveWorkoutRing(appState: appState, settings: settings)
+        } else {
+            HeroRingView(
+                progress: isCountingDown ? countdownProgress : 1,
+                color: isCountingDown ? AppColors.accent : AppColors.textMuted,
+                centerText: countdownValue.map(String.init) ?? String(localized: "Ready?"),
+                subtitle: isCountingDown ? String(localized: "Starting...") : String(localized: "Tap to Start"),
+                accessibilityLabel: isCountingDown ? String(localized: "Workout countdown") : String(localized: "Ready to start workout"),
+                accessibilityValue: countdownValue.map {
+                    String(format: String(localized: "%lld seconds remaining"), Int64($0))
+                } ?? goalText
+            )
+            .contentShape(Circle())
+            .onTapGesture {
+                if isCountingDown { cancelCountdown() } else { startWithCountdown() }
             }
+            .accessibilityAddTraits(.isButton)
+            .accessibilityHint(String(localized: "Tap to start or cancel workout countdown."))
         }
-        .accessibilityAddTraits(appState.sessionState == .active ? [] : .isButton)
-        .accessibilityHint(appState.sessionState == .active ? "" : String(localized: "Tap to start or cancel workout countdown."))
     }
 
     // MARK: - View Body
@@ -363,7 +197,7 @@ struct HomeView: View {
                         // Dynamic bottom controls housed in a fixed-height container so statistics slide in below the ring
                         Group {
                             if appState.sessionState == .active {
-                                activeSessionMetricsAndControls
+                                ActiveWorkoutControls(appState: appState, settings: settings, onStop: onStop)
                                     .transition(.move(edge: .bottom).combined(with: .opacity))
                             } else {
                                 idleControls
@@ -432,34 +266,6 @@ struct HomeView: View {
             .sheet(isPresented: $showPaywall) {
                 PaywallView()
             }
-            .task(id: appState.sessionState) {
-                guard appState.sessionState == .active else { return }
-                syncHeroRing(animated: true)
-                while !Task.isCancelled, appState.sessionState == .active {
-                    now = Date()
-                    try? await Task.sleep(for: .seconds(1))
-                }
-            }
-            .onChange(of: appState.jumpCount) {
-                if appState.sessionState == .active {
-                    syncHeroRing()
-                }
-            }
-            .onChange(of: appState.sessionGoalValue) {
-                if appState.sessionState == .active {
-                    syncHeroRing()
-                }
-            }
-            .onChange(of: appState.sessionGoalType) {
-                if appState.sessionState == .active {
-                    syncHeroRing()
-                }
-            }
-            .onChange(of: now) {
-                if appState.sessionState == .active, goalType == .time {
-                    syncHeroRing()
-                }
-            }
             .onDisappear {
                 countdownTask?.cancel()
                 countdownTask = nil
@@ -495,35 +301,6 @@ struct HomeView: View {
         .appGlassButton(prominent: true, tint: primaryButtonTint)
         .disabled(isPrimaryButtonDisabled)
         .padding(.bottom, 24)
-    }
-
-    /// Renders live active workout metrics and the stop slider.
-    private var activeSessionMetricsAndControls: some View {
-        VStack(spacing: 20) {
-            LazyVGrid(columns: statColumns, spacing: 10) {
-                StatCardView(label: leadingStatLabel, value: leadingStatValue)
-                StatCardView(label: "CALORIES", value: "\(Int(appState.caloriesBurned.rounded()))")
-                StatCardView(label: "HR", value: heartRateText, valueColor: AppColors.accent)
-                StatCardView(label: "RATE(AVG)", value: localizedRateText(appState.averageRate))
-            }
-
-            GlassSlider(
-                text: stopSliderText,
-                iconName: "stop.fill",
-                config: GlassSlider.Config(tint: stopSliderTint, size: 80),
-                onProgressChanged: { _ in },
-                onFinished: {
-                    onStop()
-                }
-            )
-            .accessibilityLabel(Text(stopSliderText))
-            .accessibilityHint(Text(stopSliderAccessibilityHint))
-            .accessibilityAddTraits(.isButton)
-            .accessibilityAction {
-                onStop()
-            }
-        }
-        .padding(.bottom, 16)
     }
 
     /// Shows the active motion source as an icon-only badge in the header.
@@ -601,23 +378,73 @@ struct HomeView: View {
         countdownValue = nil
         countdownProgress = 1
     }
+}
 
-    /// Synchronizes the displayed hero-ring values with the latest active session state.
-    private func syncHeroRing(animated: Bool = true) {
-        guard appState.sessionState == .active else { return }
-        let updates = {
-            animatedProgress = activeProgress
-            animatedCenterText = activeRingCenterText
-            animatedRingSubtitle = activeRingSubtitle
-        }
+/// Owns live goal progress independently of Home's navigation and presentation state.
+/// Count goals have no timer; only a time goal schedules one-second ring updates.
+private struct ActiveWorkoutRing: View {
+    let appState: JumpRecState
+    let settings: JumpRecSettings
 
-        if animated {
-            withAnimation(.spring(duration: 0.4, bounce: 0.2)) {
-                updates()
+    var body: some View {
+        if (appState.sessionGoalType ?? settings.goalType) == .time {
+            TimelineView(.periodic(from: .now, by: 1)) { context in
+                ActiveWorkoutRingContent(appState: appState, settings: settings, now: context.date)
             }
         } else {
-            updates()
+            ActiveWorkoutRingContent(appState: appState, settings: settings, now: .now)
         }
+    }
+}
+
+/// Narrow rendering boundary for the metrics that actually change the ring.
+private struct ActiveWorkoutRingContent: View {
+    let appState: JumpRecState
+    let settings: JumpRecSettings
+    let now: Date
+
+    var body: some View {
+        let type = appState.sessionGoalType ?? settings.goalType
+        let goal = appState.sessionGoalValue ?? settings.goalCount
+        let elapsed = max(0, Int(now.timeIntervalSince(appState.startTime ?? now)))
+        let value = type == .count ? appState.jumpCount : elapsed / 60
+        // Convert before multiplying to avoid integer overflow for externally supplied goals.
+        let progress = goal > 0 ? min(1, type == .count ? Double(value) / Double(goal) : Double(elapsed) / (Double(goal) * 60)) : 0
+        HeroRingView(
+            progress: progress,
+            centerText: value.formatted(),
+            subtitle: type == .count ? String(format: String(localized: "/ %@ jumps"), goal.formatted()) : String(format: String(localized: "/ %lld min"), Int64(goal)),
+            accessibilityLabel: type == .count ? String(localized: "Jump progress") : String(localized: "Time progress"),
+            accessibilityValue: type == .count ? String(format: String(localized: "%@ of %@ jumps"), value.formatted(), goal.formatted()) : String(format: String(localized: "%lld of %lld minutes"), Int64(value), Int64(goal))
+        )
+        .animation(.spring(duration: 0.4, bounce: 0.2), value: progress)
+    }
+}
+
+/// Reads live stats in their own boundary. The elapsed label uses system timer text
+/// so seconds don't invalidate either the controls or the Home screen.
+private struct ActiveWorkoutControls: View {
+    let appState: JumpRecState
+    let settings: JumpRecSettings
+    let onStop: () -> Void
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    var body: some View {
+        let isCountGoal = (appState.sessionGoalType ?? settings.goalType) == .count
+        VStack(spacing: 20) {
+            LazyVGrid(columns: dynamicTypeSize.isAccessibilitySize ? [GridItem(.flexible())] : [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                StatCardView(label: isCountGoal ? "TIME" : "JUMPS", value: isCountGoal ? "00:00" : appState.jumpCount.formatted(), timerStart: isCountGoal ? appState.startTime : nil)
+                StatCardView(label: "CALORIES", value: "\(Int(appState.caloriesBurned.rounded()))")
+                StatCardView(label: "HR", value: appState.heartRate.map { "\($0) bpm" } ?? "--", valueColor: AppColors.accent)
+                StatCardView(label: "RATE(AVG)", value: localizedRateText(appState.averageRate))
+            }
+            GlassSlider(text: String(localized: "STOP WORKOUT"), iconName: "stop.fill", config: .init(tint: AppColors.warning, size: 80), onProgressChanged: { _ in }, onFinished: onStop)
+                .accessibilityLabel(Text("STOP WORKOUT"))
+                .accessibilityHint(Text("Ends the current jump workout."))
+                .accessibilityAddTraits(.isButton)
+                .accessibilityAction { onStop() }
+        }
+        .padding(.bottom, 16)
     }
 }
 
