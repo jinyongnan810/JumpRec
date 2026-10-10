@@ -59,6 +59,14 @@ public final class JumpSession {
     @Relationship(deleteRule: .cascade, inverse: \SessionRateSeries.session)
     public var rateSeries: SessionRateSeries?
 
+    /// These caches belong to a fetched model instance, not the persistent schema.
+    /// Comparing the payload detects replacement and late CloudKit arrival, so an
+    /// initially missing series does not leave a detail screen permanently empty.
+    @Transient private var cachedRatePayload: Data?
+    @Transient private var cachedRateSamples: [RateSamplePoint]?
+    @Transient private var cachedAnalyticsSamples: [RateSamplePoint]?
+    @Transient private var cachedRhythmConsistency: Double?
+
     /// Initializes a new jump rope session with summary statistics
     /// - Parameters:
     ///   - startedAt: Session start time
@@ -136,7 +144,14 @@ public extension JumpSession {
     /// This property intentionally performs work only when called. List views should keep using the
     /// scalar summary fields on `JumpSession` so they do not accidentally fault and decode chart data.
     var decodedRateSamples: [RateSamplePoint] {
-        Self.decodeRateSamples(from: rateSeries?.payload)
+        let payload = rateSeries?.payload
+        if let cachedRateSamples, cachedRatePayload == payload {
+            return cachedRateSamples
+        }
+        let samples = Self.decodeRateSamples(from: payload)
+        cachedRatePayload = payload
+        cachedRateSamples = samples
+        return samples
     }
 
     /// Encodes a rate sample series for persistence in `SessionRateSeries`.
@@ -187,8 +202,14 @@ public extension JumpSession {
     /// Rate samples are expected to be in ascending `secondOffset` order when provided.
     func derivedMetrics(rateSamples: [RateSamplePoint]? = nil) -> DerivedMetrics {
         let resolvedRateSamples = rateSamples ?? decodedRateSamples
+        // Rhythm depends only on the series. Scalar calorie edits still recompute
+        // the cheap efficiency value without rescanning or decoding the rate samples.
+        if cachedAnalyticsSamples != resolvedRateSamples {
+            cachedRhythmConsistency = SessionMetricsCalculator.rhythmConsistencyScore(from: resolvedRateSamples)
+            cachedAnalyticsSamples = resolvedRateSamples
+        }
         return DerivedMetrics(
-            rhythmConsistency: SessionMetricsCalculator.rhythmConsistencyScore(from: resolvedRateSamples),
+            rhythmConsistency: cachedRhythmConsistency,
             caloriesPerMinute: SessionMetricsCalculator.caloriesPerMinute(
                 caloriesBurned: caloriesBurned,
                 durationSeconds: durationSeconds

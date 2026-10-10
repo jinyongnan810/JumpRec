@@ -11,19 +11,17 @@ struct JumpingRateGraphView: View {
     /// The rate samples used to render the chart.
     let samples: [RateSamplePoint]
 
-    /// The color used for chart grid lines.
+    /// Prepared only when samples change; axis closures reuse this snapshot instead
+    /// of remapping the full series for every tick and unrelated parent update.
+    @State private var prepared = PreparedRateChart(samples: [])
     private let gridLineColor = Color(hex: 0x0F172A)
-    /// The number of major steps used on the y-axis.
-    private let yAxisStepCount = 3
-    /// The number of major steps used on the x-axis.
-    private let xAxisStepCount = 4
 
     // MARK: - View
 
     /// Renders the chart or an empty placeholder when no samples are available.
     var body: some View {
         Group {
-            if chartPoints.isEmpty {
+            if prepared.chartPoints.isEmpty {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(AppColors.tabInactive.opacity(0.35), lineWidth: 1)
                     .overlay {
@@ -32,7 +30,7 @@ struct JumpingRateGraphView: View {
                             .foregroundStyle(AppColors.textSecondary)
                     }
             } else {
-                Chart(chartPoints) { point in
+                Chart(prepared.chartPoints) { point in
                     AreaMark(
                         x: .value("Elapsed Time", point.elapsedSeconds),
                         y: .value("Rate", point.value)
@@ -58,15 +56,15 @@ struct JumpingRateGraphView: View {
                     .foregroundStyle(AppColors.accent)
                 }
                 .chartLegend(.hidden)
-                .chartXScale(domain: chartXDomain)
-                .chartYScale(domain: chartYDomain)
+                .chartXScale(domain: prepared.chartXDomain)
+                .chartYScale(domain: prepared.chartYDomain)
                 .chartXAxis {
-                    AxisMarks(values: xAxisMarks) { value in
+                    AxisMarks(values: prepared.xAxisMarks) { value in
                         AxisGridLine(stroke: StrokeStyle(lineWidth: 0))
                         AxisTick(stroke: StrokeStyle(lineWidth: 0))
                         AxisValueLabel {
                             if let elapsedSeconds = value.as(Int.self),
-                               let label = xAxisLabelMap[elapsedSeconds]
+                               let label = prepared.xAxisLabelMap[elapsedSeconds]
                             {
                                 Text(label)
                                     .font(AppFonts.graphAxisMonospaced)
@@ -76,13 +74,13 @@ struct JumpingRateGraphView: View {
                     }
                 }
                 .chartYAxis {
-                    AxisMarks(position: .leading, values: yAxisMarks.map(\.value)) { value in
+                    AxisMarks(position: .leading, values: prepared.yAxisMarks.map(\.value)) { value in
                         AxisGridLine(stroke: StrokeStyle(lineWidth: 1))
                             .foregroundStyle(gridLineColor)
                         AxisTick(stroke: StrokeStyle(lineWidth: 0))
                         AxisValueLabel(anchor: .trailing) {
                             if let axisValue = value.as(Double.self),
-                               let mark = yAxisMarks.first(where: { abs($0.value - axisValue) < 0.0001 })
+                               let mark = prepared.yAxisMarks.first(where: { abs($0.value - axisValue) < 0.0001 })
                             {
                                 Text(mark.label)
                                     .font(AppFonts.graphAxisMonospaced)
@@ -98,45 +96,31 @@ struct JumpingRateGraphView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    // MARK: - Derived Values
-
-    /// Converts chart-ready session samples into plotted points.
-    ///
-    /// `RateSamplePoint` payloads are encoded in chronological order by the session save flow. This
-    /// view preserves that order instead of sorting during every render, which keeps chart updates
-    /// cheap and makes ordering responsibility explicit at the data boundary.
-    private var chartPoints: [ChartPoint] {
-        samples
-            .map { sample in
-                ChartPoint(elapsedSeconds: sample.secondOffset, value: Double(sample.rate))
-            }
-    }
-
-    /// Returns the x-axis domain for the chart.
-    private var chartXDomain: ClosedRange<Int> {
-        let upperBound = max(chartPoints.map(\.elapsedSeconds).max() ?? 0, 1)
-        return 0 ... upperBound
-    }
-
-    /// Returns the y-axis domain for the chart.
-    private var chartYDomain: ClosedRange<Double> {
-        let values = chartPoints.map(\.value)
-        guard let minValue = values.min(), let maxValue = values.max() else {
-            return 0 ... 1
+        .onChange(of: samples, initial: true) { _, samples in
+            prepared = PreparedRateChart(samples: samples)
         }
+    }
+}
 
-        if abs(maxValue - minValue) < 0.0001 {
-            let upperBound = max(1, maxValue * 1.1)
-            return 0 ... upperBound
-        }
+/// Immutable plotted values and domains, prepared at the sample-change boundary.
+private struct PreparedRateChart {
+    let chartPoints: [ChartPoint]
+    let chartXDomain: ClosedRange<Int>
+    let chartYDomain: ClosedRange<Double>
+    private let xAxisStepCount = 4
+    private let yAxisStepCount = 3
 
-        return 0 ... maxValue
+    init(samples: [RateSamplePoint]) {
+        chartPoints = samples.map { ChartPoint(elapsedSeconds: $0.secondOffset, value: Double($0.rate)) }
+        chartXDomain = 0 ... max(samples.map(\.secondOffset).max() ?? 0, 1)
+        let values = samples.map { Double($0.rate) }
+        let minimum = values.min() ?? 0
+        let maximum = values.max() ?? 0
+        chartYDomain = 0 ... (abs(maximum - minimum) < 0.0001 ? max(1, maximum * 1.1) : maximum)
     }
 
     /// Returns the x-axis positions used for labels.
-    private var xAxisMarks: [Int] {
+    var xAxisMarks: [Int] {
         let durationSeconds = chartXDomain.upperBound
         guard durationSeconds > 0 else { return [0] }
 
@@ -163,14 +147,14 @@ struct JumpingRateGraphView: View {
     }
 
     /// Maps x-axis positions to their formatted labels.
-    private var xAxisLabelMap: [Int: String] {
+    var xAxisLabelMap: [Int: String] {
         Dictionary(uniqueKeysWithValues: xAxisMarks.map { seconds in
             (seconds, formattedElapsedTime(seconds))
         })
     }
 
     /// Returns the labeled y-axis marks used by the chart.
-    private var yAxisMarks: [ChartAxisLabel] {
+    var yAxisMarks: [ChartAxisLabel] {
         let lowerBound = chartYDomain.lowerBound
         let upperBound = chartYDomain.upperBound
         let span = upperBound - lowerBound

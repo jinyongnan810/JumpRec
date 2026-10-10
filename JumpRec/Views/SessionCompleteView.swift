@@ -76,20 +76,6 @@ struct SessionCompleteView: View {
         return session
     }
 
-    /// Returns rate samples for the saved session or generated temporary summary session.
-    ///
-    /// The completion screen displays the chart immediately after a workout, so decoding or reading
-    /// the in-memory rate-series payload here is expected and separate from lazy history loading.
-    /// The calculator generates points chronologically, so no extra per-render sorting is needed.
-    private var rateSamples: [RateSamplePoint] {
-        summarySession.decodedRateSamples
-    }
-
-    /// Returns the shared derived metrics used across summary surfaces.
-    private var derivedMetrics: JumpSession.DerivedMetrics {
-        summarySession.derivedMetrics(rateSamples: rateSamples)
-    }
-
     /// The exact personal record kinds that are still waiting to be acknowledged by the user.
     private var unseenRecordKinds: [PersonalRecordKind] {
         dataStore.unseenPersonalRecordKinds
@@ -99,6 +85,11 @@ struct SessionCompleteView: View {
 
     /// Renders the post-session summary, chart, and actions.
     var body: some View {
+        // Build a fallback session only once per render, then share its decoded series
+        // and analytics across every summary field instead of recreating model objects.
+        let summary = summarySession
+        let samples = summary.decodedRateSamples
+        let metrics = summary.derivedMetrics(rateSamples: samples)
         ScrollView {
             VStack(spacing: 20) {
                 // Header
@@ -141,19 +132,19 @@ struct SessionCompleteView: View {
                 }
 
                 SessionMetricsSummaryView(
-                    duration: durationText,
-                    jumps: jumpCountText,
-                    calories: caloriesText,
-                    averageRate: averageRateText,
-                    peakRate: peakRateText,
-                    rhythmConsistency: rhythmConsistencyText,
-                    caloriesPerMinute: caloriesPerMinuteText,
-                    longestJumpStrikes: longestStreakText,
-                    shortBreaks: shortBreaksText,
-                    longBreaks: longBreaksText,
-                    averageHeartRate: averageHeartRateText,
-                    peakHeartRate: peakHeartRateText,
-                    rateSamples: rateSamples,
+                    duration: summary.formattedDuration,
+                    jumps: summary.formattedJumpCount,
+                    calories: summary.formattedCalories,
+                    averageRate: summary.formattedAverageRate(),
+                    peakRate: summary.formattedPeakRate(),
+                    rhythmConsistency: metrics.rhythmConsistency.map { localizedPercentText($0) } ?? "--",
+                    caloriesPerMinute: metrics.caloriesPerMinute.map { localizedCaloriesPerMinuteText($0) } ?? "--",
+                    longestJumpStrikes: summary.formattedLongestStreak,
+                    shortBreaks: summary.formattedSmallBreaksCount,
+                    longBreaks: summary.formattedLongBreaksCount,
+                    averageHeartRate: summary.formattedAverageHeartRate(),
+                    peakHeartRate: summary.formattedPeakHeartRate(),
+                    rateSamples: samples,
                     achievedRecordKinds: unseenRecordKinds
                 )
                 .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
@@ -215,70 +206,6 @@ struct SessionCompleteView: View {
             guard !isGeneratingComment, completedSession != nil else { return }
             await generateCommentIfNeeded()
         }
-    }
-
-    // MARK: - Formatting
-
-    /// Returns the completed session duration text.
-    private var durationText: String {
-        summarySession.formattedDuration
-    }
-
-    /// Returns the formatted jump-count text.
-    private var jumpCountText: String {
-        summarySession.formattedJumpCount
-    }
-
-    /// Returns the formatted calories text.
-    private var caloriesText: String {
-        summarySession.formattedCalories
-    }
-
-    /// Returns the formatted average-rate text.
-    private var averageRateText: String {
-        summarySession.formattedAverageRate()
-    }
-
-    /// Returns the formatted peak-rate text.
-    private var peakRateText: String {
-        summarySession.formattedPeakRate()
-    }
-
-    /// Returns the formatted rhythm-consistency text.
-    private var rhythmConsistencyText: String {
-        guard let rhythmConsistency = derivedMetrics.rhythmConsistency else { return "--" }
-        return localizedPercentText(rhythmConsistency)
-    }
-
-    /// Returns the formatted calories-per-minute text.
-    private var caloriesPerMinuteText: String {
-        guard let caloriesPerMinute = derivedMetrics.caloriesPerMinute else { return "--" }
-        return localizedCaloriesPerMinuteText(caloriesPerMinute)
-    }
-
-    /// Returns the formatted longest-streak text.
-    private var longestStreakText: String {
-        summarySession.formattedLongestStreak
-    }
-
-    /// Returns the formatted short-break count.
-    private var shortBreaksText: String {
-        summarySession.formattedSmallBreaksCount
-    }
-
-    /// Returns the formatted long-break count.
-    private var longBreaksText: String {
-        summarySession.formattedLongBreaksCount
-    }
-
-    /// Returns the formatted average heart-rate text.
-    private var averageHeartRateText: String {
-        summarySession.formattedAverageHeartRate()
-    }
-
-    /// Returns the formatted peak heart-rate text.
-    private var peakHeartRateText: String {
-        summarySession.formattedPeakHeartRate()
     }
 
     // MARK: - Actions
