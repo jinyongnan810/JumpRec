@@ -35,6 +35,16 @@ final class JumpRecState: NSObject, @unchecked Sendable {
     /// Stores a pending start goal requested by an App Intent before the UI has finished loading.
     static var pendingStartGoal: (type: GoalType, value: Int)?
 
+    /// A UI-consumed start request. A stable value type lets SwiftUI observe requests
+    /// without letting an intent bypass the root view's quota and settings policy.
+    struct WorkoutStartRequest: Equatable {
+        let type: GoalType
+        let value: Int
+    }
+
+    /// Foreground intents publish here; ContentView consumes and clears the request.
+    var requestedStartGoal: WorkoutStartRequest?
+
     // MARK: - Session State
 
     /// Tracks the current lifecycle state of the session UI.

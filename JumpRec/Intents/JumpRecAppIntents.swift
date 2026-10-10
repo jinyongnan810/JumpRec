@@ -320,10 +320,9 @@ public struct StartWorkoutIntent: AppIntent {
         }
 
         if let state = JumpRecState.current, state.sessionState == .idle {
-            state.start(
-                goalType: resolvedGoalType,
-                goalValue: resolvedGoalValue
-            )
+            // The root view selects Home, checks the quota, and applies saved preferences.
+            // Publishing a request also works when the app was already foregrounded.
+            state.requestedStartGoal = .init(type: resolvedGoalType, value: resolvedGoalValue)
         } else {
             // Queue pending start for when ContentView loads
             JumpRecState.pendingStartGoal = (type: resolvedGoalType, value: resolvedGoalValue)

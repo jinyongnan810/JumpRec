@@ -34,14 +34,7 @@ struct ContentView: View {
                     settings: settings,
                     appState: appState,
                     onStart: {
-                        appState.start(
-                            goalType: settings.goalType,
-                            goalValue: settings.goalCount,
-                            preferLocalHeadphonesOverWatch: settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable,
-                            shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
-                            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
-                            jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
-                        )
+                        startWorkout(goalType: settings.goalType, goalValue: settings.goalCount)
                     },
                     onStop: {
                         appState.finish()
@@ -93,6 +86,9 @@ struct ContentView: View {
                 syncSettingsToWatch()
                 processPendingIntentStartIfNeeded()
             }
+        }
+        .onChange(of: appState.requestedStartGoal) { _, _ in
+            processPendingIntentStartIfNeeded()
         }
         .onChange(of: settings.goalType) { _, _ in
             applySettingsChange()
@@ -235,25 +231,35 @@ struct ContentView: View {
         }
     }
 
-    /// Checks if an App Intent requested a workout start before or while the view was loading.
-    private func processPendingIntentStartIfNeeded() {
-        guard let pending = JumpRecState.pendingStartGoal else { return }
-        JumpRecState.pendingStartGoal = nil
-        if appState.sessionState == .idle {
-            selectedTab = .jump
-            if !dataStore.canStartNewWorkout(isLicenseUnlocked: purchaseManager.hasUnlockedUnlimitedWorkouts) {
-                showPaywall = true
-                return
-            }
-            appState.start(
-                goalType: pending.type,
-                goalValue: pending.value,
-                preferLocalHeadphonesOverWatch: settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable,
-                shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
-                shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
-                jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
-            )
+    /// Applies the same quota and preference policy to button and intent requests.
+    /// Rechecking at actual start covers quota changes during the visible countdown.
+    private func startWorkout(goalType: GoalType, goalValue: Int) {
+        guard appState.sessionState == .idle else { return }
+        selectedTab = .jump
+        guard dataStore.canStartNewWorkout(isLicenseUnlocked: purchaseManager.hasUnlockedUnlimitedWorkouts) else {
+            showPaywall = true
+            return
         }
+        appState.start(
+            goalType: goalType,
+            goalValue: goalValue,
+            preferLocalHeadphonesOverWatch: settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable,
+            shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
+            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
+            jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
+        )
+    }
+
+    /// Consumes cold-launch and foreground intent requests exactly once.
+    /// Requests received during an existing session are discarded rather than starting later.
+    private func processPendingIntentStartIfNeeded() {
+        let request = appState.requestedStartGoal ?? JumpRecState.pendingStartGoal.map {
+            JumpRecState.WorkoutStartRequest(type: $0.type, value: $0.value)
+        }
+        appState.requestedStartGoal = nil
+        JumpRecState.pendingStartGoal = nil
+        guard let request else { return }
+        startWorkout(goalType: request.type, goalValue: request.value)
     }
 }
 
