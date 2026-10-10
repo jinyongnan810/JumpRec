@@ -76,3 +76,13 @@
 
 - [Privacy Policy (English)](PRIVACY_POLICY.md)
 - [プライバシーポリシー (日本語)](PRIVACY_POLICY_ja.md)
+
+---
+
+## License
+
+This repository is available under the [PolyForm Noncommercial License 1.0.0](LICENSE). You may use, study, modify, and share the software for purposes permitted by that license, including personal learning and noncommercial projects. Commercial use, such as selling a derivative app, adding paid features or advertising to a fork, or incorporating this code into a commercial product, requires separate permission from the relevant copyright holders.
+
+JumpRec is source-available with restrictions on commercial use. The repository license does not restrict the copyright holders from selling the official app. The official App Store release is distributed under its applicable App Store terms and end-user license agreement; this repository license does not replace those terms.
+
+Retain the license and required copyright notices when sharing copies. Any third-party material remains subject to its own license. The full [LICENSE](LICENSE) text governs; this section is only a summary.
