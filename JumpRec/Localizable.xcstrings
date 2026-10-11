@@ -4582,6 +4582,136 @@
           }
         }
       }
+    },
+    "Session Backup" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションのバックアップ"
+          }
+        }
+      }
+    },
+    "Export Backup" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを書き出す"
+          }
+        }
+      }
+    },
+    "Import Backup" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを読み込む"
+          }
+        }
+      }
+    },
+    "Import Backup?" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを読み込みますか？"
+          }
+        }
+      }
+    },
+    "Export downloaded sessions before changing builds. Import saves to the current build’s iCloud environment. Wait for iCloud sync to finish first." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ビルドを変更する前に、ダウンロード済みのセッションを書き出してください。読み込んだデータは現在のビルドのiCloud環境に保存されます。まずiCloudの同期が完了するまでお待ちください。"
+          }
+        }
+      }
+    },
+    "Saved a backup of %lld sessions." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld件のセッションのバックアップを保存しました。"
+          }
+        }
+      }
+    },
+    "This backup contains %lld sessions. Existing session IDs will be skipped. Better personal records will be kept." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このバックアップには%lld件のセッションが含まれています。同じIDのセッションはスキップし、自己記録はより良い値を保持します。"
+          }
+        }
+      }
+    },
+    "Imported %lld sessions; skipped %lld existing sessions. iCloud upload will continue automatically when available." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld件のセッションを読み込み、既存の%2$lld件をスキップしました。iCloudへのアップロードは利用可能になり次第、自動的に続行されます。"
+          }
+        }
+      }
+    },
+    "Could not save the backup. Please try again." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを保存できませんでした。もう一度お試しください。"
+          }
+        }
+      }
+    },
+    "Could not open the backup. Please try again." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを開けませんでした。もう一度お試しください。"
+          }
+        }
+      }
+    },
+    "Could not create the backup. Please try again." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを作成できませんでした。もう一度お試しください。"
+          }
+        }
+      }
+    },
+    "This file could not be read as a supported JumpRec backup. Choose an unmodified backup exported by JumpRec." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このファイルは対応するJumpRecのバックアップとして読み込めませんでした。JumpRecから書き出した未編集のバックアップを選択してください。"
+          }
+        }
+      }
+    },
+    "Could not import the backup. No backup changes were saved. Please try again." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを読み込めませんでした。バックアップの変更は保存されていません。もう一度お試しください。"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

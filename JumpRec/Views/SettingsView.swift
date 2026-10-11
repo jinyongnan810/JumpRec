@@ -63,8 +63,11 @@ struct SettingsView: View {
                     iPhoneSessionSection
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 5)
 
-                    privacyPolicyLink
+                    SessionBackupSection()
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 6)
+
+                    privacyPolicyLink
+                        .staggeredAppearance(isVisible: hasContentAppeared, index: 7)
                 }
                 .padding(.bottom, 8)
             }
@@ -81,7 +84,7 @@ struct SettingsView: View {
                         .frame(height: 56)
                 }
                 .appGlassButton(prominent: true, tint: AppColors.accent)
-                .staggeredAppearance(isVisible: hasContentAppeared, index: 7)
+                .staggeredAppearance(isVisible: hasContentAppeared, index: 8)
                 .padding(.top, 12)
             }
         }
