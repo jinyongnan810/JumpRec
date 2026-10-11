@@ -7,9 +7,7 @@ import Foundation
 import SwiftData
 
 public extension MyDataStore {
-    /// Fetches only the requested calendar year's scalar session rows for Shortcuts.
-    /// Half-open date bounds include January 1 and exclude the following year;
-    /// omitting the year deliberately returns all-time history.
+    /// Fetches scalar summaries for [January 1, next January 1), or all history when year is omitted.
     func sessionsForStatistics(year: Int?) throws -> [JumpSession] {
         var descriptor = FetchDescriptor<JumpSession>()
         if let year {
@@ -21,9 +19,7 @@ public extension MyDataStore {
         return try modelContext.fetch(descriptor)
     }
 
-    /// Removes short sessions that are usually created during local development and manual testing.
-    /// This runs only in debug builds during store bootstrap so release users never lose history and
-    /// developers start each launch from a cleaner dataset without having to clear the entire store.
+    /// Deletes short development sessions during debug-only store startup.
     func removeDebugSessionsBelowMinimumJumpCountIfNeeded() {
         #if DEBUG
             let minimumJumpCount = 100
@@ -45,8 +41,7 @@ public extension MyDataStore {
         #endif
     }
 
-    /// Returns the number of completed sessions that have at least 100 jumps.
-    /// This count is used to evaluate the 100-workout free usage quota.
+    /// Counts workouts with at least 100 jumps toward the free quota.
     func qualifiedSessionsCount() -> Int {
         let minimumJumpCount = JumpRecSettings.minimumJumpsForQuotaQualification
         let descriptor = FetchDescriptor<JumpSession>(
@@ -57,9 +52,7 @@ public extension MyDataStore {
         return (try? modelContext.fetchCount(descriptor)) ?? 0
     }
 
-    /// Evaluates whether the user is permitted to start a new workout session.
-    /// Returns true if the one-time unlimited license is unlocked, or if the user has
-    /// completed fewer than 100 qualified workouts.
+    /// Allows workouts with an unlimited license or fewer than 100 qualifying sessions.
     func canStartNewWorkout(isLicenseUnlocked: Bool) -> Bool {
         if isLicenseUnlocked {
             return true
@@ -131,11 +124,7 @@ public extension MyDataStore {
         await SessionAICommentGenerator.generateIfNeeded(for: session, in: modelContext)
     }
 
-    /// Creates the single child blob row for a session's rate samples.
-    ///
-    /// The list screen only needs the scalar fields on `JumpSession`, so storing rate points in this
-    /// separate one-to-one object prevents normal history fetches from materializing chart data. The
-    /// detail screen still has full fidelity by decoding `JumpSession.decodedRateSamples` on demand.
+    /// Stores chart samples in a separate child row for lazy loading.
     private func attachRateSeries(_ rateSamples: [RateSamplePoint], to session: JumpSession) {
         guard !rateSamples.isEmpty else { return }
 

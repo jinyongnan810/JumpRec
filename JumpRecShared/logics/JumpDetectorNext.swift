@@ -2,8 +2,7 @@
 //  JumpDetectorNext.swift
 //  JumpRec
 //
-//  Preserves the previous experimental detector for inspection.
-//  It intentionally reuses the shared public enums and debug-state types from `JumpDetector.swift`.
+//  Experimental detector using shared JumpDetector types.
 //
 
 import Foundation
@@ -11,11 +10,7 @@ import Foundation
 public final class JumpDetectorNext {
     // MARK: - Configuration
 
-    /// Tunable values are intentionally profile-specific, but the detector flow stays the same:
-    /// 1) filter raw motion into short-window signals,
-    /// 2) choose the most useful signal for the device profile,
-    /// 3) detect local extrema above an adaptive threshold,
-    /// 4) apply a refractory gate so one movement does not count multiple jumps.
+    /// Filter, threshold, and timing settings for each device profile.
     private struct Config {
         /// Number of seconds of recent filtered motion kept in memory.
         let rollingWindowDuration: TimeInterval
@@ -167,8 +162,7 @@ public final class JumpDetectorNext {
 
         switch profile {
         case .iPhonePocket, .headphones:
-            // Phone and headphones are acceleration-led. We continuously re-evaluate the dominant axis
-            // so the detector can recover after the user repositions the device or resumes after a rest.
+            // Re-evaluate the dominant acceleration axis as the device moves.
             updateAccelerationPattern()
             guard let axis = dominantAxis,
                   let polarity = chosenPolarity,
@@ -181,8 +175,7 @@ public final class JumpDetectorNext {
             return acceptJump(at: candidate)
 
         case .watch:
-            // Watch detection is impact-led. Wrist-only gyro motion created too many false counts in practice,
-            // so the watch path now treats a sharp acceleration impact as the primary jump event.
+            // Watch detection uses sharp acceleration impacts to limit wrist-motion false counts.
             dominantAxis = .magnitude
             chosenPolarity = .positiveMagnitude
             guard let candidate = watchAccelerationCandidateTimestamp() else {
@@ -213,8 +206,7 @@ public final class JumpDetectorNext {
 
     /// Re-evaluates the dominant acceleration axis and polarity for phone-style sources.
     private func updateAccelerationPattern() {
-        // Choose the axis with the strongest short-window energy. This keeps the detector orientation-agnostic
-        // for pockets/headphones without requiring a fixed "up" axis.
+        // Select the strongest axis by recent energy, independent of device orientation.
         let axes: [(JumpDetectorAxis, [Double])] = [
             (.x, history.map(\.accel.x)),
             (.y, history.map(\.accel.y)),
@@ -259,8 +251,7 @@ public final class JumpDetectorNext {
     private func selectPolarity(values: [Double]) -> JumpDetectorPolarity? {
         guard values.count >= 3 else { return nil }
 
-        // Some placements produce a useful positive peak, others a useful negative trough.
-        // We score both directly from recent extrema and keep whichever looks stronger.
+        // Select whichever is stronger: positive peaks or negative troughs.
         let threshold = adaptiveThreshold(for: values)
         var positiveScore = 0.0
         var negativeScore = 0.0
@@ -317,8 +308,7 @@ public final class JumpDetectorNext {
     ) -> TimeInterval? {
         guard values.count >= 3, timestamps.count == values.count else { return nil }
 
-        // Thresholds are local and adaptive so quiet idle motion stays quiet while stronger jump motion
-        // still registers without relying on one global number for every device and every user.
+        // Adapt the threshold to recent motion strength to reject idle noise.
         let adaptiveBaseThreshold = adaptiveThreshold(for: values)
         let threshold = adaptiveBaseThreshold * thresholdMultiplier
         let previous = values[values.count - 2]
@@ -359,8 +349,7 @@ public final class JumpDetectorNext {
         let timestamps = history.map(\.timestamp)
         guard values.count >= 3, timestamps.count == values.count else { return nil }
 
-        // The watch uses acceleration magnitude because actual jumps create a body-impact signature,
-        // while hand-only movement is much more variable across axes.
+        // Acceleration magnitude captures body impacts across wrist orientations.
         let threshold = adaptiveThreshold(for: values) * 0.65
         let previous = values[values.count - 2]
         let beforePrevious = values[values.count - 3]
@@ -385,8 +374,7 @@ public final class JumpDetectorNext {
             return false
         }
 
-        // For phone/headphones, a candidate on one axis still needs support from overall acceleration magnitude.
-        // This suppresses small orientation-specific wiggles and "put down" artifacts that briefly spike one axis.
+        // Require magnitude support to reject isolated axis spikes.
         guard hasAccelerationMagnitudeSupport(around: timestamp) else {
             syncDebugState()
             return false
@@ -403,8 +391,7 @@ public final class JumpDetectorNext {
             return false
         }
 
-        // Watch jumps are accepted directly from impact candidates. This is intentionally simpler than the earlier
-        // gyro-led design because missing real jumps was worse than tolerating a small amount of extra noise.
+        // Watch impact candidates directly count as jumps.
         registerAcceptedJump(at: timestamp)
         return true
     }
@@ -419,8 +406,7 @@ public final class JumpDetectorNext {
     private func registerAcceptedJump(at timestamp: TimeInterval) {
         if let lastAcceptedJumpTimestamp {
             let interval = timestamp - lastAcceptedJumpTimestamp
-            // `expectedInterval` is debug-only guidance right now. We keep updating it so cadence can still be
-            // inspected in logs, but it no longer blocks counting after rests or speed changes.
+            // Update expectedInterval for diagnostics only; it does not gate jump counting.
             if let expectedInterval {
                 self.expectedInterval =
                     (expectedInterval * (1 - config.expectedIntervalAlpha)) +
@@ -450,8 +436,7 @@ public final class JumpDetectorNext {
         let dt = max(0.001, timestamp - (lastSampleTimestamp ?? timestamp))
         lastSampleTimestamp = timestamp
 
-        // Filtering stays intentionally lightweight: a slow baseline subtraction acts like a high-pass filter,
-        // then a short smoothing pass removes jitter without adding too much lag.
+        // Subtract the slow baseline, then smooth briefly to reduce drift and jitter.
         let rawAccel = SIMD3<Double>(
             sample.userAccelerationX,
             sample.userAccelerationY,
@@ -496,8 +481,7 @@ public final class JumpDetectorNext {
         let timestamps = history.map(\.timestamp)
         guard !values.isEmpty else { return false }
 
-        // This support check is the main false-positive guard for phone/headphones.
-        // We only accept an axis extremum if the total acceleration magnitude also looks meaningful nearby.
+        // Accept an axis extremum only when nearby acceleration magnitude supports it.
         let threshold = adaptiveThreshold(for: values) * config.magnitudeSupportMultiplier
         return zip(timestamps, values).contains { sampleTimestamp, value in
             abs(sampleTimestamp - timestamp) <= 0.08 && value >= threshold

@@ -7,10 +7,7 @@ import AppIntents
 import Foundation
 import SwiftData
 
-/// An App Entity representing a completed jump rope workout in JumpRec for Siri, Shortcuts, and system integrations.
-///
-/// This entity exposes core workout statistics such as jump counts, duration, burned calories, and streak details
-/// so Siri voice queries, App Shortcuts, and Apple Intelligence can display and interact with individual workout records.
+/// Completed workout statistics exposed to Siri, Shortcuts, and Apple Intelligence.
 public struct JumpSessionEntity: AppEntity, Identifiable, Sendable {
     /// Localized display representation for the entity type in Shortcuts and Siri interfaces.
     public static let typeDisplayRepresentation: TypeDisplayRepresentation = "Jump Rope Workout"
@@ -97,7 +94,7 @@ public struct JumpSessionEntity: AppEntity, Identifiable, Sendable {
     }
 }
 
-/// Entity query implementation allowing Siri, Shortcuts, and Spotlight to look up workouts.
+/// Resolves workouts for Siri, Shortcuts, and Spotlight.
 public struct JumpSessionQuery: EntityQuery, EntityStringQuery, Sendable {
     public init() {}
 

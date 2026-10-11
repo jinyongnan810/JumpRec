@@ -8,12 +8,7 @@
 import StoreKit
 import SwiftUI
 
-/// Presents the paywall modal sheet when the user reaches the 100-workout free quota.
-///
-/// JumpRec's freemium model allows 100 workouts with at least 100 jumps for free.
-/// When the quota is exhausted, users purchase a one-time lifetime license to start new sessions.
-/// Even if users choose not to purchase, their workout history, personal records, and statistics
-/// remain accessible at all times in compliance with Apple App Store Review Guidelines.
+/// Offers a lifetime license at the free-workout limit; history and records remain accessible.
 struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(MyDataStore.self) private var dataStore
@@ -97,7 +92,7 @@ struct PaywallView: View {
         }
     }
 
-    /// Dynamic title: celebrates milestone if quota reached, or general unlock title if opened earlier from settings.
+    /// Shows a milestone title at the quota limit, otherwise an unlock title.
     private var headerTitle: String {
         if isQuotaReached {
             String(localized: "100 Workouts Milestone! 🎉")
@@ -242,8 +237,7 @@ struct PaywallView: View {
             .disabled(purchaseManager.isPurchasing || purchaseManager.isRestoring)
             .padding(.top, 4)
 
-            // Dismisses the paywall sheet without completing a purchase.
-            // Styled identically to Restore Purchases with an explicit top gap separating it from the action above.
+            // Dismiss the paywall without purchasing.
             Button {
                 dismiss()
             } label: {

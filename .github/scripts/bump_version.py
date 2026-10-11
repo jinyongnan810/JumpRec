@@ -1,22 +1,7 @@
 #!/usr/bin/env python3
-"""
-Bump MARKETING_VERSION in JumpRec.xcodeproj/project.pbxproj.
+"""Bump the app, Watch, and Live Activity marketing versions.
 
-Usage:
-    python3 bump_version.py [patch|minor|major]
-
-The script reads the current version from the pbxproj, increments it
-according to the action, and writes the result back.
-
-Targets updated:
-  - iOS app            (com.kinn.JumpRec)
-  - Watch app          (com.kinn.JumpRec.watchkitapp)
-  - Live Activity Ext  (com.kinn.JumpRec.Jump-Rec-Live-Activity-Extension)
-
-Testing:
-python3 .github/scripts/bump_version.py patch   # 1.0.0 → 1.0.1
-python3 .github/scripts/bump_version.py minor   # 1.0.0 → 1.1.0
-python3 .github/scripts/bump_version.py major   # 1.0.0 → 2.0.0
+Usage: python3 .github/scripts/bump_version.py [patch|minor|major]
 """
 
 import re

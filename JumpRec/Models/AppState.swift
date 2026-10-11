@@ -8,11 +8,7 @@ import Foundation
 import Observation
 import UIKit
 
-/// Owns the iPhone app's session lifecycle, live metrics, and companion-device coordination.
-///
-/// `JumpRecState` inherits from `NSObject` to serve as an `AVSpeechSynthesizerDelegate`.
-/// Since its mutable state is completely isolated to the `@MainActor`, it is marked `@unchecked Sendable`
-/// here in its primary declaration to satisfy concurrency requirements for delegate protocols.
+/// Owns iPhone workout state; main-actor isolation protects unchecked Sendable delegate state.
 @Observable
 @MainActor
 final class JumpRecState: NSObject, @unchecked Sendable {
@@ -29,14 +25,13 @@ final class JumpRecState: NSObject, @unchecked Sendable {
 
     // MARK: - App Intents Coordination
 
-    /// Holds a weak reference to the active `JumpRecState` instance so foreground App Intents can start or coordinate workouts.
+    /// Weak reference used by foreground App Intents to coordinate workouts.
     weak static var current: JumpRecState?
 
     /// Stores a pending start goal requested by an App Intent before the UI has finished loading.
     static var pendingStartGoal: (type: GoalType, value: Int)?
 
-    /// A UI-consumed start request. A stable value type lets SwiftUI observe requests
-    /// without letting an intent bypass the root view's quota and settings policy.
+    /// Observable start request handled by the root view's quota and settings policy.
     struct WorkoutStartRequest: Equatable {
         let type: GoalType
         let value: Int
@@ -71,15 +66,9 @@ final class JumpRecState: NSObject, @unchecked Sendable {
     var sessionGoalValue: Int?
     /// Indicates whether the current session is being mirrored from Apple Watch.
     var isMirroredWatchSession = false
-    /// Stores whether jump-count announcements should play for the active local session.
-    ///
-    /// The start flow seeds this from settings, and the active-session settings sheet can
-    /// refresh it while a workout is running so feedback changes take effect immediately.
+    /// Enables jump announcements for the active session; updated from settings.
     var sessionShouldSpeakJumpCountAnnouncements = true
-    /// Stores whether elapsed-time announcements should play for the active local session.
-    ///
-    /// Goal completion and haptics still run when this is disabled; only spoken minute
-    /// cues are muted for the current session.
+    /// Enables spoken minute cues without affecting goal completion or haptics.
     var sessionShouldSpeakJumpTimeAnnouncements = true
     /// Stores the saved session shown on the completion screen.
     var completedSession: JumpSession?
@@ -108,11 +97,7 @@ final class JumpRecState: NSObject, @unchecked Sendable {
     /// Remembers when a mirrored start request is waiting for watch confirmation.
     @ObservationIgnored
     var pendingMirroredStart = false
-    /// Identifies the current session attempt across asynchronous workout operations.
-    ///
-    /// HealthKit calls may finish after cancellation has been requested. Comparing this
-    /// token before applying a completion prevents an older operation from changing or
-    /// retaining workout state after reset or a replacement session.
+    /// Session token rejects stale asynchronous HealthKit completions after reset or replacement.
     @ObservationIgnored
     var sessionGeneration = UUID()
     /// Owns the request that asks Apple Watch to start a companion workout.
@@ -139,29 +124,16 @@ final class JumpRecState: NSObject, @unchecked Sendable {
     /// Manages live-activity presentation and updates.
     @ObservationIgnored
     let liveActivityManager = LiveActivityManager.shared
-    /// Serializes Live Activity operations and allows superseded metric updates to be cancelled.
-    ///
-    /// ActivityKit updates suspend while the system applies them. Retaining the latest task
-    /// prevents a burst of jump events from launching independent updates that can finish out
-    /// of order, and lets terminal operations wait for any update already in flight.
+    /// Serializes Live Activity calls and cancels superseded metric updates.
     @ObservationIgnored
     var liveActivitySyncTask: Task<Void, Never>?
     /// Speaks audible session prompts and milestones.
     @ObservationIgnored
     let synthesizer = AVSpeechSynthesizer()
-    /// Tracks whether the synthesizer has already been primed during this app lifetime.
-    ///
-    /// The first `AVSpeechSynthesizer` utterance can be noticeably slower because iOS may
-    /// still need to instantiate the voice pipeline. Keeping this state on the app model
-    /// lets `ContentView` request a warmup on first appearance without repeating the work
-    /// every time SwiftUI re-renders the screen hierarchy.
+    /// Tracks the one-time speech warmup for this app lifetime.
     @ObservationIgnored
     var hasWarmedUpSpeechSynthesizer = false
-    /// Tracks whether a silent warmup utterance is currently occupying the synthesizer.
-    ///
-    /// A real session announcement should never wait behind the silent warmup. This flag
-    /// allows the speech path to cancel the warmup immediately if the user starts a
-    /// workout before the priming utterance finishes.
+    /// Marks silent warmup speech so a real announcement can interrupt it.
     @ObservationIgnored
     var isSpeechWarmupInProgress = false
     /// Owns the latest delayed speech request so obsolete session cues can be cancelled.
@@ -173,10 +145,7 @@ final class JumpRecState: NSObject, @unchecked Sendable {
     /// Emits haptic feedback for session events.
     @ObservationIgnored
     let notificationFeedbackGenerator = UINotificationFeedbackGenerator()
-    /// Owns the cancellable task that announces elapsed-minute milestones.
-    ///
-    /// Retaining the task lets every session teardown path cancel pending work immediately,
-    /// preventing an old session from announcing after a new session has started.
+    /// Cancellable minute-announcement task owned by the current session.
     @ObservationIgnored
     var minuteAnnouncementTask: Task<Void, Never>?
 
@@ -229,9 +198,7 @@ final class JumpRecState: NSObject, @unchecked Sendable {
                 session: session
             )
         }
-        // Wire the synthesizer delegate so the app can release its audio session
-        // after each spoken prompt finishes. This keeps Apple Music and other
-        // background audio at normal volume until JumpRec actually needs to speak.
+        // The delegate restores background-audio volume after speech finishes.
         synthesizer.delegate = self
         prepareHaptics()
     }

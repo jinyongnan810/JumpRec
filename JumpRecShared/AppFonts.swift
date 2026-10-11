@@ -9,13 +9,11 @@ import SwiftUI
     import UIKit
 #endif
 
-/// Centralizes every custom font choice used by the app so typography can be
-/// adjusted in one place without hunting through individual views.
+/// Shared typography for the iPhone app, Watch app, and extensions.
 public enum AppFonts {
     // MARK: - Helpers
 
-    /// Builds a standard system font while keeping the sizing details in this
-    /// shared catalog instead of scattering them across views.
+    /// Creates a system font with a fixed size.
     public static func system(
         _ size: CGFloat,
         weight: Font.Weight = .regular,
@@ -24,8 +22,7 @@ public enum AppFonts {
         .system(size: size, weight: weight, design: design)
     }
 
-    /// Builds a monospaced system font for countdowns, metrics, and any other
-    /// numeric content that benefits from stable glyph widths.
+    /// Creates a monospaced font with stable widths for numeric content.
     public static func monospaced(
         _ size: CGFloat,
         weight: Font.Weight = .regular
@@ -33,8 +30,7 @@ public enum AppFonts {
         system(size, weight: weight, design: .monospaced)
     }
 
-    /// Builds a rounded system font for the few places where the UI intentionally
-    /// uses a softer, more playful presentation.
+    /// Creates a rounded system font.
     public static func rounded(
         _ size: CGFloat,
         weight: Font.Weight = .regular
@@ -42,8 +38,7 @@ public enum AppFonts {
         system(size, weight: weight, design: .rounded)
     }
 
-    /// Text styles participate in Dynamic Type. Fixed-size helpers above remain useful
-    /// for decorative icons and chart geometry, where scaling would obscure the data.
+    /// Text styles support Dynamic Type; fixed sizes suit icons and chart geometry.
     private static func text(_ style: Font.TextStyle, weight: Font.Weight = .regular,
                              design: Font.Design = .default) -> Font
     {
@@ -86,9 +81,7 @@ public enum AppFonts {
     public static let graphLabelMonospaced = monospaced(10, weight: .semibold)
     public static let calendarBadgeMonospaced = monospaced(8, weight: .semibold)
 
-    /// The calendar switches weight to indicate selection state, so the shared
-    /// catalog exposes a parameterized font instead of duplicating the logic in
-    /// the view layer.
+    /// Uses font weight to indicate calendar selection.
     public static func calendarDay(weight: Font.Weight) -> Font {
         monospaced(12, weight: weight)
     }
@@ -129,8 +122,7 @@ public enum AppFonts {
 
         // MARK: - UIKit Fonts
 
-        /// Provides UIKit counterparts for the few controls whose typography still
-        /// has to be configured through appearance APIs.
+        /// UIKit fonts for controls configured through appearance APIs.
         public static func uiSystem(
             _ size: CGFloat,
             weight: UIFont.Weight = .regular

@@ -71,11 +71,7 @@ public nonisolated enum SessionMetricsCalculator {
         rateSamples.map { Double($0.rate) }.max()
     }
 
-    /// Returns a normalized pace-consistency score in the range `0...1`.
-    /// The score is based on average absolute deviation from the session's sampled mean rate,
-    /// so higher values represent a steadier rhythm. We keep this as a normalized score rather
-    /// than raw variance because it is easier to compare across both slower and faster sessions.
-    /// Callers are expected to pass rate samples in ascending `secondOffset` order.
+    /// Scores pace consistency from 0 to 1; higher is steadier. Samples must be in time order.
     public static func rhythmConsistencyScore(from rateSamples: [RateSamplePoint]) -> Double? {
         guard rateSamples.count > 1 else { return nil }
 

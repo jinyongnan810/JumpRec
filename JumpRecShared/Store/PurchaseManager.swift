@@ -9,11 +9,7 @@ import Foundation
 import Observation
 import StoreKit
 
-/// Manages StoreKit 2 in-app purchases, product entitlement verification, and state synchronization.
-///
-/// JumpRec uses a freemium model: users can log up to 100 workouts (with >= 100 jumps) for free.
-/// Once that quota is reached, starting a new session requires unlocking a one-time non-consumable license.
-/// Past workout history, personal records, and stats always remain completely readable without purchase.
+/// Verifies StoreKit purchases and syncs unlimited-workout entitlements.
 @MainActor
 @Observable
 public final class PurchaseManager: Sendable {
@@ -71,11 +67,7 @@ public final class PurchaseManager: Sendable {
 
     // MARK: - Transaction Listener
 
-    /// Starts a structured background task observing asynchronous App Store transactions.
-    ///
-    /// This listener captures transactions that occur outside normal in-app purchase taps,
-    /// such as parental approvals ("Ask to Buy"), Family Sharing grants/revocations,
-    /// or purchases initiated on another device signed in to the same Apple ID.
+    /// Observes external transactions, including approvals, Family Sharing, and other devices.
     private func startListeningForTransactionUpdates() {
         updatesTask = Task.detached { [weak self] in
             for await result in Transaction.updates {
@@ -100,10 +92,7 @@ public final class PurchaseManager: Sendable {
 
     // MARK: - Entitlement Verification
 
-    /// Evaluates current user entitlements via StoreKit 2's cryptographic verification.
-    ///
-    /// Checks all verified transactions currently entitled to the customer. If the unlimited workouts
-    /// product is present and unrevoked, updates local and mirrored iCloud storage accordingly.
+    /// Syncs the unlimited license from verified, unrevoked StoreKit entitlements.
     public func updatePurchasedState() async {
         var isUnlocked = false
 
@@ -150,8 +139,7 @@ public final class PurchaseManager: Sendable {
 
     // MARK: - Purchase Flow
 
-    /// Initiates the StoreKit purchase flow for the one-time unlimited workouts license.
-    /// - Returns: `true` if the purchase succeeded and was verified; `false` if cancelled or failed.
+    /// Purchases the unlimited license; returns true only for a verified purchase.
     @discardableResult
     public func purchase() async -> Bool {
         guard let product else {
@@ -210,17 +198,14 @@ public final class PurchaseManager: Sendable {
 
     // MARK: - Restore Flow
 
-    /// Synchronizes previous purchases with the App Store and restores entitlements.
-    ///
-    /// Required by Apple App Store Review Guideline 3.1.1 for all non-consumable in-app purchases.
+    /// Restores purchases and refreshes entitlements from the App Store.
     public func restorePurchases() async {
         isRestoring = true
         errorMessage = nil
         defer { isRestoring = false }
 
         do {
-            // AppStore.sync() triggers a cryptographic sync with Apple's servers, asking the user
-            // to authenticate if needed, and updates Transaction.currentEntitlements.
+            // Sync may request authentication and updates current entitlements.
             try await AppStore.sync()
             await updatePurchasedState()
         } catch {

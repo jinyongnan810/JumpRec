@@ -104,8 +104,7 @@ struct HistoryYearSummaryCard: View {
         return totalJumps.formatted()
     }
 
-    /// Formats the localized workout count subtitle.
-    /// Uses %d with integer year to ensure it renders as "2026", never "2,026".
+    /// Formats the workout subtitle with an ungrouped integer year, such as 2026.
     private var subtitleText: String {
         String(
             format: String(localized: "%lld workouts in %d"),

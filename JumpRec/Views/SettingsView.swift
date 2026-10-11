@@ -354,7 +354,7 @@ struct SettingsView: View {
         }
     }
 
-    /// Renders a settings row with a switch toggle and an info mark icon that shows explanatory copy in a popover when tapped.
+    /// Settings toggle with an info button that presents help in a popover.
     private func settingsToggle(isOn: Binding<Bool>, title: String, description: String) -> some View {
         SettingsToggleRow(isOn: isOn, title: title, description: description)
     }
@@ -434,8 +434,7 @@ struct SettingsView: View {
 
     // MARK: - Helpers
 
-    /// Binds the UI slider to the stored threshold adjustment percentage, inverting the sign
-    /// so that moving the slider to the right increases sensitivity (lower acceleration threshold).
+    /// Inverts the threshold adjustment so sliding right increases sensitivity.
     private var sensitivitySliderBinding: Binding<Double> {
         Binding(
             get: { -settings.jumpDetectorThresholdAdjustmentPercentage },
@@ -443,12 +442,7 @@ struct SettingsView: View {
         )
     }
 
-    /// Formats the detector sensitivity tier for display in the settings section.
-    ///
-    /// Maps internal percentage offsets (-50% to +50%) to human-readable sensitivity levels:
-    /// - Negative percentages lower acceleration threshold -> Higher sensitivity
-    /// - Positive percentages raise acceleration threshold -> Lower sensitivity
-    /// - Zero percentage represents standard default sensitivity
+    /// Labels sensitivity: negative adjustments increase it, positive reduce it, and zero is standard.
     private var thresholdAdjustmentDisplayValue: String {
         let roundedPercentage = Int(settings.jumpDetectorThresholdAdjustmentPercentage.rounded())
         switch roundedPercentage {

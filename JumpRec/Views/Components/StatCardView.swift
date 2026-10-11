@@ -14,8 +14,7 @@ struct StatCardView: View {
     /// The color applied to the value text.
     var valueColor: Color = AppColors.textPrimary
 
-    /// Optional system-rendered elapsed value. Only the Text updates each second,
-    /// leaving the card and enclosing screen outside the timer's invalidation scope.
+    /// System timer text updates elapsed time without invalidating the whole card.
     var timerStart: Date?
 
     private var valueText: Text {
@@ -35,7 +34,7 @@ struct StatCardView: View {
             valueText
                 .font(AppFonts.metricValueMonospaced)
                 .foregroundStyle(valueColor)
-                // Keep values on a single line and scale font down cleanly when text is longer (e.g. Japanese "1時間35分").
+                // Shrink long values to fit a single line.
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }

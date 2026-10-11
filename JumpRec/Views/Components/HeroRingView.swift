@@ -61,9 +61,7 @@ struct HeroRingView: View {
                     .foregroundStyle(AppColors.textSecondary)
                     .contentTransition(.opacity)
             }
-            // The ring has a fixed diameter even when text scales. Give its labels
-            // an explicit interior proposal so long translations shrink or wrap
-            // inside the stroke instead of expanding the whole ZStack.
+            // Constrain labels inside the fixed ring so larger text wraps or shrinks within its stroke.
             .frame(width: max(0, diameter - lineWidth * 3), height: max(0, diameter - lineWidth * 3))
         }
         .accessibilityElement(children: .ignore)

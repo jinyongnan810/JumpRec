@@ -9,11 +9,7 @@ import Foundation
 extension JumpRecState {
     // MARK: - Audio
 
-    /// Configures the watch app's speech audio session immediately before an announcement.
-    ///
-    /// The watch app avoids keeping this session active all the time because `.duckOthers`
-    /// lowers background audio as soon as activation happens. Deferring activation until
-    /// speech starts preserves the user's audio unless JumpRec is actively talking.
+    /// Activates ducking audio only when a Watch announcement is about to play.
     private func configureSpeechAudioSession() {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
@@ -23,10 +19,7 @@ extension JumpRecState {
         }
     }
 
-    /// Releases the watch app's speech audio session once announcements are finished.
-    ///
-    /// `notifyOthersOnDeactivation` tells watchOS that any ducked audio can return to
-    /// normal volume as soon as JumpRec stops speaking.
+    /// Releases speech audio and restores background-audio volume.
     private func deactivateSpeechAudioSession() {
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
@@ -35,22 +28,12 @@ extension JumpRecState {
         }
     }
 
-    /// Primes `AVSpeechSynthesizer` with a silent utterance so the first real prompt starts quickly.
-    ///
-    /// The warmup still needs the speech audio session, but only briefly. This keeps the
-    /// watch behavior aligned with the iPhone app: fast first speech without holding the
-    /// ducking audio session open for the rest of the app lifetime.
+    /// Warms up speech silently, then releases the audio session through delegate cleanup.
     func warmUpSpeechSynthesizerIfNeeded() {
         warmUpSpeechSynthesizer(force: false)
     }
 
-    /// Clears stale speech state after the watch app has been suspended for a long time.
-    ///
-    /// watchOS may keep the Swift process alive while tearing down the underlying audio
-    /// route. When that happens, `AVSpeechSynthesizer` can still appear initialized even
-    /// though queued utterances will not play until much later. Resetting before the next
-    /// workout prevents old prompts from bursting out together and gives the first real
-    /// cue a fresh audio session.
+    /// Resets speech after long suspension so stale audio routes cannot delay or batch cues.
     func recoverSpeechAudioPipelineAfterExtendedBackground() {
         cancelPendingSpeech()
         if synthesizer.isSpeaking || synthesizer.isPaused {
@@ -102,9 +85,7 @@ extension JumpRecState {
 
             pendingSpeechTask = nil
 
-            // Workout cues should represent the latest session state. Replacing anything
-            // still queued in AVSpeechSynthesizer prevents stale announcements from piling
-            // up while watchOS is waking the audio route after a long suspension.
+            // Replace queued speech to avoid stale announcements after suspension.
             if isSpeechWarmupInProgress || synthesizer.isSpeaking || synthesizer.isPaused {
                 synthesizer.stopSpeaking(at: .immediate)
                 isSpeechWarmupInProgress = false
@@ -161,10 +142,7 @@ extension JumpRecState {
 }
 
 extension JumpRecState: AVSpeechSynthesizerDelegate {
-    /// Releases the ducking audio session after the last queued announcement finishes.
-    ///
-    /// Delegate callbacks are not main-actor isolated, so cleanup hops back to the main
-    /// actor before touching state shared with the rest of the watch UI.
+    /// Releases ducking audio on the main actor after the last announcement finishes.
     nonisolated func speechSynthesizer(_: AVSpeechSynthesizer, didFinish _: AVSpeechUtterance) {
         Task { @MainActor in
             self.isSpeechWarmupInProgress = false

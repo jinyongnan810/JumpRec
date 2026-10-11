@@ -65,7 +65,7 @@ struct MotionSourceStatusView: View {
 
     // MARK: - Display Content
 
-    /// Uses distinct labels so the home screen describes an upcoming route while the session screen reports live state.
+    /// Labels distinguish the planned motion source from active tracking.
     private var sectionTitle: String {
         switch presentation {
         case .preSession:
@@ -75,7 +75,7 @@ struct MotionSourceStatusView: View {
         }
     }
 
-    /// Clearly states what the app will do instead of presenting the source name as a selectable option.
+    /// Describes the planned tracking source.
     private var statusTitle: String {
         switch (presentation, source) {
         case (.preSession, .watch):

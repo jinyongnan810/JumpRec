@@ -14,17 +14,11 @@ struct SessionCompleteView: View {
     /// Resets the flow back to the idle state.
     var onDone: () -> Void
 
-    /// Drives the one-time entrance animation for the completion badge.
-    /// Keeping this state local makes the animation deterministic for this screen
-    /// without coupling it to broader session lifecycle state.
+    /// Controls the completion badge's one-time entrance animation.
     @State private var isCompletionBadgeVisible = false
-    /// Reveals the major completion-screen sections in their visual reading order.
-    /// This remains separate from the badge animation so the existing symbol effect can run independently.
+    /// Reveals completion sections in order, independently of the badge animation.
     @State private var hasContentAppeared = false
-    /// Tracks whether this screen is actively requesting an AI recap for the just-finished session.
-    /// The completion flow can arrive before the background generation task has finished, so the
-    /// view keeps its own loading flag to show a deterministic placeholder instead of inferring
-    /// progress from the current comment text alone.
+    /// Tracks the visible recap request even while background generation is pending.
     @State private var isGeneratingComment = false
 
     // MARK: - Derived Values
@@ -34,8 +28,7 @@ struct SessionCompleteView: View {
         appState.completedSession
     }
 
-    /// Determines whether the debug CSV share button is present so the following action
-    /// can sequence its staggered entrance without an invisible timing gap.
+    /// Includes the debug CSV button in the entrance sequence only when visible.
     private var hasMotionCSVShareAction: Bool {
         #if DEBUG
             return appState.motionCSVShareURL != nil
@@ -44,9 +37,7 @@ struct SessionCompleteView: View {
         #endif
     }
 
-    /// Provides one session-shaped value for all summary calculations on this screen.
-    /// When persistence has not finished yet, we synthesize a temporary session so the
-    /// summary UI still uses the exact same formatting and derived-metric logic.
+    /// Uses the saved session or a temporary summary while persistence is pending.
     private var summarySession: JumpSession {
         if let completedSession {
             return completedSession
@@ -85,8 +76,7 @@ struct SessionCompleteView: View {
 
     /// Renders the post-session summary, chart, and actions.
     var body: some View {
-        // Build a fallback session only once per render, then share its decoded series
-        // and analytics across every summary field instead of recreating model objects.
+        // Create one fallback session per render and share its samples and analytics.
         let summary = summarySession
         let samples = summary.decodedRateSamples
         let metrics = summary.derivedMetrics(rateSamples: samples)
@@ -102,9 +92,7 @@ struct SessionCompleteView: View {
                             .opacity(isCompletionBadgeVisible ? 1 : 0)
                         completionCheckmark
                     }
-                    // The delayed spring gives the completion icon a clear "arrival"
-                    // moment when this screen is pushed into view, while avoiding a
-                    // repeated animation during unrelated body updates.
+                    // Play the delayed badge spring once when the screen appears.
                     .onAppear {
                         guard !isCompletionBadgeVisible else { return }
                         withAnimation(.spring(response: 1, dampingFraction: 1)) {
@@ -197,8 +185,7 @@ struct SessionCompleteView: View {
             }.padding(.horizontal, 24)
         }
         .task {
-            // Waiting one update cycle ensures every section starts from the hidden state
-            // before the shared staggered modifier reveals the completed-session content.
+            // Wait one update cycle to render hidden sections before revealing them.
             await Task.yield()
             hasContentAppeared = true
         }
@@ -210,10 +197,7 @@ struct SessionCompleteView: View {
 
     // MARK: - Actions
 
-    /// Ensures the completion screen actively requests an AI recap for the saved session.
-    /// The session save path already attempts generation in the background, but this view still
-    /// performs an explicit check so the UI owns its loading state and reliably refreshes when the
-    /// comment becomes available while the summary screen is visible.
+    /// Requests the saved session's recap and tracks loading while this screen is visible.
     private func generateCommentIfNeeded() async {
         guard let completedSession else { return }
         guard SessionAICommentGenerator.shouldGenerate(for: completedSession) else { return }
@@ -227,9 +211,7 @@ struct SessionCompleteView: View {
 
     // MARK: - Private Subviews
 
-    /// Chooses the symbol animation style based on OS support.
-    /// Newer systems get the line-drawing treatment, while earlier releases keep
-    /// the bounce fallback so the completion state still feels celebratory.
+    /// Uses line-drawing animation where supported, with a bounce fallback.
     @ViewBuilder
     private var completionCheckmark: some View {
         let checkmark = Image(systemName: "checkmark")

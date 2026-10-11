@@ -6,8 +6,7 @@
 import Foundation
 
 #if canImport(ActivityKit)
-    // ActivityKit's Activity reference is intended for async update and end calls, but the
-    // framework has not yet annotated that reference as Sendable for strict Swift checking.
+    // Activity lacks Sendable conformance despite supporting async update and end calls.
     @preconcurrency import ActivityKit
 
     /// Owns the app's live-activity lifecycle for active jump sessions.

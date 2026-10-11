@@ -59,8 +59,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             print("[WatchConnectivityManager] Activation completed with state: \(activationState.rawValue)")
         }
 
-        // WCSession properties are read on the delegate callback thread, then only
-        // Sendable value snapshots cross to the main actor for observable state updates.
+        // Snapshot WCSession values on its callback thread before updating main-actor state.
         let isPaired = session.isPaired
         let isWatchAppInstalled = session.isWatchAppInstalled
         let isReachable = session.isReachable
@@ -151,8 +150,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             let filename = file.fileURL.lastPathComponent
             print("[WatchConnectivityManager] Received file from watch: \(filename)")
             do {
-                // WatchConnectivity owns this temporary URL only for the callback lifetime,
-                // so copy its contents before starting any asynchronous work.
+                // Copy the temporary file during the callback; WatchConnectivity owns its lifetime.
                 let data = try Data(contentsOf: file.fileURL)
                 if let csvText = String(data: data, encoding: .utf8) {
                     Task { @MainActor [weak self] in
@@ -283,18 +281,13 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
 
         guard session.isReachable else { return }
-        // Application context preserves the latest settings for eventual delivery. A reachable
-        // message gives an active Watch workout the same update immediately when both apps are awake.
+        // Application context queues the latest settings; reachable messages apply them immediately.
         session.sendMessage(payload, replyHandler: nil) { error in
             print("[WatchConnectivityManager] Failed to send immediate goal settings message: \(error.localizedDescription)")
         }
     }
 
-    /// Sends a stop workout command to the active companion watch app over WatchConnectivity.
-    ///
-    /// When the user ends a mirrored Watch session from the iPhone UI, this sends an immediate
-    /// action payload requesting the Apple Watch to finish its active `HKWorkoutSession`. The Watch
-    /// then processes session teardown and transfers the finalized workout metrics back to iPhone.
+    /// Requests Watch to end the mirrored workout and return its final metrics.
     func sendStopSessionCommand() {
         guard session.isReachable else {
             print("[WatchConnectivityManager] Watch is not reachable to receive stop command")
@@ -329,11 +322,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)
     }
 
-    /// Saves CSV text to iCloud Drive without blocking the caller while iCloud becomes available.
-    /// - Parameters:
-    ///   - csvText: The CSV content as a string.
-    ///   - filename: The destination filename in the iCloud Documents directory.
-    ///   - containerIdentifier: The iCloud container identifier used for the export.
+    /// Exports CSV to iCloud Documents, waiting asynchronously for the container.
     func saveCSVToICloud(
         csvText: String,
         filename: String,
@@ -349,9 +338,6 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     }
 
     /// Saves CSV text to the app's local Documents directory.
-    /// - Parameters:
-    ///   - csvText: The CSV content as string
-    ///   - filename: The filename for the CSV file
     @discardableResult
     func saveCSVToLocalDocuments(csvText: String, filename: String) -> URL? {
         #if DEBUG

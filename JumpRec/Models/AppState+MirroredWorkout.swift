@@ -65,9 +65,7 @@ extension JumpRecState {
     private func beginMirroredSession(_ payload: MirroredWorkoutPayload) {
         cancelPendingSpeech()
 
-        // A watch confirmation can arrive after companion startup appeared to fail and
-        // local tracking began. Stop both pending paths before adopting the watch workout
-        // so the phone cannot keep a second HealthKit session alive in the background.
+        // Stop pending and local startup before adopting a late Watch confirmation.
         companionWorkoutStartTask?.cancel()
         companionWorkoutStartTask = nil
         phoneWorkoutLifecycleTask?.cancel()

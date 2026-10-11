@@ -13,8 +13,7 @@ struct SettingsView: View {
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
 
-    /// Binds the UI slider to the stored threshold adjustment percentage, inverting the sign
-    /// so that moving the slider to the right increases sensitivity (lower acceleration threshold).
+    /// Inverts the threshold adjustment so sliding right increases sensitivity.
     private var sensitivitySliderBinding: Binding<Double> {
         Binding(
             get: { -settings.jumpDetectorThresholdAdjustmentPercentage },
@@ -167,8 +166,7 @@ struct SettingsView: View {
         .navigationTitle("Settings")
     }
 
-    /// Matches the timing used by the row animation so follow-up symbol effects
-    /// can wait until the layout and opacity changes have settled.
+    /// Delay symbol effects until the row's layout and opacity animation settles.
     private static let selectionAnimationDuration = 0.3
     /// The row delays its selection animation slightly to wait for screen navigation
     private static let selectionAnimationDelay = 0.2
@@ -240,8 +238,7 @@ private struct SelectionIndicatorView: View {
                 drawTrigger += 1
             }
             .task(id: isSelected) {
-                // Reset immediately when the row is deselected so a later selection
-                // can replay the effect from a known baseline.
+                // Reset on deselection so the next selection can replay the effect.
                 isDrawEffectActive = isSelected
 
                 do {
@@ -249,9 +246,7 @@ private struct SelectionIndicatorView: View {
                         try await Task.sleep(for: .seconds(0.5))
                     }
                 } catch {
-                    // SwiftUI cancels the task if the selection flips quickly. That
-                    // cancellation is expected because the delayed symbol effect
-                    // should not play for a stale selection state.
+                    // Cancellation skips the delayed effect for a stale selection.
                     return
                 }
 
@@ -374,12 +369,7 @@ struct TimeView: View {
     /// Dismisses the editor after the user confirms.
     @Environment(\.dismiss)
     private var dismiss
-    /// Stores the raw Digital Crown position.
-    ///
-    /// The crown is intentionally configured with a much larger range than the
-    /// visible minute value because smaller `by` values proved unreliable on real
-    /// hardware. Scaling the raw crown value lets the user make finer adjustments
-    /// while still presenting a smaller minute-based number in the UI.
+    /// Raw Digital Crown position scaled to minutes for finer adjustments.
     @State private var rawTimeValue: Double
     /// Applies the confirmed time back to persisted settings.
     private let onConfirm: (Int64) -> Void
@@ -415,8 +405,7 @@ struct TimeView: View {
             .accessibilityHint(Text("Turn the Digital Crown to adjust the time."))
 
             Button("Confirm") {
-                // The rest of the app persists integer minute goals, so the scaled
-                // crown value is converted back into that representation here.
+                // Convert the scaled crown position to the stored integer minute goal.
                 onConfirm(Int64(scaledTimeValue.rounded()))
                 dismiss()
             }
@@ -440,7 +429,7 @@ struct TimeView: View {
         rawTimeValue / 100
     }
 
-    /// Formats the staged time so the watch shows the scaled value instead of the raw crown position.
+    /// Formats the staged duration in minutes.
     private var timeDisplayText: String {
         scaledTimeValue.formatted(.number.precision(.fractionLength(0)))
     }

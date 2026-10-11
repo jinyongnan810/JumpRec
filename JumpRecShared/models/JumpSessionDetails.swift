@@ -8,21 +8,12 @@
 import Foundation
 import SwiftData
 
-/// Compact, Codable chart payload point for a session rate series.
-///
-/// This is intentionally a plain Swift value type, not a SwiftData model. Completed sessions can
-/// produce many rate points, and storing each point as a managed object creates unnecessary local
-/// object churn and CloudKit records. The app now encodes arrays of these lightweight values into
-/// `SessionRateSeries.payload` so list screens can keep loading only the session summary row while
-/// detail screens decode the chart data on demand.
+/// Codable rate sample stored in the session's chart payload.
 public nonisolated struct RateSamplePoint: Codable, Sendable, Equatable {
     /// Time offset from the session start, measured in whole seconds.
     public let secondOffset: Int
 
-    /// Jump rate at this offset, in jumps per minute.
-    ///
-    /// A `Float` is precise enough for charting and derived pacing analytics, and keeps the encoded
-    /// payload smaller than the previous `Double`-backed SwiftData row representation.
+    /// Jump rate in jumps per minute, stored as a Float to keep the payload compact.
     public let rate: Float
 
     /// Creates one chart payload point.
@@ -32,39 +23,21 @@ public nonisolated struct RateSamplePoint: Codable, Sendable, Equatable {
     }
 }
 
-/// One-to-one persisted payload for a session's chart rate series.
-///
-/// This model exists as a single child object so SwiftData can lazy-load it separately from
-/// `JumpSession`. History and list screens can fetch session summaries without decoding the
-/// potentially larger `payload`, while detail screens can read `JumpSession.decodedRateSamples`
-/// when they actually need chart and rhythm analytics.
+/// Stores a session's chart series separately for lazy loading.
 @Model
 public final class SessionRateSeries {
     // MARK: - Stored Properties
 
-    /// Parent session that owns this encoded series.
-    ///
-    /// The inverse relationship lives on `JumpSession.rateSeries` and uses cascade deletion so the
-    /// blob row is removed with its session. The optional shape keeps the model compatible with
-    /// CloudKit-backed SwiftData stores, where relationships should tolerate eventual sync timing.
+    /// Owning session; an optional inverse relationship supports CloudKit sync and cascade deletion.
     public var session: JumpSession?
 
-    /// Encoded `[RateSamplePoint]` payload for the session.
-    ///
-    /// The value is optional so old sessions and partially synced records can exist safely. Decoding
-    /// helpers treat `nil` or corrupt data as an empty series instead of crashing the detail screen.
+    /// Encoded rate samples; missing or corrupt payloads decode as an empty series.
     public var payload: Data?
 
-    /// Number of samples encoded into `payload`.
-    ///
-    /// Keeping this as metadata lets diagnostics and future UI checks understand the series size
-    /// without decoding the full blob first.
+    /// Sample count available without decoding the payload.
     public var sampleCount: Int = 0
 
-    /// Payload format version.
-    ///
-    /// Versioning gives the app a clear future migration hook if the encoded representation changes
-    /// from `[RateSamplePoint]` to another format.
+    /// Version of the encoded payload format.
     public var version: Int = 1
 
     // MARK: - Initialization

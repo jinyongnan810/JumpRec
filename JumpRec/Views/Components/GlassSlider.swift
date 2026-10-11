@@ -20,7 +20,7 @@ struct GlassSlider: View {
     let onProgressChanged: (CGFloat) -> Void
     let onFinished: () -> Void
 
-    /// Reads the standard SwiftUI environment `isEnabled` state to hide the interactive slider thumb icon when disabled.
+    /// Hides the slider thumb when the SwiftUI environment disables interaction.
     @Environment(\.isEnabled) private var isEnabled
 
     @State private var offset: CGFloat = 0
@@ -39,8 +39,7 @@ struct GlassSlider: View {
                         .minimumScaleFactor(0.6)
                         .foregroundStyle(config.tint.secondary)
 
-                    // The moving mask gives the label a subtle shimmer while keeping
-                    // the base text visible for legibility on every supported OS.
+                    // Animate a shimmer mask while keeping the base label readable.
                     Text(text)
                         .font(AppFonts.sectionTitle)
                         .lineLimit(1)
@@ -70,8 +69,7 @@ struct GlassSlider: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                // Hide the interactive thumb icon when the slider is disabled so users clearly see
-                // that sliding is unavailable (e.g. when mirroring an Apple Watch session).
+                // Hide the thumb when sliding is disabled.
                 if isEnabled {
                     Image(systemName: iconName)
                         .foregroundStyle(config.tint)
@@ -114,9 +112,7 @@ struct GlassSlider: View {
 
     @ViewBuilder
     private var trackBackground: some View {
-        // Liquid Glass is only available on iOS 26 and newer. The fallback keeps
-        // the same capsule silhouette and soft translucent feel so the control
-        // still reads as a slider on older deployment targets.
+        // Use Liquid Glass on iOS 26 and a translucent capsule on older versions.
         if #available(iOS 26.0, *) {
             Capsule()
                 .fill(config.tint.opacity(0.05))
@@ -138,8 +134,7 @@ struct GlassSlider: View {
 
 private struct SliderThumbGlassEffect: ViewModifier {
     func body(content: Content) -> some View {
-        // Keep the OS-specific modifier isolated so the main slider layout does
-        // not need to duplicate drag handling or text rendering for availability.
+        // Apply the available glass style without duplicating the slider layout.
         if #available(iOS 26.0, *) {
             content
                 .glassEffect(.clear, in: .circle)

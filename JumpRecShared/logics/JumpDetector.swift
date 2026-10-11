@@ -33,9 +33,9 @@ public struct JumpDetectorDebugState: Sendable {
     public let dominantAxis: JumpDetectorAxis?
     /// Whether the detector is looking for a positive peak or negative trough.
     public let chosenPolarity: JumpDetectorPolarity?
-    /// Reserved for compatibility with the previous detector design. Always `false` here.
+    /// Unused by this detector; always false.
     public let rhythmLocked: Bool
-    /// Reserved for compatibility with the previous detector design. Always `nil` here.
+    /// Unused by this detector; always nil.
     public let expectedInterval: TimeInterval?
     /// Timestamp of the last accepted jump after refractory filtering.
     public let lastAcceptedJumpTimestamp: TimeInterval?
@@ -60,21 +60,15 @@ public struct JumpDetectorDebugState: Sendable {
 public final class JumpDetector {
     // MARK: - Configuration
 
-    /// A tiny profile config for the intentionally simple detector.
+    /// Signal, threshold, and timing settings for a device profile.
     private struct Config {
         /// The device profile this config belongs to.
         let profile: JumpDeviceProfile
-        /// The raw `MotionSample` signal to inspect.
-        ///
-        /// Axis values are useful when a device has a predictable placement, while `.magnitude`
-        /// keeps detection independent from how the user rotates or holds the device.
+        /// Raw motion signal; magnitude is independent of device orientation.
         let axis: JumpDetectorAxis
         /// The extremum direction that represents a jump on the selected signal.
         let polarity: JumpDetectorPolarity
-        /// The default raw acceleration threshold that must be crossed to count a jump.
-        ///
-        /// User tuning is applied as a percentage of this baseline so profile calibration
-        /// stays centralized here while settings only store a relative adjustment.
+        /// Baseline acceleration threshold scaled by the user's percentage adjustment.
         let threshold: Double
         /// Minimum time between accepted jumps to prevent double counting.
         let minimumInterval: TimeInterval
@@ -122,27 +116,16 @@ public final class JumpDetector {
 
     /// The fixed profile rule used by this detector instance.
     private let config: Config
-    /// User-selected percentage applied to the profile's default threshold.
-    ///
-    /// The stored value is a real percentage from `-50` to `50`. Applying it to the
-    /// signed threshold keeps negative troughs intuitive: `50%` turns `-1.2` into
-    /// `-1.8`, which requires a deeper negative motion event.
+    /// Signed threshold adjustment from -50% to 50%; +50% scales -1.2 to -1.8.
     private var thresholdAdjustmentPercentage: Double
-    /// Cached threshold used by the hot sample-processing path.
-    ///
-    /// Motion samples arrive many times per second, while settings change rarely.
-    /// Caching keeps `thresholdSatisfied(value:)` to a direct comparison even when
-    /// the active-session settings sheet updates the threshold during a workout.
+    /// Cached threshold for frequent motion-sample comparisons.
     private var adjustedThreshold: Double
     /// Timestamp of the last jump that passed threshold and refractory checks.
     private var lastAcceptedJumpTimestamp: TimeInterval?
 
     // MARK: - Initialization
 
-    /// Creates a detector configured for the specified device profile.
-    /// - Parameters:
-    ///   - profile: The device profile whose axis, polarity, and baseline threshold should be used.
-    ///   - thresholdAdjustmentPercentage: A relative threshold adjustment from `-50` to `50`.
+    /// Creates a detector for a profile with a threshold adjustment from -50% to 50%.
     public init(profile: JumpDeviceProfile = .iPhonePocket, thresholdAdjustmentPercentage: Double = 0) {
         self.profile = profile
         config = .profile(profile)
@@ -160,10 +143,7 @@ public final class JumpDetector {
 
     // MARK: - Public Methods
 
-    /// Updates the relative threshold adjustment used for subsequent samples.
-    ///
-    /// Callers use this at session start and when the active-session settings sheet changes sensitivity.
-    /// The update affects future samples without clearing the detector's timing state.
+    /// Changes sensitivity for future samples without resetting detection timing.
     public func updateThresholdAdjustmentPercentage(_ percentage: Double) {
         thresholdAdjustmentPercentage = Self.clampedThresholdAdjustmentPercentage(percentage)
         adjustedThreshold = Self.adjustedThreshold(
@@ -172,8 +152,7 @@ public final class JumpDetector {
         )
     }
 
-    /// Processes one raw motion sample.
-    /// The detector inspects the configured raw acceleration signal and threshold for the profile.
+    /// Checks one motion sample against the profile's signal and threshold.
     public func processMotionSample(_ sample: MotionSample) -> Bool {
         let value = axisValue(from: sample, axis: config.axis)
         let isCandidate = thresholdSatisfied(value: value)
@@ -249,7 +228,7 @@ public final class JumpDetector {
         min(50, max(-50, percentage))
     }
 
-    /// Keeps debug state aligned with the simple detector implementation.
+    /// Updates debug state to match the active detector.
     private func syncDebugState() {
         debugState = JumpDetectorDebugState(
             profile: profile,

@@ -7,10 +7,7 @@
 
 import SwiftUI
 
-/// Renders the animated shader-based dot treatment used as a decorative status accent.
-///
-/// The view keeps its own animation timeline so callers can attach it as a lightweight
-/// overlay without needing to manage any external state.
+/// Decorative shader dot with its own animation timeline.
 struct DotIndicator: View {
     let size: CGFloat
     let color: Color
@@ -35,10 +32,7 @@ struct DotIndicator: View {
     }
 }
 
-/// Places the shader indicator in the top trailing corner of the modified view.
-///
-/// Centralizing this layout in one modifier keeps call sites readable and ensures the
-/// indicator uses the same overlay alignment and offset everywhere it appears.
+/// Positions the shader indicator at the top trailing corner.
 private struct DotIndicatorOverlayModifier: ViewModifier {
     let isVisible: Bool
     let size: CGFloat
@@ -57,15 +51,7 @@ private struct DotIndicatorOverlayModifier: ViewModifier {
 }
 
 extension View {
-    /// Adds the animated dot indicator as a decorative top trailing overlay.
-    ///
-    /// - Parameters:
-    ///   - isVisible: Allows common call sites to keep the modifier in place while toggling
-    ///     the indicator on and off from local state or derived conditions.
-    ///   - size: The rendered size of the square shader surface before masking and glow.
-    ///   - color: The tint passed into the shader and matching shadow.
-    ///   - offset: Fine-tunes placement relative to the view's top trailing corner.
-    /// - Returns: A view with the dot indicator layered above it.
+    /// Adds a decorative dot overlay with configurable visibility, size, tint, and offset.
     func dotIndicatorOverlay(
         isVisible: Bool = true,
         size: CGFloat = 100,

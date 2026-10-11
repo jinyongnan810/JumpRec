@@ -1,8 +1,7 @@
 #!/bin/sh
 set -e
 
-# Xcode Cloud build environments do not include the Metal Toolchain by default in Xcode 16/26.
-# If the toolchain is missing, download and install it so CompileMetalFile can succeed.
+# Install the Metal toolchain if it is missing from the Xcode Cloud environment.
 if xcodebuild -showComponent metalToolchain >/dev/null 2>&1; then
     echo "✓ Metal toolchain is already installed"
 else

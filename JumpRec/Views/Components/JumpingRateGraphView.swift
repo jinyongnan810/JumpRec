@@ -11,8 +11,7 @@ struct JumpingRateGraphView: View {
     /// The rate samples used to render the chart.
     let samples: [RateSamplePoint]
 
-    /// Prepared only when samples change; axis closures reuse this snapshot instead
-    /// of remapping the full series for every tick and unrelated parent update.
+    /// Chart snapshot rebuilt when samples change and reused by axis labels.
     @State private var prepared = PreparedRateChart(samples: [])
     private let gridLineColor = Color(hex: 0x0F172A)
 
@@ -124,10 +123,7 @@ private struct PreparedRateChart {
         let durationSeconds = chartXDomain.upperBound
         guard durationSeconds > 0 else { return [0] }
 
-        // Short sessions can collapse multiple rounded steps onto the same second
-        // (for example `[0, 1, 1, 2, 2]`). Deduplicating while preserving order keeps
-        // the axis stable and avoids `Dictionary(uniqueKeysWithValues:)` trapping later
-        // when labels are built from these marks.
+        // Deduplicate rounded ticks in order to avoid duplicate-key traps for short sessions.
         let rawMarks = (0 ... xAxisStepCount).map { step in
             Int((Double(step) / Double(xAxisStepCount) * Double(durationSeconds)).rounded())
         }

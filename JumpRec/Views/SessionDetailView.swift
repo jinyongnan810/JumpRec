@@ -29,11 +29,7 @@ struct SessionDetailView: View {
         session.formattedDuration
     }
 
-    /// Returns the saved rate samples in their persisted chart order.
-    ///
-    /// Accessing this property intentionally decodes the series payload because the detail screen is
-    /// the place where charts and rhythm analytics are actually visible. The save flow writes points
-    /// chronologically, so the detail view does not need to sort on every render.
+    /// Decodes saved chart samples in chronological order without sorting.
     private var rateSamples: [RateSamplePoint] {
         session.decodedRateSamples
     }

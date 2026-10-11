@@ -17,10 +17,7 @@ struct TimerView: View {
         self.startTime = startTime
     }
 
-    /// Renders the continuously updating elapsed time using system compositor rendering.
-    ///
-    /// Using `Text(_:style: .timer)` lets watchOS handle counter updates in the system compositor
-    /// without waking SwiftUI view bodies, string allocations, or CPU timers every 100ms.
+    /// Renders elapsed time with system timer text, without a SwiftUI update timer.
     var body: some View {
         Text(startTime, style: .timer)
             .font(AppFonts.watchTimer)

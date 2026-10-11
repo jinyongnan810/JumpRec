@@ -12,11 +12,7 @@ actor CloudCSVExporter {
     /// The delay between iCloud availability checks.
     private let retryDelay: Duration = .milliseconds(500)
 
-    /// Saves CSV text in the requested iCloud container's Documents directory.
-    ///
-    /// iCloud identity and container discovery can briefly return `nil` during app startup
-    /// or account transitions. Suspending between checks leaves the underlying thread free
-    /// and also makes cancellation responsive when the owning task no longer needs the export.
+    /// Exports CSV to iCloud Documents with cancellable retries while the container is unavailable.
     func save(csvText: String, filename: String, containerIdentifier: String) async {
         guard await waitForUbiquityIdentity() else {
             print("[CloudCSVExporter] iCloud not available or user not logged in")

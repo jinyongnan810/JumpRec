@@ -105,7 +105,7 @@ public struct GetTodayJumpStatsIntent: AppIntent {
 
 // MARK: - Get Workout Stats Intent (All-Time & Yearly)
 
-/// Siri App Intent to query aggregated workout metrics (total jumps and workout sessions) for all time or a specific calendar year.
+/// Queries all-time or yearly jump and workout totals.
 public struct GetWorkoutStatsIntent: AppIntent {
     public static let title: LocalizedStringResource = "Get Workout Stats"
     public static let description = IntentDescription("Calculates total jump count, workout count, and calories for all time or a specific year in JumpRec.")
@@ -137,8 +137,7 @@ public struct GetWorkoutStatsIntent: AppIntent {
             caloriesBurned: totalCalories
         )
 
-        // Keep complete literal templates at the dialog boundary so Xcode can
-        // extract them and translators can reorder the values without English fragments.
+        // Use complete literal dialogs so Xcode extracts them and translators can reorder values.
         let dialog: IntentDialog = if filteredSessions.isEmpty {
             if let targetYear {
                 "No jump rope workouts recorded for \(targetYear) in JumpRec."
@@ -283,8 +282,7 @@ public struct StartWorkoutIntent: AppIntent {
         }
 
         if let state = JumpRecState.current, state.sessionState == .idle {
-            // The root view selects Home, checks the quota, and applies saved preferences.
-            // Publishing a request also works when the app was already foregrounded.
+            // The root view handles the request, selects Home, and checks quota and preferences.
             state.requestedStartGoal = .init(type: resolvedGoalType, value: resolvedGoalValue)
         } else {
             // Queue pending start for when ContentView loads

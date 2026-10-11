@@ -17,12 +17,7 @@ final class WorkoutMirrorManager: NSObject {
     /// Notifies app state when the mirrored session ends.
     var onMirroredSessionEnded: (() -> Void)?
 
-    // The iPhone must own an HKHealthStore to participate in HealthKit workout mirroring.
-    // This is separate from WatchConnectivity:
-    // - WCSession is for general app/watch messaging.
-    // - HKWorkoutSession mirroring is for an active HealthKit workout and lets the system
-    //   wake the companion iPhone app, attach a mirrored session, and deliver workout data.
-    /// The HealthKit store used for mirroring registration.
+    /// HealthKit store required to register and receive mirrored workout sessions.
     private let healthStore = HKHealthStore()
     /// Decodes mirrored payloads coming from the watch.
     private let decoder = JSONDecoder()
@@ -39,8 +34,7 @@ final class WorkoutMirrorManager: NSObject {
     func startCompanionWorkout() async throws {
         guard HKHealthStore.isHealthDataAvailable() else { return }
 
-        // Reuse the iPhone workout manager's authorization task so launching the Watch app never
-        // races a second HealthKit request against the authorization primed during app startup.
+        // Share authorization with the iPhone workout manager to avoid overlapping requests.
         try await PhoneWorkoutManager.shared.ensureAuthorization()
 
         let configuration = HKWorkoutConfiguration()
@@ -54,22 +48,19 @@ final class WorkoutMirrorManager: NSObject {
     func activate() {
         guard HKHealthStore.isHealthDataAvailable() else { return }
 
-        // Register this as early as possible so the iPhone can receive a mirrored workout
-        // session started from Apple Watch, even if the iOS app is launched in background.
+        // Register early to receive Watch workouts during background launches.
         healthStore.workoutSessionMirroringStartHandler = { [weak self] session in
             Task { @MainActor [weak self] in
                 self?.attachMirroredSession(session)
             }
         }
 
-        // PhoneWorkoutManager owns the combined iPhone authorization request. Registration itself
-        // does not need to present UI and must remain safe when the app is launched in background.
+        // Registration is safe in background; PhoneWorkoutManager owns authorization UI.
     }
 
     /// Attaches the mirrored workout session so payloads can be received.
     private func attachMirroredSession(_ session: HKWorkoutSession) {
-        // Keep a reference to the mirrored session so the iPhone can receive payloads sent with
-        // sendToRemoteWorkoutSession(data:) from the watch's primary HKWorkoutSession.
+        // Retain the mirrored session to receive remote workout payloads.
         mirroredSession = session
         mirroredSession?.delegate = self
     }
@@ -80,8 +71,7 @@ extension WorkoutMirrorManager: HKWorkoutSessionDelegate {
     nonisolated func workoutSession(_: HKWorkoutSession,
                                     didReceiveDataFromRemoteWorkoutSession data: [Data])
     {
-        // HealthKit may batch multiple payloads before delivering them to iPhone,
-        // especially when the iOS app was suspended in background.
+        // HealthKit may deliver several payloads in one callback after background suspension.
         for payloadData in data {
             Task { @MainActor [weak self] in
                 guard let self else { return }

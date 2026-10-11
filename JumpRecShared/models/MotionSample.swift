@@ -7,9 +7,7 @@
 
 import Foundation
 
-/// A device-agnostic representation of a single motion data point.
-/// Works with data from Apple Watch (CMMotionManager), iPhone (CMMotionManager),
-/// and AirPods (CMHeadphoneMotionManager).
+/// Motion sample shared by Watch, iPhone, and headphone detectors.
 public struct MotionSample {
     // MARK: - Stored Properties
 
@@ -23,9 +21,7 @@ public struct MotionSample {
     public let rotationRateY: Double
     public let rotationRateZ: Double
 
-    /// Monotonic timestamp of the sample (seconds).
-    /// On Apple Watch / iPhone this is `CMDeviceMotion.timestamp`.
-    /// For AirPods you may use `ProcessInfo.processInfo.systemUptime` or similar.
+    /// Monotonic sample timestamp in seconds.
     public let timestamp: TimeInterval
 
     // MARK: - Initialization

@@ -7,9 +7,7 @@ import Foundation
 import SwiftData
 
 extension MyDataStore {
-    /// Minimum values a session must reach before it can establish a personal record.
-    /// This avoids surfacing trivial early-session numbers as "records" when the user
-    /// has not yet completed a meaningful workout.
+    /// Minimum session values required to qualify for a personal record.
     private enum PersonalRecordThreshold {
         static let highestJumpCount = 200
         static let longestJumpStreak = 100
@@ -62,9 +60,7 @@ extension MyDataStore {
         return updatedKinds
     }
 
-    /// Removes every cached personal record row from the local store.
-    /// This is intentionally scoped to the derived record cache only, so clearing the sheet does not
-    /// destroy the underlying session history that future record calculations still depend on.
+    /// Clears cached personal records while retaining session history.
     func clearAllPersonalRecords() {
         let descriptor = FetchDescriptor<PersonalRecord>()
         let existingRecords = (try? modelContext.fetch(descriptor)) ?? []
@@ -98,8 +94,7 @@ extension MyDataStore {
         let sessions = (try? modelContext.fetch(sessionDescriptor)) ?? []
         guard !sessions.isEmpty else { return }
 
-        // Reprocessing all historical sessions keeps previously shipped record kinds intact while
-        // allowing newly introduced kinds to be derived for existing users during app upgrade.
+        // Rebuild records from history to include any missing record kinds.
         for session in sessions {
             upsertPersonalRecords(for: session)
         }
@@ -109,13 +104,10 @@ extension MyDataStore {
 
     private func personalRecordCandidates(for session: JumpSession) -> [PersonalRecordCandidate] {
         var candidates: [PersonalRecordCandidate] = []
-        // Rate samples live in a lazily loaded blob so history lists avoid chart payload work. This
-        // record calculation runs only while saving or backfilling detailed records, where decoding
-        // the series is intentional and needed for rhythm-based achievements.
+        // Decode chart samples for rhythm-based records during saves and backfills.
         let rateSamples = session.decodedRateSamples
 
-        // Each category has a minimum qualification threshold so personal records reflect
-        // a meaningful workout milestone instead of the first small session in history.
+        // Apply qualification thresholds before assigning personal records.
         if session.jumpCount > PersonalRecordThreshold.highestJumpCount {
             candidates.append(
                 PersonalRecordCandidate(
@@ -177,8 +169,7 @@ extension MyDataStore {
             )
         }
 
-        // These playful records rely on persisted rate samples, so they are only eligible once
-        // the session is long enough to provide meaningful pacing data.
+        // Require enough pacing data before evaluating these records.
         if
             rateSamples.count >= PersonalRecordThreshold.steadyRhythmSampleCount,
             let rhythmScore = SessionMetricsCalculator.rhythmConsistencyScore(from: rateSamples)

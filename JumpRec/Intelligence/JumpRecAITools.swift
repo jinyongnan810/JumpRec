@@ -180,7 +180,7 @@ import SwiftData
         }
     }
 
-    /// An AI Tool for on-device Foundation Models to query all-time or yearly jump stats (total jumps and session count).
+    /// Queries all-time or yearly jump and session totals through Foundation Models.
     @available(iOS 26.0, *)
     public struct GetAggregatedWorkoutStatsAITool: Tool {
         public let name = "getAggregatedWorkoutStats"

@@ -67,11 +67,8 @@ struct ContentView: View {
         }
         .preferredColorScheme(.dark)
         .onAppear {
-//            configureTabBarAppearance()
             appState.updateSceneActive(scenePhase == .active)
-            // Prime speech once when the root view first appears so the first spoken
-            // workout cue does not stall while `AVSpeechSynthesizer` performs its
-            // internal one-time initialization work.
+            // Warm up speech on first appearance to reduce the first workout cue's delay.
             appState.warmUpSpeechSynthesizerIfNeeded()
             dataStore.refreshCloudDiagnostics()
             refreshQuotaAndEntitlements()
@@ -134,47 +131,16 @@ struct ContentView: View {
         )
     }
 
-//    private func configureTabBarAppearance() {
-//        let appearance = UITabBarAppearance()
-//        appearance.configureWithDefaultBackground()
-//
-//        let normalAttributes: [NSAttributedString.Key: Any] = [
-//            .font: UIFont.systemFont(ofSize: 16, weight: .medium),
-//        ]
-//        let selectedAttributes: [NSAttributedString.Key: Any] = [
-//            .font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-//        ]
-//
-//        appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttributes
-//        appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedAttributes
-//        appearance.inlineLayoutAppearance.normal.titleTextAttributes = normalAttributes
-//        appearance.inlineLayoutAppearance.selected.titleTextAttributes = selectedAttributes
-//        appearance.compactInlineLayoutAppearance.normal.titleTextAttributes = normalAttributes
-//        appearance.compactInlineLayoutAppearance.selected.titleTextAttributes = selectedAttributes
-//
-//        UITabBar.appearance().standardAppearance = appearance
-//        UITabBar.appearance().scrollEdgeAppearance = appearance
-//    }
-
-    /// Persists how many meaningful sessions the user has completed on this installation.
-    /// This intentionally uses `AppStorage` rather than querying SwiftData so the root view
-    /// does not need to keep the full session table live just to decide when to request a review.
-    /// Reinstalling the app resets this counter, which is acceptable for this lightweight heuristic.
+    /// Stores the qualifying-session review counter locally; reinstalling resets it.
     private func recordQualifiedCompletedSessionIfNeeded() {
         guard let completedSession = appState.completedSession else { return }
 
-        // Only workouts with at least 100 jumps count toward the review prompt so accidental
-        // starts, warmups, and short test sessions do not quickly exhaust the request threshold.
+        // Only workouts with at least 100 jumps count toward a review request.
         guard completedSession.jumpCount > 99 else { return }
         qualifiedFinishedSessionCount += 1
     }
 
-    /// Applies a persisted settings edit to every active consumer.
-    ///
-    /// Settings can be changed from the active-session sheet, so this helper updates the
-    /// running iPhone session first and also sends the latest payload to Apple Watch. When
-    /// the current session is mirrored, the phone updates its displayed goal immediately
-    /// while the Watch receives the same change through WatchConnectivity.
+    /// Applies settings to the active iPhone session and sends them to Watch.
     private func applySettingsChange() {
         appState.applyActiveSessionSettings(
             goalType: settings.goalType,
@@ -186,11 +152,7 @@ struct ContentView: View {
         syncSettingsToWatch()
     }
 
-    /// Refreshes quota and license entitlements for the local device and paired Watch.
-    ///
-    /// If the user has already unlocked lifetime unlimited workouts, querying SQLite for the
-    /// qualified sessions count is intentionally skipped to avoid synchronous main-thread disk I/O
-    /// during screen activation and app resume.
+    /// Refreshes entitlements and quota; an unlimited license skips the database count.
     private func refreshQuotaAndEntitlements() {
         let isUnlimited = purchaseManager.hasUnlockedUnlimitedWorkouts
         settings.hasUnlockedUnlimitedWorkouts = isUnlimited
@@ -235,8 +197,7 @@ struct ContentView: View {
         }
     }
 
-    /// Applies the same quota and preference policy to button and intent requests.
-    /// Rechecking at actual start covers quota changes during the visible countdown.
+    /// Checks quota and preferences at actual start, including after a countdown.
     private func startWorkout(goalType: GoalType, goalValue: Int) {
         guard appState.sessionState == .idle else { return }
         selectedTab = .jump
@@ -254,8 +215,7 @@ struct ContentView: View {
         )
     }
 
-    /// Consumes cold-launch and foreground intent requests exactly once.
-    /// Requests received during an existing session are discarded rather than starting later.
+    /// Consumes each intent request once; discards requests during an existing session.
     private func processPendingIntentStartIfNeeded() {
         let request = appState.requestedStartGoal ?? JumpRecState.pendingStartGoal.map {
             JumpRecState.WorkoutStartRequest(type: $0.type, value: $0.value)
@@ -274,8 +234,7 @@ struct ContentView: View {
 }
 
 #Preview("100 Free Workouts Used") {
-    // Seed 100 qualifying workouts in an isolated database so the existing quota check
-    // presents the milestone paywall when Start Workout is tapped on the free tier.
+    // Seed isolated qualifying sessions so starting a free-tier workout presents the paywall.
     let dataStore = try! MyDataStore.makePreviewStore(qualifiedWorkoutCount: JumpRecSettings.freeWorkoutQuota)
     ContentView()
         .modelContainer(dataStore.modelContainer)

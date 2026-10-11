@@ -9,10 +9,7 @@ import WatchKit
 extension JumpRecState {
     // MARK: - Session Lifecycle
 
-    /// Starts a new watch-tracked workout session.
-    ///
-    /// Speech and detector preferences seed session state at start and can later be
-    /// refreshed when settings sync from the paired iPhone during a workout.
+    /// Starts a Watch workout with settings that can be refreshed during the session.
     func start(
         goalType: GoalType,
         goalCount: Int,
@@ -43,8 +40,7 @@ extension JumpRecState {
             )
         }
         jumpState = .jumping
-        // Start minute announcements for every workout so elapsed-time feedback
-        // remains available even when the user selected a jump-count goal.
+        // Announce elapsed minutes for both count and time goals.
         startMinuteAnnouncements()
         WKInterfaceDevice.current().play(.start)
         speak(text: localizedSessionStartedAnnouncement)
@@ -64,11 +60,7 @@ extension JumpRecState {
         )
     }
 
-    /// Applies synced settings edits to the active watch workout.
-    ///
-    /// iPhone can present settings while a mirrored Watch workout is running. Updating
-    /// these session fields lets a changed goal, muted cue, or detector threshold affect
-    /// the workout in progress without resetting HealthKit collection or jump history.
+    /// Applies synced settings without resetting HealthKit collection or jump history.
     func applyActiveSessionSettings(
         goalType: GoalType,
         goalCount: Int,
@@ -163,9 +155,7 @@ extension JumpRecState {
 
     /// Handles count-based milestones and goal completion.
     func checkJumpLandmark(before: Int, after: Int) {
-        // Only count-goal sessions should auto-finish from jump progress, but the
-        // 100-jump announcement should fire in both goal modes so watch feedback
-        // matches the phone experience.
+        // Count goals finish at the target; both goal types announce 100-jump milestones.
         if goalType == .count, jumpCount >= goal {
             end()
             return
@@ -177,8 +167,7 @@ extension JumpRecState {
 
     /// Announces each 100-jump landmark during count-based sessions.
     func handleHundredJumpsLandmark(jumpCount: Int) {
-        // A disabled count cue should be fully quiet on Watch as well as iPhone,
-        // so skip the haptic and spoken announcement together.
+        // Skip both haptics and speech when count cues are disabled.
         guard sessionShouldSpeakJumpCountAnnouncements else { return }
 
         WKInterfaceDevice.current().play(.success)
@@ -192,14 +181,12 @@ extension JumpRecState {
         minuteAnnouncementTask = Task { [weak self] in
             while !Task.isCancelled {
                 do {
-                    // Suspending avoids blocking the main actor and removes the need to
-                    // force-unwrap a timer before adding it to the watch run loop.
+                    // Sleep between minute cues without blocking the main actor.
                     try await Task.sleep(for: .seconds(60))
                 } catch is CancellationError {
                     return
                 } catch {
-                    // `Task.sleep` currently only throws for cancellation. Returning for
-                    // any future error keeps this repeating task from spinning rapidly.
+                    // Exit on sleep errors to avoid a rapid retry loop.
                     return
                 }
 
@@ -225,8 +212,7 @@ extension JumpRecState {
             return
         }
 
-        // Keep time-goal completion above active, but make the optional elapsed-minute
-        // cue fully silent when the user disables it.
+        // Skip disabled minute cues while retaining time-goal completion.
         guard sessionShouldSpeakJumpTimeAnnouncements else { return }
 
         speak(text: localizedMinuteAnnouncement(for: minutesElapsed))

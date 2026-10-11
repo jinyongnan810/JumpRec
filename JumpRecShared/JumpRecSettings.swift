@@ -31,10 +31,7 @@ public let MinimumJumpDetectorThresholdAdjustmentPercentage = -50.0
 /// Highest supported relative threshold adjustment for jump detection.
 public let MaximumJumpDetectorThresholdAdjustmentPercentage = 50.0
 
-/// Stores and synchronizes user-selected workout settings across devices.
-///
-/// Settings are observed directly by SwiftUI, so all reads and mutations are isolated to the
-/// main actor. This also gives notification callbacks a single, explicit synchronization point.
+/// Synchronizes workout settings across devices on the main actor.
 @MainActor
 @Observable
 public class JumpRecSettings {
@@ -75,10 +72,7 @@ public class JumpRecSettings {
         }
     }
 
-    /// Indicates whether compatible headphones should keep a session on iPhone instead of starting on Apple Watch.
-    ///
-    /// The default remains `false` to preserve the existing Watch-first behavior for current users.
-    /// Users who prefer headphone motion can opt into iPhone sessions from the settings sheet.
+    /// Prefers iPhone headphone tracking over Watch tracking when enabled; defaults to false.
     public var preferHeadphonesForIPhoneSessions: Bool {
         didSet {
             guard !isLoadingFromStore else { return }
@@ -87,10 +81,7 @@ public class JumpRecSettings {
         }
     }
 
-    /// Controls whether the app speaks jump-count milestones during a workout.
-    ///
-    /// This defaults to `true` for both new and existing installs so current audible
-    /// feedback behavior is preserved until the user explicitly turns it off.
+    /// Enables spoken jump milestones; defaults to true.
     public var shouldSpeakJumpCountAnnouncements: Bool {
         didSet {
             guard !isLoadingFromStore else { return }
@@ -99,10 +90,7 @@ public class JumpRecSettings {
         }
     }
 
-    /// Controls whether the app speaks elapsed-time milestones during a workout.
-    ///
-    /// Time-goal completion still works when this is disabled; only the spoken minute
-    /// cue is muted so the setting does not change workout lifecycle behavior.
+    /// Enables spoken minute cues without affecting time-goal completion.
     public var shouldSpeakJumpTimeAnnouncements: Bool {
         didSet {
             guard !isLoadingFromStore else { return }
@@ -111,11 +99,7 @@ public class JumpRecSettings {
         }
     }
 
-    /// Stores the relative sensitivity adjustment applied to the shared jump detector thresholds.
-    ///
-    /// This is intentionally a percentage instead of a raw acceleration value. Keeping settings
-    /// relative to each detector profile lets the app improve default calibration later without
-    /// migrating user data or exposing implementation details in the UI.
+    /// Adjusts sensitivity as a percentage of each detector profile's baseline threshold.
     public var jumpDetectorThresholdAdjustmentPercentage: Double {
         didSet {
             let clampedValue = Self.clampedJumpDetectorThresholdAdjustmentPercentage(jumpDetectorThresholdAdjustmentPercentage)
@@ -144,8 +128,7 @@ public class JumpRecSettings {
         }
     }
 
-    /// The number of qualified workouts completed (workouts with >= 100 jumps).
-    /// Synced between iPhone and Apple Watch so both devices know the current quota state.
+    /// Completed workouts with at least 100 jumps, synced between iPhone and Watch.
     public var qualifiedWorkoutCount: Int {
         didSet {
             guard !isLoadingFromStore else { return }
@@ -172,10 +155,7 @@ public class JumpRecSettings {
     // MARK: - Initialization
 
     #if DEBUG
-        /// Supplies a free-tier quota snapshot for Watch previews without reading or writing iCloud.
-        /// The Watch uses synced settings for quota checks rather than querying workout history.
-        /// Keeping write-back suppressed and omitting sync observers isolates canvas interactions
-        /// from real settings and prevents incoming sync updates from replacing the sample quota.
+        /// Provides a Watch preview quota with iCloud reads, writes, and sync observers disabled.
         public init(previewQualifiedWorkoutCount: Int) {
             isLoadingFromStore = true
             goalType = .count
@@ -209,8 +189,7 @@ public class JumpRecSettings {
             object: store,
             queue: .main
         ) { [weak self] _ in
-            // NotificationCenter's closure is Sendable even when delivery uses the main queue.
-            // An explicit task communicates the actor hop to Swift's concurrency checker.
+            // Notification callbacks are Sendable, so settings updates require a main-actor hop.
             Task { @MainActor [weak self] in
                 self?.loadSettings()
             }

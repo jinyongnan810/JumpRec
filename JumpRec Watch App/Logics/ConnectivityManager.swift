@@ -44,11 +44,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         parseSettingsPayload(session.receivedApplicationContext)
     }
 
-    /// Sends CSV text to iPhone via transferFile. Falls back to transferUserInfo if file creation fails.
-    /// - Parameters:
-    ///   - csvText: The CSV content as string
-    ///   - filename: The filename for the CSV file
-    /// Transfers a CSV export to the iPhone companion app.
+    /// Transfers CSV to iPhone as a file, falling back to user info if file creation fails.
     func sendCSV(_ csvText: String, filename: String) {
         guard session.isReachable else {
             print("[WatchConnectivityManager] Session not reachable or not paired")

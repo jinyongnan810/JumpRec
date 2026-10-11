@@ -7,10 +7,7 @@ import AppIntents
 import Foundation
 import SwiftData
 
-/// An App Entity representing aggregated workout statistics (all-time or for a specific year) in JumpRec.
-///
-/// Enables Siri, Shortcuts, and Apple Intelligence to inspect aggregated workout metrics such as
-/// total jumps, total session count, and calories burned for all time or a specific calendar year.
+/// All-time or yearly workout totals exposed to Siri, Shortcuts, and Apple Intelligence.
 public struct WorkoutStatsEntity: AppEntity, Identifiable, Sendable {
     /// Localized display representation for the entity type in Shortcuts.
     public static let typeDisplayRepresentation: TypeDisplayRepresentation = "Workout Statistics"
@@ -66,7 +63,7 @@ public struct WorkoutStatsEntity: AppEntity, Identifiable, Sendable {
     }
 }
 
-/// Query implementation allowing Shortcuts to resolve workout statistics entities.
+/// Resolves workout statistics for Shortcuts.
 public struct WorkoutStatsQuery: EntityQuery, Sendable {
     public init() {}
 

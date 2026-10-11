@@ -13,9 +13,7 @@ import Foundation
     public nonisolated struct JumpRecLiveActivityAttributes {
         /// Defines the live-updating content for the activity.
         public struct ContentState: Codable, Hashable {
-            /// Current goal text, updated when settings change during a workout.
-            /// Optional for decoding activities created by an older app version;
-            /// those activities fall back to the original static attribute.
+            /// Current goal text; older activities fall back to the static goal when absent.
             public var goalSummary: String?
             /// The current jump count.
             public var jumpCount: Int
@@ -48,8 +46,7 @@ import Foundation
 
         /// The time when the session started.
         public var startedAt: Date
-        /// Initial goal retained as a decoding/display fallback for older activities.
-        /// New updates carry the current goal in ContentState.
+        /// Initial goal used when ContentState has no goal text.
         public var goalSummary: String
 
         /// Creates the static attributes for a live activity.
@@ -59,8 +56,7 @@ import Foundation
         }
     }
 
-    // Declaring the conformance separately keeps this immutable payload nonisolated even in app
-    // targets that use main-actor isolation by default.
+    // Separate conformance keeps the payload nonisolated in main-actor-default targets.
     @available(iOS 18.0, *)
     nonisolated extension JumpRecLiveActivityAttributes: ActivityAttributes {}
 #endif

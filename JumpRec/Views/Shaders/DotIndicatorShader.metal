@@ -13,7 +13,7 @@ using namespace metal;
 
     half3 baseColor = color.rgb;
 
-    // Subtle life, but not too "animated".
+    // Subtle pulse and shimmer.
     float pulse = 0.96 + 0.04 * sin(time * 2.2);
     float shimmer = 0.94 + 0.06 * sin(time * 7.0 + rotatedAngle * 6.0 + r * 24.0);
 
@@ -26,8 +26,7 @@ using namespace metal;
     // Wider soft halo.
     float halo = exp(-pow(r / 0.16, 2.0) * 1.15);
 
-    // Rays from angular lobes instead of explicit line primitives.
-    // Major rays: horizontal + vertical
+    // Angular lobes form the horizontal and vertical rays.
     float majorAngular = pow(abs(cos(rotatedAngle * 2.0)), 34.0);
 
     // Minor rays: diagonals, dimmer and thinner
@@ -45,9 +44,7 @@ using namespace metal;
     float brightness = core * 1.35 + innerGlow * 0.75 + halo * 0.22 + rays * 0.95;
     brightness = clamp(brightness, 0.0, 1.0);
 
-    // Color treatment:
-    // - keep your tint in the body
-    // - push center/rays toward warm white
+    // Tint the glow and blend the center and rays toward warm white.
     half3 warmWhite = half3(1.0, 0.96, 0.90);
 
     half3 rgb = baseColor * half(innerGlow * 0.95 + halo * 0.35);
@@ -55,7 +52,7 @@ using namespace metal;
     rgb = mix(rgb, half3(1.0), half(clamp(core * 0.9, 0.0, 1.0)));
     rgb = clamp(rgb, half3(0.0), half3(1.0));
 
-    // Keep outer halo faint so it feels luminous, not foggy.
+    // Keep the outer halo faint.
     float alpha = core * 0.95 + innerGlow * 0.42 + halo * 0.12 + rays * 0.55;
     alpha = clamp(alpha, 0.0, 1.0) * color.a;
 

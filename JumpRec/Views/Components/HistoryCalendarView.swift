@@ -59,11 +59,7 @@ struct HistoryCalendarView: View {
         return day > todayDay
     }
 
-    /// The day-of-week headers shown above the grid.
-    /// The calendar grid is fixed with Sunday at column 0. For Japanese locales,
-    /// we display single-kanji abbreviations ("日", "月", "火", "水", "木", "金", "土")
-    /// to follow standard Japanese calendar conventions. Other locales use 2-letter uppercase
-    /// English abbreviations ("SU", "MO", etc.) to avoid single-letter ambiguity (e.g. S for Sun/Sat).
+    /// Sunday-first headers: single kanji for Japanese, two-letter English abbreviations otherwise.
     private var dayHeaders: [String] {
         if isJapaneseLocale {
             return ["日", "月", "火", "水", "木", "金", "土"]
@@ -71,9 +67,7 @@ struct HistoryCalendarView: View {
         return ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]
     }
 
-    /// Indicates whether the active locale corresponds to Japanese.
-    /// Uses languageCode identifier rather than exact locale string to match
-    /// any Japanese variant (such as "ja", "ja_JP", or "ja-US").
+    /// Matches Japanese language variants by language code.
     private var isJapaneseLocale: Bool {
         locale.language.languageCode?.identifier == "ja"
     }
@@ -189,8 +183,7 @@ struct HistoryCalendarView: View {
         return formatter.string(from: displayedMonth)
     }
 
-    /// Returns the full weekday name for accessibility (e.g. "Sunday" or "日曜日") so screen readers
-    /// do not read abbreviated letters or standalone kanji ambiguously.
+    /// Full weekday name for VoiceOver instead of an ambiguous abbreviation.
     private func weekdayAccessibilityLabel(at index: Int, fallback: String) -> String {
         var localizedCalendar = calendar
         localizedCalendar.locale = locale
@@ -318,17 +311,14 @@ private struct HistoryCalendarDayCellView: View {
 
 // MARK: - Preview
 
-/// Interactive container that allows toggling and navigating months in Xcode Previews.
-/// This allows validating swipe gestures, month transitions, today highlights,
-/// badge formatting (<1k vs >=1k), and empty day cell alignments.
+/// Interactive calendar preview with month navigation and sample jump counts.
 private struct HistoryCalendarInteractivePreview: View {
     @State private var displayedMonth = Date()
 
     /// The calendar used for date calculations.
     private var calendar: Calendar { Calendar.current }
 
-    /// Returns sample jump counts for the displayed month to showcase various visual states:
-    /// standard counts (< 1K), formatted counts (>= 1K), and days with or without sessions.
+    /// Sample days with empty, below-1K, and 1K-or-higher counts.
     private var sampleJumpsByDay: [Int: Int] {
         let now = Date()
         let isCurrentMonth = calendar.isDate(displayedMonth, equalTo: now, toGranularity: .month)

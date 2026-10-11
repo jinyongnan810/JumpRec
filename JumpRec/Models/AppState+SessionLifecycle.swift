@@ -9,11 +9,7 @@ import UIKit
 extension JumpRecState {
     // MARK: - Session Lifecycle
 
-    /// Starts a session locally or requests a mirrored watch session when available.
-    ///
-    /// `preferLocalHeadphonesOverWatch` is intentionally evaluated by the caller because only the UI layer
-    /// knows whether compatible headphones are currently available and whether the user enabled that preference.
-    /// The remaining preferences seed session state at start and can later be refreshed by in-session settings edits.
+    /// Starts locally or on Watch; the caller resolves headphone availability and preference.
     func start(
         goalType: GoalType,
         goalValue: Int,
@@ -25,8 +21,7 @@ extension JumpRecState {
         cancelPendingSpeech()
         let generation = beginSessionAttempt()
 
-        // Enter a transient starting state immediately so the home screen can
-        // block duplicate taps while the watch companion workout request is in flight.
+        // Enter the starting state to block duplicate requests during the Watch handshake.
         sessionGoalType = goalType
         sessionGoalValue = goalValue
         sessionShouldSpeakJumpCountAnnouncements = shouldSpeakJumpCountAnnouncements
@@ -60,8 +55,7 @@ extension JumpRecState {
                         return
                     }
 
-                    // If watch startup fails, fall back to an iPhone-tracked session
-                    // only when this request still owns the current starting state.
+                    // Fall back to local tracking only if this request still owns startup.
                     pendingMirroredStart = false
                     startLocalSession(
                         goalType: goalType,
@@ -82,12 +76,7 @@ extension JumpRecState {
         )
     }
 
-    /// Applies settings edits to the workout that is already on screen.
-    ///
-    /// The start flow still captures a snapshot so startup is deterministic, but the active-session
-    /// settings sheet intentionally lets users correct a goal, mute cues, or tune detection without
-    /// stopping the workout. Mirrored Watch sessions update the phone UI immediately while the Watch
-    /// receives the same settings through WatchConnectivity and remains the authority for ending.
+    /// Applies live settings; Watch remains responsible for ending mirrored workouts.
     func applyActiveSessionSettings(
         goalType: GoalType,
         goalValue: Int,
@@ -110,11 +99,7 @@ extension JumpRecState {
         syncLiveActivity()
     }
 
-    /// Finishes the active session and persists its results.
-    ///
-    /// For local sessions, this stops local motion tracking and saves to HealthKit/DataStore.
-    /// For mirrored Watch sessions, this sends a remote stop command to the Apple Watch,
-    /// which then finishes its workout and transfers the finalized session back to iPhone.
+    /// Saves local results, or requests Watch to finish and return mirrored results.
     func finish() {
         guard sessionState == .active, let startTime else { return }
 
@@ -133,13 +118,10 @@ extension JumpRecState {
         if let endTime {
             let precedingWorkoutTask = phoneWorkoutLifecycleTask
             phoneWorkoutLifecycleTask = Task { [phoneWorkoutManager] in
-                // Ending must wait for an in-flight HealthKit start. Otherwise a late start
-                // could create a workout after the finish request has already done nothing.
+                // Wait for HealthKit startup before ending so a late start cannot leave a workout running.
                 await precedingWorkoutTask?.value
 
-                // Once the user has completed a local session, saving it is durable work. Do not
-                // depend on completion-screen state here because tapping Done may reset the UI
-                // before HealthKit has finished creating the workout sample.
+                // Finish saving even if Done resets the completion screen first.
                 await phoneWorkoutManager.endWorkout(at: endTime)
             }
         }
@@ -178,8 +160,7 @@ extension JumpRecState {
         cancelMinuteAnnouncements()
         motionManager?.stopTracking()
 
-        // A completed local workout may still be finalizing asynchronously after the summary appears.
-        // Preserve that operation when the user taps Done; only active or abandoned sessions discard.
+        // Preserve completed-workout finalization when Done resets the UI.
         if !shouldFinishSavingCompletedWorkout {
             phoneWorkoutManager.discardWorkout()
         }
@@ -249,9 +230,7 @@ extension JumpRecState {
         pendingMirroredStart = false
         sessionState = .active
         motionManager?.startTracking(thresholdAdjustmentPercentage: thresholdAdjustmentPercentage)
-        // Start minute announcements for every session so users hear elapsed time
-        // even when the selected goal is jump-based. Goal completion still remains
-        // controlled by `isGoalReached(referenceDate:)`.
+        // Announce elapsed minutes for both goal types; goal completion is checked separately.
         startMinuteAnnouncements()
         syncIdleTimer()
         notificationFeedbackGenerator.notificationOccurred(.success)
@@ -263,8 +242,7 @@ extension JumpRecState {
             } catch {
                 guard let self else { return }
                 if Task.isCancelled || sessionGeneration != generation {
-                    // The framework may have created partial workout state before failing.
-                    // Discard it when the operation no longer belongs to the active session.
+                    // Discard partial HealthKit state when this operation no longer owns the session.
                     phoneWorkoutManager.discardWorkout()
                     return
                 }
@@ -279,8 +257,7 @@ extension JumpRecState {
                   sessionState == .active,
                   !isMirroredWatchSession
             else {
-                // Cancellation cannot guarantee that HealthKit stopped an operation already
-                // handed to the framework. Explicitly discard any workout created by a stale start.
+                // Discard workouts from stale starts; cancellation cannot stop an in-flight HealthKit call.
                 phoneWorkoutManager.discardWorkout()
                 return
             }
@@ -320,9 +297,7 @@ extension JumpRecState {
     func checkFeedbackLandmarks() {
         guard !isMirroredWatchSession else { return }
 
-        // Count landmarks are useful progress cues regardless of whether the user
-        // is chasing a jump target or a time target. When the user disables this
-        // cue, skip both speech and haptics so the milestone stays fully silent.
+        // Announce count milestones for both goal types; disabling cues also skips haptics.
         guard sessionShouldSpeakJumpCountAnnouncements else { return }
 
         if jumpCount > 0, jumpCount.isMultiple(of: 100) {
@@ -338,14 +313,12 @@ extension JumpRecState {
         minuteAnnouncementTask = Task { [weak self] in
             while !Task.isCancelled {
                 do {
-                    // Suspending avoids blocking the main thread while preserving the
-                    // same one-minute cadence as the former run-loop timer.
+                    // Sleep without blocking the main actor between minute cues.
                     try await Task.sleep(for: .seconds(60))
                 } catch is CancellationError {
                     return
                 } catch {
-                    // `Task.sleep` currently only throws for cancellation. Returning for
-                    // any future error keeps this repeating task from spinning rapidly.
+                    // Exit on sleep errors to avoid a rapid retry loop.
                     return
                 }
 
@@ -361,11 +334,7 @@ extension JumpRecState {
         minuteAnnouncementTask = nil
     }
 
-    /// Announces each elapsed minute.
-    ///
-    /// Time-goal sessions still end from this callback once the configured duration
-    /// has been met. Count-goal sessions keep running and only use this path for
-    /// spoken progress so the user hears both time and jump milestones.
+    /// Announces elapsed minutes and finishes time-goal sessions when their duration is reached.
     private func handleMinuteLandmark() {
         guard sessionState == .active, !isMirroredWatchSession, let startTime else {
             return
@@ -379,8 +348,7 @@ extension JumpRecState {
             return
         }
 
-        // Time-goal completion above still runs when this cue is disabled. Only the
-        // optional minute feedback is skipped, including the haptic pulse.
+        // Skip speech and haptics when minute cues are disabled; goal completion still runs.
         guard sessionShouldSpeakJumpTimeAnnouncements else { return }
 
         notificationFeedbackGenerator.notificationOccurred(.success)

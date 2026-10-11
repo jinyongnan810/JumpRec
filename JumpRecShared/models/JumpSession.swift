@@ -8,9 +8,7 @@
 import Foundation
 import SwiftData
 
-/// Represents a single jump rope session with summary statistics.
-/// This model stores the high-level metadata and calculated metrics for a workout session.
-/// Detailed time-series data is stored in one lazily loaded `SessionRateSeries` blob.
+/// Workout summary with a separately loaded chart series.
 @Model
 public final class JumpSession {
     /// Unique identifier for the session
@@ -59,27 +57,13 @@ public final class JumpSession {
     @Relationship(deleteRule: .cascade, inverse: \SessionRateSeries.session)
     public var rateSeries: SessionRateSeries?
 
-    /// These caches belong to a fetched model instance, not the persistent schema.
-    /// Comparing the payload detects replacement and late CloudKit arrival, so an
-    /// initially missing series does not leave a detail screen permanently empty.
+    /// Instance-only caches invalidate when the payload changes or arrives through CloudKit.
     @Transient private var cachedRatePayload: Data?
     @Transient private var cachedRateSamples: [RateSamplePoint]?
     @Transient private var cachedAnalyticsSamples: [RateSamplePoint]?
     @Transient private var cachedRhythmConsistency: Double?
 
-    /// Initializes a new jump rope session with summary statistics
-    /// - Parameters:
-    ///   - startedAt: Session start time
-    ///   - endedAt: Session end time
-    ///   - jumpCount: Total jumps completed
-    ///   - peakRate: Highest jump rate achieved (jumps per minute)
-    ///   - averageRate: Average jump rate achieved (jumps per minute)
-    ///   - caloriesBurned: Estimated calories burned
-    ///   - smallBreaksCount: Number of small breaks (defaults to 0)
-    ///   - longBreaksCount: Number of long breaks (defaults to 0)
-    ///   - longestStreak: Longest uninterrupted jump streak (defaults to 0)
-    ///   - averageHeartRate: Average heart rate in bpm
-    ///   - peakHeartRate: Peak heart rate in bpm
+    /// Creates a workout summary with rates in jumps per minute and heart rates in bpm.
     public init(
         startedAt: Date,
         endedAt: Date,
@@ -112,9 +96,7 @@ public final class JumpSession {
 }
 
 public extension JumpSession {
-    /// Groups derived workout analytics that are calculated from saved session data.
-    /// Keeping these values together ensures every UI surface reads the same interpretation
-    /// of the underlying session instead of reimplementing the formulas independently.
+    /// Derived workout metrics shared by session summaries.
     struct DerivedMetrics: Sendable {
         /// A normalized `0...1` score that reflects how steady the user's pace was.
         public let rhythmConsistency: Double?
@@ -139,10 +121,7 @@ public extension JumpSession {
         "\(Int(caloriesBurned.rounded()))"
     }
 
-    /// Decodes the persisted chart payload when detail surfaces need the full rate series.
-    ///
-    /// This property intentionally performs work only when called. List views should keep using the
-    /// scalar summary fields on `JumpSession` so they do not accidentally fault and decode chart data.
+    /// Decodes chart samples on access; list views should use scalar summary fields.
     var decodedRateSamples: [RateSamplePoint] {
         let payload = rateSeries?.payload
         if let cachedRateSamples, cachedRatePayload == payload {
@@ -154,11 +133,7 @@ public extension JumpSession {
         return samples
     }
 
-    /// Encodes a rate sample series for persistence in `SessionRateSeries`.
-    ///
-    /// The method centralizes the payload format so saves, previews, and migrations all write the
-    /// same representation. Encoding failures are unlikely for this simple Codable payload, but the
-    /// optional return keeps save flows explicit about dropping corrupt or unsupported data.
+    /// Encodes rate samples for storage; returns nil if encoding fails.
     static func encodeRateSamples(_ samples: [RateSamplePoint]) -> Data? {
         do {
             return try JSONEncoder().encode(samples)
@@ -168,10 +143,7 @@ public extension JumpSession {
         }
     }
 
-    /// Safely decodes a rate sample payload.
-    ///
-    /// Corrupt payloads, missing blobs, and future incompatible formats all resolve to an empty
-    /// series so chart and analytics views can degrade gracefully instead of crashing.
+    /// Decodes rate samples, returning an empty series for missing or unreadable data.
     static func decodeRateSamples(from payload: Data?) -> [RateSamplePoint] {
         guard let payload else { return [] }
 
@@ -183,11 +155,7 @@ public extension JumpSession {
         }
     }
 
-    /// Attaches encoded rate samples to this session.
-    ///
-    /// This helper is used by save flows, previews, and migration code to keep the one-to-one model
-    /// consistent. Empty series still create metadata with a zero count only when callers explicitly
-    /// choose to persist them.
+    /// Attaches an encoded series and its sample-count metadata to this session.
     func replaceRateSamples(with samples: [RateSamplePoint]) {
         let encodedPayload = Self.encodeRateSamples(samples)
         let series = rateSeries ?? SessionRateSeries(session: self)
@@ -198,12 +166,10 @@ public extension JumpSession {
         rateSeries = series
     }
 
-    /// Returns the derived analytics used by detailed session summaries.
-    /// Rate samples are expected to be in ascending `secondOffset` order when provided.
+    /// Calculates session analytics from samples in ascending secondOffset order.
     func derivedMetrics(rateSamples: [RateSamplePoint]? = nil) -> DerivedMetrics {
         let resolvedRateSamples = rateSamples ?? decodedRateSamples
-        // Rhythm depends only on the series. Scalar calorie edits still recompute
-        // the cheap efficiency value without rescanning or decoding the rate samples.
+        // Calorie edits recompute efficiency without decoding or rescanning the rate series.
         if cachedAnalyticsSamples != resolvedRateSamples {
             cachedRhythmConsistency = SessionMetricsCalculator.rhythmConsistencyScore(from: resolvedRateSamples)
             cachedAnalyticsSamples = resolvedRateSamples

@@ -98,8 +98,7 @@ public enum PersonalRecordComparison: String, Codable, Sendable {
     }
 }
 
-/// Cached personal-record rows updated when a session is saved.
-/// Display metadata is derived from the record kind so UI labels and icons stay consistent.
+/// Cached personal records with labels and icons derived from their kind.
 @Model
 public final class PersonalRecord {
     // MARK: - Stored Properties

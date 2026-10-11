@@ -36,11 +36,7 @@ private struct StaggeredAppearanceModifier: ViewModifier {
 }
 
 public extension View {
-    /// Adds an ordered fade-and-rise entrance animation using the view's sequence position.
-    ///
-    /// - Parameters:
-    ///   - isVisible: Set to `true` to reveal the view using the staggered animation.
-    ///   - index: The zero-based position used to calculate the view's entrance delay.
+    /// Adds a fade-and-rise entrance; index sets the delay and isVisible triggers the reveal.
     func staggeredAppearance(isVisible: Bool, index: Int) -> some View {
         modifier(StaggeredAppearanceModifier(isVisible: isVisible, index: index))
     }

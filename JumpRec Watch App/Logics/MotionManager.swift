@@ -34,8 +34,7 @@ class MotionManager: NSObject {
 
     // MARK: - Detection
 
-    // The watch runs at a higher sample rate than the phone path because impact-style jump signals are brief.
-    /// Defines the motion sample interval used by the watch detector.
+    /// Watch sample interval captures brief acceleration impacts.
     private var updateInterval: TimeInterval = 0.025 // 40Hz sampling rate when supported
     /// Shared jump detector configured for watch motion data.
     private let jumpDetector = JumpDetector(profile: .watch)
@@ -55,10 +54,7 @@ class MotionManager: NSObject {
 
     /// Sets up Core Motion update intervals and processing queue configuration.
     private func setupMotionManager() {
-        // Device motion provides fused user acceleration and gyro data in one stream at 40Hz,
-        // which provides the required userAcceleration.y input for the watch jump detector profile.
-        // Magnetometer calibration (showsDeviceMovementDisplay) is omitted to prevent unnecessary
-        // sensor wakeups and compass calibration prompts during workouts.
+        // Sample fused motion at 40 Hz without magnetometer calibration prompts.
         motionManager.deviceMotionUpdateInterval = updateInterval
 
         // Set up operation queue
@@ -68,8 +64,7 @@ class MotionManager: NSObject {
 
     // MARK: - Public Methods
 
-    /// Start motion tracking and jump detection.
-    /// - Parameter thresholdAdjustmentPercentage: Relative sensitivity tuning applied to the watch detector profile.
+    /// Starts Watch motion tracking with a relative sensitivity adjustment.
     func startTracking(
         startDate: Date,
         goalType: GoalType,
@@ -83,8 +78,7 @@ class MotionManager: NSObject {
 
         workoutManager.startWorkout(startDate: startDate, goalType: goalType, goalValue: goalValue)
 
-        // Apply the current tuning before `resetSession()` so the detector starts
-        // the workout with the same setting shown by the current settings state.
+        // Apply sensitivity before resetting the detector for the new workout.
         updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
         resetSession()
         isTracking = true
@@ -97,10 +91,7 @@ class MotionManager: NSObject {
         }
     }
 
-    /// Updates detector sensitivity for future samples without clearing current workout progress.
-    ///
-    /// The settings sheet can change this while a workout is running. Updating only the
-    /// threshold keeps the existing jump count, CSV rows, and refractory timing intact.
+    /// Changes sensitivity without clearing jump counts, CSV samples, or refractory timing.
     func updateThresholdAdjustmentPercentage(_ percentage: Double) {
         jumpDetector.updateThresholdAdjustmentPercentage(percentage)
     }
@@ -146,7 +137,7 @@ class MotionManager: NSObject {
             timestamp: motion.timestamp
         )
 
-        // The detector returns a boolean event instead of a score so the watch UI can stay simple and update live.
+        // Each accepted sample reports one jump to app state.
         if jumpDetector.processMotionSample(sample) {
             addJump(1)
         }

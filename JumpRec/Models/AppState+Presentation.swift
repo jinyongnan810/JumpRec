@@ -10,12 +10,7 @@ import UIKit
 extension JumpRecState {
     // MARK: - Live Activity And Idle Timer
 
-    /// Starts, updates, or ends the live activity to match session state.
-    ///
-    /// Every operation waits for the previous ActivityKit call before proceeding. Metric
-    /// updates cancel the superseded task, so rapid jump events collapse to the newest
-    /// snapshot while an update already accepted by ActivityKit is still allowed to finish.
-    /// Terminal operations use the same chain, ensuring stale content cannot run after end.
+    /// Serializes ActivityKit calls, coalesces metric updates, and orders end after pending updates.
     func syncLiveActivity() {
         let previousTask = liveActivitySyncTask
         previousTask?.cancel()
@@ -31,8 +26,7 @@ extension JumpRecState {
         if sessionState == .complete {
             guard let endedAt = endTime else { return }
 
-            // Capture final values before suspension so later reset work cannot alter the
-            // content that belongs to the completed session.
+            // Capture final metrics before suspension so reset cannot alter the completed session.
             let startedAt = startTime
             let goalSummary = liveActivityGoalSummary
             let finalJumpCount = jumpCount
@@ -57,8 +51,7 @@ extension JumpRecState {
 
         guard let startedAt = startTime else { return }
 
-        // Snapshot observable state on the main actor. The task may wait behind an in-flight
-        // update, and reading these properties later could mix values from another session.
+        // Snapshot metrics before waiting to avoid reading values from a later session.
         let goalSummary = liveActivityGoalSummary
         let latestJumpCount = jumpCount
         let latestCaloriesBurned = caloriesBurned
@@ -178,12 +171,7 @@ extension JumpRecState {
 
     // MARK: - Audio And Haptics
 
-    /// Configures the app's speech audio session immediately before an announcement.
-    ///
-    /// The app intentionally avoids activating this session during launch because
-    /// `.duckOthers` lowers Apple Music and other background audio as soon as the
-    /// session becomes active. Deferring activation until speech starts preserves
-    /// the user's listening volume while the app is merely open on screen.
+    /// Activates the ducking audio session only when an announcement is about to play.
     private func configureSpeechAudioSession() {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
@@ -193,10 +181,7 @@ extension JumpRecState {
         }
     }
 
-    /// Releases the app's speech audio session once announcements are finished.
-    ///
-    /// `notifyOthersOnDeactivation` tells iOS that any ducked background audio can
-    /// return to its normal level immediately after JumpRec stops speaking.
+    /// Deactivates speech audio and restores background-audio volume.
     private func deactivateSpeechAudioSession() {
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
@@ -210,18 +195,7 @@ extension JumpRecState {
         notificationFeedbackGenerator.prepare()
     }
 
-    /// Primes `AVSpeechSynthesizer` with a silent utterance so the first real prompt starts quickly.
-    ///
-    /// Commit `2716b99` removed the old warmup when speech audio activation was deferred
-    /// until announcement time. That preserved background-audio volume, but it also
-    /// reintroduced the sluggish first spoken prompt because the synthesizer had to do
-    /// its one-time voice setup on the first user-visible utterance. This method restores
-    /// the warmup while keeping the newer audio-session behavior: we briefly activate the
-    /// speech session, speak a zero-volume utterance, and rely on the delegate cleanup to
-    /// release the session immediately afterward.
-    ///
-    /// The method is intentionally idempotent because SwiftUI may call `onAppear` more
-    /// than once across the app's lifecycle.
+    /// Warms up speech once with a silent utterance; delegate cleanup releases the audio session.
     func warmUpSpeechSynthesizerIfNeeded() {
         guard !hasWarmedUpSpeechSynthesizer else { return }
 
@@ -263,8 +237,7 @@ extension JumpRecState {
 
             pendingSpeechTask = nil
 
-            // If the user acts before the silent warmup completes, discard it so the
-            // real announcement is not queued behind invisible setup work.
+            // Cancel the silent warmup so real speech can play immediately.
             if isSpeechWarmupInProgress {
                 synthesizer.stopSpeaking(at: .immediate)
                 isSpeechWarmupInProgress = false
@@ -321,10 +294,7 @@ extension JumpRecState {
 }
 
 extension JumpRecState: AVSpeechSynthesizerDelegate {
-    /// Releases the ducking audio session after the last queued announcement ends.
-    ///
-    /// The delegate callback is not main-actor isolated, so the audio-session
-    /// cleanup hops back to the main actor before touching app state helpers.
+    /// Releases ducking audio on the main actor after the last announcement ends.
     nonisolated func speechSynthesizer(_: AVSpeechSynthesizer, didFinish _: AVSpeechUtterance) {
         Task { @MainActor in
             self.isSpeechWarmupInProgress = false

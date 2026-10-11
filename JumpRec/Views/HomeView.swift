@@ -60,11 +60,7 @@ struct HomeView: View {
         countdownValue != nil
     }
 
-    /// Returns whether the app is waiting for a session-start request to finish.
-    ///
-    /// This is primarily used when the iPhone asks the Apple Watch to start a
-    /// mirrored workout, because that handshake can take long enough that users
-    /// may tap the button repeatedly unless the UI clearly reflects the pending state.
+    /// Indicates a pending start request, including the Watch handshake.
     private var isStartingSession: Bool {
         appState.sessionState == .starting
     }
@@ -180,8 +176,7 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
-                // Scrolling preserves access to the stop control on small screens and
-                // at accessibility sizes; the minimum height keeps the usual ring placement.
+                // Allow scrolling to reach Stop on small screens and at accessibility text sizes.
                 ScrollView {
                     VStack(spacing: 0) {
                         // Fixed top spacer clamps Hero Ring at a constant offset from top navigation bar
@@ -276,9 +271,7 @@ struct HomeView: View {
 
     // MARK: - Private Subviews
 
-    /// Returns whether the user is permitted to start a new workout.
-    /// Unlimited workouts are available if the user has completed fewer than 100
-    /// qualified sessions or has unlocked the one-time license.
+    /// Allows starting with an unlimited license or fewer than 100 qualifying workouts.
     private var canStartWorkout: Bool {
         dataStore.canStartNewWorkout(isLicenseUnlocked: purchaseManager.hasUnlockedUnlimitedWorkouts)
     }
@@ -295,8 +288,7 @@ struct HomeView: View {
             Text(primaryButtonTitle)
                 .font(AppFonts.primaryButtonLabel)
                 .foregroundStyle(primaryButtonTextColor)
-                // Accessibility fonts and longer translations need more than one
-                // line. Let the button grow vertically within the scrolling Home.
+                // Allow wrapping for larger fonts and longer translations.
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.vertical, 14)
@@ -329,16 +321,13 @@ struct HomeView: View {
     private func startWithCountdown() {
         guard !isCountingDown, !isStartingSession else { return }
 
-        // Both the hero ring and the start button enter through this helper. Check the
-        // saved workout quota here so neither control can bypass the free-tier limit.
-        // Cancellation remains available because it does not enter this start path.
+        // Check quota for both ring and button start actions.
         guard canStartWorkout else {
             showPaywall = true
             return
         }
 
-        // SwiftUI actions and countdown state stay on the main actor. Cancellation
-        // exits immediately at each suspension rather than being swallowed by try?.
+        // Keep countdown state on the main actor and honor cancellation at each suspension.
         countdownTask = Task { @MainActor in
             withAnimation(.easeInOut(duration: 0.35)) {
                 countdownValue = 3
@@ -378,8 +367,7 @@ struct HomeView: View {
     }
 }
 
-/// Owns live goal progress independently of Home's navigation and presentation state.
-/// Count goals have no timer; only a time goal schedules one-second ring updates.
+/// Live goal ring; only time goals schedule one-second updates.
 private struct ActiveWorkoutRing: View {
     let appState: JumpRecState
     let settings: JumpRecSettings
@@ -419,8 +407,7 @@ private struct ActiveWorkoutRingContent: View {
     }
 }
 
-/// Reads live stats in their own boundary. The elapsed label uses system timer text
-/// so seconds don't invalidate either the controls or the Home screen.
+/// Live metrics with system timer text to keep second updates local to the label.
 private struct ActiveWorkoutControls: View {
     let appState: JumpRecState
     let settings: JumpRecSettings

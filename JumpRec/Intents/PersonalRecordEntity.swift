@@ -7,10 +7,7 @@ import AppIntents
 import Foundation
 import SwiftData
 
-/// An App Entity representing a personal record milestone in JumpRec for Siri and Shortcuts.
-///
-/// Exposes records such as highest jump count, longest streak, best jump rate, and longest workout
-/// so users can ask Siri about their records or use them in automated shortcuts.
+/// Personal record exposed to Siri and Shortcuts.
 public struct PersonalRecordEntity: AppEntity, Identifiable, Sendable {
     /// Localized display representation for the entity type in Shortcuts and Siri interfaces.
     public static let typeDisplayRepresentation: TypeDisplayRepresentation = "Personal Record"
@@ -66,7 +63,7 @@ public struct PersonalRecordEntity: AppEntity, Identifiable, Sendable {
     }
 }
 
-/// Entity query implementation allowing Siri and Shortcuts to inspect personal records.
+/// Resolves personal records for Siri and Shortcuts.
 public struct PersonalRecordQuery: EntityQuery, Sendable {
     public init() {}
 

@@ -28,12 +28,7 @@ final class MotionManager: NSObject {
     private let phoneMotionManager = CMMotionManager()
     /// Reads motion data from supported headphones.
     private let headphoneMotionManager = CMHeadphoneMotionManager()
-    /// Monitors compatible headphone connection status outside of an active motion session.
-    ///
-    /// Apple documents `CMHeadphoneActivityManager.Status.connected` as "A compatible set of headphones is connected."
-    /// Apple also documents that `startStatusUpdates` immediately delivers `.connected` when supported headphones
-    /// were already connected before monitoring started. That makes this manager the most reliable way to decide
-    /// whether the home screen should show headphones as available before the first motion sample arrives.
+    /// Reports compatible headphone connections before motion tracking starts.
     private let headphoneActivityManager = CMHeadphoneActivityManager()
     /// Serializes motion processing work off the main thread.
     private let queue = OperationQueue()
@@ -42,9 +37,7 @@ final class MotionManager: NSObject {
 
     // MARK: - Detection
 
-    // The app keeps separate detector instances because iPhone-in-pocket motion and headphone motion
-    // have different signal characteristics and should not share internal state.
-    /// Detects jumps from iPhone motion samples.
+    /// Separate phone and headphone detectors keep motion histories independent.
     private let phoneDetector = JumpDetector(profile: .iPhonePocket)
     /// Detects jumps from headphone motion samples.
     private let headphoneDetector = JumpDetector(profile: .headphones)
@@ -66,12 +59,7 @@ final class MotionManager: NSObject {
 
     /// Remembers the last published preferred source to avoid duplicate updates.
     private var lastPreferredSource: Source?
-    /// Tracks whether Core Motion has confirmed a motion-capable headphone connection.
-    ///
-    /// This is intentionally stricter than "some headphones are connected." The device selector should only
-    /// present a headphone model as usable after Core Motion reports a compatible connection or delivers live
-    /// motion samples. Audio route information alone is too broad because many regular Bluetooth headphones
-    /// appear there even though they never provide motion data.
+    /// Headphone motion support confirmed by Core Motion, not by the audio route alone.
     private var isHeadphoneConnected = false
     /// Stores the latest route name for the connected headphones so the UI can show a real product name.
     private var connectedHeadphoneName: String?
@@ -116,9 +104,7 @@ final class MotionManager: NSObject {
         headphoneMotionManager.stopDeviceMotionUpdates()
         headphoneMotionManager.stopConnectionStatusUpdates()
         headphoneMotionManager.delegate = nil
-        // Core Motion may already have enqueued sample or status callbacks when teardown begins.
-        // Cancelling the serial queue prevents stale work from touching this manager after its
-        // system observers and delegates have been disconnected.
+        // Cancel queued Core Motion callbacks before disconnecting observers and delegates.
         queue.cancelAllOperations()
     }
 
@@ -136,8 +122,7 @@ final class MotionManager: NSObject {
 
     /// Returns the preferred live motion source based on current connectivity and data flow.
     var preferredSource: Source? {
-        // Headphone motion wins whenever it is actively producing samples.
-        // This avoids mixing two motion streams into one session count.
+        // Use active headphone samples exclusively to avoid mixing motion streams.
         if isHeadphoneConnected, headphoneMotionManager.deviceMotion != nil {
             return .headphones
         }
@@ -150,9 +135,7 @@ final class MotionManager: NSObject {
 
     /// Refreshes local availability flags and republishes the preferred source.
     func refreshAvailability() {
-        // Route metadata can tell us when no headphones are connected at all, but it cannot prove that the
-        // connected accessory supports motion. Preserve the stricter Core Motion-backed flag unless the route
-        // clearly shows that all headphones are gone.
+        // Clear availability when headphones disconnect; an audio route alone cannot confirm support.
         if !hasConnectedHeadphoneRoute() {
             isHeadphoneConnected = false
         }
@@ -163,16 +146,14 @@ final class MotionManager: NSObject {
 
     // MARK: - Tracking
 
-    /// Starts local motion tracking for both iPhone and headphone sources when available.
-    /// - Parameter thresholdAdjustmentPercentage: Relative sensitivity tuning applied to both local detector profiles.
+    /// Starts phone and headphone tracking with a shared relative sensitivity adjustment.
     func startTracking(thresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage) {
         guard !isTracking else { return }
 
         isTracking = true
-        // Apply the current tuning before samples start flowing so the detector begins
-        // the session with the same setting the user saw on the start screen.
+        // Apply sensitivity before motion samples start arriving.
         updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
-        // Reset detector state at session start so old peaks / cadence hints do not bleed into a new workout.
+        // Clear motion history before starting a new workout.
         phoneDetector.reset()
         headphoneDetector.reset()
         resetRecordedSamples()
@@ -187,11 +168,7 @@ final class MotionManager: NSObject {
         updatePreferredSourceIfNeeded()
     }
 
-    /// Updates detector sensitivity for subsequent motion samples without resetting current session state.
-    ///
-    /// This is used by the in-session settings sheet. Changing the threshold should affect
-    /// new samples immediately, but it must not clear refractory state, recorded samples, or
-    /// the user's current jump count.
+    /// Changes sensitivity without clearing jumps, recorded samples, or refractory timing.
     func updateThresholdAdjustmentPercentage(_ percentage: Double) {
         phoneDetector.updateThresholdAdjustmentPercentage(percentage)
         headphoneDetector.updateThresholdAdjustmentPercentage(percentage)
@@ -249,8 +226,7 @@ final class MotionManager: NSObject {
             )
             record(sample)
 
-            // The shared detector operates on normalized `MotionSample` values, so this manager only
-            // adapts Core Motion data into that shared format and forwards accepted jumps to the UI layer.
+            // Normalize Core Motion samples and forward accepted jumps.
             if phoneDetector.processMotionSample(sample) {
                 Task { @MainActor in
                     self.onJumpDetected(.iPhone)
@@ -265,9 +241,7 @@ final class MotionManager: NSObject {
 
         headphoneMotionManager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
             guard let self, let motion, isTracking else { return }
-            // A live sample is definitive proof that the current headphones are motion-capable, so keep this
-            // as a fallback confirmation path even though the home screen now usually learns about support from
-            // connection-status updates before the user starts a session.
+            // A live motion sample confirms compatible headphones if status updates are unavailable.
             applyConfirmedHeadphoneAvailability(isConnected: true)
 
             // Promote headphones immediately on the first live headphone sample.
@@ -286,8 +260,7 @@ final class MotionManager: NSObject {
             )
             record(sample)
 
-            // Headphone motion is treated as a first-class source rather than a tweak on top of phone motion,
-            // because real-world false positives and thresholds differ enough to justify a dedicated profile.
+            // Use the headphone detector's separate profile and state.
             if headphoneDetector.processMotionSample(sample) {
                 Task { @MainActor in
                     self.onJumpDetected(.headphones)
@@ -298,10 +271,7 @@ final class MotionManager: NSObject {
 
     // MARK: - Headphone Status
 
-    /// Starts Core Motion headphone status updates when the platform supports them.
-    ///
-    /// The status stream is used for pre-session availability because Apple explicitly says it reports
-    /// `.connected` immediately when compatible headphones were already connected before monitoring began.
+    /// Monitors headphone status, including compatible headphones connected before startup.
     private func startHeadphoneStatusUpdatesIfAvailable() {
         guard headphoneActivityManager.isStatusAvailable else { return }
 
@@ -319,10 +289,7 @@ final class MotionManager: NSObject {
         }
     }
 
-    /// Applies a Core Motion-confirmed headphone availability change and republishes the UI state if needed.
-    ///
-    /// This shared helper keeps the connection-status stream, motion-manager delegate callbacks, and first
-    /// live motion sample aligned so the app has one consistent definition of "supported headphones available."
+    /// Applies confirmed headphone availability from status, delegate, or motion callbacks.
     private func applyConfirmedHeadphoneAvailability(isConnected: Bool) {
         let previousConnection = isHeadphoneConnected
         let previousHeadphoneName = connectedHeadphoneName
@@ -354,8 +321,7 @@ final class MotionManager: NSObject {
     /// Publishes the latest iPhone and headphone availability flags.
     private func notifyAvailabilityChanged() {
         Task { @MainActor in
-            // Route names come from AVAudioSession and can be missing or generic depending on the accessory.
-            // The UI only uses this when the system exposes something more specific than the fallback label.
+            // Use the audio-route name only when it is more specific than the fallback label.
             onAvailabilityChanged(isPhoneMotionAvailable, isHeadphoneMotionAvailable, connectedHeadphoneName)
         }
     }
@@ -382,10 +348,7 @@ final class MotionManager: NSObject {
 
     // MARK: - Audio Routing
 
-    /// Returns whether the current audio route contains any headphone-like output.
-    ///
-    /// Audio routes alone do not prove motion support. This helper is only used to clear stale state when
-    /// the user fully disconnects from headphones, not to positively declare motion availability.
+    /// Checks for a headphone audio route to clear stale availability, not confirm motion support.
     private func hasConnectedHeadphoneRoute() -> Bool {
         let outputs = AVAudioSession.sharedInstance().currentRoute.outputs
         return outputs.contains { output in
@@ -398,10 +361,7 @@ final class MotionManager: NSObject {
         }
     }
 
-    /// Returns the current route's descriptive headphone name when motion-capable headphones are confirmed.
-    ///
-    /// This guard avoids showing a generic Bluetooth headset model inside the selector when that accessory
-    /// cannot actually be used for motion tracking.
+    /// Returns the route name only for confirmed motion-capable headphones.
     private func currentConnectedHeadphoneName() -> String? {
         guard isHeadphoneConnected else {
             return nil
@@ -417,7 +377,7 @@ final class MotionManager: NSObject {
         return trimmedName.isEmpty ? nil : trimmedName
     }
 
-    /// Centralizes the route types that can represent headphone motion sources so name lookup matches availability checks.
+    /// Audio-route types used by headphone availability checks and name lookup.
     private func isSupportedHeadphonePort(_ output: AVAudioSessionPortDescription) -> Bool {
         switch output.portType {
         case .headphones, .bluetoothA2DP, .bluetoothHFP, .bluetoothLE:
@@ -445,11 +405,7 @@ final class MotionManager: NSObject {
 extension MotionManager: CMHeadphoneMotionManagerDelegate {
     /// Refreshes availability when supported headphones connect.
     func headphoneMotionManagerDidConnect(_: CMHeadphoneMotionManager) {
-        // Connection callbacks refresh availability immediately, but actual promotion to
-        // headphones as the active in-session source still depends on receiving live motion samples.
-        //
-        // This callback is still valuable for foreground attach events, while the activity-manager status
-        // stream covers the "already connected before launch" case for the home screen.
+        // Refresh availability on connection; select headphones for tracking only after live samples arrive.
         applyConfirmedHeadphoneAvailability(isConnected: hasConnectedHeadphoneRoute())
     }
 

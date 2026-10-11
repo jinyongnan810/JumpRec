@@ -7,8 +7,7 @@ import SwiftData
 import SwiftUI
 
 struct HistoryView: View {
-    /// A one-row probe is enough to distinguish an empty library from a populated one.
-    /// Using a descriptor with `fetchLimit = 1` avoids loading the full session history just to decide which empty state to show.
+    /// Checks for history with a one-row fetch.
     private static var sessionExistenceDescriptor: FetchDescriptor<JumpSession> {
         var descriptor = FetchDescriptor<JumpSession>(
             sortBy: [SortDescriptor(\.startedAt, order: .reverse)]
@@ -65,9 +64,7 @@ struct HistoryView: View {
         return DateInterval(start: start, end: end)
     }
 
-    /// Determines whether any sessions exist across the whole store.
-    /// Checking both the local probe query and the data store's reactive counter ensures
-    /// newly imported CloudKit records trigger an immediate transition to the history list.
+    /// Combines the local query and reactive count to detect history after CloudKit imports.
     private var hasSessions: Bool {
         !sessionExistenceProbe.isEmpty || dataStore.hasLocalSessions
     }
@@ -215,9 +212,7 @@ struct HistoryView: View {
         }
     }
 
-    /// Clean, native empty state shown when no workouts have been recorded yet.
-    /// Evaluates immediately without any artificial delay or blocking wait screens.
-    /// Supports pull-to-refresh, and unobtrusively displays a subtle sync indicator if CloudKit is actively transferring data.
+    /// Empty workout history with pull-to-refresh and CloudKit sync status.
     private var emptyLibraryState: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -320,8 +315,7 @@ private struct MonthSessionsList: View {
     /// Controls the calendar's one-time entrance without replaying it during month navigation.
     @State private var hasCalendarAppeared = false
 
-    /// Drives the coordinated entrance sequence for the month-dependent summary and session rows.
-    /// Resetting this value when the month changes lets the newly queried items animate as a group.
+    /// Replays the summary and row entrance sequence when the displayed month changes.
     @State private var hasAppeared = false
 
     let displayedMonth: Date
@@ -457,14 +451,12 @@ private struct MonthSessionsList: View {
             await onRefresh()
         }
         .task {
-            // The calendar enters with the rest of the screen initially, but this state is
-            // intentionally independent from displayedMonth so navigation does not replay it.
+            // Keep the calendar's entrance independent of month navigation.
             await Task.yield()
             hasCalendarAppeared = true
         }
         .task(id: displayedMonth) {
-            // Remove the previous month's presentation state without animation, then wait
-            // one update cycle so SwiftUI can render the new query results before revealing them.
+            // Reset without animation, then render the new query results before revealing them.
             hasAppeared = false
             await Task.yield()
             hasAppeared = true
@@ -774,8 +766,6 @@ private struct SessionRowView: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 5)
-//        .background(AppColors.bgPrimary.opacity(0.45))
-//        .clipShape(Capsule())
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityValue(value)

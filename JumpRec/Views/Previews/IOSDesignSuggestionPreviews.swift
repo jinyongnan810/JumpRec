@@ -6,11 +6,7 @@
 #if DEBUG
     import SwiftUI
 
-    /// Collects isolated design explorations for the iPhone app.
-    ///
-    /// These views intentionally do not replace production screens. Keeping the
-    /// explorations in one preview-only file makes the proposed hierarchy and
-    /// responsive behavior easy to compare before adopting any individual change.
+    /// Preview-only iPhone layouts for comparing hierarchy and responsive behavior.
     private struct SuggestedPreviewCanvas<Content: View>: View {
         @ViewBuilder let content: Content
 
@@ -23,8 +19,7 @@
         }
     }
 
-    /// Demonstrates a home screen where device routing remains visible without
-    /// competing with the goal and primary start action.
+    /// Home preview with visible device routing and a prominent start action.
     private struct SuggestedHomePreview: View {
         var body: some View {
             VStack(spacing: 24) {
@@ -68,8 +63,7 @@
             .padding(.vertical, 20)
         }
 
-        /// A one-line status preserves routing confidence while keeping the center
-        /// of attention on session readiness and the start button.
+        /// Compact device-routing status.
         private var compactDeviceStatus: some View {
             HStack(spacing: 10) {
                 Image(systemName: "applewatch.radiowaves.left.and.right")
@@ -99,8 +93,7 @@
         }
     }
 
-    /// Demonstrates a denser live workout layout that keeps all critical metrics
-    /// visible on compact phones while retaining a large progress target.
+    /// Compact workout preview with key metrics and a large progress target.
     private struct SuggestedActiveSessionPreview: View {
         @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -160,8 +153,7 @@
             .padding(.vertical, 20)
         }
 
-        /// Accessibility sizes switch to a vertical presentation so values remain
-        /// readable instead of shrinking inside three narrow columns.
+        /// Stack metrics vertically at accessibility text sizes.
         @ViewBuilder
         private var metricsLayout: some View {
             let layout = dynamicTypeSize.isAccessibilitySize
@@ -251,8 +243,7 @@
             }
         }
 
-        /// A two-column metadata grid stays aligned when localized labels or values
-        /// grow, avoiding the visual breaks caused by several independent chips.
+        /// Two-column metadata grid that accommodates longer labels and values.
         private func suggestedSessionRow(
             date: String,
             jumps: String,
@@ -305,13 +296,11 @@
         }
     }
 
-    /// Demonstrates a completion screen that foregrounds the main result and places
-    /// specialist analytics in a disclosure group rather than one uninterrupted list.
+    /// Completion preview with primary results and expandable analytics.
     private struct SuggestedCompletionPreview: View {
         @State private var showsDetails: Bool
 
-        /// Allows Canvas to display both the concise default and the expanded
-        /// analytics state without requiring manual interaction for every comparison.
+        /// Sets the initial analytics state for collapsed and expanded previews.
         init(showsDetails: Bool = false) {
             _showsDetails = State(initialValue: showsDetails)
         }

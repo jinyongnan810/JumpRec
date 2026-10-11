@@ -148,9 +148,7 @@ struct StartView: View {
         }
     }
 
-    /// Explains how to unlock more workouts using existing localized quota-message strings.
-    /// Rendering in place avoids the watchOS preview runtime's CoreUI layout crash with
-    /// system presentations, while keeping the workout idle and allowing an explicit return.
+    /// Shows quota help inline to avoid system-presentation crashes in Watch previews.
     private var quotaReachedExplanation: some View {
         VStack(spacing: 12) {
             Text("Free Limit Reached")
@@ -179,11 +177,7 @@ struct StartView: View {
 
     // MARK: - Countdown
 
-    /// Runs the visible countdown and starts the workout only if the task remains active.
-    ///
-    /// SwiftUI cancels this task when the countdown view leaves the hierarchy. Each sleep
-    /// observes cancellation, preventing navigation or a parent state change from starting
-    /// a workout after the countdown is no longer visible.
+    /// Starts a workout after the countdown only while its SwiftUI task remains active.
     private func runCountdown() async {
         countdown = 3
         isAnimating = false

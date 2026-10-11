@@ -47,9 +47,7 @@ final class PhoneWorkoutManager: NSObject {
         guard HKHealthStore.isHealthDataAvailable() else { return }
         guard authorizationTask == nil else { return }
 
-        // Start the retained authorization task with the underlying HealthKit request directly.
-        // Calling `ensureAuthorization()` from this task would make it await itself because the
-        // task is already stored in `authorizationTask`, blocking every later workout start.
+        // Call the underlying request directly; ensureAuthorization would make this task await itself.
         authorizationTask = Task {
             try await requestAuthorizationIfNeeded()
         }
@@ -76,8 +74,7 @@ final class PhoneWorkoutManager: NSObject {
                 configuration: configuration
             )
         } else {
-            // Before iOS 26, iPhone cannot run the newer live workout-session workflow. A regular
-            // builder still creates a workout sample that appears in Health when it is finished.
+            // Before iOS 26, use a regular builder to save the workout to Health.
             let builder = HKWorkoutBuilder(
                 healthStore: healthStore,
                 configuration: configuration,
@@ -119,8 +116,7 @@ final class PhoneWorkoutManager: NSObject {
             workoutStore = nil
         }
 
-        // An unfinished HKWorkoutBuilder has not written a workout sample, so releasing it is the
-        // pre-iOS-26 equivalent of discarding the local session.
+        // Releasing an unfinished builder discards the unsaved workout before iOS 26.
         workoutBuilder = nil
     }
 
@@ -132,10 +128,7 @@ final class PhoneWorkoutManager: NSObject {
         return configuration
     }
 
-    /// Ensures the app has requested every HealthKit permission used by iPhone workouts and mirroring.
-    ///
-    /// This method has internal visibility so the mirroring manager can share the same retained task.
-    /// Keeping one authorization owner prevents two startup services from racing separate system sheets.
+    /// Shares one HealthKit authorization task between local workouts and mirroring.
     func ensureAuthorization() async throws {
         if let authorizationTask {
             try await authorizationTask.value
@@ -161,9 +154,7 @@ final class PhoneWorkoutManager: NSObject {
             HKObjectType.workoutType(),
         ]
 
-        // Keep this list as the union of local-workout and mirrored-workout requirements. HealthKit
-        // does not reveal read authorization for privacy reasons, so the request-status API is the
-        // supported way to determine whether the system still needs to ask about any read type.
+        // Request all local and mirrored types; HealthKit hides read authorization status.
         var typesToRead: Set<HKObjectType> = [
             HKObjectType.workoutType(),
             HKObjectType.activitySummaryType(),
@@ -183,8 +174,7 @@ final class PhoneWorkoutManager: NSObject {
             try await healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead)
         }
 
-        // Write authorization is visible and required to save an iPhone workout. Read authorization
-        // intentionally is not exposed by HealthKit; denied reads simply return no protected data.
+        // Check write authorization; denied reads return no data and expose no authorization status.
         let status = healthStore.authorizationStatus(for: HKObjectType.workoutType())
         guard status == .sharingAuthorized else {
             print("[PhoneWorkoutManager] Workout write authorization status: \(status.rawValue)")

@@ -14,36 +14,13 @@ When making changes, prioritize readability, maintainability, and safety over cl
 - Also implement localization if ui changes
 
 ## Readability and comments
-- Always leave detailed comments for reading.
-- Write comments with the assumption that another developer will read this code later without prior context.
-- Explain:
-  - why the code exists
-  - the intent of non-obvious logic
-  - important state transitions
-  - edge cases and assumptions
-  - framework or platform quirks
-- Do not add useless comments that only restate the code literally.
-- Prefer meaningful documentation comments (`///`) for public types, properties, and functions.
-- For complex internal logic, add regular inline comments that explain the reasoning.
-
-## SwiftUI guidelines
-- Prefer small, composable views over very large view files.
-- Extract repeated UI into reusable views or modifiers when it improves clarity.
-- Keep `body` implementations readable and not overly nested.
-- When a view becomes hard to scan, split parts into clearly named private computed properties or subviews.
-- Use SwiftUI-native patterns first before falling back to UIKit.
-- Avoid putting too much business logic directly inside SwiftUI views.
-- Move non-UI logic into view models, helpers, or services when appropriate.
-- Use the shared typography catalog in `JumpRecShared/AppFonts.swift` for app font styling instead of introducing new inline `.font(...)` definitions when an existing shared style fits.
-- When a new font treatment is genuinely needed, add it to `AppFonts` first so typography remains centralized across the iPhone app, Watch app, and extensions.
-
-## Architecture preferences
-- Favor simple MVVM-style separation when suitable for the feature.
-- Views should focus on presentation and user interaction.
-- View models should manage UI state and orchestrate calls to services.
-- Services should handle data access, persistence, networking, or system APIs.
-- Keep boundaries clear between UI code and business logic.
-- Use dependency injection where practical, especially for testability.
+- Keep comments concise and plain; prefer one line when possible.
+- Describe the code as it is: current behavior, constraints, and intent.
+- Do not include implementation stories, commit history, or descriptions of earlier designs.
+- Explain non-obvious logic, state transitions, edge cases, and platform quirks only when useful.
+- Do not restate what the code already makes clear.
+- Use `///` for useful type, property, and function documentation.
+- Use longer comments only when a short comment would omit an essential detail.
 
 ## Naming
 - Use descriptive names.
@@ -58,13 +35,6 @@ When making changes, prioritize readability, maintainability, and safety over cl
 - When swallowing an error intentionally, leave a comment explaining why.
 - Surface user-facing errors in a clear and non-technical way.
 - Log useful debugging context when appropriate.
-
-## Async and concurrency
-- Prefer Swift concurrency (`async/await`) over older callback-based approaches when possible.
-- Keep async flows readable and well-structured.
-- Be explicit about main-thread UI updates.
-- Avoid starting unnecessary tasks in views.
-- Document concurrency assumptions when they are not obvious.
 
 ## State management
 - Keep state as local as possible.
@@ -106,7 +76,7 @@ When making changes, prioritize readability, maintainability, and safety over cl
 
 ## Output expectations
 When making changes in this repository:
-- Leave detailed comments wherever the intent may not be obvious to a future reader.
-- explain non-obvious choices
-- avoid unnecessary complexity
-- preserve maintainability for future readers
+- Keep useful comments short, plain, and focused on the current code.
+- Explain non-obvious choices without implementation history.
+- Avoid unnecessary complexity.
+- Preserve maintainability for future readers.

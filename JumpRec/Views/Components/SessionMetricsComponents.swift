@@ -44,8 +44,7 @@ struct SessionMetricCard: View {
         .padding(14)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        // Keep the indicator attachment at the card level so the badge remains anchored
-        // to the card corner instead of shifting with the text stack's intrinsic size.
+        // Anchor the badge to the card corner, independent of text size.
         .dotIndicatorOverlay(isVisible: showsBadge)
         // The visual card splits the label and value for styling, but assistive tech should hear them together.
         .accessibilityElement(children: .combine)
@@ -104,11 +103,10 @@ struct SessionBreakdownRow<Content: View>: View {
         .padding(.horizontal, 16)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        // Applying the badge after clipping keeps the decorative overlay aligned with the
-        // rounded row container without affecting the tappable content layout.
+        // Attach the badge after clipping so it follows the rounded row without changing layout.
         .dotIndicatorOverlay(isVisible: showsBadge, offset: CGSize(width: 40, height: -40))
         .contentShape(RoundedRectangle(cornerRadius: 10))
-        // Rows with explanations behave like buttons even though they keep a custom card appearance.
+        // Explanatory rows expose button semantics to accessibility.
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(explanation == nil ? [] : .isButton)
         .accessibilityHint(explanation == nil ? Text("") : Text("Shows an explanation for this metric."))

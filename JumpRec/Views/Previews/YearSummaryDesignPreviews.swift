@@ -6,15 +6,7 @@
 #if DEBUG
     import SwiftUI
 
-    /// Design preview for Option 2: Segmented [Month | Year] control with inline details.
-    ///
-    /// Key Design Principles:
-    /// 1. **Zero Route Collisions**: Preserves `HistoryView`'s real navigation bar (`History` title and the `Records 🏆` trophy button).
-    /// 2. **Symmetric Layout**:
-    ///    - **Month Tab**: `< Month >` calendar card ➔ 3 stat cards ➔ inline monthly sessions list.
-    ///    - **Year Tab**: `< Year >` summary card ➔ 3 stat cards ➔ inline annual sessions list.
-    /// 3. **Inline Simplicity**: No push transitions or extra screens. Tapping `<` / `>` (or selecting a year pill)
-    ///    updates the annual stat cards and session list right inline on the same screen.
+    /// History preview with Month and Year tabs, inline summaries, and session lists.
 
     // MARK: - Canvas Helper
 
@@ -177,8 +169,7 @@
 
     // MARK: - Year Card Component (Header in Year Tab)
 
-    /// A clean card displayed at the top of the Year tab, matching `HistoryCalendarView`'s layout and weight.
-    /// Allows cycling years via `<` and `>` buttons or horizontal swipe gestures.
+    /// Year summary card with buttons and swipe gestures for navigation.
     private struct YearSelectorHeaderCard: View {
         let selectedYear: Int
         let summary: YearSummaryItem
@@ -260,8 +251,7 @@
 
     // MARK: - Option 2: Inline Year Tab View (Primary Concept)
 
-    /// Segmented `[Month | Year]` view where the Year tab displays details inline,
-    /// exactly matching the visual structure of the Month tab.
+    /// Month and Year tabs share the same inline summary and session-list layout.
     private struct Option2InlineYearSummaryView: View {
         enum Scope: String, CaseIterable {
             case month = "Month"

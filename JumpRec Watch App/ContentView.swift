@@ -17,8 +17,7 @@ struct ContentView: View {
     var body: some View {
         MainView()
             .onAppear {
-                // Prime speech once when the root watch UI appears so the first workout
-                // announcement is not delayed by the synthesizer's one-time setup cost.
+                // Warm up speech on first appearance to reduce the first workout cue's delay.
                 appState.warmUpSpeechSynthesizerIfNeeded()
             }
             .onChange(of: scenePhase) { _, newPhase in
@@ -26,11 +25,7 @@ struct ContentView: View {
             }
     }
 
-    /// Tracks long background periods so stale watchOS audio state can be refreshed.
-    ///
-    /// Short inactive/background transitions are common while the user lowers their wrist.
-    /// Waiting a few minutes avoids disrupting normal in-workout prompts while still
-    /// recovering the speech pipeline before a later session starts after days away.
+    /// Refreshes speech after long background periods, ignoring brief wrist-down transitions.
     private func handleScenePhaseChange(_ newPhase: ScenePhase) {
         switch newPhase {
         case .active:
@@ -62,7 +57,7 @@ struct ContentView: View {
 }
 
 #Preview("100 Free Workouts Used") {
-    // Keep the initial screen idle; tapping Start exercises the existing quota explanation.
+    // Tapping Start in this idle preview shows quota help.
     ContentView()
         .environment(JumpRecSettings(previewQualifiedWorkoutCount: JumpRecSettings.freeWorkoutQuota))
 }

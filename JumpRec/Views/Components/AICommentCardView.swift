@@ -12,8 +12,7 @@ struct AICommentCardView: View {
     /// Indicates whether a comment is currently being generated.
     let isLoading: Bool
 
-    /// Triggers the discrete sparkle animation each time the card transitions from
-    /// a loading placeholder into a finished AI summary.
+    /// Triggers sparkles when loading finishes and the AI summary appears.
     @State private var sparkleAnimationTrigger = 0
 
     // MARK: - View
@@ -75,8 +74,7 @@ struct AICommentCardView: View {
 
     // MARK: - Private Helpers
 
-    /// Applies the sparkle symbol styling and replays the completion animation
-    /// using the most expressive symbol effect available on the current OS.
+    /// Styles sparkles and plays the completion effect supported by the current OS.
     @ViewBuilder
     private var sparklesIcon: some View {
         let sparkles = Image(systemName: "sparkles")
@@ -97,9 +95,7 @@ struct AICommentCardView: View {
     }
 }
 
-/// Provides an interactive preview that mimics the async AI generation flow.
-/// The delayed state change makes it easy to verify both the loading placeholder
-/// and the completion animation without running the full app.
+/// Preview with delayed loading and recap states to show the completion animation.
 private struct AICommentCardDelayedPreview: View {
     @State private var comment: String?
     @State private var isLoading = true

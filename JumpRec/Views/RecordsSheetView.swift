@@ -84,8 +84,7 @@ struct RecordsSheetView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     if !displayRecords.isEmpty {
                         Button(role: .destructive) {
-                            // The destructive action is split from the tap target so the sheet can present
-                            // a confirmation step before removing every cached personal record.
+                            // Confirm before clearing cached personal records.
                             isShowingClearRecordsConfirmation = true
                         } label: {
                             Image(systemName: "trash")
@@ -266,8 +265,7 @@ private struct RecordCardView: View {
         .padding(16)
         .background(Self.cardBg)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        // The larger negative Y offset preserves the original art direction where the
-        // badge sits above the compact record row rather than directly on its edge.
+        // Position the badge above the compact record row.
         .dotIndicatorOverlay(isVisible: isHighlighted)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)

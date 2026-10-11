@@ -29,8 +29,7 @@ extension ModelContainer {
         ])
     }
 
-    /// Returns the SwiftData configuration used by the production store.
-    /// Keeping this in one place avoids the diagnostics path drifting away from the real store setup.
+    /// SwiftData configuration shared by the store and diagnostics.
     static func makeSharedConfiguration() -> ModelConfiguration {
         ModelConfiguration(
             schema: makeSharedSchema(),
@@ -154,8 +153,7 @@ public final class MyDataStore {
     /// Count of local JumpSession records currently present in the database.
     public private(set) var localSessionCount: Int = 0
 
-    /// Cached quota count for rendering. Refreshes after local saves and CloudKit
-    /// changes; actual start authorization still performs a fresh database count.
+    /// Cached quota for display; workout authorization uses a fresh database count.
     public private(set) var qualifiedWorkoutCount = 0
 
     /// Tracks whether at least one session exists locally.
@@ -202,8 +200,7 @@ public final class MyDataStore {
     }
 
     #if DEBUG
-        /// Creates isolated preview history using the production schema and quota rules.
-        /// In-memory storage with CloudKit disabled prevents sample workouts from reaching real history.
+        /// Creates in-memory preview history with CloudKit disabled.
         public static func makePreviewStore(qualifiedWorkoutCount: Int) throws -> MyDataStore {
             let schema = ModelContainer.makeSharedSchema()
             let configuration = ModelConfiguration(
@@ -216,8 +213,7 @@ public final class MyDataStore {
             let store = MyDataStore(modelContainer: container)
             let latestStart = Date(timeIntervalSince1970: 1_791_417_600)
 
-            // Each sample meets the minimum jump count; spacing them a day apart also makes
-            // the history tab useful when inspecting this exhausted-quota preview interactively.
+            // Daily qualifying sessions populate the exhausted-quota history preview.
             for index in 0 ..< qualifiedWorkoutCount {
                 let startedAt = latestStart.addingTimeInterval(-Double(index) * 86400)
                 store.modelContext.insert(JumpSession(
@@ -263,8 +259,7 @@ public final class MyDataStore {
         updateUnseenPersonalRecordUpdates([])
     }
 
-    /// Refreshes iCloud-related diagnostics on demand.
-    /// This is safe to call whenever the app becomes active because it only updates observable status fields and logs.
+    /// Refreshes observable iCloud diagnostics and logs.
     public func refreshCloudDiagnostics() {
         Task { [weak self] in
             guard let self else { return }
@@ -272,8 +267,7 @@ public final class MyDataStore {
         }
     }
 
-    /// Refreshes the local session count from the persistent store and updates observable flags.
-    /// This is called whenever a CloudKit import finishes, a remote change notification fires, or manual refresh runs.
+    /// Refreshes the session count after sync notifications or manual refresh.
     public func refreshLocalSessionCount() {
         let count = fetchSessionCount()
         localSessionCount = count
@@ -281,8 +275,7 @@ public final class MyDataStore {
         qualifiedWorkoutCount = qualifiedSessionsCount()
     }
 
-    /// Manually triggers a re-check of the iCloud account and model store.
-    /// This is invoked by pull-to-refresh on history views.
+    /// Rechecks the iCloud account and store for pull-to-refresh.
     public func manualSyncCheck() async {
         isCloudSyncActive = true
         cloudSyncPhase = .connecting
@@ -301,7 +294,7 @@ public final class MyDataStore {
 
     // MARK: - Private Helpers
 
-    /// Logs the concrete storage location and the expected CloudKit container so uninstall-related behavior is easier to diagnose.
+    /// Logs the store location and expected CloudKit container.
     private func logPersistenceConfiguration() {
         let configuration = ModelContainer.makeSharedConfiguration()
         let groupContainerURL = FileManager.default.containerURL(
@@ -414,7 +407,7 @@ public final class MyDataStore {
         }
     }
 
-    /// Listens for account changes so diagnostics stay accurate if the user signs in or out while the app is installed.
+    /// Observes iCloud sign-in and sign-out changes for diagnostics.
     private func observeCloudAccountChanges() {
         NotificationCenter.default.addObserver(
             forName: .CKAccountChanged,

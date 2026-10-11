@@ -14,11 +14,7 @@ enum JumpState {
     case idle, jumping, finished
 }
 
-/// Owns the watch app's session lifecycle, motion tracking, and mirrored workout updates.
-///
-/// `JumpRecState` inherits from `NSObject` to serve as an `AVSpeechSynthesizerDelegate`.
-/// Since its mutable state is completely isolated to the `@MainActor`, it is marked `@unchecked Sendable`
-/// here in its primary declaration to satisfy concurrency requirements for delegate protocols.
+/// Owns Watch workout state; main-actor isolation protects unchecked Sendable delegate state.
 @Observable
 @MainActor
 class JumpRecState: NSObject, @unchecked Sendable {
@@ -54,17 +50,11 @@ class JumpRecState: NSObject, @unchecked Sendable {
     var energyBurned: Double = 0
     /// Stores the active goal type for the session.
     var goalType: GoalType = .count
-    /// Stores the active goal value: jumps for count goals, seconds for time goals after converting from the minute-based setting.
+    /// Active goal in jumps for count goals or seconds for time goals.
     var goal: Int = 0
-    /// Stores whether jump-count announcements should play for the active watch session.
-    ///
-    /// The value is seeded from shared settings when the workout starts and refreshed
-    /// when the paired iPhone sends an in-session settings update.
+    /// Enables Watch jump announcements; refreshed from synced settings.
     var sessionShouldSpeakJumpCountAnnouncements = true
-    /// Stores whether elapsed-time announcements should play for the active watch session.
-    ///
-    /// The minute timer still drives time-goal completion when this is disabled; only
-    /// the spoken progress cue is muted.
+    /// Enables spoken minute cues without affecting time-goal completion.
     var sessionShouldSpeakJumpTimeAnnouncements = true
     /// Returns the finished session duration formatted as `mm:ss`.
     var totalTime: String {
@@ -78,18 +68,10 @@ class JumpRecState: NSObject, @unchecked Sendable {
     /// Speaks workout announcements on Apple Watch.
     @ObservationIgnored
     let synthesizer = AVSpeechSynthesizer()
-    /// Tracks whether the synthesizer has already been primed during this app lifetime.
-    ///
-    /// The first spoken announcement can stall while watchOS initializes the speech
-    /// pipeline. Keeping this flag on the shared state lets the root view request a
-    /// one-time warmup without repeating the work every time SwiftUI re-renders.
+    /// Tracks the one-time speech warmup for this app lifetime.
     @ObservationIgnored
     var hasWarmedUpSpeechSynthesizer = false
-    /// Tracks whether a silent warmup utterance is currently using the synthesizer.
-    ///
-    /// Real workout announcements should not wait for the zero-volume warmup to
-    /// complete. This flag lets the speech path cancel the warmup immediately when a
-    /// user-visible prompt is ready to play.
+    /// Marks silent warmup speech so real announcements can interrupt it.
     @ObservationIgnored
     var isSpeechWarmupInProgress = false
     /// Owns the latest delayed speech request so obsolete workout cues can be cancelled.
@@ -102,10 +84,7 @@ class JumpRecState: NSObject, @unchecked Sendable {
     /// Detects watch motion and jump events.
     @ObservationIgnored
     var motionManager: MotionManager?
-    /// Owns the cancellable task that announces elapsed-minute milestones.
-    ///
-    /// Retaining the task lets session cleanup stop a pending sleep before another
-    /// workout starts, avoiding announcements that belong to the previous workout.
+    /// Cancellable minute-announcement task owned by the current workout.
     @ObservationIgnored
     var minuteAnnouncementTask: Task<Void, Never>?
 
@@ -128,28 +107,21 @@ class JumpRecState: NSObject, @unchecked Sendable {
                 self.energyBurned = energyBurned
             }
         })
-        // The synthesizer delegate releases the speech audio session after each spoken
-        // prompt so the watch only ducks other audio while it is actively speaking.
+        // The delegate releases ducking audio after speech finishes.
         synthesizer.delegate = self
         NotificationCenter.default.addObserver(
             forName: .jumpRecSettingsDidUpdate,
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            // WatchConnectivity writes the latest settings to shared storage before posting
-            // this notification. App state reads the small snapshot directly here so it does
-            // not create extra observable settings objects just to update a running workout.
+            // Read the synced snapshot after WatchConnectivity persists it and posts the notification.
             Task { @MainActor [weak self] in
                 self?.applySyncedSettingsFromStore()
             }
         }
     }
 
-    /// Reads the latest synced settings snapshot and applies it to a running workout.
-    ///
-    /// This intentionally mirrors `JumpRecSettings.loadSettings()` for the small subset
-    /// needed by active sessions, while avoiding construction of a new observable settings
-    /// object from inside every WatchConnectivity notification.
+    /// Applies a synced settings snapshot to the active workout without creating an observer.
     private func applySyncedSettingsFromStore() {
         let store = NSUbiquitousKeyValueStore.default
         store.synchronize()

@@ -37,11 +37,7 @@ final class WorkoutManager: NSObject {
     private var builder: HKLiveWorkoutBuilder?
     /// Encodes mirrored payloads sent to the iPhone app.
     private let encoder = JSONEncoder()
-    /// Tracks whether HealthKit successfully created a companion iPhone mirror.
-    ///
-    /// Watch-only workouts must keep collecting local HealthKit data even when the user
-    /// leaves the iPhone behind. Keeping this flag false until mirroring succeeds lets
-    /// jump and metric updates avoid a stream of expected remote-send failures.
+    /// Enables remote updates only after mirroring succeeds; local collection stays independent.
     private var isMirroringActive = false
     /// Stores the current (latest) heart rate for mirrored updates.
     private var currentHeartRate: Int?
@@ -72,8 +68,7 @@ final class WorkoutManager: NSObject {
         self.updateEnergyBurned = updateEnergyBurned
         super.init()
 
-        // Prime authorization early. Workout startup awaits the same retained task, so
-        // multiple callers never present overlapping HealthKit permission requests.
+        // Share the early authorization task with workout startup to avoid overlapping requests.
         authorizationTask = Task { [healthStore] in
             try await Self.requestAuthorization(using: healthStore)
         }
@@ -116,8 +111,7 @@ final class WorkoutManager: NSObject {
             HKObjectType.activitySummaryType(),
         ]
 
-        // requestAuthorization is safe after a previous decision, but checking first avoids asking
-        // watchOS to begin an authorization presentation every time AppState recreates this manager.
+        // Check request status before presenting HealthKit authorization again.
         let requestStatus = try await authorizationRequestStatus(
             using: healthStore,
             toShare: typesToShare,
@@ -214,9 +208,7 @@ final class WorkoutManager: NSObject {
                 } catch is CancellationError {
                     return
                 } catch {
-                    // A missing or unreachable iPhone should not break a watch-only workout.
-                    // Local collection is already running, so keep the session alive and skip
-                    // remote payloads until a future workout creates a mirror successfully.
+                    // Keep local collection running if mirroring fails; skip remote payloads for this workout.
                     isMirroringActive = false
                     print("[WorkoutManager] Companion mirroring unavailable: \(error.localizedDescription)")
                     return
@@ -292,11 +284,7 @@ final class WorkoutManager: NSObject {
         }
     }
 
-    /// Sends a mirrored jump update to the iPhone companion app, including latest cumulative metrics.
-    ///
-    /// Jumps occur multiple times per second (e.g., 2–3 Hz). Transmitting Bluetooth radio packets on
-    /// every single jump keeps the watch wireless chip continuously powered on. This method throttles
-    /// transmissions to at most once per second while ensuring the trailing jump count is always delivered.
+    /// Sends cumulative jump metrics at most once per second, including the final pending update.
     func sendJumpUpdate(jumpCount: Int, jumpOffset: TimeInterval) {
         let totalEnergyBurned = currentEnergyBurned
         let payload = MirroredWorkoutPayload(
@@ -350,11 +338,7 @@ final class WorkoutManager: NSObject {
             .doubleValue(for: .kilocalorie()) ?? 0
     }
 
-    /// Processes newly collected health samples delivered by HKLiveWorkoutBuilder.
-    ///
-    /// Relying on HKLiveWorkoutDataSource and HKLiveWorkoutBuilder's native statistics calculations
-    /// avoids running redundant HKAnchoredObjectQuery instances against the HealthKit store,
-    /// significantly reducing background database queries and CPU wakeups on Apple Watch.
+    /// Reads live HealthKit builder statistics for newly collected samples.
     func processCollectedData(from workoutBuilder: HKLiveWorkoutBuilder, types: Set<HKSampleType>) {
         guard builder === workoutBuilder else { return }
 
