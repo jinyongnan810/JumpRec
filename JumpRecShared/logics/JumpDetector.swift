@@ -114,35 +114,11 @@ public final class JumpDetector {
     /// The public profile exposed to callers and debug tooling.
     public let profile: JumpDeviceProfile
     /// Optional console logging for debugging live sessions.
-    public var debugLoggingEnabled: Bool {
-        get {
-            stateLock.lock()
-            defer { stateLock.unlock() }
-            return storedDebugLoggingEnabled
-        }
-        set {
-            stateLock.lock()
-            defer { stateLock.unlock() }
-            storedDebugLoggingEnabled = newValue
-        }
-    }
-
+    public var debugLoggingEnabled = false
     /// Snapshot of the detector state used by debugging and inspection.
-    public var debugState: JumpDetectorDebugState {
-        stateLock.lock()
-        defer { stateLock.unlock() }
-        return storedDebugState
-    }
+    public private(set) var debugState: JumpDetectorDebugState
 
     // MARK: - Private State
-
-    /// Samples run on Core Motion's queue while settings and reset calls arrive from
-    /// the main actor. One short critical section protects the threshold, refractory
-    /// timestamp, and debug snapshot together on both phone and Watch. Private helpers
-    /// assume the caller holds this lock; they must not recursively acquire it.
-    private let stateLock = NSLock()
-    private var storedDebugLoggingEnabled = false
-    private var storedDebugState: JumpDetectorDebugState
 
     /// The fixed profile rule used by this detector instance.
     private let config: Config
@@ -175,7 +151,7 @@ public final class JumpDetector {
             baseThreshold: config.threshold,
             adjustmentPercentage: self.thresholdAdjustmentPercentage
         )
-        storedDebugState = JumpDetectorDebugState(
+        debugState = JumpDetectorDebugState(
             profile: profile,
             dominantAxis: config.axis,
             chosenPolarity: config.polarity
@@ -189,8 +165,6 @@ public final class JumpDetector {
     /// Callers use this at session start and when the active-session settings sheet changes sensitivity.
     /// The update affects future samples without clearing the detector's timing state.
     public func updateThresholdAdjustmentPercentage(_ percentage: Double) {
-        stateLock.lock()
-        defer { stateLock.unlock() }
         thresholdAdjustmentPercentage = Self.clampedThresholdAdjustmentPercentage(percentage)
         adjustedThreshold = Self.adjustedThreshold(
             baseThreshold: config.threshold,
@@ -201,8 +175,6 @@ public final class JumpDetector {
     /// Processes one raw motion sample.
     /// The detector inspects the configured raw acceleration signal and threshold for the profile.
     public func processMotionSample(_ sample: MotionSample) -> Bool {
-        stateLock.lock()
-        defer { stateLock.unlock() }
         let value = axisValue(from: sample, axis: config.axis)
         let isCandidate = thresholdSatisfied(value: value)
 
@@ -221,7 +193,7 @@ public final class JumpDetector {
         lastAcceptedJumpTimestamp = sample.timestamp
         syncDebugState()
 
-        if storedDebugLoggingEnabled {
+        if debugLoggingEnabled {
             print(
                 "[JumpDetector] profile=\(profile.rawValue) axis=\(config.axis.rawValue) " +
                     "polarity=\(config.polarity.rawValue) value=\(value) accepted=\(sample.timestamp)"
@@ -233,8 +205,6 @@ public final class JumpDetector {
 
     /// Clears the simple refractory state so a new session starts fresh.
     public func reset() {
-        stateLock.lock()
-        defer { stateLock.unlock() }
         lastAcceptedJumpTimestamp = nil
         syncDebugState()
     }
@@ -281,7 +251,7 @@ public final class JumpDetector {
 
     /// Keeps debug state aligned with the simple detector implementation.
     private func syncDebugState() {
-        storedDebugState = JumpDetectorDebugState(
+        debugState = JumpDetectorDebugState(
             profile: profile,
             dominantAxis: config.axis,
             chosenPolarity: config.polarity,
