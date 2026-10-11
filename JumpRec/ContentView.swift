@@ -233,10 +233,12 @@ struct ContentView: View {
         .environment(MyDataStore.shared)
 }
 
-#Preview("100 Free Workouts Used") {
-    // Seed isolated qualifying sessions so starting a free-tier workout presents the paywall.
-    let dataStore = try! MyDataStore.makePreviewStore(qualifiedWorkoutCount: JumpRecSettings.freeWorkoutQuota)
-    ContentView()
-        .modelContainer(dataStore.modelContainer)
-        .environment(dataStore)
-}
+#if DEBUG
+    #Preview("100 Free Workouts Used") {
+        // Seed isolated qualifying sessions so starting a free-tier workout presents the paywall.
+        let dataStore = try! MyDataStore.makePreviewStore(qualifiedWorkoutCount: JumpRecSettings.freeWorkoutQuota)
+        ContentView()
+            .modelContainer(dataStore.modelContainer)
+            .environment(dataStore)
+    }
+#endif
