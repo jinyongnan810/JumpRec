@@ -7,6 +7,7 @@
 
 import Foundation
 import HealthKit
+import OSLog
 
 /// Manages HealthKit workout sessions, heart rate, and energy burned tracking.
 @MainActor
@@ -19,6 +20,8 @@ final class WorkoutManager: NSObject {
             "HealthKit could not end workout data collection."
         }
     }
+
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "JumpRec.watch", category: "WorkoutLifecycle")
 
     // MARK: - Callbacks
 
@@ -47,7 +50,9 @@ final class WorkoutManager: NSObject {
     private var peakHeartRate: Int?
     /// Deduplicates an in-flight HealthKit authorization request.
     private var authorizationTask: Task<Void, Error>?
-    /// Owns asynchronous startup or finishing work for the current workout.
+    /// Retains stopped workouts until HealthKit confirms they are ready to save.
+    private var pendingFinalizations: [ObjectIdentifier: (session: HKWorkoutSession, builder: HKLiveWorkoutBuilder)] = [:]
+    /// Owns asynchronous startup work for the current workout.
     private var workoutLifecycleTask: Task<Void, Never>?
     /// Identifies the workout that owns asynchronous HealthKit completions.
     private var workoutGeneration = UUID()
@@ -238,6 +243,8 @@ final class WorkoutManager: NSObject {
 
     /// Ends the workout, sends final mirrored metrics, and saves it to HealthKit.
     func stopWorkout() {
+        guard let session, let builder else { return }
+
         workoutGeneration = UUID()
         workoutLifecycleTask?.cancel()
         workoutLifecycleTask = nil
@@ -261,25 +268,33 @@ final class WorkoutManager: NSObject {
         averageHeartRate = nil
         peakHeartRate = nil
 
-        guard let session, let builder else {
-            self.session = nil
-            self.builder = nil
-            return
-        }
-
-        session.end()
+        pendingFinalizations[ObjectIdentifier(session)] = (session, builder)
         self.session = nil
         self.builder = nil
+        Self.logger.info("Stopping workout activity; waiting for HealthKit's stopped state")
+        session.stopActivity(with: endDate)
+    }
 
-        workoutLifecycleTask = Task {
+    /// Keeps background execution available until the stopped workout has been saved.
+    private func finalizeWorkout(_ session: HKWorkoutSession, at endDate: Date) {
+        guard let pending = pendingFinalizations.removeValue(forKey: ObjectIdentifier(session)) else { return }
+
+        // Saving belongs to this session and must survive resets or another workout starting.
+        Task {
+            defer {
+                session.end()
+                Self.logger.info("Workout finalization completed; ending HealthKit session")
+            }
             do {
-                try await endCollection(builder, at: endDate)
-                let workout = try await finishWorkout(builder)
-                print("[WorkoutManager] Workout finished: \(String(describing: workout))")
-            } catch is CancellationError {
-                return
+                try await endCollection(pending.builder, at: endDate)
+                let workout = try await finishWorkout(pending.builder)
+                if workout != nil {
+                    Self.logger.info("Workout saved to HealthKit")
+                } else {
+                    Self.logger.error("HealthKit finished without returning a saved workout")
+                }
             } catch {
-                print("[WorkoutManager] Failed to finish workout: \(error.localizedDescription)")
+                Self.logger.error("Failed to finish workout: \(error.localizedDescription, privacy: .public)")
             }
         }
     }
@@ -436,25 +451,28 @@ final class WorkoutManager: NSObject {
 // MARK: - HKWorkoutSessionDelegate
 
 extension WorkoutManager: HKWorkoutSessionDelegate {
-    nonisolated func workoutSession(_: HKWorkoutSession,
+    nonisolated func workoutSession(_ workoutSession: HKWorkoutSession,
                                     didChangeTo toState: HKWorkoutSessionState,
-                                    from _: HKWorkoutSessionState,
-                                    date _: Date)
+                                    from fromState: HKWorkoutSessionState,
+                                    date: Date)
     {
-        switch toState {
-        case .running:
-            print("Workout started")
-        case .ended:
-            print("Workout ended")
-        default:
-            break
+        Task { @MainActor [weak self] in
+            Self.logger.info("HealthKit state \(fromState.rawValue) -> \(toState.rawValue) at \(date.timeIntervalSince1970)")
+            if toState == .stopped {
+                self?.finalizeWorkout(workoutSession, at: date)
+            }
         }
     }
 
-    nonisolated func workoutSession(_: HKWorkoutSession,
+    nonisolated func workoutSession(_ workoutSession: HKWorkoutSession,
                                     didFailWithError error: Error)
     {
-        print("workout session error: \(error.localizedDescription)")
+        Task { @MainActor [weak self] in
+            Self.logger.error("Workout session failed: \(error.localizedDescription, privacy: .public)")
+            if self?.pendingFinalizations.removeValue(forKey: ObjectIdentifier(workoutSession)) != nil {
+                workoutSession.end()
+            }
+        }
     }
 }
 

@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import OSLog
 import SwiftUI
 
 struct ContentView: View {
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "JumpRec.watch", category: "SceneLifecycle")
     @Environment(\.scenePhase) private var scenePhase
     @State private var connectivityMangaer = ConnectivityManager.shared
     @State private var appState = JumpRecState.shared
@@ -27,6 +29,7 @@ struct ContentView: View {
 
     /// Refreshes speech after long background periods, ignoring brief wrist-down transitions.
     private func handleScenePhaseChange(_ newPhase: ScenePhase) {
+        Self.logger.info("Scene changed to \(String(describing: newPhase), privacy: .public); workout state: \(String(describing: appState.jumpState), privacy: .public)")
         switch newPhase {
         case .active:
             guard let enteredBackgroundAt else {
