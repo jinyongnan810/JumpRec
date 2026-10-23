@@ -140,8 +140,13 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             ?? 0.0
         let hasUnlockedUnlimitedWorkouts = payload["hasUnlockedUnlimitedWorkouts"] as? Bool
         let qualifiedWorkoutCount = (payload["qualifiedWorkoutCount"] as? NSNumber)?.intValue
+        let accentColor = (payload["accentColor"] as? String).flatMap(AppAccentColor.init(rawValue:))
 
         Task { @MainActor [weak self] in
+            // Missing or unknown colors from older companions leave the current accent intact.
+            if let accentColor {
+                AppAppearance.shared.accent = accentColor
+            }
             self?.applySettings(
                 goalTypeRawValue: goalTypeRawValue,
                 jumpCount: jumpCount,

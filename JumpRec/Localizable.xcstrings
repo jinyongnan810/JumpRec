@@ -280,6 +280,17 @@
         }
       }
     },
+    "Accent Color" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセントカラー"
+          }
+        }
+      }
+    },
     "Achieved %@" : {
       "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
       "localizations" : {
@@ -444,6 +455,28 @@
         }
       }
     },
+    "Also applies to your paired Apple Watch." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ペアリングしたApple Watchにも適用されます。"
+          }
+        }
+      }
+    },
+    "Amber" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アンバー"
+          }
+        }
+      }
+    },
     "Apple Watch is ready." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -564,6 +597,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最高ジャンプレート"
+          }
+        }
+      }
+    },
+    "Blue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ブルー"
           }
         }
       }
@@ -846,6 +890,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在選択中"
+          }
+        }
+      }
+    },
+    "Cyan" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "シアン"
           }
         }
       }
@@ -1805,6 +1860,17 @@
         }
       }
     },
+    "Lavender" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ラベンダー"
+          }
+        }
+      }
+    },
     "Long Breaks" : {
       "localizations" : {
         "ja" : {
@@ -1940,6 +2006,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メンバーシップ & 利用状況"
+          }
+        }
+      }
+    },
+    "Mint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ミント"
           }
         }
       }
@@ -2449,6 +2526,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自己ベスト"
+          }
+        }
+      }
+    },
+    "Pink" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピンク"
           }
         }
       }

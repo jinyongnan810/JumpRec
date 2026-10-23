@@ -110,7 +110,7 @@ struct StartView: View {
                             Text("START")
                                 .font(AppFonts.watchPrimaryButton)
                                 .tracking(2)
-                                .foregroundStyle(AppColors.bgPrimary)
+                                .foregroundStyle(AppColors.accentForeground)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 14)
                                 .background(AppColors.accent)
@@ -167,7 +167,7 @@ struct StartView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
                     .background(AppColors.accent)
-                    .foregroundStyle(AppColors.bgPrimary)
+                    .foregroundStyle(AppColors.accentForeground)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .buttonStyle(.plain)

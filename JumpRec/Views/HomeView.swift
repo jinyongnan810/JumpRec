@@ -83,7 +83,7 @@ struct HomeView: View {
 
     /// Returns the text color for the primary pre-session button.
     private var primaryButtonTextColor: Color {
-        isCountingDown || isStartingSession ? AppColors.textPrimary : AppColors.bgPrimary
+        isCountingDown || isStartingSession ? AppColors.textPrimary : AppColors.accentForeground
     }
 
     /// Returns the tint color for the primary pre-session button.

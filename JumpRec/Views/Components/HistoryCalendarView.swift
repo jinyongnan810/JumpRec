@@ -290,7 +290,7 @@ private struct HistoryCalendarDayCellView: View {
     /// Returns the text color for the day number.
     private var dayColor: Color {
         if hasSession, !isToday {
-            AppColors.bgPrimary
+            AppColors.accentForeground
         } else if isToday {
             AppColors.accent
         } else if isFuture {

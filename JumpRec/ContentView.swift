@@ -9,6 +9,7 @@ import StoreKit
 import SwiftData
 import SwiftUI
 import UIKit
+import WatchConnectivity
 
 struct ContentView: View {
     @Environment(MyDataStore.self) var dataStore
@@ -93,6 +94,19 @@ struct ContentView: View {
         }
         .onChange(of: settings.goalType) { _, _ in
             applySettingsChange()
+        }
+        .onChange(of: AppAppearance.shared.accent) { _, _ in
+            syncSettingsToWatch()
+        }
+        .onChange(of: connectivityManager.activationState) { _, state in
+            if state == .activated {
+                syncSettingsToWatch()
+            }
+        }
+        .onChange(of: connectivityManager.isWatchAppInstalled) { _, isInstalled in
+            if isInstalled {
+                syncSettingsToWatch()
+            }
         }
         .onChange(of: settings.jumpCount) { _, _ in
             applySettingsChange()

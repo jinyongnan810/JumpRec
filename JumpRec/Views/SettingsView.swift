@@ -5,7 +5,6 @@
 
 import SwiftData
 import SwiftUI
-import UIKit
 
 /// Presents user-editable workout settings before a session starts.
 struct SettingsView: View {
@@ -63,8 +62,11 @@ struct SettingsView: View {
                     iPhoneSessionSection
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 5)
 
-                    privacyPolicyLink
+                    AccentColorSettingsView()
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 6)
+
+                    privacyPolicyLink
+                        .staggeredAppearance(isVisible: hasContentAppeared, index: 7)
                 }
                 .padding(.bottom, 8)
             }
@@ -76,12 +78,12 @@ struct SettingsView: View {
                 } label: {
                     Text("Confirm")
                         .font(AppFonts.primaryButtonLabel)
-                        .foregroundStyle(AppColors.bgPrimary)
+                        .foregroundStyle(AppColors.accentForeground)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
                 }
                 .appGlassButton(prominent: true, tint: AppColors.accent)
-                .staggeredAppearance(isVisible: hasContentAppeared, index: 7)
+                .staggeredAppearance(isVisible: hasContentAppeared, index: 8)
                 .padding(.top, 12)
             }
         }
@@ -101,7 +103,6 @@ struct SettingsView: View {
             Text(restoreAlertMessage)
         }
         .onAppear {
-            configureSegmentedControlAppearance()
             selectedType = settings.goalType
             countValue = settings.jumpCount
             timeValue = settings.jumpTime
@@ -165,7 +166,7 @@ struct SettingsView: View {
                         } label: {
                             Text("Unlock Unlimited")
                                 .font(AppFonts.primaryButtonLabel)
-                                .foregroundStyle(AppColors.bgPrimary)
+                                .foregroundStyle(AppColors.accentForeground)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 44)
                                 .background(AppColors.accent)
@@ -210,7 +211,7 @@ struct SettingsView: View {
     /// Groups goal controls so this sheet can grow into a broader settings surface without mixing concerns.
     private var goalSettingsSection: some View {
         settingsSection(title: String(localized: "Goal Settings")) {
-            segmentedControl
+            GoalTypePickerView(selection: $selectedType)
 
             stepperRow
                 .animation(.easeInOut, value: selectedType)
@@ -357,20 +358,6 @@ struct SettingsView: View {
     /// Settings toggle with an info button that presents help in a popover.
     private func settingsToggle(isOn: Binding<Bool>, title: String, description: String) -> some View {
         SettingsToggleRow(isOn: isOn, title: title, description: description)
-    }
-
-    // MARK: - Segmented Control
-
-    /// Switches between count and time goal editing.
-    private var segmentedControl: some View {
-        Picker("Goal Type", selection: $selectedType) {
-            Text("Jump Count")
-                .tag(GoalType.count)
-            Text("Jump Time")
-                .tag(GoalType.time)
-        }
-        .pickerStyle(.segmented)
-        .controlSize(.large)
     }
 
     // MARK: - Stepper Row
@@ -540,25 +527,41 @@ struct SettingsView: View {
         }
         settings.goalType = selectedType
     }
-
-    /// Applies the custom UIKit appearance used by the segmented control.
-    private func configureSegmentedControlAppearance() {
-        let selectedTextAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UIColor(AppColors.bgPrimary),
-            .font: AppFonts.segmentedControlLabel,
-        ]
-        let normalTextAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UIColor(AppColors.textSecondary),
-            .font: AppFonts.segmentedControlLabel,
-        ]
-
-        UISegmentedControl.appearance().selectedSegmentTintColor = UIColor(AppColors.accent)
-        UISegmentedControl.appearance().setTitleTextAttributes(normalTextAttributes, for: .normal)
-        UISegmentedControl.appearance().setTitleTextAttributes(selectedTextAttributes, for: .selected)
-    }
 }
 
 // MARK: - Settings Subviews
+
+/// Keeps selected goal labels readable while the accent changes.
+private struct GoalTypePickerView: View {
+    @Binding var selection: GoalType
+
+    var body: some View {
+        HStack(spacing: 4) {
+            goalButton("Jump Count", goalType: .count)
+            goalButton("Jump Time", goalType: .time)
+        }
+        .padding(4)
+        .background(AppColors.cardSurface, in: RoundedRectangle(cornerRadius: 12))
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(Text("Goal Type"))
+    }
+
+    private func goalButton(_ title: LocalizedStringKey, goalType: GoalType) -> some View {
+        Button {
+            selection = goalType
+        } label: {
+            Text(title)
+                .font(AppFonts.bodyLabelStrong)
+                .foregroundStyle(selection == goalType ? AppColors.accentForeground : AppColors.textSecondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(selection == goalType ? AppColors.accent : .clear, in: RoundedRectangle(cornerRadius: 8))
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(selection == goalType ? .isSelected : [])
+    }
+}
 
 /// Renders a toggle setting row with an info mark icon that reveals explanatory copy inside a popover.
 private struct SettingsToggleRow: View {

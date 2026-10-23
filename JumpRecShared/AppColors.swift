@@ -20,7 +20,9 @@ public extension Color {
 public enum AppColors {
     public static let bgPrimary = Color(hex: 0x0A0F1C)
     public static let cardSurface = Color(hex: 0x1E293B)
-    public static let accent = Color(hex: 0x22D3EE)
+    @MainActor public static var accent: Color { AppAppearance.shared.accent.color }
+    /// All palette colors support dark labels on filled accent controls.
+    public static let accentForeground = bgPrimary
     public static let textPrimary = Color.white
     public static let textSecondary = Color(hex: 0x94A3B8)
     public static let textMuted = Color(hex: 0x64748B)

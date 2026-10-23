@@ -263,6 +263,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     ) {
         let payload: [String: Any] = [
             "type": "goalSettings",
+            "accentColor": AppAppearance.shared.accent.rawValue,
             "goalType": goalType.rawValue,
             "jumpCount": jumpCount,
             "jumpTime": jumpTime,

@@ -199,7 +199,7 @@ struct PaywallView: View {
                     } else {
                         Text("Unlock Unlimited Workouts")
                             .font(AppFonts.primaryButtonLabel)
-                            .foregroundStyle(AppColors.bgPrimary)
+                            .foregroundStyle(AppColors.accentForeground)
                     }
                 }
                 .frame(maxWidth: .infinity)

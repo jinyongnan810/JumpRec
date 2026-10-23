@@ -18,6 +18,7 @@ struct ContentView: View {
 
     var body: some View {
         MainView()
+            .tint(AppColors.accent)
             .onAppear {
                 // Warm up speech on first appearance to reduce the first workout cue's delay.
                 appState.warmUpSpeechSynthesizerIfNeeded()

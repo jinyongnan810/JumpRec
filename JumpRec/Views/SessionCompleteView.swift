@@ -170,7 +170,7 @@ struct SessionCompleteView: View {
                         Text("DONE")
                             .font(AppFonts.cardTitle)
                     }
-                    .foregroundStyle(AppColors.bgPrimary)
+                    .foregroundStyle(AppColors.accentForeground)
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
                 }
@@ -216,11 +216,10 @@ struct SessionCompleteView: View {
     private var completionCheckmark: some View {
         let checkmark = Image(systemName: "checkmark")
             .font(AppFonts.largeDisplay)
-            .foregroundStyle(AppColors.bgPrimary)
+            .foregroundStyle(AppColors.accentForeground)
 
         if #available(iOS 26.0, *) {
             checkmark
-                .foregroundStyle(.white)
                 .symbolEffect(
                     .drawOn,
                     options: .speed(0.5),
