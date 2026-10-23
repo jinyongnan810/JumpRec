@@ -25,7 +25,7 @@ struct HomeView: View {
 
     // MARK: - View State
 
-    /// Controls presentation of the paywall sheet when the 100-workout quota is reached.
+    /// Controls presentation of the paywall sheet when the free workout quota is reached.
     @State private var showPaywall = false
     /// Controls presentation of the settings sheet.
     @State private var showSettingsView = false
@@ -271,7 +271,7 @@ struct HomeView: View {
 
     // MARK: - Private Subviews
 
-    /// Allows starting with an unlimited license or fewer than 100 qualifying workouts.
+    /// Allows starting with an unlimited license or fewer than 10 qualifying workouts.
     private var canStartWorkout: Bool {
         dataStore.canStartNewWorkout(isLicenseUnlocked: purchaseManager.hasUnlockedUnlimitedWorkouts)
     }

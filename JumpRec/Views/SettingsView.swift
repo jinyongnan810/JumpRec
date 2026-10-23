@@ -155,7 +155,7 @@ struct SettingsView: View {
                     )
                     .tint(AppColors.accent)
 
-                    Text("Includes workouts with 100+ jumps. When you complete 100 workouts, unlock lifetime unlimited tracking with a single purchase.")
+                    Text("Includes workouts with 100+ jumps. When you complete 10 workouts, unlock lifetime unlimited tracking with a single purchase.")
                         .font(AppFonts.bodySmall)
                         .foregroundStyle(AppColors.textSecondary)
 

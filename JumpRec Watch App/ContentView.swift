@@ -60,7 +60,7 @@ struct ContentView: View {
 }
 
 #if DEBUG
-    #Preview("100 Free Workouts Used") {
+    #Preview("10 Free Workouts Used") {
         // Tapping Start in this idle preview shows quota help.
         ContentView()
             .environment(JumpRecSettings(previewQualifiedWorkoutCount: JumpRecSettings.freeWorkoutQuota))

@@ -655,18 +655,18 @@
         }
       }
     },
-    "You've completed your 100 free workouts. Please consider open JumpRec on your iPhone to unlock unlimited workouts." : {
+    "You've completed your 10 free workouts. Please consider open JumpRec on your iPhone to unlock unlimited workouts." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You've completed your 100 free workouts. Please consider open JumpRec on your iPhone to unlock unlimited workouts."
+            "value" : "You've completed your 10 free workouts. Please consider open JumpRec on your iPhone to unlock unlimited workouts."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無料の100回ワークアウトが完了しました。iPhoneのJumpRecから無制限ワークアウトのアンロックをご検討ください。"
+            "value" : "無料の10回ワークアウトが完了しました。iPhoneのJumpRecから無制限ワークアウトのアンロックをご検討ください。"
           }
         }
       }

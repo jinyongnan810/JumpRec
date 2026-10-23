@@ -115,8 +115,8 @@ public class JumpRecSettings {
     }
 
     /// Free workout quota allowed before requiring a one-time license.
-    public static let freeWorkoutQuota = 100
-    /// Minimum jump count for a session to qualify toward the 100-workout quota.
+    public static let freeWorkoutQuota = 10
+    /// Minimum jump count for a session to qualify toward the free workout quota.
     public static let minimumJumpsForQuotaQualification = 100
 
     /// Indicates whether the user has unlocked the one-time license for unlimited workouts.

@@ -155,7 +155,7 @@ struct StartView: View {
                 .font(AppFonts.watchSectionTitle)
                 .multilineTextAlignment(.center)
 
-            Text("You've completed your 100 free workouts. Please consider open JumpRec on your iPhone to unlock unlimited workouts.")
+            Text("You've completed your 10 free workouts. Please consider open JumpRec on your iPhone to unlock unlimited workouts.")
                 .font(AppFonts.watchSupporting)
                 .multilineTextAlignment(.center)
 

@@ -43,7 +43,7 @@
 - **No Ads or Third-Party Trackers:** No analytics SDKs or advertising networks.
 
 ### 💰 Pricing
-- **100 Free Workouts:** First 100 sessions are free with full functionality.
+- **10 Free Workouts:** First 10 sessions are free with full functionality.
 - **One-Time Purchase:** A single in-app purchase unlocks unlimited workouts. No subscriptions.
 
 ---

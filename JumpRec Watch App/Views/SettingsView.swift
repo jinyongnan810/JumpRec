@@ -441,7 +441,7 @@ struct TimeView: View {
 }
 
 #if DEBUG
-    #Preview("100 Free Workouts Used") {
+    #Preview("10 Free Workouts Used") {
         // Show the exhausted membership state without persisting sample quota or goal edits.
         SettingsView()
             .environment(JumpRecSettings(previewQualifiedWorkoutCount: JumpRecSettings.freeWorkoutQuota))

@@ -14,7 +14,7 @@ struct ContentView: View {
     @Environment(MyDataStore.self) var dataStore
     @Environment(\.requestReview) private var requestReview
     @Environment(\.scenePhase) private var scenePhase
-    @AppStorage("hasRequestedReviewAfterTenSessions") private var hasRequestedReviewAfterTenSessions = false
+    @AppStorage("hasRequestedReviewAfterTenSessions") private var hasRequestedWorkoutReview = false
     @AppStorage("qualifiedFinishedSessionCount") private var qualifiedFinishedSessionCount = 0
     @State private var connectivityManager = ConnectivityManager.shared
     @State private var purchaseManager = PurchaseManager.shared
@@ -179,8 +179,8 @@ struct ContentView: View {
     private func scheduleReviewRequestIfNeeded() {
         guard appState.sessionState == .complete,
               appState.completedSession != nil,
-              qualifiedFinishedSessionCount >= 10,
-              !hasRequestedReviewAfterTenSessions
+              qualifiedFinishedSessionCount >= 20,
+              !hasRequestedWorkoutReview
         else {
             pendingReviewTask?.cancel()
             pendingReviewTask = nil
@@ -192,7 +192,7 @@ struct ContentView: View {
             try? await Task.sleep(for: .seconds(3))
             guard !Task.isCancelled, appState.sessionState == .complete else { return }
             requestReview()
-            hasRequestedReviewAfterTenSessions = true
+            hasRequestedWorkoutReview = true
             pendingReviewTask = nil
         }
     }
@@ -234,7 +234,7 @@ struct ContentView: View {
 }
 
 #if DEBUG
-    #Preview("100 Free Workouts Used") {
+    #Preview("10 Free Workouts Used") {
         // Seed isolated qualifying sessions so starting a free-tier workout presents the paywall.
         let dataStore = try! MyDataStore.makePreviewStore(qualifiedWorkoutCount: JumpRecSettings.freeWorkoutQuota)
         ContentView()

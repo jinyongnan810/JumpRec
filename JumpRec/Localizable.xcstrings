@@ -1550,29 +1550,29 @@
     "Inbox" : {
 
     },
-    "Includes sessions with 100+ jumps. When you complete 100 workouts, unlock lifetime unlimited tracking with a single purchase." : {
+    "Includes sessions with 100+ jumps. When you complete 10 workouts, unlock lifetime unlimited tracking with a single purchase." : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Includes sessions with 100+ jumps. When you complete 100 workouts, unlock lifetime unlimited tracking with a single purchase."
+            "value" : "Includes sessions with 100+ jumps. When you complete 10 workouts, unlock lifetime unlimited tracking with a single purchase."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "100回以上のジャンプを完了したセッションが対象です。100回完了後は、1回限りの購入で無制限のワークアウトをアンロックできます。"
+            "value" : "100回以上のジャンプを完了したセッションが対象です。10回完了後は、1回限りの購入で無制限のワークアウトをアンロックできます。"
           }
         }
       }
     },
-    "Includes workouts with 100+ jumps. When you complete 100 workouts, unlock lifetime unlimited tracking with a single purchase." : {
+    "Includes workouts with 100+ jumps. When you complete 10 workouts, unlock lifetime unlimited tracking with a single purchase." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "100回以上のジャンプを完了したワークアウトが対象です。100回完了後は、1回限りの購入で無制限のワークアウトをアンロックできます。"
+            "value" : "100回以上のジャンプを完了したワークアウトが対象です。10回完了後は、1回限りの購入で無制限のワークアウトをアンロックできます。"
           }
         }
       }
@@ -4348,18 +4348,18 @@
         }
       }
     },
-    "You've logged 100 great workouts with JumpRec. Consider unlocking unlimited workout tracking forever with a single, one-time purchase." : {
+    "You've logged 10 great workouts with JumpRec. Consider unlocking unlimited workout tracking forever with a single, one-time purchase." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You've logged 100 great workouts with JumpRec. Consider unlocking unlimited workout tracking forever with a single, one-time purchase."
+            "value" : "You've logged 10 great workouts with JumpRec. Consider unlocking unlimited workout tracking forever with a single, one-time purchase."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "JumpRecで100回のワークアウトを記録しました。1回限りの購入で、無制限のワークアウト記録をアンロックできます。"
+            "value" : "JumpRecで10回のワークアウトを記録しました。1回限りの購入で、無制限のワークアウト記録をアンロックできます。"
           }
         }
       }

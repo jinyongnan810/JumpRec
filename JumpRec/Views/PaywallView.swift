@@ -21,7 +21,7 @@ struct PaywallView: View {
         dataStore.qualifiedSessionsCount()
     }
 
-    /// Indicates whether the 100 free workouts quota has actually been exhausted.
+    /// Indicates whether the 10 free workouts quota has actually been exhausted.
     private var isQuotaReached: Bool {
         qualifiedCount >= JumpRecSettings.freeWorkoutQuota
     }
@@ -104,7 +104,7 @@ struct PaywallView: View {
     /// Dynamic subtitle: specifies current session count when under quota.
     private var headerSubtitle: String {
         if isQuotaReached {
-            String(localized: "You've logged 100 great workouts with JumpRec. Consider unlocking unlimited workout tracking forever with a single, one-time purchase.")
+            String(localized: "You've logged 10 great workouts with JumpRec. Consider unlocking unlimited workout tracking forever with a single, one-time purchase.")
         } else {
             String(
                 format: String(localized: "You've logged %lld of %lld free workouts. Consider unlocking unlimited workout tracking with a single, one-time purchase."),

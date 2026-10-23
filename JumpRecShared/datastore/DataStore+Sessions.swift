@@ -52,7 +52,7 @@ public extension MyDataStore {
         return (try? modelContext.fetchCount(descriptor)) ?? 0
     }
 
-    /// Allows workouts with an unlimited license or fewer than 100 qualifying sessions.
+    /// Allows workouts with an unlimited license or fewer than 10 qualifying sessions.
     func canStartNewWorkout(isLicenseUnlocked: Bool) -> Bool {
         if isLicenseUnlocked {
             return true
