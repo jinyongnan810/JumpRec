@@ -31,6 +31,9 @@ struct SessionCompleteView: View {
     /// Includes the debug CSV button in the entrance sequence only when visible.
     private var hasMotionCSVShareAction: Bool {
         #if DEBUG
+            #if targetEnvironment(simulator)
+                if ScreenshotFixtures.isEnabled { return false }
+            #endif
             return appState.motionCSVShareURL != nil
         #else
             return false
@@ -146,7 +149,7 @@ struct SessionCompleteView: View {
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 12) {
                 #if DEBUG
-                    if let motionCSVShareURL = appState.motionCSVShareURL {
+                    if hasMotionCSVShareAction, let motionCSVShareURL = appState.motionCSVShareURL {
                         ShareLink(item: motionCSVShareURL) {
                             HStack(spacing: 8) {
                                 Image(systemName: "square.and.arrow.up")

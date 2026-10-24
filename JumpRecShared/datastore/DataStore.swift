@@ -135,6 +135,15 @@ public final class MyDataStore {
     /// Main context for performing data operations.
     public let modelContext: ModelContext
 
+    /// Identifies the isolated simulator store used for App Store captures.
+    public var isScreenshotStore: Bool {
+        #if DEBUG && targetEnvironment(simulator)
+            ScreenshotFixtures.isEnabled
+        #else
+            false
+        #endif
+    }
+
     /// Tracks the current CloudKit account status so empty-state UI can explain why history may be missing.
     public private(set) var cloudAccountAvailability: CloudAccountAvailability = .checking
 
@@ -170,6 +179,21 @@ public final class MyDataStore {
 
     /// Creates the shared store and applies one-time bootstrap work.
     private static func makeSharedStore() throws -> MyDataStore {
+        #if DEBUG && targetEnvironment(simulator)
+            if ScreenshotFixtures.isEnabled {
+                let schema = ModelContainer.makeSharedSchema()
+                let configuration = ModelConfiguration(
+                    "ScreenshotHistory",
+                    schema: schema,
+                    groupContainer: .none,
+                    cloudKitDatabase: .none
+                )
+                let container = try ModelContainer(for: schema, configurations: [configuration])
+                let store = MyDataStore(modelContainer: container)
+                try store.seedScreenshotHistoryIfNeeded()
+                return store
+            }
+        #endif
         let modelContainer = try ModelContainer.createContainer()
         let store = MyDataStore(modelContainer: modelContainer)
         #if DEBUG
@@ -261,6 +285,7 @@ public final class MyDataStore {
 
     /// Refreshes observable iCloud diagnostics and logs.
     public func refreshCloudDiagnostics() {
+        guard !isScreenshotStore else { return }
         Task { [weak self] in
             guard let self else { return }
             await updateCloudAccountAvailability()

@@ -163,11 +163,13 @@ struct HistoryView: View {
                     .matchedTransitionSource(id: Self.recordsTransitionID, in: navigationTransitionNamespace)
                 }
                 #if DEBUG
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button(role: .destructive) {
-                            promptDeleteAllSessions()
-                        } label: {
-                            Label("Delete All", systemImage: "trash")
+                    if !dataStore.isScreenshotStore {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button(role: .destructive) {
+                                promptDeleteAllSessions()
+                            } label: {
+                                Label("Delete All", systemImage: "trash")
+                            }
                         }
                     }
                 #endif

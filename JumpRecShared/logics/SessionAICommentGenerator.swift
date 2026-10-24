@@ -27,9 +27,12 @@ public enum SessionAICommentGenerator {
     /// Enables AI comments only in debug builds.
     public static var isEnabled: Bool {
         #if DEBUG
-            true
+            #if targetEnvironment(simulator)
+                if ScreenshotFixtures.isEnabled { return false }
+            #endif
+            return true
         #else
-            false
+            return false
         #endif
     }
 

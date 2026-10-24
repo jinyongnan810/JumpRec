@@ -121,6 +121,25 @@ class JumpRecState: NSObject, @unchecked Sendable {
         }
     }
 
+    #if DEBUG && targetEnvironment(simulator)
+        /// Loads a screenshot state without starting sensors or a HealthKit workout.
+        func loadScreenshotState() {
+            guard let state = ScreenshotFixtures.state, ["active", "complete"].contains(state) else { return }
+            let session = ScreenshotFixtures.makeCompletedSession()
+            startTime = state == "active" ? Date().addingTimeInterval(-81) : session.startedAt
+            endTime = state == "active" ? nil : session.endedAt
+            jumpCount = session.jumpCount
+            energyBurned = session.caloriesBurned
+            heartrate = 111
+            heartRateSum = 111
+            heartRateSampleCount = 1
+            peakHeartRate = 128
+            goalType = .count
+            goal = 1000
+            jumpState = state == "active" ? .jumping : .finished
+        }
+    #endif
+
     /// Applies a synced settings snapshot to the active workout without creating an observer.
     private func applySyncedSettingsFromStore() {
         let store = NSUbiquitousKeyValueStore.default

@@ -161,6 +161,12 @@ final class JumpRecState: NSObject, @unchecked Sendable {
                 self?.addJump(from: source)
             },
             onSourceChanged: { [weak self] source in
+                #if DEBUG && targetEnvironment(simulator)
+                    if ScreenshotFixtures.state == "active" {
+                        self?.activeMotionSource = .airpods
+                        return
+                    }
+                #endif
                 self?.activeMotionSource = Self.deviceSource(from: source)
             },
             onAvailabilityChanged: { [weak self] isPhoneAvailable, isHeadphoneAvailable, headphoneName in
@@ -201,6 +207,24 @@ final class JumpRecState: NSObject, @unchecked Sendable {
         // The delegate restores background-audio volume after speech finishes.
         synthesizer.delegate = self
         prepareHaptics()
+        #if DEBUG && targetEnvironment(simulator)
+            if let state = ScreenshotFixtures.state, ["active", "complete"].contains(state) {
+                let session = ScreenshotFixtures.makeCompletedSession()
+                startTime = state == "active" ? Date().addingTimeInterval(-81) : session.startedAt
+                endTime = state == "active" ? nil : session.endedAt
+                jumpCount = session.jumpCount
+                caloriesBurned = session.caloriesBurned
+                heartRate = 111
+                averageHeartRate = 111
+                peakHeartRate = 128
+                sessionGoalType = .count
+                sessionGoalValue = 1000
+                activeMotionSource = .airpods
+                isHeadphoneMotionAvailable = true
+                completedSession = state == "complete" ? session : nil
+                sessionState = state == "active" ? .active : .complete
+            }
+        #endif
     }
 
     // MARK: - Derived Values

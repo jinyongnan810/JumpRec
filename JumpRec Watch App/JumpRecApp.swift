@@ -19,6 +19,13 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate {
 @main
 struct JumpRec_Watch_AppApp: App {
     @WKApplicationDelegateAdaptor(WatchAppDelegate.self) private var appDelegate
+
+    init() {
+        #if DEBUG && targetEnvironment(simulator)
+            JumpRecState.shared.loadScreenshotState()
+        #endif
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
