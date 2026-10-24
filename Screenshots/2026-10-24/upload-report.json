@@ -1,0 +1,347 @@
+{
+  "appId": "6760456262",
+  "appName": "JumpRec",
+  "version": "1.0.21",
+  "versionId": "3cbe6115-6296-4af6-aed8-6d63584b0df5",
+  "verificationDate": "2026-10-24",
+  "cliVersion": "5.16.1",
+  "uploadedScreenshotCount": 36,
+  "sets": [
+    {
+      "locale": "en-US",
+      "displayType": "APP_IPHONE_61",
+      "setId": "db4e2509-3b7f-4c75-aa70-c9e14374b65e",
+      "count": 7,
+      "screenshots": [
+        {
+          "file": "iPhone-18-Pro/01-ready.png",
+          "assetId": "2a400019-2f46-8046-803c-5786651e5ed2",
+          "state": "COMPLETE",
+          "md5": "c06d7ff035ed1244d9cbc77afcdcd266",
+          "width": 1206,
+          "height": 2622
+        },
+        {
+          "file": "iPhone-18-Pro/02-active.png",
+          "assetId": "17800019-2f46-8046-801f-454e5b1e7a93",
+          "state": "COMPLETE",
+          "md5": "5ca17772f2212573020560a9f5706335",
+          "width": 1206,
+          "height": 2622
+        },
+        {
+          "file": "iPhone-18-Pro/03-history.png",
+          "assetId": "43800019-2f46-8046-8007-0c9aaa519246",
+          "state": "COMPLETE",
+          "md5": "9e014d6421c8331ebd4519a61e6d8b69",
+          "width": 1206,
+          "height": 2622
+        },
+        {
+          "file": "iPhone-18-Pro/04-records.png",
+          "assetId": "ff000019-2f46-8046-802e-d45766724fb2",
+          "state": "COMPLETE",
+          "md5": "8b048b69454b1c8b9a1583dc3c7515f2",
+          "width": 1206,
+          "height": 2622
+        },
+        {
+          "file": "iPhone-18-Pro/05-workout-details.png",
+          "assetId": "13400019-2f46-8046-800d-40c30ec1f375",
+          "state": "COMPLETE",
+          "md5": "d477be2eeb7ad1cd62f2e59be6501a03",
+          "width": 1206,
+          "height": 2622
+        },
+        {
+          "file": "iPhone-18-Pro/06-complete.png",
+          "assetId": "77800019-2f46-8046-800b-0bb60297679a",
+          "state": "COMPLETE",
+          "md5": "cdbc6ccbfc9c13e15488f2a6e4889c45",
+          "width": 1206,
+          "height": 2622
+        },
+        {
+          "file": "iPhone-18-Pro/07-settings.png",
+          "assetId": "4c400019-2f46-8046-801c-974600e3cee6",
+          "state": "COMPLETE",
+          "md5": "4d93586916f7ef7c78d49327d0021e8a",
+          "width": 1206,
+          "height": 2622
+        }
+      ]
+    },
+    {
+      "locale": "en-US",
+      "displayType": "APP_IPHONE_DUO",
+      "setId": "a4a015c9-edde-4913-a9a5-2f28df5c07c4",
+      "count": 7,
+      "screenshots": [
+        {
+          "file": "iPhone-Duo/01-ready.png",
+          "assetId": "fec00019-2f46-8046-800e-c5b4a7c5ac0f",
+          "state": "COMPLETE",
+          "md5": "a43953ef753ccdf21fc722b0d4e1426a",
+          "width": 1398,
+          "height": 2034
+        },
+        {
+          "file": "iPhone-Duo/02-active.png",
+          "assetId": "f3400019-2f46-8046-803d-981585554d84",
+          "state": "COMPLETE",
+          "md5": "adbd3fa97860480a81607cedfee13ce2",
+          "width": 1398,
+          "height": 2034
+        },
+        {
+          "file": "iPhone-Duo/03-history.png",
+          "assetId": "cf400019-2f46-8046-803f-933b0e025045",
+          "state": "COMPLETE",
+          "md5": "4918636192499245c4911f9b863f68e9",
+          "width": 1398,
+          "height": 2034
+        },
+        {
+          "file": "iPhone-Duo/04-records.png",
+          "assetId": "36800019-2f46-8046-8020-b18b0789dd8a",
+          "state": "COMPLETE",
+          "md5": "71aca9b45e2619759670c43a6009ce28",
+          "width": 1398,
+          "height": 2034
+        },
+        {
+          "file": "iPhone-Duo/05-workout-details.png",
+          "assetId": "a0400019-2f46-8046-8024-f1077296e9b1",
+          "state": "COMPLETE",
+          "md5": "32275b44140785fe0744d1ab0616b38f",
+          "width": 1398,
+          "height": 2034
+        },
+        {
+          "file": "iPhone-Duo/06-complete.png",
+          "assetId": "ce400019-2f46-8046-8032-f35ffff62c08",
+          "state": "COMPLETE",
+          "md5": "60d28473874e77f62c9e88252770b051",
+          "width": 1398,
+          "height": 2034
+        },
+        {
+          "file": "iPhone-Duo/07-settings.png",
+          "assetId": "07400019-2f46-8046-8008-76acdca34850",
+          "state": "COMPLETE",
+          "md5": "e846a6948c6bb851d27eb9abce440d4c",
+          "width": 1398,
+          "height": 2034
+        }
+      ]
+    },
+    {
+      "locale": "en-US",
+      "displayType": "APP_WATCH_SERIES_10",
+      "setId": "dfdc644d-6b2a-4451-82ee-a60456acff6a",
+      "count": 4,
+      "screenshots": [
+        {
+          "file": "Apple-Watch/01-ready.png",
+          "assetId": "91c00019-2f46-8046-802b-6036924c6fd9",
+          "state": "COMPLETE",
+          "md5": "58e1f1e48981412f5c0e213dc130124a",
+          "width": 416,
+          "height": 496
+        },
+        {
+          "file": "Apple-Watch/02-active.png",
+          "assetId": "4f000019-2f46-8046-8027-6cd2c74d59fd",
+          "state": "COMPLETE",
+          "md5": "5c46b983faa15123d7496450384d7338",
+          "width": 416,
+          "height": 496
+        },
+        {
+          "file": "Apple-Watch/03-complete.png",
+          "assetId": "74000019-2f46-8046-801a-10c051a1cf23",
+          "state": "COMPLETE",
+          "md5": "a2a191fd06dcdc7d104951ca7659ddae",
+          "width": 416,
+          "height": 496
+        },
+        {
+          "file": "Apple-Watch/04-settings.png",
+          "assetId": "05c00019-2f46-8046-8006-a8b7b31239a7",
+          "state": "COMPLETE",
+          "md5": "d5ab1cc7bddf7034283d09e821aa1bfa",
+          "width": 416,
+          "height": 496
+        }
+      ]
+    },
+    {
+      "locale": "ja",
+      "displayType": "APP_IPHONE_61",
+      "setId": "236cc7f1-038b-4c7f-9a13-fba165a39e69",
+      "count": 7,
+      "screenshots": [
+        {
+          "file": "ja/iPhone-18-Pro/01-ready.png",
+          "assetId": "02c00019-2f46-8046-8021-4796b9b6423f",
+          "state": "COMPLETE",
+          "md5": "4ad955a875e99fd0f2960cc9b8992536",
+          "width": 1206,
+          "height": 2622
+        },
+        {
+          "file": "ja/iPhone-18-Pro/02-active.png",
+          "assetId": "0f400019-2f46-8046-802b-bdc334eb0ec3",
+          "state": "COMPLETE",
+          "md5": "5142affb2f1ac1464853d9e9a9dfa42d",
+          "width": 1206,
+          "height": 2622
+        },
+        {
+          "file": "ja/iPhone-18-Pro/03-history.png",
+          "assetId": "a5c00019-2f46-8046-8011-139cff5b97ba",
+          "state": "COMPLETE",
+          "md5": "f3bada1336a03b7a579a776ce8fee36b",
+          "width": 1206,
+          "height": 2622
+        },
+        {
+          "file": "ja/iPhone-18-Pro/04-records.png",
+          "assetId": "13400019-2f46-8046-8008-29c574318886",
+          "state": "COMPLETE",
+          "md5": "a4efd9f003c2c7f4d800b10a56f455d9",
+          "width": 1206,
+          "height": 2622
+        },
+        {
+          "file": "ja/iPhone-18-Pro/05-workout-details.png",
+          "assetId": "a5800019-2f46-8046-800a-52daa93f3c5f",
+          "state": "COMPLETE",
+          "md5": "d6d3d95a8123093488f80c1d57cf8f44",
+          "width": 1206,
+          "height": 2622
+        },
+        {
+          "file": "ja/iPhone-18-Pro/06-complete.png",
+          "assetId": "2f800019-2f46-8046-8013-3bc1937489b2",
+          "state": "COMPLETE",
+          "md5": "9767360c6b23fa53b4005aeb2e99732a",
+          "width": 1206,
+          "height": 2622
+        },
+        {
+          "file": "ja/iPhone-18-Pro/07-settings.png",
+          "assetId": "0b400019-2f46-8046-8027-a0ea39e10f83",
+          "state": "COMPLETE",
+          "md5": "95e0917ec4ee55772bb9951d51091ad1",
+          "width": 1206,
+          "height": 2622
+        }
+      ]
+    },
+    {
+      "locale": "ja",
+      "displayType": "APP_IPHONE_DUO",
+      "setId": "360832d8-b1c9-4e87-9c7e-7e57400bb6bb",
+      "count": 7,
+      "screenshots": [
+        {
+          "file": "ja/iPhone-Duo/01-ready.png",
+          "assetId": "2f800019-2f46-8046-8034-562330abf35e",
+          "state": "COMPLETE",
+          "md5": "606f8644db7f46b106b667d55b2098f0",
+          "width": 1398,
+          "height": 2034
+        },
+        {
+          "file": "ja/iPhone-Duo/02-active.png",
+          "assetId": "11800019-2f46-8046-801b-2331687da45f",
+          "state": "COMPLETE",
+          "md5": "162f865b9bd1c545b8f3b8fc7e679e6c",
+          "width": 1398,
+          "height": 2034
+        },
+        {
+          "file": "ja/iPhone-Duo/03-history.png",
+          "assetId": "2a400019-2f46-8046-801d-daefe351a43a",
+          "state": "COMPLETE",
+          "md5": "4f87597c943552baedd53a17010e1d47",
+          "width": 1398,
+          "height": 2034
+        },
+        {
+          "file": "ja/iPhone-Duo/04-records.png",
+          "assetId": "b1c00019-2f46-8046-8014-523bd46589c0",
+          "state": "COMPLETE",
+          "md5": "0095c13836bbddd63773d7d78fb05eab",
+          "width": 1398,
+          "height": 2034
+        },
+        {
+          "file": "ja/iPhone-Duo/05-workout-details.png",
+          "assetId": "3a400019-2f46-8046-802e-578c41ad240d",
+          "state": "COMPLETE",
+          "md5": "f32381c1f26ecc733692d770f99ecef9",
+          "width": 1398,
+          "height": 2034
+        },
+        {
+          "file": "ja/iPhone-Duo/06-complete.png",
+          "assetId": "d8400019-2f46-8046-8015-f3b028f000d8",
+          "state": "COMPLETE",
+          "md5": "e8492a07d3b030faa4cc74e5ade78e80",
+          "width": 1398,
+          "height": 2034
+        },
+        {
+          "file": "ja/iPhone-Duo/07-settings.png",
+          "assetId": "e3800019-2f46-8046-8021-d5e0e7495c8d",
+          "state": "COMPLETE",
+          "md5": "5a8fea1e0da994d992df2a6a1ef6758b",
+          "width": 1398,
+          "height": 2034
+        }
+      ]
+    },
+    {
+      "locale": "ja",
+      "displayType": "APP_WATCH_SERIES_10",
+      "setId": "71993563-d43a-4303-ac8b-37b2539cc65c",
+      "count": 4,
+      "screenshots": [
+        {
+          "file": "ja/Apple-Watch/01-ready.png",
+          "assetId": "2d800019-2f46-8046-8017-3c7e064c3b14",
+          "state": "COMPLETE",
+          "md5": "a50c1a58c8b2972e8ef023f7f3367ec9",
+          "width": 416,
+          "height": 496
+        },
+        {
+          "file": "ja/Apple-Watch/02-active.png",
+          "assetId": "76800019-2f46-8046-8032-72149dce4a45",
+          "state": "COMPLETE",
+          "md5": "84a3c48e68d5265616017009cf61ef37",
+          "width": 416,
+          "height": 496
+        },
+        {
+          "file": "ja/Apple-Watch/03-complete.png",
+          "assetId": "e0400019-2f46-8046-8018-4dc1ee098c4c",
+          "state": "COMPLETE",
+          "md5": "28d234de8d8e45fda993fe41c9db8df3",
+          "width": 416,
+          "height": 496
+        },
+        {
+          "file": "ja/Apple-Watch/04-settings.png",
+          "assetId": "e4800019-2f46-8046-8028-f26273bf602b",
+          "state": "COMPLETE",
+          "md5": "2d718ff3158d5842fb083270c6610219",
+          "width": 416,
+          "height": 496
+        }
+      ]
+    }
+  ]
+}
