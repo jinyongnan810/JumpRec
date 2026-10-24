@@ -181,13 +181,7 @@ struct HomeView: View {
                 if appState.sessionState == .active {
                     ActiveWorkoutControls(appState: appState, settings: settings, onStop: onStop)
                 } else {
-                    VStack(spacing: 20) {
-                        Text("For hands-free workouts, use Apple Watch or supported headphones.")
-                            .font(AppFonts.bodySmall)
-                            .foregroundStyle(AppColors.textSecondary)
-                            .multilineTextAlignment(.center)
-                        idleControls
-                    }
+                    idleControls
                 }
             }
             .toolbarVisibility(appState.sessionState == .idle ? .visible : .hidden, for: .tabBar)

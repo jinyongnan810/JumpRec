@@ -80,6 +80,7 @@ struct ResultView: View {
                         Image(systemName: "xmark")
                             .foregroundStyle(AppColors.textSecondary)
                     }
+                    .buttonStyle(.plain)
                     .accessibilityLabel(Text("Close results"))
                 }
             }

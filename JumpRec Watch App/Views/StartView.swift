@@ -139,6 +139,7 @@ struct StartView: View {
                         Image(systemName: "gearshape.fill")
                             .foregroundStyle(AppColors.textMuted)
                     }
+                    .buttonStyle(.plain)
                     .accessibilityLabel(Text("Settings"))
                 }
             }

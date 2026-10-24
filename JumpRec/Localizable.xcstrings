@@ -1252,16 +1252,6 @@
         }
       }
     },
-    "For hands-free workouts, use Apple Watch or supported headphones." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ハンズフリーでワークアウトするには、Apple Watchまたは対応するヘッドフォンを使用してください。"
-          }
-        }
-      }
-    },
     "Free Workouts" : {
       "localizations" : {
         "en" : {
