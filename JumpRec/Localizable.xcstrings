@@ -775,6 +775,16 @@
         }
       }
     },
+    "Choose a workout from History to see its details." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴からワークアウトを選択すると、詳細が表示されます。"
+          }
+        }
+      }
+    },
     "Close" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1238,6 +1248,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファミリー共有"
+          }
+        }
+      }
+    },
+    "For hands-free workouts, use Apple Watch or supported headphones." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ハンズフリーでワークアウトするには、Apple Watchまたは対応するヘッドフォンを使用してください。"
           }
         }
       }
@@ -1806,6 +1826,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "回数"
+          }
+        }
+      }
+    },
+    "Keep iPhone in your pocket to detect jumps." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプを検出するには、iPhoneをポケットに入れてください。"
           }
         }
       }
@@ -3037,6 +3067,16 @@
         }
       }
     },
+    "Select a workout" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトを選択"
+          }
+        }
+      }
+    },
     "Selected automatically when the session starts." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3926,6 +3966,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ で計測中"
+          }
+        }
+      }
+    },
+    "Tracking with headphones" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘッドフォンで計測中"
           }
         }
       }

@@ -21,6 +21,7 @@ struct HistoryView: View {
 
     @Environment(MyDataStore.self) private var dataStore
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @Namespace private var navigationTransitionNamespace
     private static let recordsTransitionID = "records"
@@ -43,6 +44,7 @@ struct HistoryView: View {
     @State private var displayedYear = Date()
     @State private var showRecords = false
     @State private var selectedSession: JumpSession?
+    @State private var preferredCompactColumn: NavigationSplitViewColumn = .sidebar
     @State private var sessionsPendingDeletion: [JumpSession] = []
     @State private var showingDeleteConfirmation = false
     @State private var isDeletingAllSessions = false
@@ -70,7 +72,7 @@ struct HistoryView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationSplitView(preferredCompactColumn: $preferredCompactColumn) {
             Group {
                 if !hasSessions {
                     emptyLibraryState
@@ -92,7 +94,8 @@ struct HistoryView: View {
                                     displayedMonth: displayedMonth,
                                     monthRange: displayedMonthRange,
                                     navigationTransitionNamespace: navigationTransitionNamespace,
-                                    selectedSession: $selectedSession,
+                                    selectedSession: sessionSelection,
+                                    showsSelection: horizontalSizeClass == .regular,
                                     onPreviousMonth: {
                                         displayedMonth = calendar.date(byAdding: .month, value: -1, to: displayedMonth) ?? displayedMonth
                                     },
@@ -115,7 +118,8 @@ struct HistoryView: View {
                                     displayedYear: displayedYear,
                                     yearRange: displayedYearRange,
                                     navigationTransitionNamespace: navigationTransitionNamespace,
-                                    selectedSession: $selectedSession,
+                                    selectedSession: sessionSelection,
+                                    showsSelection: horizontalSizeClass == .regular,
                                     onPreviousYear: {
                                         displayedYear = calendar.date(byAdding: .year, value: -1, to: displayedYear) ?? displayedYear
                                     },
@@ -141,10 +145,7 @@ struct HistoryView: View {
                     syncDisplayedYearWithMonth()
                 }
             }
-            .navigationDestination(item: $selectedSession) { session in
-                SessionDetailView(session: session)
-                    .navigationTransition(.zoom(sourceID: session.id, in: navigationTransitionNamespace))
-            }
+            .navigationSplitViewColumnWidth(min: 300, ideal: 360, max: 440)
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -184,6 +185,29 @@ struct HistoryView: View {
                 sessionCount: sessionsPendingDeletion.count,
                 onDelete: confirmDeleteSessions
             )
+        } detail: {
+            if let selectedSession, !selectedSession.isDeleted {
+                SessionDetailView(session: selectedSession, onDelete: clearSessionSelection)
+                    .id(selectedSession.id)
+            } else {
+                ContentUnavailableView(
+                    "Select a workout",
+                    systemImage: "figure.jumprope",
+                    description: Text("Choose a workout from History to see its details.")
+                )
+                .background(AppColors.bgPrimary)
+            }
+        }
+        .navigationSplitViewStyle(.balanced)
+        .onChange(of: preferredCompactColumn) { _, column in
+            if horizontalSizeClass == .compact, column == .sidebar {
+                selectedSession = nil
+            }
+        }
+        .onChange(of: selectedSession?.isDeleted) { _, isDeleted in
+            if isDeleted == true {
+                clearSessionSelection()
+            }
         }
         .onAppear {
             dataStore.refreshLocalSessionCount()
@@ -194,6 +218,27 @@ struct HistoryView: View {
         .onChange(of: dataStore.hasLocalSessions) { _, _ in
             dataStore.refreshLocalSessionCount()
         }
+    }
+
+    /// Selecting a row also opens the detail column when navigation is collapsed.
+    private var sessionSelection: Binding<JumpSession?> {
+        Binding(
+            get: { selectedSession },
+            set: { session in
+                // A second tap clears the selection while both columns are visible.
+                if horizontalSizeClass == .regular, selectedSession?.id == session?.id {
+                    clearSessionSelection()
+                } else {
+                    selectedSession = session
+                    preferredCompactColumn = session == nil ? .sidebar : .detail
+                }
+            }
+        )
+    }
+
+    private func clearSessionSelection() {
+        selectedSession = nil
+        preferredCompactColumn = .sidebar
     }
 
     /// Title header for the current active sync state.
@@ -270,6 +315,9 @@ struct HistoryView: View {
     private func confirmDeleteSessions() {
         let shouldDeletePersonalRecords = isDeletingAllSessions
 
+        if let selectedSession, sessionsPendingDeletion.contains(where: { $0.id == selectedSession.id }) {
+            clearSessionSelection()
+        }
         for session in sessionsPendingDeletion {
             modelContext.delete(session)
         }
@@ -322,6 +370,7 @@ private struct MonthSessionsList: View {
     let monthRange: DateInterval
     let navigationTransitionNamespace: Namespace.ID
     @Binding var selectedSession: JumpSession?
+    let showsSelection: Bool
     let onPreviousMonth: () -> Void
     let onNextMonth: () -> Void
     let onDeleteSessions: ([JumpSession]) -> Void
@@ -334,6 +383,7 @@ private struct MonthSessionsList: View {
         monthRange: DateInterval,
         navigationTransitionNamespace: Namespace.ID,
         selectedSession: Binding<JumpSession?>,
+        showsSelection: Bool,
         onPreviousMonth: @escaping () -> Void,
         onNextMonth: @escaping () -> Void,
         onDeleteSessions: @escaping ([JumpSession]) -> Void,
@@ -343,6 +393,7 @@ private struct MonthSessionsList: View {
         self.monthRange = monthRange
         self.navigationTransitionNamespace = navigationTransitionNamespace
         _selectedSession = selectedSession
+        self.showsSelection = showsSelection
         self.onPreviousMonth = onPreviousMonth
         self.onNextMonth = onNextMonth
         self.onDeleteSessions = onDeleteSessions
@@ -425,10 +476,11 @@ private struct MonthSessionsList: View {
                         Button {
                             selectedSession = session
                         } label: {
-                            SessionRowView(session: session)
+                            SessionRowView(session: session, isSelected: showsSelection && selectedSession?.id == session.id)
                                 .matchedTransitionSource(id: session.id, in: navigationTransitionNamespace)
                         }
                         .buttonStyle(.plain)
+                        .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets(top: 4, leading: 24, bottom: 4, trailing: 24))
                         .listRowSeparator(.hidden)
                         .staggeredAppearance(isVisible: hasAppeared, index: index + 2)
@@ -499,6 +551,7 @@ private struct YearSessionsList: View {
     let yearRange: DateInterval
     let navigationTransitionNamespace: Namespace.ID
     @Binding var selectedSession: JumpSession?
+    let showsSelection: Bool
     let onPreviousYear: () -> Void
     let onNextYear: () -> Void
     let onDeleteSessions: ([JumpSession]) -> Void
@@ -511,6 +564,7 @@ private struct YearSessionsList: View {
         yearRange: DateInterval,
         navigationTransitionNamespace: Namespace.ID,
         selectedSession: Binding<JumpSession?>,
+        showsSelection: Bool,
         onPreviousYear: @escaping () -> Void,
         onNextYear: @escaping () -> Void,
         onDeleteSessions: @escaping ([JumpSession]) -> Void,
@@ -520,6 +574,7 @@ private struct YearSessionsList: View {
         self.yearRange = yearRange
         self.navigationTransitionNamespace = navigationTransitionNamespace
         _selectedSession = selectedSession
+        self.showsSelection = showsSelection
         self.onPreviousYear = onPreviousYear
         self.onNextYear = onNextYear
         self.onDeleteSessions = onDeleteSessions
@@ -592,10 +647,11 @@ private struct YearSessionsList: View {
                         Button {
                             selectedSession = session
                         } label: {
-                            SessionRowView(session: session)
+                            SessionRowView(session: session, isSelected: showsSelection && selectedSession?.id == session.id)
                                 .matchedTransitionSource(id: session.id, in: navigationTransitionNamespace)
                         }
                         .buttonStyle(.plain)
+                        .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets(top: 4, leading: 24, bottom: 4, trailing: 24))
                         .listRowSeparator(.hidden)
                         .staggeredAppearance(isVisible: hasAppeared, index: index + 2)
@@ -655,6 +711,7 @@ private struct YearSessionsList: View {
 
 private struct SessionRowView: View {
     let session: JumpSession
+    var isSelected = false
 
     private var dateText: String {
         session.startedAt.formatted(date: .abbreviated, time: .shortened)
@@ -713,12 +770,17 @@ private struct SessionRowView: View {
 
             Image(systemName: "chevron.right")
                 .font(AppFonts.sectionIcon)
-                .foregroundStyle(AppColors.tabInactive)
+                .foregroundStyle(isSelected ? AppColors.accent : AppColors.tabInactive)
         }
         .padding(.vertical, 14)
         .padding(.horizontal, 16)
         .background(AppColors.cardSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(isSelected ? AppColors.accent.opacity(0.55) : .clear, lineWidth: 1.5)
+        }
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
         .accessibilityElement(children: .combine)
         .accessibilityHint(Text("Opens workout details."))
     }

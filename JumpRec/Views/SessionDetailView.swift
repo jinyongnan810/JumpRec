@@ -17,6 +17,8 @@ struct SessionDetailView: View {
     @Environment(\.modelContext) private var modelContext
     /// The saved session being displayed.
     let session: JumpSession
+    /// Clears selection when this detail is hosted in a split view.
+    var onDelete: (() -> Void)? = nil
     /// Indicates whether the AI comment is currently being generated.
     @State private var isGeneratingComment = false
     /// Controls the delete confirmation alert.
@@ -78,7 +80,9 @@ struct SessionDetailView: View {
                     achievedRecordKinds: []
                 )
             }
+            .frame(maxWidth: 1000)
             .padding(.horizontal, 24)
+            .frame(maxWidth: .infinity)
         }
         .scrollIndicators(.hidden)
         .topSoftScrollEdgeEffect()
@@ -149,7 +153,11 @@ struct SessionDetailView: View {
         do {
             try modelContext.save()
             dataStore.refreshLocalSessionCount()
-            dismiss()
+            if let onDelete {
+                onDelete()
+            } else {
+                dismiss()
+            }
         } catch {
             print("Failed to delete session: \(error)")
         }

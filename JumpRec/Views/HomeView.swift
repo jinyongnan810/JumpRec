@@ -19,7 +19,6 @@ struct HomeView: View {
     /// Stops the active local session.
     var onStop: () -> Void
 
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(MyDataStore.self) private var dataStore
     @State private var purchaseManager = PurchaseManager.shared
 
@@ -147,15 +146,16 @@ struct HomeView: View {
 
     /// Builds the hero ring for the current state.
     @ViewBuilder
-    private var heroRingView: some View {
+    private func heroRingView(diameter: CGFloat) -> some View {
         if appState.sessionState == .active {
-            ActiveWorkoutRing(appState: appState, settings: settings)
+            ActiveWorkoutRing(appState: appState, settings: settings, diameter: diameter)
         } else {
             HeroRingView(
                 progress: isCountingDown ? countdownProgress : 1,
                 color: isCountingDown ? AppColors.accent : AppColors.textMuted,
                 centerText: countdownValue.map(String.init) ?? String(localized: "Ready?"),
                 subtitle: isCountingDown ? String(localized: "Starting...") : String(localized: "Tap to Start"),
+                diameter: diameter,
                 accessibilityLabel: isCountingDown ? String(localized: "Workout countdown") : String(localized: "Ready to start workout"),
                 accessibilityValue: countdownValue.map {
                     String(format: String(localized: "%lld seconds remaining"), Int64($0))
@@ -175,37 +175,20 @@ struct HomeView: View {
     /// Renders the home screen, transitioning in-place between idle readiness, countdown, and active tracking.
     var body: some View {
         NavigationStack {
-            GeometryReader { geometry in
-                // Allow scrolling to reach Stop on small screens and at accessibility text sizes.
-                ScrollView {
-                    VStack(spacing: 0) {
-                        // Fixed top spacer clamps Hero Ring at a constant offset from top navigation bar
-                        Spacer(minLength: 8)
-                            .frame(maxHeight: 28)
-
-                        // Hero Ring remains centered in-place across all session states without shifting
-                        heroRingView
-
-                        // Flexible spacer absorbs bottom safe area / tab bar transitions below the ring
-                        Spacer(minLength: 16)
-
-                        // Dynamic bottom controls housed in a fixed-height container so statistics slide in below the ring
-                        Group {
-                            if appState.sessionState == .active {
-                                ActiveWorkoutControls(appState: appState, settings: settings, onStop: onStop)
-                                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                            } else {
-                                idleControls
-                                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                            }
-                        }
-                        .frame(height: dynamicTypeSize.isAccessibilitySize ? nil : 270, alignment: .bottom)
-                        .animation(.spring(duration: 0.4, bounce: 0.15), value: appState.sessionState)
+            WorkoutDashboardView { diameter in
+                heroRingView(diameter: diameter)
+            } controls: {
+                if appState.sessionState == .active {
+                    ActiveWorkoutControls(appState: appState, settings: settings, onStop: onStop)
+                } else {
+                    VStack(spacing: 20) {
+                        Text("For hands-free workouts, use Apple Watch or supported headphones.")
+                            .font(AppFonts.bodySmall)
+                            .foregroundStyle(AppColors.textSecondary)
+                            .multilineTextAlignment(.center)
+                        idleControls
                     }
-                    .padding(.horizontal, 24)
-                    .frame(minHeight: geometry.size.height)
                 }
-                .scrollIndicators(.hidden)
             }
             .toolbarVisibility(appState.sessionState == .idle ? .visible : .hidden, for: .tabBar)
             .toolbar {
@@ -262,9 +245,7 @@ struct HomeView: View {
                 PaywallView()
             }
             .onDisappear {
-                countdownTask?.cancel()
-                countdownTask = nil
-                countdownValue = nil
+                cancelCountdown()
             }
         }
     }
@@ -371,14 +352,15 @@ struct HomeView: View {
 private struct ActiveWorkoutRing: View {
     let appState: JumpRecState
     let settings: JumpRecSettings
+    let diameter: CGFloat
 
     var body: some View {
         if (appState.sessionGoalType ?? settings.goalType) == .time {
             TimelineView(.periodic(from: .now, by: 1)) { context in
-                ActiveWorkoutRingContent(appState: appState, settings: settings, now: context.date)
+                ActiveWorkoutRingContent(appState: appState, settings: settings, now: context.date, diameter: diameter)
             }
         } else {
-            ActiveWorkoutRingContent(appState: appState, settings: settings, now: .now)
+            ActiveWorkoutRingContent(appState: appState, settings: settings, now: .now, diameter: diameter)
         }
     }
 }
@@ -388,6 +370,7 @@ private struct ActiveWorkoutRingContent: View {
     let appState: JumpRecState
     let settings: JumpRecSettings
     let now: Date
+    let diameter: CGFloat
 
     var body: some View {
         let type = appState.sessionGoalType ?? settings.goalType
@@ -400,6 +383,7 @@ private struct ActiveWorkoutRingContent: View {
             progress: progress,
             centerText: value.formatted(),
             subtitle: type == .count ? String(format: String(localized: "/ %@ jumps"), goal.formatted()) : String(format: String(localized: "/ %lld min"), Int64(goal)),
+            diameter: diameter,
             accessibilityLabel: type == .count ? String(localized: "Jump progress") : String(localized: "Time progress"),
             accessibilityValue: type == .count ? String(format: String(localized: "%@ of %@ jumps"), value.formatted(), goal.formatted()) : String(format: String(localized: "%lld of %lld minutes"), Int64(value), Int64(goal))
         )
@@ -417,6 +401,7 @@ private struct ActiveWorkoutControls: View {
     var body: some View {
         let isCountGoal = (appState.sessionGoalType ?? settings.goalType) == .count
         VStack(spacing: 20) {
+            WorkoutTrackingStatusView(source: appState.activeMotionSource)
             LazyVGrid(columns: dynamicTypeSize.isAccessibilitySize ? [GridItem(.flexible())] : [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
                 StatCardView(label: isCountGoal ? "TIME" : "JUMPS", value: isCountGoal ? "00:00" : appState.jumpCount.formatted(), timerStart: isCountGoal ? appState.startTime : nil)
                 StatCardView(label: "CALORIES", value: "\(Int(appState.caloriesBurned.rounded()))")
@@ -443,4 +428,32 @@ private struct ActiveWorkoutControls: View {
     .environment(MyDataStore.shared)
     .background(AppColors.bgPrimary)
     .preferredColorScheme(.dark)
+}
+
+#Preview("Expanded Workout", traits: .fixedLayout(width: 800, height: 550)) {
+    let appState = JumpRecState()
+    appState.sessionState = .active
+    appState.activeMotionSource = .watch
+    appState.sessionGoalType = .count
+    appState.sessionGoalValue = 1000
+    appState.jumpCount = 432
+    appState.startTime = .now.addingTimeInterval(-180)
+    appState.heartRate = 128
+    return HomeView(settings: JumpRecSettings(), appState: appState, onStart: {}, onStop: {})
+        .environment(MyDataStore.shared)
+        .environment(\.horizontalSizeClass, .regular)
+        .background(AppColors.bgPrimary)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Accessible Workout", traits: .fixedLayout(width: 390, height: 600)) {
+    let appState = JumpRecState()
+    appState.sessionState = .active
+    appState.activeMotionSource = .iPhone
+    appState.startTime = .now.addingTimeInterval(-180)
+    return HomeView(settings: JumpRecSettings(), appState: appState, onStart: {}, onStop: {})
+        .environment(MyDataStore.shared)
+        .environment(\.dynamicTypeSize, .accessibility3)
+        .background(AppColors.bgPrimary)
+        .preferredColorScheme(.dark)
 }

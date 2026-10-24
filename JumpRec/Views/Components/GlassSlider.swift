@@ -24,6 +24,8 @@ struct GlassSlider: View {
     @Environment(\.isEnabled) private var isEnabled
 
     @State private var offset: CGFloat = 0
+    @GestureState private var isDragging = false
+    @State private var hasResizedDuringDrag = false
 
     var body: some View {
         GeometryReader { proxy in
@@ -36,14 +38,14 @@ struct GlassSlider: View {
                     Text(text)
                         .font(AppFonts.sectionTitle)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.6)
+                        .minimumScaleFactor(0.3)
                         .foregroundStyle(config.tint.secondary)
 
                     // Animate a shimmer mask while keeping the base label readable.
                     Text(text)
                         .font(AppFonts.sectionTitle)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.6)
+                        .minimumScaleFactor(0.3)
                         .foregroundStyle(config.tint)
                         .mask(alignment: .leading) {
                             GeometryReader { proxy in
@@ -68,6 +70,9 @@ struct GlassSlider: View {
                         }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                // Keep the resting thumb clear of long translations and large text.
+                .padding(.leading, config.size + 12)
+                .padding(.trailing, 16)
 
                 // Hide the thumb when sliding is disabled.
                 if isEnabled {
@@ -81,7 +86,11 @@ struct GlassSlider: View {
                         .offset(x: offset)
                         .gesture(
                             DragGesture(minimumDistance: 0)
+                                .updating($isDragging) { _, isDragging, _ in
+                                    isDragging = true
+                                }
                                 .onChanged { value in
+                                    guard !hasResizedDuringDrag else { return }
                                     let maxOffset = max(sliderWidth - config.size, 0)
                                     let cappedOffset = min(max(value.translation.width, 0), maxOffset)
 
@@ -89,6 +98,11 @@ struct GlassSlider: View {
                                     onProgressChanged(maxOffset == 0 ? 0 : cappedOffset / maxOffset)
                                 }
                                 .onEnded { value in
+                                    defer {
+                                        hasResizedDuringDrag = false
+                                        withAnimation { offset = 0 }
+                                    }
+                                    guard !hasResizedDuringDrag else { return }
                                     let maxOffset = max(sliderWidth - config.size, 0)
                                     let cappedOffset = min(max(value.translation.width, 0), maxOffset)
 
@@ -96,12 +110,19 @@ struct GlassSlider: View {
                                         onFinished()
                                         return
                                     }
-
-                                    withAnimation {
-                                        offset = 0
-                                    }
                                 }
                         )
+                }
+            }
+            .onChange(of: sliderWidth) { _, _ in
+                // Resizing invalidates the current drag distance; require a fresh gesture.
+                offset = 0
+                if isDragging { hasResizedDuringDrag = true }
+            }
+            .onChange(of: isDragging) { _, isDragging in
+                if !isDragging {
+                    hasResizedDuringDrag = false
+                    withAnimation { offset = 0 }
                 }
             }
         }

@@ -48,50 +48,14 @@ struct SessionMetricsSummaryView: View {
     /// Renders the stats grid, rate chart, and breakdown rows.
     var body: some View {
         VStack(spacing: 20) {
-            // Stats Grid
-            VStack(spacing: 8) {
-                HStack(spacing: 10) {
-                    SessionMetricCard(
-                        label: "DURATION",
-                        value: duration,
-                        showsBadge: achievedRecordKinds.contains(.longestSession)
-                    )
-                    SessionMetricCard(
-                        label: "JUMPS",
-                        value: jumps,
-                        showsBadge: achievedRecordKinds.contains(.highestJumpCount)
-                    )
-                }
-
-                HStack(spacing: 10) {
-                    SessionMetricCard(
-                        label: "CALORIES",
-                        value: calories,
-                        showsBadge: achievedRecordKinds.contains(.mostCalories)
-                    )
-                    SessionMetricCard(
-                        label: "AVG RATE",
-                        value: averageRate,
-                        showsBadge: achievedRecordKinds.contains(.bestAverageJumpRate)
-                    )
-                }
-            }
-
-            // Graph Section
-            VStack(alignment: .leading, spacing: 12) {
-                Text("JUMPING RATE")
-                    .font(AppFonts.badgeLabel)
-                    .tracking(2)
-                    .foregroundStyle(AppColors.textMuted)
-
-                JumpingRateGraphView(
-                    samples: rateSamples
-                )
-                .frame(height: 160)
-            }
-            .padding(16)
-            .background(AppColors.cardSurface)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            SessionMetricsOverviewView(
+                duration: duration,
+                jumps: jumps,
+                calories: calories,
+                averageRate: averageRate,
+                rateSamples: rateSamples,
+                achievedRecordKinds: achievedRecordKinds
+            )
 
             // Session Breakdown
             VStack(alignment: .leading, spacing: 8) {

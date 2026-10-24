@@ -137,11 +137,12 @@ struct SessionCompleteView: View {
                 )
                 .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
             }
+            .frame(maxWidth: 1000)
             .padding(.horizontal, 24)
             .padding(.top, 24)
+            .frame(maxWidth: .infinity)
         }
         .scrollIndicators(.hidden)
-        .padding(.horizontal, 24)
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 12) {
                 #if DEBUG
