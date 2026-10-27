@@ -202,18 +202,18 @@
         }
       }
     },
-    "100 Workouts Milestone! 🎉" : {
+    "10 Workouts Milestone! 🎉" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "100 Workouts Milestone! 🎉"
+            "value" : "10 Workouts Milestone! 🎉"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "100回ワークアウト達成！🎉"
+            "value" : "10回ワークアウト達成！🎉"
           }
         }
       }

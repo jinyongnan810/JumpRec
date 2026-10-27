@@ -95,7 +95,7 @@ struct PaywallView: View {
     /// Shows a milestone title at the quota limit, otherwise an unlock title.
     private var headerTitle: String {
         if isQuotaReached {
-            String(localized: "100 Workouts Milestone! 🎉")
+            String(localized: "10 Workouts Milestone! 🎉")
         } else {
             String(localized: "Unlock Unlimited Workouts")
         }
