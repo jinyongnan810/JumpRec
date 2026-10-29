@@ -89,6 +89,10 @@ struct ContentView: View {
             settings.qualifiedWorkoutCount = count
             syncSettingsToWatch()
         }
+        .onChange(of: purchaseManager.hasUnlockedUnlimitedWorkouts) { _, _ in
+            refreshQuotaAndEntitlements()
+            syncSettingsToWatch()
+        }
         .onChange(of: appState.requestedStartGoal) { _, _ in
             processPendingIntentStartIfNeeded()
         }
