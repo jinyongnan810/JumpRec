@@ -12,7 +12,7 @@ public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
     case highestJumpCount
     /// Longest uninterrupted jump streak achieved in a single session.
     case longestJumpStreak
-    /// Longest completed session duration.
+    /// Longest completed session duration with a time-based goal.
     case longestSession
     /// Highest calories burned in a session.
     case mostCalories

@@ -19,9 +19,9 @@ extension MyDataStore {
     }
 
     @discardableResult
-    func upsertPersonalRecords(for session: JumpSession) -> [PersonalRecordKind] {
+    func upsertPersonalRecords(for session: JumpSession, goalType: GoalType? = nil) -> [PersonalRecordKind] {
         var updatedKinds: [PersonalRecordKind] = []
-        for candidate in personalRecordCandidates(for: session) {
+        for candidate in personalRecordCandidates(for: session, goalType: goalType) {
             let kindRawValue = candidate.kind.rawValue
             let descriptor = FetchDescriptor<PersonalRecord>(
                 predicate: #Predicate { record in
@@ -88,13 +88,14 @@ extension MyDataStore {
                 record.kindRawValue.flatMap(PersonalRecordKind.init(rawValue:))
             }
         )
-        guard existingKinds.count < PersonalRecordKind.allCases.count else { return }
+        let backfillableKinds = Set(PersonalRecordKind.allCases).subtracting([.longestSession])
+        guard !backfillableKinds.isSubset(of: existingKinds) else { return }
 
         let sessionDescriptor = FetchDescriptor<JumpSession>()
         let sessions = (try? modelContext.fetch(sessionDescriptor)) ?? []
         guard !sessions.isEmpty else { return }
 
-        // Rebuild records from history to include any missing record kinds.
+        // History has no goal metadata, so duration records only update when saving new workouts.
         for session in sessions {
             upsertPersonalRecords(for: session)
         }
@@ -102,7 +103,7 @@ extension MyDataStore {
         saveContextIfNeeded()
     }
 
-    private func personalRecordCandidates(for session: JumpSession) -> [PersonalRecordCandidate] {
+    private func personalRecordCandidates(for session: JumpSession, goalType: GoalType?) -> [PersonalRecordCandidate] {
         var candidates: [PersonalRecordCandidate] = []
         // Decode chart samples for rhythm-based records during saves and backfills.
         let rateSamples = session.decodedRateSamples
@@ -136,7 +137,9 @@ extension MyDataStore {
             )
         }
 
-        if session.durationSeconds > PersonalRecordThreshold.longestSessionDurationSeconds {
+        if goalType == .time,
+           session.durationSeconds > PersonalRecordThreshold.longestSessionDurationSeconds
+        {
             candidates.append(
                 PersonalRecordCandidate(
                     kind: .longestSession,

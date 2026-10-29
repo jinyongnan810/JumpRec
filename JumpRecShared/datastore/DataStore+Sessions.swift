@@ -61,10 +61,10 @@ public extension MyDataStore {
     }
 
     /// Inserts a session and its encoded rate series into the model context.
-    func addSession(session: JumpSession, rateSamples: [RateSamplePoint] = []) {
+    func addSession(session: JumpSession, rateSamples: [RateSamplePoint] = [], goalType: GoalType? = nil) {
         modelContext.insert(session)
         attachRateSeries(rateSamples, to: session)
-        let updatedRecordKinds = upsertPersonalRecords(for: session)
+        let updatedRecordKinds = upsertPersonalRecords(for: session, goalType: goalType)
         if !updatedRecordKinds.isEmpty {
             markUnseenPersonalRecordUpdates(updatedRecordKinds)
         }
@@ -84,7 +84,8 @@ public extension MyDataStore {
         caloriesBurned: Double,
         jumpOffsets: [TimeInterval],
         averageHeartRate: Int? = nil,
-        peakHeartRate: Int? = nil
+        peakHeartRate: Int? = nil,
+        goalType: GoalType? = nil
     ) -> JumpSession {
         let breakMetrics = SessionMetricsCalculator.breakMetrics(from: jumpOffsets)
         let session = JumpSession(
@@ -111,7 +112,7 @@ public extension MyDataStore {
             durationSeconds: session.durationSeconds
         )
 
-        addSession(session: session, rateSamples: rateSamples)
+        addSession(session: session, rateSamples: rateSamples, goalType: goalType)
         Task { @MainActor [weak self] in
             guard let self else { return }
             await SessionAICommentGenerator.generateIfNeeded(for: session, in: modelContext)

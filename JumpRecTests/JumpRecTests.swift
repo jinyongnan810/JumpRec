@@ -7,9 +7,51 @@
 
 import Foundation
 @testable import JumpRec
+import SwiftData
 import Testing
 
 struct JumpRecTests {
+    @MainActor
+    @Test func testLongestSessionRecordRequiresDurationGoal() throws {
+        let store = try MyDataStore.makePreviewStore(qualifiedWorkoutCount: 0)
+        let startedAt = Date(timeIntervalSince1970: 1_000_000)
+
+        func makeSession(duration: TimeInterval) -> JumpSession {
+            JumpSession(
+                startedAt: startedAt,
+                endedAt: startedAt.addingTimeInterval(duration),
+                jumpCount: 300,
+                peakRate: 150,
+                caloriesBurned: 30
+            )
+        }
+
+        let countSession = makeSession(duration: 600)
+        let legacySession = makeSession(duration: 900)
+        for session in [countSession, legacySession] {
+            store.modelContext.insert(session)
+            let updatedKinds = store.upsertPersonalRecords(for: session)
+            #expect(!updatedKinds.contains(.longestSession))
+        }
+
+        store.backfillPersonalRecordsIfNeeded()
+        let historicalRecords = try store.modelContext.fetch(FetchDescriptor<PersonalRecord>())
+        #expect(!historicalRecords.contains { $0.kind == .longestSession })
+
+        let thresholdSession = makeSession(duration: 60)
+        #expect(!store.upsertPersonalRecords(for: thresholdSession, goalType: .time).contains(.longestSession))
+
+        let durationSession = makeSession(duration: 120)
+        store.modelContext.insert(durationSession)
+        #expect(store.upsertPersonalRecords(for: durationSession, goalType: .time).contains(.longestSession))
+        #expect(!store.upsertPersonalRecords(for: countSession, goalType: .count).contains(.longestSession))
+        #expect(!store.upsertPersonalRecords(for: legacySession).contains(.longestSession))
+
+        store.backfillPersonalRecordsIfNeeded()
+        let records = try store.modelContext.fetch(FetchDescriptor<PersonalRecord>())
+        #expect(records.first { $0.kind == .longestSession }?.metricValue == 120)
+    }
+
     @Test func testMakeRateSamplesForSteady150Rate() async throws {
         let jumpOffsets = stride(from: 0.4, through: 60.0, by: 0.4).map(\.self)
         let samples = SessionMetricsCalculator.makeRateSamples(

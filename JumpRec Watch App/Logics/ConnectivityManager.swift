@@ -93,7 +93,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         caloriesBurned: Double,
         jumpOffsets: [TimeInterval],
         averageHeartRate: Int?,
-        peakHeartRate: Int?
+        peakHeartRate: Int?,
+        goalType: GoalType
     ) {
         var payload: [String: Any] = [
             "type": "sessionComplete",
@@ -102,6 +103,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             "jumpCount": jumpCount,
             "caloriesBurned": caloriesBurned,
             "jumpOffsets": jumpOffsets,
+            "goalType": goalType.rawValue,
         ]
         payload["averageHeartRate"] = averageHeartRate
         payload["peakHeartRate"] = peakHeartRate

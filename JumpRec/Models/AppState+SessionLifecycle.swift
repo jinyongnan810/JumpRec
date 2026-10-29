@@ -138,7 +138,8 @@ extension JumpRecState {
                 caloriesBurned: caloriesBurned,
                 jumpOffsets: jumps,
                 averageHeartRate: averageHeartRate,
-                peakHeartRate: peakHeartRate
+                peakHeartRate: peakHeartRate,
+                goalType: sessionGoalType
             )
             #if DEBUG
                 exportMotionCSVIfNeeded(samples: motionSamples, startedAt: startTime, endedAt: endTime)

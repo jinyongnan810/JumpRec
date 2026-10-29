@@ -203,6 +203,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         let endedAt = Date(timeIntervalSince1970: endedAtTimestamp)
         let averageHeartRate = NumberParser.int(userInfo["averageHeartRate"])
         let peakHeartRate = NumberParser.int(userInfo["peakHeartRate"])
+        let goalType = (userInfo["goalType"] as? String).flatMap(GoalType.init(rawValue:))
 
         Task { @MainActor [weak self] in
             self?.saveCompletedSession(
@@ -212,7 +213,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
                 caloriesBurned: caloriesBurned,
                 jumpOffsets: jumpOffsets,
                 averageHeartRate: averageHeartRate,
-                peakHeartRate: peakHeartRate
+                peakHeartRate: peakHeartRate,
+                goalType: goalType
             )
         }
     }
@@ -225,7 +227,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         caloriesBurned: Double,
         jumpOffsets: [TimeInterval],
         averageHeartRate: Int?,
-        peakHeartRate: Int?
+        peakHeartRate: Int?,
+        goalType: GoalType?
     ) {
         let session = MyDataStore.shared.saveCompletedSession(
             startedAt: startedAt,
@@ -234,7 +237,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             caloriesBurned: caloriesBurned,
             jumpOffsets: jumpOffsets,
             averageHeartRate: averageHeartRate,
-            peakHeartRate: peakHeartRate
+            peakHeartRate: peakHeartRate,
+            goalType: goalType
         )
 
         onCompletedSessionReceived?(

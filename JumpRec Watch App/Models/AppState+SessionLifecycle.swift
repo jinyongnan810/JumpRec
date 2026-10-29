@@ -125,7 +125,8 @@ extension JumpRecState {
             caloriesBurned: energyBurned,
             jumpOffsets: jumps,
             averageHeartRate: averageHeartRate,
-            peakHeartRate: peakHeartRateValue
+            peakHeartRate: peakHeartRateValue,
+            goalType: goalType
         )
 
         print("end finished")
