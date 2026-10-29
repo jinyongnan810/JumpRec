@@ -170,11 +170,6 @@ struct SettingsView: View {
         .navigationTitle("Settings")
     }
 
-    /// Delay symbol effects until the row's layout and opacity animation settles.
-    private static let selectionAnimationDuration = 0.3
-    /// The row delays its selection animation slightly to wait for screen navigation
-    private static let selectionAnimationDelay = 0.2
-
     /// Formats the row value so selected state is announced without relying on the checkmark symbol alone.
     private func accessibilityValue(detail: String, isSelected: Bool) -> String {
         guard isSelected else { return detail }
@@ -204,87 +199,19 @@ struct SettingsView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
-            SelectionIndicatorView(
-                isSelected: isSelected
-            )
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(AppFonts.watchSupportingRegular)
+                    .foregroundStyle(AppColors.accent)
+                    .frame(width: 18, alignment: .trailing)
+                    .transition(.opacity)
+            }
         }
-        .animation(
-            .easeInOut(duration: 0.3)
-                .delay(0.2),
-            value: isSelected
-        )
+        .animation(.easeOut(duration: 0.5), value: isSelected)
         .padding(.vertical, 4)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(titleKey))
         .accessibilityValue(Text(accessibilityValue(detail: detail, isSelected: isSelected)))
-    }
-}
-
-private struct SelectionIndicatorView: View {
-    let isSelected: Bool
-
-    @State private var drawTrigger = 0
-    @State private var previousIsSelected = false
-    @State private var isDrawEffectActive = false
-
-    var body: some View {
-        Image(systemName: "checkmark.circle.fill")
-            .font(AppFonts.watchSupportingRegular)
-            .foregroundStyle(AppColors.accent)
-            .modifier(SelectionEffectModifier(isSelected: isSelected, drawTrigger: drawTrigger, isDrawEffectActive: isDrawEffectActive))
-            .frame(width: 18, alignment: .trailing)
-            .opacity(isSelected ? 1 : 0)
-            .scaleEffect(isSelected ? 1 : 0.85)
-            .animation(.easeInOut(duration: 0.3).delay(0.2), value: isSelected)
-            .frame(maxWidth: isSelected ? 18 : 0)
-            .onAppear {
-                previousIsSelected = isSelected
-                drawTrigger += 1
-            }
-            .task(id: isSelected) {
-                // Reset on deselection so the next selection can replay the effect.
-                isDrawEffectActive = isSelected
-
-                do {
-                    if #available(watchOS 26.0, *) {
-                        try await Task.sleep(for: .seconds(0.5))
-                    }
-                } catch {
-                    // Cancellation skips the delayed effect for a stale selection.
-                    return
-                }
-
-                if #available(watchOS 26.0, *) {
-                    isDrawEffectActive = !isSelected
-                } else {
-                    drawTrigger += 1
-                }
-            }
-    }
-}
-
-private struct SelectionEffectModifier: ViewModifier {
-    let isSelected: Bool
-    let drawTrigger: Int
-    let isDrawEffectActive: Bool
-
-    @ViewBuilder
-    func body(content: Content) -> some View {
-        if #available(watchOS 26.0, *) {
-            content
-                .symbolEffect(
-                    .drawOn.byLayer,
-                    options: .speed(0.5),
-                    isActive: isDrawEffectActive
-                )
-        } else {
-            content
-                .symbolEffect(
-                    .wiggle.byLayer,
-                    options: .speed(0.6).repeat(1),
-                    value: drawTrigger
-                )
-        }
     }
 }
 
