@@ -1,6 +1,176 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "Favorites": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "お気に入り"
+        }
+      }
+    }
+  },
+  "Favorite session": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "お気に入りのワークアウト"
+        }
+      }
+    }
+  },
+  "Save as a favorite": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "お気に入りに追加"
+        }
+      }
+    }
+  },
+  "Felt good": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "気持ちよかった"
+        }
+      }
+    }
+  },
+  "Cleared my head": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "頭がすっきりした"
+        }
+      }
+    }
+  },
+  "Had fun": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "楽しかった"
+        }
+      }
+    }
+  },
+  "Edit tags and note": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "タグとメモを編集"
+        }
+      }
+    }
+  },
+  "What made it special? (Optional)": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "よかったこと（任意）"
+        }
+      }
+    }
+  },
+  "Note (Optional)": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "メモ（任意）"
+        }
+      }
+    }
+  },
+  "A thought to remember": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "残しておきたいこと"
+        }
+      }
+    }
+  },
+  "No favorites yet": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "お気に入りはまだありません"
+        }
+      }
+    }
+  },
+  "Tap the heart on any workout to keep it here.": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "ワークアウトのハートをタップすると、ここに表示されます。"
+        }
+      }
+    }
+  },
+  "Removes this workout from favorites.": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "このワークアウトをお気に入りから外します。"
+        }
+      }
+    }
+  },
+  "Adds this workout to favorites.": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "このワークアウトをお気に入りに追加します。"
+        }
+      }
+    }
+  },
+  "Unable to save favorite": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "お気に入りを保存できませんでした"
+        }
+      }
+    }
+  },
+  "Please try again.": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "もう一度お試しください。"
+        }
+      }
+    }
+  },
+  "Save": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "保存"
+        }
+      }
+    }
+  },
     "Version %@" : {
       "comment" : "Settings footer showing the installed app version.",
       "localizations" : {

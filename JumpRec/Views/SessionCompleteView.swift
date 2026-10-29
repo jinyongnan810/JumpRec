@@ -122,6 +122,10 @@ struct SessionCompleteView: View {
                     .staggeredAppearance(isVisible: hasContentAppeared, index: 1)
                 }
 
+                if let completedSession {
+                    SessionFavoriteCard(session: completedSession)
+                }
+
                 SessionMetricsSummaryView(
                     duration: summary.formattedDuration,
                     jumps: summary.formattedJumpCount,

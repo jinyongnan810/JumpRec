@@ -63,6 +63,8 @@ struct SessionDetailView: View {
                     )
                 }
 
+                SessionFavoriteCard(session: session)
+
                 SessionMetricsSummaryView(
                     duration: durationText,
                     jumps: session.jumpCount.formatted(),

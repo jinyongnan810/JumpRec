@@ -28,6 +28,7 @@ struct HistoryView: View {
     private enum HistoryScope: String, CaseIterable {
         case month = "Month"
         case year = "Year"
+        case favorites = "Favorites"
 
         var localizedTitle: LocalizedStringKey {
             switch self {
@@ -35,6 +36,8 @@ struct HistoryView: View {
                 "Month"
             case .year:
                 "Year"
+            case .favorites:
+                "Favorites"
             }
         }
     }
@@ -88,7 +91,12 @@ struct HistoryView: View {
                         .padding(.vertical, 8)
                         .background(AppColors.bgPrimary)
 
-                        if selectedScope == .month {
+                        if selectedScope == .favorites {
+                            FavoriteSessionsList(
+                                selectedSession: sessionSelection,
+                                showsSelection: horizontalSizeClass == .regular
+                            )
+                        } else if selectedScope == .month {
                             if let displayedMonthRange {
                                 MonthSessionsList(
                                     displayedMonth: displayedMonth,
@@ -709,6 +717,40 @@ private struct YearSessionsList: View {
     }
 }
 
+/// Favorites span all dates so users can return to any session they enjoyed.
+private struct FavoriteSessionsList: View {
+    @Query(filter: #Predicate<JumpSession> { $0.isFavorite }, sort: \JumpSession.startedAt, order: .reverse)
+    private var sessions: [JumpSession]
+    @Binding var selectedSession: JumpSession?
+    let showsSelection: Bool
+
+    var body: some View {
+        List {
+            ForEach(sessions) { session in
+                Button {
+                    selectedSession = session
+                } label: {
+                    SessionRowView(session: session, isSelected: showsSelection && selectedSession?.id == session.id)
+                }
+                .buttonStyle(.plain)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .overlay {
+            if sessions.isEmpty {
+                ContentUnavailableView(
+                    "No favorites yet",
+                    systemImage: "heart",
+                    description: Text("Tap the heart on any workout to keep it here.")
+                )
+            }
+        }
+    }
+}
+
 // MARK: - Session Row
 
 private struct SessionRowView: View {
@@ -769,6 +811,12 @@ private struct SessionRowView: View {
             }
 
             Spacer()
+
+            if session.isFavorite {
+                Image(systemName: "heart.fill")
+                    .foregroundStyle(AppColors.accent)
+                    .accessibilityLabel("Favorite session")
+            }
 
             Image(systemName: "chevron.right")
                 .font(AppFonts.sectionIcon)
