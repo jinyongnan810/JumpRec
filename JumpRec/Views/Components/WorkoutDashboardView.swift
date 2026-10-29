@@ -4,7 +4,9 @@ import SwiftUI
 struct WorkoutDashboardView<Progress: View, Controls: View>: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    var isWorkoutActive: Bool
     @ViewBuilder var progress: (CGFloat) -> Progress
     @ViewBuilder var controls: () -> Controls
 
@@ -35,6 +37,7 @@ struct WorkoutDashboardView<Progress: View, Controls: View>: View {
                 let availableWidth = isHorizontal ? (geometry.size.width - 72) / 2 : geometry.size.width - 48
                 let availableHeight = isHorizontal ? max(120, geometry.size.height - 66) : 270
                 let diameter = max(0, min(270, min(availableWidth - 18, availableHeight)))
+                let topSpacing = isHorizontal ? 0 : diameter / (isWorkoutActive ? 6 : 2)
 
                 ScrollView {
                     layout {
@@ -44,8 +47,11 @@ struct WorkoutDashboardView<Progress: View, Controls: View>: View {
                             .frame(maxWidth: 440)
                             .frame(maxWidth: .infinity)
                     }
+                    // Keep the ring's position independent of the controls' height.
+                    .padding(.top, topSpacing)
+                    .animation(reduceMotion ? nil : .easeInOut(duration: 0.3), value: isWorkoutActive)
                     .padding(24)
-                    .frame(minHeight: geometry.size.height)
+                    .frame(minHeight: geometry.size.height, alignment: isHorizontal ? .center : .top)
                 }
                 .scrollIndicators(.hidden)
             }

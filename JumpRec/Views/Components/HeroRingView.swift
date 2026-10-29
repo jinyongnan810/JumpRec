@@ -70,8 +70,8 @@ struct HeroRingView: View {
     }
 }
 
-#Preview("Ready State") {
-    HeroRingView(progress: 0, centerText: "Ready", subtitle: "Tap Start to begin")
+#Preview("Workout Goal") {
+    HeroRingView(progress: 1, color: AppColors.textMuted, centerText: 1000.formatted(), subtitle: String(localized: "jumps"))
         .background(AppColors.bgPrimary)
         .preferredColorScheme(.dark)
 }

@@ -1,16 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-  "More": {
-    "localizations": {
-      "ja": {
-        "stringUnit": {
-          "state": "translated",
-          "value": "その他"
-        }
-      }
-    }
-  },
     "" : {
 
     },
@@ -1403,7 +1393,6 @@
       }
     },
     "Goal" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -2296,6 +2285,16 @@
         }
       }
     },
+    "More" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他"
+          }
+        }
+      }
+    },
     "Most Calories" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3102,6 +3101,7 @@
       }
     },
     "Ready to start workout" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -3112,6 +3112,7 @@
       }
     },
     "Ready?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -4112,6 +4113,7 @@
       }
     },
     "Tap to Start" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -4133,6 +4135,7 @@
       }
     },
     "Tap to start or cancel workout countdown." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {

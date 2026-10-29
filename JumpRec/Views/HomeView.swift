@@ -20,6 +20,7 @@ struct HomeView: View {
     var onStop: () -> Void
 
     @Environment(MyDataStore.self) private var dataStore
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var purchaseManager = PurchaseManager.shared
 
     // MARK: - View State
@@ -39,7 +40,7 @@ struct HomeView: View {
 
     // MARK: - Derived Values: Pre-Session & Shared
 
-    /// Returns the formatted goal summary shown under the app title when idle.
+    /// Describes the selected goal for VoiceOver.
     var goalText: String {
         if settings.goalType == .count {
             String(
@@ -52,6 +53,14 @@ struct HomeView: View {
                 settings.jumpTime
             )
         }
+    }
+
+    private var idleGoalValue: String {
+        (settings.goalType == .count ? settings.jumpCount : settings.jumpTime).formatted()
+    }
+
+    private var idleGoalUnit: String {
+        settings.goalType == .count ? String(localized: "jumps") : String(localized: "minutes")
     }
 
     /// Returns whether the countdown is currently active.
@@ -149,24 +158,20 @@ struct HomeView: View {
     private func heroRingView(diameter: CGFloat) -> some View {
         if appState.sessionState == .active {
             ActiveWorkoutRing(appState: appState, settings: settings, diameter: diameter)
+                .transition(.identity)
         } else {
             HeroRingView(
                 progress: isCountingDown ? countdownProgress : 1,
                 color: isCountingDown ? AppColors.accent : AppColors.textMuted,
-                centerText: countdownValue.map(String.init) ?? String(localized: "Ready?"),
-                subtitle: isCountingDown ? String(localized: "Starting...") : String(localized: "Tap to Start"),
+                centerText: countdownValue.map(String.init) ?? idleGoalValue,
+                subtitle: isCountingDown || isStartingSession ? String(localized: "Starting...") : idleGoalUnit,
                 diameter: diameter,
-                accessibilityLabel: isCountingDown ? String(localized: "Workout countdown") : String(localized: "Ready to start workout"),
+                accessibilityLabel: isCountingDown ? String(localized: "Workout countdown") : String(localized: "Goal"),
                 accessibilityValue: countdownValue.map {
                     String(format: String(localized: "%lld seconds remaining"), Int64($0))
                 } ?? goalText
             )
-            .contentShape(Circle())
-            .onTapGesture {
-                if isCountingDown { cancelCountdown() } else { startWithCountdown() }
-            }
-            .accessibilityAddTraits(.isButton)
-            .accessibilityHint(String(localized: "Tap to start or cancel workout countdown."))
+            .transition(.identity)
         }
     }
 
@@ -175,16 +180,25 @@ struct HomeView: View {
     /// Renders the home screen, transitioning in-place between idle readiness, countdown, and active tracking.
     var body: some View {
         NavigationStack {
-            WorkoutDashboardView { diameter in
-                heroRingView(diameter: diameter)
+            WorkoutDashboardView(isWorkoutActive: appState.sessionState == .active) { diameter in
+                ZStack {
+                    heroRingView(diameter: diameter)
+                }
+                .frame(width: diameter, height: diameter)
             } controls: {
-                if appState.sessionState == .active {
-                    ActiveWorkoutControls(appState: appState, settings: settings, onStop: onStop)
-                } else {
-                    idleControls
+                ZStack {
+                    if appState.sessionState == .active {
+                        ActiveWorkoutControls(appState: appState, settings: settings, onStop: onStop)
+                            .transition(.opacity.animation(reduceMotion ? nil : .easeOut(duration: 0.3)))
+                    } else {
+                        idleControls
+                            .transition(.opacity.animation(reduceMotion ? nil : .easeOut(duration: 0.3)))
+                    }
                 }
             }
-            .toolbarVisibility(appState.sessionState == .idle ? .visible : .hidden, for: .tabBar)
+            .toolbarVisibility(appState.sessionState == .active ? .hidden : .visible, for: .tabBar)
+            // Each section controls its own animation.
+            .animation(nil, value: appState.sessionState)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack(spacing: 2) {
@@ -200,18 +214,20 @@ struct HomeView: View {
                                     .transition(.opacity)
                             }
                         }
-                        .animation(.easeOut(duration: 0.5), value: appState.sessionState)
+                        .animation(reduceMotion ? nil : .easeInOut(duration: 0.45), value: appState.sessionState)
 
-                        HStack(spacing: 4) {
-                            Image(systemName: "target")
-                            Text(appState.sessionState == .active ? activeGoalText : goalText)
-                                .lineLimit(1)
-                                .contentTransition(.numericText())
+                        if appState.sessionState == .active {
+                            HStack(spacing: 4) {
+                                Image(systemName: "target")
+                                Text(activeGoalText)
+                                    .lineLimit(1)
+                                    .contentTransition(.numericText())
+                            }
+                            .font(AppFonts.heroRingSubtitle)
+                            .foregroundStyle(AppColors.accent)
+                            .fixedSize(horizontal: true, vertical: false)
+                            .transition(.opacity)
                         }
-                        .font(AppFonts.heroRingSubtitle)
-                        .foregroundStyle(AppColors.accent)
-                        .fixedSize(horizontal: true, vertical: false)
-                        .animation(.spring(duration: 0.4, bounce: 0.2), value: appState.sessionState)
                     }
                     .accessibilityElement(children: .combine)
                 }
@@ -296,7 +312,7 @@ struct HomeView: View {
     private func startWithCountdown() {
         guard !isCountingDown, !isStartingSession else { return }
 
-        // Check quota for both ring and button start actions.
+        // Check the workout quota before starting the countdown.
         guard canStartWorkout else {
             showPaywall = true
             return
@@ -394,14 +410,21 @@ private struct ActiveWorkoutControls: View {
 
     var body: some View {
         let isCountGoal = (appState.sessionGoalType ?? settings.goalType) == .count
+        let rowLayout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 10)) : AnyLayout(HStackLayout(spacing: 10))
         VStack(spacing: 20) {
             WorkoutTrackingStatusView(source: appState.activeMotionSource)
-            LazyVGrid(columns: dynamicTypeSize.isAccessibilitySize ? [GridItem(.flexible())] : [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-                StatCardView(label: isCountGoal ? "TIME" : "JUMPS", value: isCountGoal ? "00:00" : appState.jumpCount.formatted(), timerStart: isCountGoal ? appState.startTime : nil)
-                StatCardView(label: "CALORIES", value: "\(Int(appState.caloriesBurned.rounded()))")
-                StatCardView(label: "HR", value: appState.heartRate.map { "\($0) bpm" } ?? "--", valueColor: AppColors.accent)
-                StatCardView(label: "RATE(AVG)", value: localizedRateText(appState.averageRate))
+            // Measure all four cards immediately so the ring's target does not shift after layout.
+            VStack(spacing: 10) {
+                rowLayout {
+                    StatCardView(label: isCountGoal ? "TIME" : "JUMPS", value: isCountGoal ? "00:00" : appState.jumpCount.formatted(), timerStart: isCountGoal ? appState.startTime : nil)
+                    StatCardView(label: "CALORIES", value: "\(Int(appState.caloriesBurned.rounded()))")
+                }
+                rowLayout {
+                    StatCardView(label: "HR", value: appState.heartRate.map { "\($0) bpm" } ?? "--", valueColor: AppColors.accent)
+                    StatCardView(label: "RATE(AVG)", value: localizedRateText(appState.averageRate))
+                }
             }
+            .fixedSize(horizontal: false, vertical: true)
             GlassSlider(text: String(localized: "STOP WORKOUT"), iconName: "stop.fill", config: .init(tint: AppColors.warning, size: 80), onProgressChanged: { _ in }, onFinished: onStop)
                 .accessibilityLabel(Text("STOP WORKOUT"))
                 .accessibilityHint(Text("Ends the current jump workout."))
@@ -412,7 +435,7 @@ private struct ActiveWorkoutControls: View {
     }
 }
 
-#Preview("Idle") {
+#Preview("Count Goal") {
     HomeView(
         settings: JumpRecSettings(),
         appState: JumpRecState(),
@@ -422,6 +445,15 @@ private struct ActiveWorkoutControls: View {
     .environment(MyDataStore.shared)
     .background(AppColors.bgPrimary)
     .preferredColorScheme(.dark)
+}
+
+#Preview("Time Goal") {
+    let settings = JumpRecSettings()
+    settings.goalType = .time
+    return HomeView(settings: settings, appState: JumpRecState(), onStart: {}, onStop: {})
+        .environment(MyDataStore.shared)
+        .background(AppColors.bgPrimary)
+        .preferredColorScheme(.dark)
 }
 
 #Preview("Expanded Workout", traits: .fixedLayout(width: 800, height: 550)) {
