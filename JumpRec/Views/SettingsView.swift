@@ -75,6 +75,13 @@ struct SettingsView: View {
 
                     privacyPolicyLink
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 7)
+
+                    if let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
+                        Text("Version \(appVersion)", comment: "Settings footer showing the installed app version.")
+                            .font(AppFonts.bodySmall)
+                            .foregroundStyle(AppColors.textMuted)
+                            .frame(maxWidth: .infinity)
+                    }
                 }
                 .padding(.bottom, 8)
             }
