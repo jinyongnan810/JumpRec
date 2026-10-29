@@ -8,6 +8,7 @@ import SwiftUI
 
 struct RecordsSheetView: View {
     @Query(sort: \PersonalRecord.kindRawValue) private var records: [PersonalRecord]
+    @Query(sort: \LifetimeJumpMilestone.jumpCount, order: .reverse) private var milestones: [LifetimeJumpMilestone]
     @Environment(MyDataStore.self) private var dataStore
     @State private var isShowingClearRecordsConfirmation = false
 
@@ -48,7 +49,7 @@ struct RecordsSheetView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     // Records list
-                    if displayRecords.isEmpty {
+                    if displayRecords.isEmpty, milestones.isEmpty {
                         VStack(spacing: 8) {
                             Spacer()
                             Text("No records yet")
@@ -60,7 +61,7 @@ struct RecordsSheetView: View {
                             Spacer()
                         }
                         .frame(maxWidth: .infinity)
-                    } else {
+                    } else if !displayRecords.isEmpty {
                         VStack(spacing: 10) {
                             ForEach(displayRecords) { record in
                                 RecordCardView(
@@ -69,6 +70,10 @@ struct RecordsSheetView: View {
                                 ).padding(.horizontal, 12)
                             }
                         }
+                    }
+
+                    if !milestones.isEmpty {
+                        LifetimeMilestonesSection(milestones: milestones)
                     }
 
                     Spacer()
@@ -120,6 +125,7 @@ struct RecordsSheetView: View {
     let container = try! ModelContainer(
         for: JumpSession.self,
         PersonalRecord.self,
+        LifetimeJumpMilestone.self,
         SessionRateSeries.self,
         configurations: config
     )

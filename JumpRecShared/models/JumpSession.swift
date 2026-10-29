@@ -62,6 +62,9 @@ public final class JumpSession {
     @Relationship(deleteRule: .cascade, inverse: \SessionRateSeries.session)
     public var rateSeries: SessionRateSeries?
 
+    /// Highest milestone earned by this save, shown only on the completion screen.
+    @Transient public var newlyAchievedJumpMilestone: Int?
+
     /// Instance-only caches invalidate when the payload changes or arrives through CloudKit.
     @Transient private var cachedRatePayload: Data?
     @Transient private var cachedRateSamples: [RateSamplePoint]?

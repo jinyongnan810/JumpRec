@@ -25,6 +25,7 @@ extension ModelContainer {
         Schema([
             JumpSession.self,
             PersonalRecord.self,
+            LifetimeJumpMilestone.self,
             SessionRateSeries.self,
         ])
     }

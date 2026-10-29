@@ -122,6 +122,19 @@ struct SessionCompleteView: View {
                     .staggeredAppearance(isVisible: hasContentAppeared, index: 1)
                 }
 
+                if let milestone = completedSession?.newlyAchievedJumpMilestone {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("A Little Adds Up", systemImage: "sparkles")
+                            .font(AppFonts.bodyLabelStrong)
+                        Text("Your sessions have added up to \(milestone.formatted()) jumps.")
+                            .font(AppFonts.bodyRegular)
+                    }
+                    .foregroundStyle(AppColors.textPrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .background(AppColors.cardSurface, in: RoundedRectangle(cornerRadius: 12))
+                }
+
                 if let completedSession {
                     SessionFavoriteCard(session: completedSession)
                 }

@@ -1,6 +1,36 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+  "A Little Adds Up": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "少しずつ、積み重ね"
+        }
+      }
+    }
+  },
+  "Your sessions have added up to %@ jumps.": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "これまでのワークアウトで、合計%@回跳びました。"
+        }
+      }
+    }
+  },
+  "%@ lifetime jumps": {
+    "localizations": {
+      "ja": {
+        "stringUnit": {
+          "state": "translated",
+          "value": "累計%@回"
+        }
+      }
+    }
+  },
   "Favorites": {
     "localizations": {
       "ja": {
