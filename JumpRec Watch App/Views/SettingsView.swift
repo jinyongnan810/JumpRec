@@ -141,6 +141,10 @@ struct SettingsView: View {
                 .padding(.vertical, 4)
             }
 
+            Section("Permissions") {
+                PermissionsSettingsContent()
+            }
+
             Section("Audio Settings") {
                 Toggle(
                     isOn: $settings.shouldSpeakJumpCountAnnouncements,

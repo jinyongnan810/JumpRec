@@ -34,12 +34,22 @@
         }
       }
     },
-    "cal" : {
+    "Allow Health Access" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "kcal"
+            "value" : "ヘルスケアへのアクセスを許可"
+          }
+        }
+      }
+    },
+    "Allowed" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "許可済み"
           }
         }
       }
@@ -95,24 +105,32 @@
         }
       }
     },
-    "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now." : {
-      "extractionState" : "stale",
+    "Headphone Motion" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたワークアウトは現在復元できません。"
+            "value" : "ヘッドフォンのモーション"
           }
         }
       }
     },
-    "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again." : {
-      "extractionState" : "stale",
+    "Health Permissions" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたワークアウトが再表示される場合があります。"
+            "value" : "ヘルスケアのアクセス許可"
+          }
+        }
+      }
+    },
+    "Health data is unavailable on this device." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスではヘルスケアデータを利用できません。"
           }
         }
       }
@@ -123,16 +141,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "待機中"
-          }
-        }
-      }
-    },
-    "iPhone" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone"
           }
         }
       }
@@ -157,6 +165,17 @@
         }
       }
     },
+    "Motion access is requested when you start a workout with supported headphones." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "対応するヘッドフォンでワークアウトを開始すると、モーションへのアクセスが求められます。"
+          }
+        }
+      }
+    },
     "No iCloud account is currently signed in, so previous cloud-backed workouts cannot be restored on this device yet." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -164,6 +183,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在このデバイスでは iCloud にサインインしていないため、以前 iCloud に保存されたワークアウトはまだ復元できません。"
+          }
+        }
+      }
+    },
+    "Not Allowed" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未許可"
+          }
+        }
+      }
+    },
+    "Not Requested" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未リクエスト"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "Open App Settings" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリの設定を開く"
+          }
+        }
+      }
+    },
+    "Open Health on iPhone, tap your profile, then Apps under Privacy, and select JumpRec. Health read permissions cannot be checked by the app." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhoneで「ヘルスケア」を開き、プロフィール→「プライバシー」の「アプリ」→JumpRecを選択してください。ヘルスケアデータの読み取り許可はアプリから確認できません。"
+          }
+        }
+      }
+    },
+    "Please try again or review JumpRec’s permissions in system settings." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "もう一度お試しいただくか、システム設定でJumpRecのアクセス許可を確認してください。"
           }
         }
       }
@@ -204,6 +283,76 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ペース"
+          }
+        }
+      }
+    },
+    "Read Health Data" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルスケアデータの読み取り"
+          }
+        }
+      }
+    },
+    "Reads heart rate, active energy, and activity summaries." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心拍数、アクティブエネルギー、アクティビティの概要を読み取ります。"
+          }
+        }
+      }
+    },
+    "Restricted" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "制限あり"
+          }
+        }
+      }
+    },
+    "Review Health Permissions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルスケアのアクセス許可を確認"
+          }
+        }
+      }
+    },
+    "Review in Health" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルスケアで確認"
+          }
+        }
+      }
+    },
+    "Save Workouts" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトの保存"
+          }
+        }
+      }
+    },
+    "Saves completed workouts to Apple Health." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了したワークアウトをヘルスケアに保存します。"
           }
         }
       }
@@ -250,6 +399,26 @@
         }
       }
     },
+    "Unable to Update Permissions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセス許可を更新できません"
+          }
+        }
+      }
+    },
+    "Unknown" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不明"
+          }
+        }
+      }
+    },
     "Uploading to iCloud..." : {
       "localizations" : {
         "ja" : {
@@ -260,12 +429,64 @@
         }
       }
     },
+    "Uses supported headphones to count jumps." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "対応するヘッドフォンを使ってジャンプ数を数えます。"
+          }
+        }
+      }
+    },
     "Watch" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Watch"
+          }
+        }
+      }
+    },
+    "cal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kcal"
+          }
+        }
+      }
+    },
+    "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたワークアウトは現在復元できません。"
+          }
+        }
+      }
+    },
+    "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたワークアウトが再表示される場合があります。"
+          }
+        }
+      }
+    },
+    "iPhone" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone"
           }
         }
       }

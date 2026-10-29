@@ -139,29 +139,7 @@ final class PhoneWorkoutManager: NSObject {
 
     /// Requests HealthKit authorization only when at least one required type is still undetermined.
     private func requestAuthorizationIfNeeded() async throws {
-        let typesToShare: Set<HKSampleType> = [
-            HKObjectType.workoutType(),
-        ]
-
-        // Request all local and mirrored types; HealthKit hides read authorization status.
-        var typesToRead: Set<HKObjectType> = [
-            HKObjectType.workoutType(),
-            HKObjectType.activitySummaryType(),
-        ]
-        if let activeEnergy = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned) {
-            typesToRead.insert(activeEnergy)
-        }
-        if let heartRate = HKQuantityType.quantityType(forIdentifier: .heartRate) {
-            typesToRead.insert(heartRate)
-        }
-
-        let requestStatus = try await authorizationRequestStatus(
-            toShare: typesToShare,
-            read: typesToRead
-        )
-        if requestStatus == .shouldRequest {
-            try await healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead)
-        }
+        try await WorkoutPermissions.requestAuthorization(using: healthStore)
 
         // Check write authorization; denied reads return no data and expose no authorization status.
         let status = healthStore.authorizationStatus(for: HKObjectType.workoutType())
@@ -171,25 +149,6 @@ final class PhoneWorkoutManager: NSObject {
         }
 
         print("[PhoneWorkoutManager] HealthKit authorization is ready.")
-    }
-
-    /// Bridges HealthKit's callback-only request-status check into the structured authorization task.
-    private func authorizationRequestStatus(
-        toShare typesToShare: Set<HKSampleType>,
-        read typesToRead: Set<HKObjectType>
-    ) async throws -> HKAuthorizationRequestStatus {
-        try await withCheckedThrowingContinuation { continuation in
-            healthStore.getRequestStatusForAuthorization(
-                toShare: typesToShare,
-                read: typesToRead
-            ) { status, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume(returning: status)
-                }
-            }
-        }
     }
 }
 

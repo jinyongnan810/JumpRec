@@ -461,6 +461,26 @@
         }
       }
     },
+    "Allow Health Access" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルスケアへのアクセスを許可"
+          }
+        }
+      }
+    },
+    "Allowed" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "許可済み"
+          }
+        }
+      }
+    },
     "Also applies to your paired Apple Watch." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1400,6 +1420,16 @@
         }
       }
     },
+    "Headphone Motion" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘッドフォンのモーション"
+          }
+        }
+      }
+    },
     "Headphone motion is preferred; iPhone will be used if it becomes unavailable." : {
       "localizations" : {
         "ja" : {
@@ -1417,6 +1447,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ヘッドフォンのモーションは利用できません。対応する AirPods または Beats を接続し、モーションへのアクセスを許可してください。"
+          }
+        }
+      }
+    },
+    "Health Permissions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルスケアのアクセス許可"
+          }
+        }
+      }
+    },
+    "Health data is unavailable on this device." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスではヘルスケアデータを利用できません。"
           }
         }
       }
@@ -2074,6 +2124,17 @@
         }
       }
     },
+    "Motion access is requested when you start a workout with supported headphones." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "対応するヘッドフォンでワークアウトを開始すると、モーションへのアクセスが求められます。"
+          }
+        }
+      }
+    },
     "Motion source" : {
       "localizations" : {
         "ja" : {
@@ -2406,6 +2467,26 @@
         }
       }
     },
+    "Not Allowed" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未許可"
+          }
+        }
+      }
+    },
+    "Not Requested" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未リクエスト"
+          }
+        }
+      }
+    },
     "OK" : {
 
     },
@@ -2438,6 +2519,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apple IDアカウントに課金される1回限りの支払いです。ファミリー共有対応。"
+          }
+        }
+      }
+    },
+    "Open App Settings" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリの設定を開く"
+          }
+        }
+      }
+    },
+    "Open Health on iPhone, tap your profile, then Apps under Privacy, and select JumpRec. Health read permissions cannot be checked by the app." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhoneで「ヘルスケア」を開き、プロフィール→「プライバシー」の「アプリ」→JumpRecを選択してください。ヘルスケアデータの読み取り許可はアプリから確認できません。"
           }
         }
       }
@@ -2537,6 +2638,16 @@
         }
       }
     },
+    "Permissions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセス許可"
+          }
+        }
+      }
+    },
     "Personal Record" : {
       "localizations" : {
         "ja" : {
@@ -2590,6 +2701,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプ100回ごとに、音声と触覚でお知らせします。"
+          }
+        }
+      }
+    },
+    "Please try again or review JumpRec’s permissions in system settings." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "もう一度お試しいただくか、システム設定でJumpRecのアクセス許可を確認してください。"
           }
         }
       }
@@ -2736,6 +2857,26 @@
         }
       }
     },
+    "Read Health Data" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルスケアデータの読み取り"
+          }
+        }
+      }
+    },
+    "Reads heart rate, active energy, and activity summaries." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心拍数、アクティブエネルギー、アクティビティの概要を読み取ります。"
+          }
+        }
+      }
+    },
     "Ready to start session" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2841,6 +2982,16 @@
         }
       }
     },
+    "Restricted" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "制限あり"
+          }
+        }
+      }
+    },
     "Retrieves your most recent jump rope workout from JumpRec." : {
       "localizations" : {
         "en" : {
@@ -2853,6 +3004,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "JumpRecから直近の縄跳びワークアウトを取得します。"
+          }
+        }
+      }
+    },
+    "Review Health Permissions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルスケアのアクセス許可を確認"
+          }
+        }
+      }
+    },
+    "Review in Health" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルスケアで確認"
           }
         }
       }
@@ -3004,6 +3175,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトを終了"
+          }
+        }
+      }
+    },
+    "Save Workouts" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトの保存"
+          }
+        }
+      }
+    },
+    "Saves completed workouts to Apple Health." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了したワークアウトをヘルスケアに保存します。"
           }
         }
       }
@@ -4000,6 +4191,16 @@
         }
       }
     },
+    "Unable to Update Permissions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセス許可を更新できません"
+          }
+        }
+      }
+    },
     "Unable to load this month." : {
       "localizations" : {
         "ja" : {
@@ -4033,6 +4234,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "利用不可"
+          }
+        }
+      }
+    },
+    "Unknown" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不明"
           }
         }
       }
@@ -4164,6 +4375,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloudにワークアウトをアップロード中..."
+          }
+        }
+      }
+    },
+    "Uses supported headphones to count jumps." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "対応するヘッドフォンを使ってジャンプ数を数えます。"
           }
         }
       }

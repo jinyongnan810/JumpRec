@@ -5,6 +5,7 @@
 
 import SwiftData
 import SwiftUI
+import UIKit
 
 /// Presents user-editable workout settings before a session starts.
 struct SettingsView: View {
@@ -64,6 +65,13 @@ struct SettingsView: View {
 
                     AccentColorSettingsView()
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 6)
+
+                    settingsSection(title: String(localized: "Permissions")) {
+                        PermissionsSettingsContent {
+                            guard let url = URL(string: UIApplication.openSettingsURLString) else { return false }
+                            return await UIApplication.shared.open(url)
+                        }
+                    }
 
                     privacyPolicyLink
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 7)
