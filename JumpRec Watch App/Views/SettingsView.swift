@@ -120,6 +120,28 @@ struct SettingsView: View {
                 }
             }
 
+            Section("Audio Settings") {
+                Toggle(
+                    isOn: $settings.shouldSpeakJumpCountAnnouncements,
+                    label: {
+                        Text("Speak Jump Count")
+                            .font(AppFonts.watchBody)
+                            .foregroundStyle(AppColors.textPrimary)
+                    }
+                )
+                .tint(AppColors.accent)
+
+                Toggle(
+                    isOn: $settings.shouldSpeakJumpTimeAnnouncements,
+                    label: {
+                        Text("Speak Jump Time")
+                            .font(AppFonts.watchBody)
+                            .foregroundStyle(AppColors.textPrimary)
+                    }
+                )
+                .tint(AppColors.accent)
+            }
+
             Section("Jump Detection") {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
@@ -143,28 +165,6 @@ struct SettingsView: View {
 
             Section("Permissions") {
                 PermissionsSettingsContent()
-            }
-
-            Section("Audio Settings") {
-                Toggle(
-                    isOn: $settings.shouldSpeakJumpCountAnnouncements,
-                    label: {
-                        Text("Speak Jump Count")
-                            .font(AppFonts.watchBody)
-                            .foregroundStyle(AppColors.textPrimary)
-                    }
-                )
-                .tint(AppColors.accent)
-
-                Toggle(
-                    isOn: $settings.shouldSpeakJumpTimeAnnouncements,
-                    label: {
-                        Text("Speak Jump Time")
-                            .font(AppFonts.watchBody)
-                            .foregroundStyle(AppColors.textPrimary)
-                    }
-                )
-                .tint(AppColors.accent)
             }
         }
         .navigationTitle("Settings")

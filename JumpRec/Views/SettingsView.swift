@@ -54,10 +54,10 @@ struct SettingsView: View {
                     goalSettingsSection
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
 
-                    jumpDetectionSection
+                    audioSettingsSection
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 3)
 
-                    audioSettingsSection
+                    jumpDetectionSection
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 4)
 
                     iPhoneSessionSection
