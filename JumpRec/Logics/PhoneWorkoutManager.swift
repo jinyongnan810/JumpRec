@@ -42,17 +42,6 @@ final class PhoneWorkoutManager: NSObject {
         super.init()
     }
 
-    /// Primes workout authorization early in the app lifecycle.
-    func activate() {
-        guard HKHealthStore.isHealthDataAvailable() else { return }
-        guard authorizationTask == nil else { return }
-
-        // Call the underlying request directly; ensureAuthorization would make this task await itself.
-        authorizationTask = Task {
-            try await requestAuthorizationIfNeeded()
-        }
-    }
-
     /// Starts a HealthKit workout at the provided time.
     func startWorkout(at startDate: Date) async throws {
         guard HKHealthStore.isHealthDataAvailable() else { return }

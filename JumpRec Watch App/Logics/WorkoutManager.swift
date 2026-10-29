@@ -67,16 +67,11 @@ final class WorkoutManager: NSObject {
 
     // MARK: - Initialization
 
-    /// Requests authorization and stores callbacks for workout metrics.
+    /// Stores callbacks for workout metrics.
     init(updateHeartRate: @escaping (Int) -> Void, updateEnergyBurned: @escaping (Double) -> Void) {
         self.updateHeartRate = updateHeartRate
         self.updateEnergyBurned = updateEnergyBurned
         super.init()
-
-        // Share the early authorization task with workout startup to avoid overlapping requests.
-        authorizationTask = Task { [healthStore] in
-            try await Self.requestAuthorization(using: healthStore)
-        }
     }
 
     // MARK: - Authorization
@@ -172,24 +167,27 @@ final class WorkoutManager: NSObject {
         configuration.activityType = .jumpRope
         configuration.locationType = .outdoor
 
-        do {
-            let session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
-            let builder = session.associatedWorkoutBuilder()
-            builder.dataSource = HKLiveWorkoutDataSource(
-                healthStore: healthStore,
-                workoutConfiguration: configuration
-            )
-            session.delegate = self
-            builder.delegate = self
-            self.session = session
-            self.builder = builder
-            session.startActivity(with: startDate)
+        workoutLifecycleTask = Task { [weak self] in
+            guard let self else { return }
 
-            workoutLifecycleTask = Task { [weak self] in
-                guard let self else { return }
+            do {
+                try await ensureAuthorization()
+                try Task.checkCancellation()
+                guard workoutGeneration == generation else { return }
+
+                let session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
+                let builder = session.associatedWorkoutBuilder()
+                builder.dataSource = HKLiveWorkoutDataSource(
+                    healthStore: healthStore,
+                    workoutConfiguration: configuration
+                )
+                session.delegate = self
+                builder.delegate = self
+                self.session = session
+                self.builder = builder
+                session.startActivity(with: startDate)
 
                 do {
-                    try await ensureAuthorization()
                     try Task.checkCancellation()
                     try await builder.beginCollection(at: startDate)
                     try Task.checkCancellation()
@@ -235,19 +233,19 @@ final class WorkoutManager: NSObject {
                         goalValue: goalValue
                     )
                 )
+            } catch {
+                print("[WorkoutManager] Failed to start workout: \(error.localizedDescription)")
             }
-        } catch {
-            print("[WorkoutManager] Failed to create workout session: \(error.localizedDescription)")
         }
     }
 
     /// Ends the workout, sends final mirrored metrics, and saves it to HealthKit.
     func stopWorkout() {
-        guard let session, let builder else { return }
-
         workoutGeneration = UUID()
         workoutLifecycleTask?.cancel()
         workoutLifecycleTask = nil
+
+        guard let session, let builder else { return }
         throttledJumpTask?.cancel()
         throttledJumpTask = nil
         pendingMirroredJumpPayload = nil
