@@ -41,12 +41,11 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Current version: $VERSION"
 
-      - name: Bump version in project.pbxproj
+      - name: Bump app and extension versions
         if: inputs.action != 'keep'
         id: bump
         run: |
-          NEW_VERSION=$(python3 .github/scripts/bump_version.py "${{ inputs.action }}")
-          echo "new_version=$(echo "$NEW_VERSION" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | tail -1)" >> "$GITHUB_OUTPUT"
+          python3 .github/scripts/bump_version.py "${{ inputs.action }}"
 
       - name: Commit version bump
         if: inputs.action != 'keep'

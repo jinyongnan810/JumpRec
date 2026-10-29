@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bump the app, Watch, and Live Activity marketing versions.
+"""Bump the app, Watch, complication, and Live Activity marketing versions.
 
 Usage: python3 .github/scripts/bump_version.py [patch|minor|major]
 """
@@ -18,6 +18,8 @@ TARGETS = [
     r"com\.kinn\.JumpRec;",
     # Watch app
     r"com\.kinn\.JumpRec\.watchkitapp;",
+    # Watch complication extension
+    r"com\.kinn\.JumpRec\.watchkitapp\.JumpRecComplications;",
     # Live Activity Extension (quoted in the file)
     r'"com\.kinn\.JumpRec\.Jump-Rec-Live-Activity-Extension";',
 ]
@@ -57,10 +59,14 @@ def bump(action: str) -> str:
             content,
         )
         if n == 0:
-            print(f"WARNING: no match for bundle pattern: {bundle_pattern}", flush=True)
+            sys.exit(f"ERROR: no match for bundle pattern: {bundle_pattern}")
 
     with open(PBXPROJ, "w") as f:
         f.write(content)
+
+    if output_path := os.environ.get("GITHUB_OUTPUT"):
+        with open(output_path, "a") as f:
+            f.write(f"new_version={new_version}\n")
 
     print(f"Done. New version: {new_version}")
     return new_version
