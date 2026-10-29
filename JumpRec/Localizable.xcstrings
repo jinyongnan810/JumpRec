@@ -2735,12 +2735,12 @@
         }
       }
     },
-    "Open Health on iPhone, tap your profile, then Apps under Privacy, and select JumpRec. Health read permissions cannot be checked by the app." : {
+    "Open Health on iPhone, tap your profile, then Apps under Privacy, and select JumpRec." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iPhoneで「ヘルスケア」を開き、プロフィール→「プライバシー」の「アプリ」→JumpRecを選択してください。ヘルスケアデータの読み取り許可はアプリから確認できません。"
+            "value" : "iPhoneで「ヘルスケア」を開き、プロフィール→「プライバシー」の「アプリ」→JumpRecを選択してください。"
           }
         }
       }

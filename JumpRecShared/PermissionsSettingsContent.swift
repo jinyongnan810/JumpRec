@@ -82,9 +82,9 @@ struct PermissionsSettingsContent: View {
             Button("OK", role: .cancel) {}
         } message: {
             #if os(watchOS)
-                Text("On Apple Watch, open Settings, then Health, and select JumpRec to review access. Health read permissions cannot be checked by the app.")
+                Text("On Apple Watch, open Settings, then Health, and select JumpRec to review access.")
             #else
-                Text("Open Health on iPhone, tap your profile, then Apps under Privacy, and select JumpRec. Health read permissions cannot be checked by the app.")
+                Text("Open Health on iPhone, tap your profile, then Apps under Privacy, and select JumpRec.")
             #endif
         }
         .alert("Unable to Update Permissions", isPresented: $isShowingError) {

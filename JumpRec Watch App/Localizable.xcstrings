@@ -480,12 +480,12 @@
         }
       }
     },
-    "On Apple Watch, open Settings, then Health, and select JumpRec to review access. Health read permissions cannot be checked by the app." : {
+    "On Apple Watch, open Settings, then Health, and select JumpRec to review access." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Watchで「設定」→「ヘルスケア」を開き、JumpRecを選択してアクセス許可を確認してください。ヘルスケアデータの読み取り許可はアプリから確認できません。"
+            "value" : "Apple Watchで「設定」→「ヘルスケア」を開き、JumpRecを選択してアクセス許可を確認してください。"
           }
         }
       }
