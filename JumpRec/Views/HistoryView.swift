@@ -178,6 +178,8 @@ struct HistoryView: View {
                             } label: {
                                 Label("Delete All", systemImage: "trash")
                             }
+                            .foregroundStyle(.red)
+                            .tint(.red)
                         }
                     }
                 #endif

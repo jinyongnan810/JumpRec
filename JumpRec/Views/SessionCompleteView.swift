@@ -110,6 +110,15 @@ struct SessionCompleteView: View {
                         .font(AppFonts.bodySmall)
                         .foregroundStyle(AppColors.textSecondary)
                 }
+                .frame(maxWidth: .infinity)
+                .overlay(alignment: .topTrailing) {
+                    if let completedSession {
+                        SessionFavoriteButton(session: completedSession)
+                            .appGlassButton()
+                            .controlSize(.regular)
+                            .buttonBorderShape(.circle)
+                    }
+                }
                 // .staggeredAppearance(isVisible: hasContentAppeared, index: 0)
 
                 if let completedSession,
@@ -133,10 +142,6 @@ struct SessionCompleteView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(16)
                     .background(AppColors.cardSurface, in: RoundedRectangle(cornerRadius: 12))
-                }
-
-                if let completedSession {
-                    SessionFavoriteCard(session: completedSession)
                 }
 
                 SessionMetricsSummaryView(
@@ -183,7 +188,6 @@ struct SessionCompleteView: View {
                     }
                 #endif
 
-                // Done Button
                 Button(action: onDone) {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark")

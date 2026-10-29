@@ -94,6 +94,8 @@ struct RecordsSheetView: View {
                         } label: {
                             Image(systemName: "trash")
                         }
+                        .foregroundStyle(.red)
+                        .tint(.red)
                         .accessibilityLabel(Text("Delete Records"))
                     }
                 }

@@ -50,10 +50,8 @@ public final class JumpSession {
     /// Peak heart rate during the session in beats per minute.
     public var peakHeartRate: Int?
 
-    /// User-selected favorite metadata, independent of workout performance.
+    /// Whether the user marked this workout as a favorite.
     public var isFavorite: Bool = false
-    public var favoriteTagRawValues: [String] = []
-    public var favoriteNote: String?
 
     /// Optional AI-generated recap for the session.
     public var aiComment: String?

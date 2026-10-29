@@ -63,8 +63,6 @@ struct SessionDetailView: View {
                     )
                 }
 
-                SessionFavoriteCard(session: session)
-
                 SessionMetricsSummaryView(
                     duration: durationText,
                     jumps: session.jumpCount.formatted(),
@@ -92,10 +90,19 @@ struct SessionDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button(role: .destructive) {
-                    showingDeleteConfirmation = true
+                SessionFavoriteButton(session: session)
+            }
+            ToolbarItem(placement: .primaryAction) {
+                Menu {
+                    Button(role: .destructive) {
+                        showingDeleteConfirmation = true
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                    .foregroundStyle(.red)
+                    .tint(.red)
                 } label: {
-                    Label("Delete", systemImage: "trash")
+                    Label("More", systemImage: "ellipsis")
                 }
             }
         }
