@@ -27,6 +27,9 @@ struct HomeView: View {
 
     /// Controls presentation of the paywall sheet when the free workout quota is reached.
     @State private var showPaywall = false
+    @State private var isPreparingWorkout = false
+    @State private var showPermissionError = false
+    @State private var permissionErrorMessage = ""
     /// Controls presentation of the settings sheet.
     @State private var showSettingsView = false
     /// Coordinates the gear-button zoom transition with the presented settings sheet.
@@ -75,12 +78,12 @@ struct HomeView: View {
 
     /// Returns whether the primary action button should reject input.
     private var isPrimaryButtonDisabled: Bool {
-        isStartingSession
+        isStartingSession || isPreparingWorkout
     }
 
     /// Returns the title for the primary pre-session action button.
     private var primaryButtonTitle: String {
-        if isStartingSession {
+        if isStartingSession || isPreparingWorkout {
             String(localized: "Starting...")
         } else if isCountingDown {
             String(localized: "CANCEL")
@@ -240,7 +243,7 @@ struct HomeView: View {
                     }
                     .tint(.primary)
                     .matchedTransitionSource(id: Self.settingsTransitionID, in: navigationTransitionNamespace)
-                    .disabled(isCountingDown)
+                    .disabled(isCountingDown || isPreparingWorkout)
                 }
             }
             .sheet(isPresented: $showSettingsView) {
@@ -253,6 +256,12 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showPaywall) {
                 PaywallView()
+            }
+            .alert("Workout Permissions", isPresented: $showPermissionError) {
+                Button("Settings") { showSettingsView = true }
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(permissionErrorMessage)
             }
             .onDisappear {
                 cancelCountdown()
@@ -310,7 +319,7 @@ struct HomeView: View {
 
     /// Starts the animated pre-session countdown.
     private func startWithCountdown() {
-        guard !isCountingDown, !isStartingSession else { return }
+        guard !isCountingDown, !isStartingSession, !isPreparingWorkout else { return }
 
         // Check the workout quota before starting the countdown.
         guard canStartWorkout else {
@@ -318,8 +327,31 @@ struct HomeView: View {
             return
         }
 
+        isPreparingWorkout = true
         // Keep countdown state on the main actor and honor cancellation at each suspension.
         countdownTask = Task { @MainActor in
+            let preferHeadphones = settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable
+            let usesWatch = appState.shouldStartOnWatch(preferLocalHeadphonesOverWatch: preferHeadphones)
+            do {
+                try await WorkoutPermissions.prepareForWorkout(requestMotion: !usesWatch)
+                try Task.checkCancellation()
+            } catch {
+                guard !Task.isCancelled else { return }
+                isPreparingWorkout = false
+                countdownTask = nil
+                permissionErrorMessage = (error as? WorkoutPermissions.PreparationError)?.localizedDescription
+                    ?? String(localized: "Unable to prepare workout permissions. Please try again or review access in Settings.")
+                showPermissionError = true
+                return
+            }
+            isPreparingWorkout = false
+            guard appState.sessionState == .idle else { return }
+            if usesWatch {
+                // Let Watch resolve its permissions before showing its countdown.
+                countdownTask = nil
+                onStart()
+                return
+            }
             withAnimation(.easeInOut(duration: 0.35)) {
                 countdownValue = 3
                 countdownProgress = 1
@@ -353,6 +385,7 @@ struct HomeView: View {
     private func cancelCountdown() {
         countdownTask?.cancel()
         countdownTask = nil
+        isPreparingWorkout = false
         countdownValue = nil
         countdownProgress = 1
     }

@@ -31,6 +31,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     var activationState: WCSessionActivationState = .notActivated
     /// Delivers fully reconstructed sessions received from Apple Watch.
     var onCompletedSessionReceived: ((Date, Date, Int, Double, [TimeInterval], Int?, Int?, JumpSession) -> Void)?
+    var onWorkoutStartCancelled: (() -> Void)?
     /// ⭐️Persists synced settings in the shared ubiquitous key-value store.
     private let settingsStore = NSUbiquitousKeyValueStore.default
     /// Performs potentially delayed iCloud container resolution and file writes away from UI state.
@@ -111,6 +112,11 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         didReceiveMessage message: [String: Any]
     ) {
         print("[WatchConnectivityManager] Received message: \(message)")
+        if message["watch app"] as? String == "startCancelled" {
+            Task { @MainActor [weak self] in
+                self?.onWorkoutStartCancelled?()
+            }
+        }
     }
 
     /// Applies settings synced via application context.

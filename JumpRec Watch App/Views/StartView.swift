@@ -15,6 +15,13 @@ struct StartView: View {
     @State var isAnimating: Bool = false
     /// Stores the current countdown value.
     @State var countdown = 3
+    var isCompanionStartRequested = false
+    var onCompanionStartConsumed: () -> Void = {}
+    @State private var preparationTask: Task<Void, Never>?
+    @State private var isPreparingWorkout = false
+    @State private var isCompanionAttempt = false
+    @State private var showPermissionError = false
+    @State private var permissionErrorMessage = ""
     /// Starts the workout when the countdown finishes.
     var onStart: () -> Void
 
@@ -99,13 +106,7 @@ struct StartView: View {
                 } else {
                     VStack(spacing: 12) {
                         Button {
-                            if settings.isQuotaExceeded {
-                                showQuotaExplanation = true
-                            } else {
-                                withAnimation {
-                                    isCountingDown.toggle()
-                                }
-                            }
+                            prepareWorkout()
                         } label: {
                             Text("START")
                                 .font(AppFonts.watchPrimaryButton)
@@ -117,6 +118,7 @@ struct StartView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         .buttonStyle(.plain)
+                        .disabled(isPreparingWorkout)
                         .accessibilityHint(Text("Starts a three second countdown before the workout begins."))
 
                         HStack(spacing: 4) {
@@ -140,11 +142,32 @@ struct StartView: View {
                             .foregroundStyle(AppColors.textMuted)
                     }
                     .buttonStyle(.plain)
+                    .disabled(isPreparingWorkout || isCountingDown)
                     .accessibilityLabel(Text("Settings"))
                 }
             }
             .navigationDestination(isPresented: $showSettings) {
                 SettingsView()
+            }
+            .alert("Workout Permissions", isPresented: $showPermissionError) {
+                Button("Settings") { showSettings = true }
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(permissionErrorMessage)
+            }
+            .onChange(of: isCompanionStartRequested, initial: true) { _, requested in
+                guard requested else { return }
+                onCompanionStartConsumed()
+                settings.loadSettings()
+                guard !isPreparingWorkout, !isCountingDown else { return }
+                isCompanionAttempt = true
+                prepareWorkout()
+            }
+            .onDisappear {
+                preparationTask?.cancel()
+                preparationTask = nil
+                isPreparingWorkout = false
+                cancelCompanionStartIfNeeded()
             }
         }
     }
@@ -174,6 +197,38 @@ struct StartView: View {
             .buttonStyle(.plain)
         }
         .padding(.horizontal, 8)
+    }
+
+    /// Asks for access before displaying or animating the countdown.
+    private func prepareWorkout() {
+        guard !isPreparingWorkout, !isCountingDown else { return }
+        guard !settings.isQuotaExceeded else {
+            showQuotaExplanation = true
+            cancelCompanionStartIfNeeded()
+            return
+        }
+        isPreparingWorkout = true
+        preparationTask = Task { @MainActor in
+            do {
+                try await WorkoutPermissions.prepareForWorkout()
+                try Task.checkCancellation()
+                isPreparingWorkout = false
+                withAnimation { isCountingDown = true }
+            } catch {
+                guard !Task.isCancelled else { return }
+                isPreparingWorkout = false
+                permissionErrorMessage = (error as? WorkoutPermissions.PreparationError)?.localizedDescription
+                    ?? String(localized: "Unable to prepare workout permissions. Please try again or review access in Settings.")
+                showPermissionError = true
+                cancelCompanionStartIfNeeded()
+            }
+        }
+    }
+
+    private func cancelCompanionStartIfNeeded() {
+        guard isCompanionAttempt else { return }
+        isCompanionAttempt = false
+        ConnectivityManager.shared.sendMessage(["watch app": "startCancelled"])
     }
 
     // MARK: - Countdown
@@ -211,6 +266,7 @@ struct StartView: View {
         }
 
         guard !Task.isCancelled else { return }
+        isCompanionAttempt = false
         onStart()
     }
 }

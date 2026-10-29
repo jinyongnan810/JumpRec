@@ -21,6 +21,8 @@ struct MainView: View {
             switch appState.jumpState {
             case .idle:
                 StartView(
+                    isCompanionStartRequested: appState.isCompanionStartRequested,
+                    onCompanionStartConsumed: { appState.isCompanionStartRequested = false },
                     onStart: {
                         appState
                             .start(
@@ -30,7 +32,8 @@ struct MainView: View {
                                 shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
                                 jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
                             )
-                    })
+                    }
+                )
             case .finished:
                 ResultView(appState: appState)
             case .jumping:

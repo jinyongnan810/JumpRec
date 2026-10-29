@@ -27,6 +27,8 @@ class JumpRecState: NSObject, @unchecked Sendable {
 
     /// Tracks the current watch-side session state.
     var jumpState: JumpState = .idle
+    /// Queues companion starts until the start screen can resolve permissions.
+    var isCompanionStartRequested = false
     /// Stores when the current or last session started.
     var startTime: Date?
     /// Stores when the current or last session ended.

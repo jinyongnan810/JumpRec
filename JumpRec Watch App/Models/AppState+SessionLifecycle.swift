@@ -49,15 +49,8 @@ extension JumpRecState {
 
     /// Starts a workout using settings received from the companion iPhone app.
     func startFromCompanion() {
-        let settings = JumpRecSettings()
-        settings.loadSettings()
-        start(
-            goalType: settings.goalType,
-            goalCount: settings.goalCount,
-            shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
-            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
-            jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
-        )
+        guard jumpState == .idle else { return }
+        isCompanionStartRequested = true
     }
 
     /// Applies synced settings without resetting HealthKit collection or jump history.

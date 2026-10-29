@@ -9,6 +9,11 @@ import UIKit
 extension JumpRecState {
     // MARK: - Session Lifecycle
 
+    /// Uses the same device selection for permission preparation and workout startup.
+    func shouldStartOnWatch(preferLocalHeadphonesOverWatch: Bool) -> Bool {
+        connectivityManager.isPaired && connectivityManager.isWatchAppInstalled && !preferLocalHeadphonesOverWatch
+    }
+
     /// Starts locally or on Watch; the caller resolves headphone availability and preference.
     func start(
         goalType: GoalType,
@@ -28,10 +33,7 @@ extension JumpRecState {
         sessionShouldSpeakJumpTimeAnnouncements = shouldSpeakJumpTimeAnnouncements
         sessionState = .starting
 
-        if connectivityManager.isPaired,
-           connectivityManager.isWatchAppInstalled,
-           !preferLocalHeadphonesOverWatch
-        {
+        if shouldStartOnWatch(preferLocalHeadphonesOverWatch: preferLocalHeadphonesOverWatch) {
             pendingMirroredStart = true
             connectivityManager.syncSettings(
                 goalType: goalType,

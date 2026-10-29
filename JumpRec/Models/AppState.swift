@@ -204,6 +204,10 @@ final class JumpRecState: NSObject, @unchecked Sendable {
                 session: session
             )
         }
+        connectivityManager.onWorkoutStartCancelled = { [weak self] in
+            guard let self, sessionState == .starting, pendingMirroredStart else { return }
+            reset()
+        }
         // The delegate restores background-audio volume after speech finishes.
         synthesizer.delegate = self
         prepareHaptics()
