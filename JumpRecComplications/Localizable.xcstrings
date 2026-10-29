@@ -1,0 +1,29 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "JumpRec" : {
+      "shouldTranslate" : false
+    },
+    "Open JumpRec" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecを開く"
+          }
+        }
+      }
+    },
+    "Open JumpRec to start a jump rope workout." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRecを開いて縄跳びのワークアウトを始めましょう。"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

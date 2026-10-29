@@ -10,6 +10,9 @@
 		3F2D44862F6164700063B4C3 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F2D44852F6164700063B4C3 /* WidgetKit.framework */; };
 		3F2D44882F6164700063B4C3 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F2D44872F6164700063B4C3 /* SwiftUI.framework */; };
 		3F2D44972F6164710063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3F2D44842F6164700063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3FA3A7C43092C4B40047E95E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F2D44852F6164700063B4C3 /* WidgetKit.framework */; };
+		3FA3A7C53092C4B40047E95E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F2D44872F6164700063B4C3 /* SwiftUI.framework */; };
+		3FA3A7D03092C4B50047E95E /* JumpRecComplicationsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3FA3A7C33092C4B40047E95E /* JumpRecComplicationsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3FCE402F2E7589A9009C271D /* JumpRec Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3FCE402E2E7589A9009C271D /* JumpRec Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -20,6 +23,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 3F2D44832F6164700063B4C3;
 			remoteInfo = "Jump​Rec​Live​Activity​ExtensionExtension";
+		};
+		3FA3A7CE3092C4B50047E95E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3FCE40192E7589A8009C271D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3FA3A7C23092C4B40047E95E;
+			remoteInfo = JumpRecComplicationsExtension;
 		};
 		3FCE40302E7589A9009C271D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -49,6 +59,17 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3FA3A7D13092C4B50047E95E /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				3FA3A7D03092C4B50047E95E /* JumpRecComplicationsExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3FCE403E2E7589A9009C271D /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -67,6 +88,7 @@
 		3F2D44842F6164700063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Jump​Rec​Live​Activity​ExtensionExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F2D44852F6164700063B4C3 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		3F2D44872F6164700063B4C3 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		3FA3A7C33092C4B40047E95E /* JumpRecComplicationsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = JumpRecComplicationsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FCE40212E7589A8009C271D /* JumpRec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JumpRec.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FCE402E2E7589A9009C271D /* JumpRec Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "JumpRec Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FCE40492E758A82009C271D /* JumpRecShared.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JumpRecShared.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +103,13 @@
 				Info.plist,
 			);
 			target = 3F2D44832F6164700063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension */;
+		};
+		3FA3A7D53092C4B50047E95E /* Exceptions for "JumpRecComplications" folder in "JumpRecComplicationsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3FA3A7C23092C4B40047E95E /* JumpRecComplicationsExtension */;
 		};
 		3FCE40642E7597AF009C271D /* Exceptions for "JumpRec" folder in "JumpRec" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -98,6 +127,14 @@
 				3F2D449B2F6164710063B4C3 /* Exceptions for "Jump​Rec​Live​Activity​Extension" folder in "Jump​Rec​Live​Activity​ExtensionExtension" target */,
 			);
 			path = "Jump​Rec​Live​Activity​Extension";
+			sourceTree = "<group>";
+		};
+		3FA3A7C63092C4B40047E95E /* JumpRecComplications */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3FA3A7D53092C4B50047E95E /* Exceptions for "JumpRecComplications" folder in "JumpRecComplicationsExtension" target */,
+			);
+			path = JumpRecComplications;
 			sourceTree = "<group>";
 		};
 		3FAD7F182FDD1787002975D1 /* Docs */ = {
@@ -137,6 +174,15 @@
 			files = (
 				3F2D44882F6164700063B4C3 /* SwiftUI.framework in Frameworks */,
 				3F2D44862F6164700063B4C3 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3FA3A7C03092C4B40047E95E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3FA3A7C53092C4B40047E95E /* SwiftUI.framework in Frameworks */,
+				3FA3A7C43092C4B40047E95E /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -181,6 +227,7 @@
 				3FCE404A2E758A82009C271D /* JumpRecShared */,
 				3FF03B002F604A5400D83A85 /* JumpRecTests */,
 				3F2D44892F6164700063B4C3 /* Jump​Rec​Live​Activity​Extension */,
+				3FA3A7C63092C4B40047E95E /* JumpRecComplications */,
 				3FCE40572E758A98009C271D /* Frameworks */,
 				3FCE40222E7589A8009C271D /* Products */,
 				3F2440F62F524EF40026DA2C /* design.pen */,
@@ -195,6 +242,7 @@
 				3FCE40492E758A82009C271D /* JumpRecShared.framework */,
 				3FF03AFF2F604A5400D83A85 /* JumpRecTests.xctest */,
 				3F2D44842F6164700063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension.appex */,
+				3FA3A7C33092C4B40047E95E /* JumpRecComplicationsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -244,6 +292,28 @@
 			productReference = 3F2D44842F6164700063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		3FA3A7C23092C4B40047E95E /* JumpRecComplicationsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3FA3A7D43092C4B50047E95E /* Build configuration list for PBXNativeTarget "JumpRecComplicationsExtension" */;
+			buildPhases = (
+				3FA3A7BF3092C4B40047E95E /* Sources */,
+				3FA3A7C03092C4B40047E95E /* Frameworks */,
+				3FA3A7C13092C4B40047E95E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				3FA3A7C63092C4B40047E95E /* JumpRecComplications */,
+			);
+			name = JumpRecComplicationsExtension;
+			packageProductDependencies = (
+			);
+			productName = JumpRecComplicationsExtension;
+			productReference = 3FA3A7C33092C4B40047E95E /* JumpRecComplicationsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		3FCE40202E7589A8009C271D /* JumpRec */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3FCE403F2E7589A9009C271D /* Build configuration list for PBXNativeTarget "JumpRec" */;
@@ -278,10 +348,12 @@
 				3FCE402A2E7589A9009C271D /* Sources */,
 				3FCE402B2E7589A9009C271D /* Frameworks */,
 				3FCE402C2E7589A9009C271D /* Resources */,
+				3FA3A7D13092C4B50047E95E /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				3FA3A7CF3092C4B50047E95E /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				3FCE40322E7589A9009C271D /* JumpRec Watch App */,
@@ -347,11 +419,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2630;
+				LastSwiftUpdateCheck = 2710;
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					3F2D44832F6164700063B4C3 = {
 						CreatedOnToolsVersion = 26.3;
+					};
+					3FA3A7C23092C4B40047E95E = {
+						CreatedOnToolsVersion = 27.1;
 					};
 					3FCE40202E7589A8009C271D = {
 						CreatedOnToolsVersion = 26.0;
@@ -388,12 +463,20 @@
 				3FCE40482E758A82009C271D /* JumpRecShared */,
 				3FF03AFE2F604A5400D83A85 /* JumpRecTests */,
 				3F2D44832F6164700063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension */,
+				3FA3A7C23092C4B40047E95E /* JumpRecComplicationsExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		3F2D44822F6164700063B4C3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3FA3A7C13092C4B40047E95E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -438,6 +521,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3FA3A7BF3092C4B40047E95E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3FCE401D2E7589A8009C271D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -473,6 +563,11 @@
 			isa = PBXTargetDependency;
 			target = 3F2D44832F6164700063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension */;
 			targetProxy = 3F2D44952F6164710063B4C3 /* PBXContainerItemProxy */;
+		};
+		3FA3A7CF3092C4B50047E95E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3FA3A7C23092C4B40047E95E /* JumpRecComplicationsExtension */;
+			targetProxy = 3FA3A7CE3092C4B50047E95E /* PBXContainerItemProxy */;
 		};
 		3FCE40312E7589A9009C271D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -551,6 +646,75 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3FA3A7D23092C4B50047E95E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6W8B6G9KYD;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = JumpRecComplications/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = JumpRec;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.24;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kinn.JumpRec.watchkitapp.JumpRecComplications;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+		3FA3A7D33092C4B50047E95E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6W8B6G9KYD;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = JumpRecComplications/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = JumpRec;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.24;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kinn.JumpRec.watchkitapp.JumpRecComplications;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
 			};
 			name = Release;
 		};
@@ -1022,6 +1186,15 @@
 			buildConfigurations = (
 				3F2D44992F6164710063B4C3 /* Debug */,
 				3F2D449A2F6164710063B4C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3FA3A7D43092C4B50047E95E /* Build configuration list for PBXNativeTarget "JumpRecComplicationsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3FA3A7D23092C4B50047E95E /* Debug */,
+				3FA3A7D33092C4B50047E95E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
