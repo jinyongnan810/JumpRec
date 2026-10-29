@@ -79,6 +79,12 @@
             "state" : "new",
             "value" : "%1$@, achieved %2$@"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@、%2$@に達成"
+          }
         }
       }
     },
@@ -213,7 +219,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "10回ワークアウト達成！🎉"
+            "value" : "ワークアウト10回達成！🎉"
           }
         }
       }
@@ -275,7 +281,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "平均レート"
+            "value" : "平均ペース"
           }
         }
       }
@@ -574,7 +580,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "平均レート"
+            "value" : "平均ペース"
           }
         }
       }
@@ -585,7 +591,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最高平均ジャンプレート"
+            "value" : "最高平均ペース"
           }
         }
       }
@@ -596,7 +602,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最高ジャンプレート"
+            "value" : "最高ペース"
           }
         }
       }
@@ -699,7 +705,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Watch、ヘッドフォン、またはiPhoneのモーション利用状況を確認してください。"
+            "value" : "Apple Watch、ヘッドフォン、またはiPhoneでモーションを計測できるか確認してください。"
           }
         }
       }
@@ -1441,7 +1447,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "心拍数は、Apple Watchまたは心拍データに対応したヘッドホンで記録したワークアウトでのみ利用できます。"
+            "value" : "心拍数は、Apple Watchまたは心拍数の計測に対応したヘッドフォンでワークアウトを記録した場合にのみ表示されます。"
           }
         }
       }
@@ -1478,7 +1484,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最高ジャンプ回数"
+            "value" : "最多ジャンプ回数"
           }
         }
       }
@@ -1489,7 +1495,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最高ジャンプ回数：%@"
+            "value" : "最多ジャンプ回数：%@"
           }
         }
       }
@@ -1536,7 +1542,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Watchを開始できない場合は、iPhoneを使用します。"
+            "value" : "Apple Watchでワークアウトを開始できない場合は、iPhoneを使用します。"
           }
         }
       }
@@ -1637,7 +1643,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "100回以上のジャンプを完了したワークアウトが対象です。10回完了後は、1回限りの購入で無制限のワークアウトをアンロックできます。"
+            "value" : "ジャンプ回数が100回以上のワークアウトが対象です。10回完了後は、1回限りの購入でワークアウトを無制限に記録できます。"
           }
         }
       }
@@ -1683,7 +1689,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ジャンプレート"
+            "value" : "ジャンプペース"
           }
         }
       }
@@ -1907,7 +1913,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最長ジャンプ連続回数"
+            "value" : "最長連続ジャンプ回数"
           }
         }
       }
@@ -1917,7 +1923,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最長連続ジャンプ"
+            "value" : "最長連続ジャンプ回数"
           }
         }
       }
@@ -1944,7 +1950,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最長ストリーク"
+            "value" : "最長連続ジャンプ回数"
           }
         }
       }
@@ -1955,7 +1961,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最長連続ジャンプ：%@"
+            "value" : "最長連続ジャンプ回数：%@"
           }
         }
       }
@@ -2025,7 +2031,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "メンバーシップ & 利用状況"
+            "value" : "メンバーシップと利用状況"
           }
         }
       }
@@ -2094,7 +2100,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "新しい自己記録です。"
+            "value" : "自己ベストを更新しました。"
           }
         }
       }
@@ -2338,7 +2344,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サブスクリプションや追加料金はありません。1度の支払いでずっと使えます。"
+            "value" : "サブスクリプションや継続的な料金はありません。一度の購入でずっと使えます。"
           }
         }
       }
@@ -2489,7 +2495,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ワークアウト詳細を開く。"
+            "value" : "ワークアウトの詳細を開きます。"
           }
         }
       }
@@ -2515,7 +2521,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最高レート"
+            "value" : "最高ペース"
           }
         }
       }
@@ -2532,7 +2538,14 @@
       }
     },
     "Personal Record" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自己ベスト"
+          }
+        }
+      }
     },
     "Personal Records" : {
       "localizations" : {
@@ -2566,7 +2579,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "経過した各分で音声とハプティクスを再生します。"
+            "value" : "1分経過するごとに、音声と触覚でお知らせします。"
           }
         }
       }
@@ -2576,7 +2589,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "100回ごとの節目で音声とハプティクスを再生します。"
+            "value" : "ジャンプ100回ごとに、音声と触覚でお知らせします。"
           }
         }
       }
@@ -2597,7 +2610,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iPhoneワークアウトでヘッドホンを優先"
+            "value" : "iPhoneでのワークアウトではヘッドフォンを優先"
           }
         }
       }
@@ -2708,7 +2721,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "レート(平均)"
+            "value" : "平均ペース"
           }
         }
       }
@@ -2718,7 +2731,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "レート"
+            "value" : "ペース"
           }
         }
       }
@@ -2749,7 +2762,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "準備OK?"
+            "value" : "準備はいいですか？"
           }
         }
       }
@@ -2996,7 +3009,14 @@
       }
     },
     "Scope" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示期間"
+          }
+        }
+      }
     },
     "Search Query" : {
       "localizations" : {
@@ -3225,7 +3245,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloudを通じてご家族と無制限アクセスを共有できます。"
+            "value" : "ファミリー共有で、無制限のワークアウト記録をご家族と共有できます。"
           }
         }
       }
@@ -3501,7 +3521,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "制限なく何度でもなわとびワークアウトを開始・記録することができます。"
+            "value" : "回数制限なく、何度でも縄跳びワークアウトを開始・記録できます。"
           }
         }
       }
@@ -3554,7 +3574,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "はじめています..."
+            "value" : "開始中..."
           }
         }
       }
@@ -3740,7 +3760,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "休憩挟まず続けられた連続ジャンプの最大回数です。"
+            "value" : "休憩を挟まずに跳び続けたジャンプの最多回数です。"
           }
         }
       }
@@ -3771,7 +3791,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "15秒以上の休憩・中断が検出された回数です。"
+            "value" : "ジャンプの間に15秒を超える休憩・中断が検出された回数です。"
           }
         }
       }
@@ -3781,7 +3801,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "5秒以上、15秒以下の休憩・中断が検出された回数です。"
+            "value" : "ジャンプの間に5秒を超え、15秒以下の休憩・中断が検出された回数です。"
           }
         }
       }
@@ -3812,7 +3832,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このシートからすべての自己ベストを削除します。保存済みのワークアウト履歴はそのまま残ります。"
+            "value" : "すべての自己ベストを削除します。保存済みのワークアウトは履歴に残ります。"
           }
         }
       }
@@ -3981,7 +4001,14 @@
       }
     },
     "Unable to load this month." : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この月のデータを読み込めません。"
+          }
+        }
+      }
     },
     "Unable to load this year." : {
       "localizations" : {
@@ -4348,7 +4375,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "利用可能な場合、ワークアウトは%@を使用します"
+            "value" : "%@が利用可能な場合は、ワークアウトの計測に使用します"
           }
         }
       }
@@ -4358,7 +4385,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ワークアウトはiPhoneを使用します"
+            "value" : "ワークアウトはiPhoneで計測します"
           }
         }
       }

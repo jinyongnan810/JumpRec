@@ -2,10 +2,24 @@
   "sourceLanguage" : "en",
   "strings" : {
     "%@ jumps" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 回"
+          }
+        }
+      }
     },
     "%@ kcal/min" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ kcal/分"
+          }
+        }
+      }
     },
     "%lld" : {
       "shouldTranslate" : false
@@ -21,7 +35,14 @@
       }
     },
     "cal" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kcal"
+          }
+        }
+      }
     },
     "Calories" : {
       "localizations" : {
@@ -45,10 +66,24 @@
       }
     },
     "Connecting to iCloud..." : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudに接続中..."
+          }
+        }
+      }
     },
     "Downloading from iCloud..." : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudからダウンロード中..."
+          }
+        }
+      }
     },
     "Headphone" : {
       "localizations" : {
@@ -83,7 +118,14 @@
       }
     },
     "Idle" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "待機中"
+          }
+        }
+      }
     },
     "iPhone" : {
       "localizations" : {
@@ -110,7 +152,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ジャンプ"
+            "value" : "回数"
           }
         }
       }
@@ -161,7 +203,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "レート"
+            "value" : "ペース"
           }
         }
       }
@@ -177,7 +219,14 @@
       }
     },
     "Sync Failed" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同期に失敗しました"
+          }
+        }
+      }
     },
     "Syncing from iCloud. Your saved workouts may take a moment to reappear after reinstalling the app." : {
       "extractionState" : "stale",
@@ -202,7 +251,14 @@
       }
     },
     "Uploading to iCloud..." : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudにアップロード中..."
+          }
+        }
+      }
     },
     "Watch" : {
       "localizations" : {

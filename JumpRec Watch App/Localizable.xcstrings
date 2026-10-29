@@ -25,7 +25,14 @@
       }
     },
     "%@ kcal/min" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ kcal/分"
+          }
+        }
+      }
     },
     "%@, selected" : {
       "localizations" : {
@@ -128,7 +135,14 @@
       }
     },
     "cal" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kcal"
+          }
+        }
+      }
     },
     "Checking iCloud availability for your saved workouts." : {
       "extractionState" : "stale",
@@ -162,7 +176,14 @@
       }
     },
     "Connecting to iCloud..." : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudに接続中..."
+          }
+        }
+      }
     },
     "Count" : {
       "localizations" : {
@@ -185,7 +206,14 @@
       }
     },
     "Downloading from iCloud..." : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudからダウンロード中..."
+          }
+        }
+      }
     },
     "Elapsed time" : {
       "localizations" : {
@@ -282,7 +310,14 @@
       }
     },
     "Idle" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "待機中"
+          }
+        }
+      }
     },
     "Jump count goal" : {
       "localizations" : {
@@ -315,7 +350,14 @@
       }
     },
     "Jumps" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回数"
+          }
+        }
+      }
     },
     "JUMPS" : {
       "localizations" : {
@@ -338,7 +380,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "上限到達しました。iPhoneでアンロックをご検討ください。"
+            "value" : "無料枠の上限に達しました。iPhoneで無制限の記録を購入できます。"
           }
         }
       }
@@ -395,7 +437,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "読み取りなし"
+            "value" : "未計測"
           }
         }
       }
@@ -411,13 +453,34 @@
       }
     },
     "Product details could not be loaded from the App Store. Please check your internet connection." : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Storeから製品情報を読み込めませんでした。通信環境をご確認ください。"
+          }
+        }
+      }
     },
     "Purchase is pending approval." : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入の承認待ちです。"
+          }
+        }
+      }
     },
     "Purchase verification failed. Please try again." : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "購入の検証に失敗しました。もう一度お試しください。"
+          }
+        }
+      }
     },
     "Sensitivity" : {
       "localizations" : {
@@ -536,13 +599,20 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "停止"
+            "value" : "終了"
           }
         }
       }
     },
     "Sync Failed" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同期に失敗しました"
+          }
+        }
+      }
     },
     "Syncing from iCloud. Your saved workouts may take a moment to reappear after reinstalling the app." : {
       "extractionState" : "stale",
@@ -627,13 +697,20 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無制限有効"
+            "value" : "無制限で利用中"
           }
         }
       }
     },
     "Uploading to iCloud..." : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloudにアップロード中..."
+          }
+        }
+      }
     },
     "WORKOUT COMPLETE" : {
       "localizations" : {
@@ -666,7 +743,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "無料の10回ワークアウトが完了しました。iPhoneのJumpRecから無制限ワークアウトのアンロックをご検討ください。"
+            "value" : "無料のワークアウト10回分を使い切りました。iPhoneのJumpRecで購入すると、ワークアウトを無制限に記録できます。"
           }
         }
       }
