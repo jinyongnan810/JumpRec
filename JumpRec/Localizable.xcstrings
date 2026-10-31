@@ -54,16 +54,6 @@
         }
       }
     },
-    "%@ lifetime jumps" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "累計%@回"
-          }
-        }
-      }
-    },
     "%@ of %@ jumps" : {
       "localizations" : {
         "ja" : {
@@ -233,16 +223,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト10回達成！🎉"
-          }
-        }
-      }
-    },
-    "A Little Adds Up" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "少しずつ、積み重ね"
           }
         }
       }
@@ -5086,16 +5066,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "以前の購入が正常に復元されました！"
-          }
-        }
-      }
-    },
-    "Your sessions have added up to %@ jumps." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "これまでのワークアウトで、合計%@回跳びました。"
           }
         }
       }

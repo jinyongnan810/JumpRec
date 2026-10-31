@@ -62,20 +62,13 @@ public extension MyDataStore {
 
     /// Inserts a session and its encoded rate series into the model context.
     func addSession(session: JumpSession, rateSamples: [RateSamplePoint] = [], goalType: GoalType? = nil) {
-        let achievedMilestone = awardLifetimeJumpMilestones(for: session)
         modelContext.insert(session)
         attachRateSeries(rateSamples, to: session)
         let updatedRecordKinds = upsertPersonalRecords(for: session, goalType: goalType)
         if !updatedRecordKinds.isEmpty {
             markUnseenPersonalRecordUpdates(updatedRecordKinds)
         }
-        do {
-            try modelContext.save()
-            session.newlyAchievedJumpMilestone = achievedMilestone
-            refreshLocalSessionCount()
-        } catch {
-            print("[DataStore] Failed to save completed session: \(error)")
-        }
+        saveContextIfNeeded()
 
         print("inserted session and encoded rate series")
         print("session: \(session)")

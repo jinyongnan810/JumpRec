@@ -11,54 +11,6 @@ import SwiftData
 import Testing
 
 struct JumpRecTests {
-    @Test func testLifetimeMilestoneThresholds() {
-        #expect(LifetimeJumpMilestone.crossedThresholds(previousTotal: 999, newTotal: 1000) == [1000])
-        #expect(LifetimeJumpMilestone.crossedThresholds(previousTotal: 1000, newTotal: 4999).isEmpty)
-        #expect(LifetimeJumpMilestone.crossedThresholds(previousTotal: 900, newTotal: 26000) == [1000, 5000, 10000, 25000])
-        #expect(LifetimeJumpMilestone.crossedThresholds(previousTotal: 99999, newTotal: 300_000) == [100_000, 200_000, 300_000])
-        #expect(LifetimeJumpMilestone.crossedThresholds(previousTotal: 5000, newTotal: 5000).isEmpty)
-    }
-
-    @MainActor
-    @Test func testLifetimeMilestonesUseHistoryWithoutRetroactiveAwards() throws {
-        let store = try MyDataStore.makePreviewStore(qualifiedWorkoutCount: 0)
-        let startedAt = Date(timeIntervalSince1970: 1_000_000)
-
-        func makeSession(jumps: Int) -> JumpSession {
-            JumpSession(
-                startedAt: startedAt,
-                endedAt: startedAt.addingTimeInterval(120),
-                jumpCount: jumps,
-                peakRate: 150,
-                caloriesBurned: 30
-            )
-        }
-
-        // Existing history contributes to totals without awarding already-passed thresholds.
-        store.modelContext.insert(makeSession(jumps: 4900))
-        let belowThreshold = makeSession(jumps: 50)
-        store.addSession(session: belowThreshold, goalType: .count)
-        #expect(belowThreshold.newlyAchievedJumpMilestone == nil)
-        #expect(try store.modelContext.fetchCount(FetchDescriptor<LifetimeJumpMilestone>()) == 0)
-
-        let crossingSession = makeSession(jumps: 25100)
-        store.addSession(session: crossingSession, goalType: .time)
-        #expect(crossingSession.newlyAchievedJumpMilestone == 25000)
-        let earned = try store.modelContext.fetch(FetchDescriptor<LifetimeJumpMilestone>())
-        #expect(Set(earned.map(\.jumpCount)) == [5000, 10000, 25000])
-
-        // Deleting workouts keeps earned highlights and prevents awarding them a second time.
-        for session in try store.modelContext.fetch(FetchDescriptor<JumpSession>()) {
-            store.modelContext.delete(session)
-        }
-        try store.modelContext.save()
-        store.modelContext.insert(makeSession(jumps: 4900))
-        let repeatedCrossing = makeSession(jumps: 200)
-        store.addSession(session: repeatedCrossing)
-        #expect(repeatedCrossing.newlyAchievedJumpMilestone == nil)
-        #expect(try store.modelContext.fetchCount(FetchDescriptor<LifetimeJumpMilestone>()) == 3)
-    }
-
     @MainActor
     @Test func testLongestSessionRecordRequiresDurationGoal() throws {
         let store = try MyDataStore.makePreviewStore(qualifiedWorkoutCount: 0)
