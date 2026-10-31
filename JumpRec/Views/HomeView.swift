@@ -445,7 +445,6 @@ private struct ActiveWorkoutControls: View {
         let isCountGoal = (appState.sessionGoalType ?? settings.goalType) == .count
         let rowLayout = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 10)) : AnyLayout(HStackLayout(spacing: 10))
         VStack(spacing: 20) {
-            WorkoutTrackingStatusView(source: appState.activeMotionSource)
             // Measure all four cards immediately so the ring's target does not shift after layout.
             VStack(spacing: 10) {
                 rowLayout {

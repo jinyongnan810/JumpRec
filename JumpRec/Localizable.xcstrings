@@ -2028,16 +2028,6 @@
         }
       }
     },
-    "Keep iPhone in your pocket to detect jumps." : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ジャンプを検出するには、iPhoneをポケットに入れてください。"
-          }
-        }
-      }
-    },
     "Keep the app open while iCloud downloads your history." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4424,16 +4414,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ で計測中"
-          }
-        }
-      }
-    },
-    "Tracking with headphones" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ヘッドフォンで計測中"
           }
         }
       }
