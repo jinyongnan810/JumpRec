@@ -25,8 +25,11 @@ extension JumpRecState {
     }
 
     /// Handles the mirrored session ending without a final payload.
-    func handleMirroredSessionEnded() {
-        guard isMirroredWatchSession, sessionState == .active else { return }
+    func handleMirroredSessionEnded(startedAt: Date?) {
+        guard isMirroredWatchSession, sessionState == .active,
+              let startedAt, let startTime,
+              abs(startTime.timeIntervalSince(startedAt)) < 0.001
+        else { return }
         cancelMinuteAnnouncements()
         endTime = endTime ?? Date()
         sessionState = .complete
@@ -45,7 +48,10 @@ extension JumpRecState {
         peakHeartRate: Int?,
         session: JumpSession
     ) {
-        guard isMirroredWatchSession else { return }
+        // Epoch timestamps can lose precision during WatchConnectivity serialization.
+        guard isMirroredWatchSession, let currentStartTime = startTime,
+              abs(currentStartTime.timeIntervalSince(startedAt)) < 0.001
+        else { return }
 
         cancelMinuteAnnouncements()
         startTime = startedAt
@@ -63,6 +69,11 @@ extension JumpRecState {
 
     /// Initializes local mirrored-session state from a watch payload.
     private func beginMirroredSession(_ payload: MirroredWorkoutPayload) {
+        // Direct and mirrored confirmations describe the same workout.
+        guard let incomingStartTime = payload.startTime else { return }
+        if isMirroredWatchSession, let startTime,
+           incomingStartTime.timeIntervalSince(startTime) < 0.001
+        { return }
         cancelPendingSpeech()
 
         // Stop pending and local startup before adopting a late Watch confirmation.
@@ -142,6 +153,9 @@ extension JumpRecState {
     /// Applies the mirrored workout end state from Apple Watch.
     private func applyMirroredEnding(_ payload: MirroredWorkoutPayload) {
         guard isMirroredWatchSession else { return }
+        if let incomingStartTime = payload.startTime, let startTime,
+           abs(incomingStartTime.timeIntervalSince(startTime)) >= 0.001
+        { return }
 
         cancelMinuteAnnouncements()
         endTime = payload.endTime ?? Date()

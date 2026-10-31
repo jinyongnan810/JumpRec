@@ -32,6 +32,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     /// Delivers fully reconstructed sessions received from Apple Watch.
     var onCompletedSessionReceived: ((Date, Date, Int, Double, [TimeInterval], Int?, Int?, JumpSession) -> Void)?
     var onWorkoutStartCancelled: (() -> Void)?
+    /// Delivers lifecycle events before HealthKit mirroring is ready.
+    var onWorkoutEventReceived: ((MirroredWorkoutPayload) -> Void)?
     /// ⭐️Persists synced settings in the shared ubiquitous key-value store.
     private let settingsStore = NSUbiquitousKeyValueStore.default
     /// Performs potentially delayed iCloud container resolution and file writes away from UI state.
@@ -112,6 +114,16 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         didReceiveMessage message: [String: Any]
     ) {
         print("[WatchConnectivityManager] Received message: \(message)")
+        if let data = message["workoutEvent"] as? Data {
+            Task { @MainActor [weak self] in
+                do {
+                    let payload = try JSONDecoder().decode(MirroredWorkoutPayload.self, from: data)
+                    self?.onWorkoutEventReceived?(payload)
+                } catch {
+                    print("[WatchConnectivityManager] Failed to decode workout event: \(error)")
+                }
+            }
+        }
         if message["watch app"] as? String == "startCancelled" {
             Task { @MainActor [weak self] in
                 self?.onWorkoutStartCancelled?()
@@ -299,14 +311,18 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     }
 
     /// Requests Watch to end the mirrored workout and return its final metrics.
-    func sendStopSessionCommand() {
+    func sendStopSessionCommand(onDeliveryFailure: @escaping @MainActor @Sendable () -> Void) {
         guard session.isReachable else {
             print("[WatchConnectivityManager] Watch is not reachable to receive stop command")
+            onDeliveryFailure()
             return
         }
         let payload: [String: Any] = ["action": "stopWorkout"]
         session.sendMessage(payload, replyHandler: nil) { error in
             print("[WatchConnectivityManager] Failed to send stop workout message: \(error.localizedDescription)")
+            Task { @MainActor in
+                onDeliveryFailure()
+            }
         }
     }
 

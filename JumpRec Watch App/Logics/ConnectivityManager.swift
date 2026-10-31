@@ -74,6 +74,16 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         parseSettingsPayload(message)
     }
 
+    /// Reports lifecycle changes without waiting for HealthKit mirroring.
+    func sendWorkoutEvent(_ payload: MirroredWorkoutPayload) {
+        do {
+            let data = try JSONEncoder().encode(payload)
+            sendMessage(["workoutEvent": data])
+        } catch {
+            print("[WatchConnectivityManager] Failed to encode workout event: \(error)")
+        }
+    }
+
     /// Sends a reachable message directly to the iPhone app.
     func sendMessage(_ message: [String: Any]) {
         guard session.isReachable else {

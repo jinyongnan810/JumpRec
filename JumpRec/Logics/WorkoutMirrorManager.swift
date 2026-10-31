@@ -15,7 +15,7 @@ final class WorkoutMirrorManager: NSObject {
     /// Delivers decoded mirrored payloads to app state.
     var onPayloadReceived: ((MirroredWorkoutPayload) -> Void)?
     /// Notifies app state when the mirrored session ends.
-    var onMirroredSessionEnded: (() -> Void)?
+    var onMirroredSessionEnded: ((Date?) -> Void)?
 
     /// HealthKit store required to register and receive mirrored workout sessions.
     private let healthStore = HKHealthStore()
@@ -44,6 +44,21 @@ final class WorkoutMirrorManager: NSObject {
         try await healthStore.startWatchApp(toHandle: configuration)
     }
 
+    /// Uses the attached workout when WatchConnectivity cannot deliver a stop.
+    func sendStopSessionCommand() {
+        guard let mirroredSession else {
+            print("[WorkoutMirrorManager] No mirrored session available for stop command")
+            return
+        }
+        mirroredSession.sendToRemoteWorkoutSession(data: Data("stopWorkout".utf8)) { success, error in
+            if let error {
+                print("[WorkoutMirrorManager] Failed to send stop command: \(error)")
+            } else if !success {
+                print("[WorkoutMirrorManager] Stop command was not delivered")
+            }
+        }
+    }
+
     /// Registers the mirroring callback early in the iPhone app lifecycle.
     func activate() {
         guard HKHealthStore.isHealthDataAvailable() else { return }
@@ -68,13 +83,13 @@ final class WorkoutMirrorManager: NSObject {
 
 extension WorkoutMirrorManager: HKWorkoutSessionDelegate {
     /// Decodes mirrored workout payloads received from Apple Watch.
-    nonisolated func workoutSession(_: HKWorkoutSession,
+    nonisolated func workoutSession(_ workoutSession: HKWorkoutSession,
                                     didReceiveDataFromRemoteWorkoutSession data: [Data])
     {
         // HealthKit may deliver several payloads in one callback after background suspension.
         for payloadData in data {
             Task { @MainActor [weak self] in
-                guard let self else { return }
+                guard let self, mirroredSession == workoutSession else { return }
 
                 do {
                     let payload = try decoder.decode(MirroredWorkoutPayload.self, from: payloadData)
@@ -95,10 +110,9 @@ extension WorkoutMirrorManager: HKWorkoutSessionDelegate {
         guard toState == .ended else { return }
 
         Task { @MainActor in
-            if self.mirroredSession == workoutSession {
-                self.mirroredSession = nil
-            }
-            self.onMirroredSessionEnded?()
+            guard self.mirroredSession == workoutSession else { return }
+            self.mirroredSession = nil
+            self.onMirroredSessionEnded?(workoutSession.startDate)
         }
     }
 

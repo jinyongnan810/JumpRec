@@ -179,8 +179,11 @@ final class JumpRecState: NSObject, @unchecked Sendable {
         workoutMirrorManager.onPayloadReceived = { [weak self] payload in
             self?.handleMirroredWorkoutPayload(payload)
         }
-        workoutMirrorManager.onMirroredSessionEnded = { [weak self] in
-            self?.handleMirroredSessionEnded()
+        connectivityManager.onWorkoutEventReceived = { [weak self] payload in
+            self?.handleMirroredWorkoutPayload(payload)
+        }
+        workoutMirrorManager.onMirroredSessionEnded = { [weak self] startedAt in
+            self?.handleMirroredSessionEnded(startedAt: startedAt)
         }
         phoneWorkoutManager.onMetricsUpdated = { [weak self] caloriesBurned, heartRate, averageHeartRate, peakHeartRate in
             guard let self else { return }

@@ -204,6 +204,7 @@ final class WorkoutManager: NSObject {
         sendPayload(
             MirroredWorkoutPayload(
                 kind: .ended,
+                startTime: session.startDate,
                 endTime: endDate,
                 energyBurned: currentEnergyBurned,
                 heartRate: currentHeartRate,
@@ -399,6 +400,16 @@ final class WorkoutManager: NSObject {
 // MARK: - HKWorkoutSessionDelegate
 
 extension WorkoutManager: HKWorkoutSessionDelegate {
+    nonisolated func workoutSession(_ workoutSession: HKWorkoutSession,
+                                    didReceiveDataFromRemoteWorkoutSession data: [Data])
+    {
+        guard data.contains(Data("stopWorkout".utf8)) else { return }
+        Task { @MainActor [weak self] in
+            guard self?.session === workoutSession else { return }
+            JumpRecState.shared.end()
+        }
+    }
+
     nonisolated func workoutSession(_ workoutSession: HKWorkoutSession,
                                     didChangeTo toState: HKWorkoutSessionState,
                                     from fromState: HKWorkoutSessionState,

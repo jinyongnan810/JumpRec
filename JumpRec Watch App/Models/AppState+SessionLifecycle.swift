@@ -44,7 +44,9 @@ extension JumpRecState {
         startMinuteAnnouncements()
         WKInterfaceDevice.current().play(.start)
         speak(text: localizedSessionStartedAnnouncement)
-        ConnectivityManager.shared.sendMessage(["watch app": "started"])
+        ConnectivityManager.shared.sendWorkoutEvent(
+            MirroredWorkoutPayload(kind: .started, startTime: startTime, goalType: goalType, goalValue: goal)
+        )
     }
 
     /// Starts a workout using settings received from the companion iPhone app.
@@ -106,7 +108,9 @@ extension JumpRecState {
         endTime = Date()
         speak(text: localizedSessionFinishedAnnouncement, delay: 0.5)
         WKInterfaceDevice.current().play(.stop)
-        ConnectivityManager.shared.sendMessage(["watch app": "finished"])
+        ConnectivityManager.shared.sendWorkoutEvent(
+            MirroredWorkoutPayload(kind: .ended, startTime: startTime, endTime: endTime)
+        )
 
         jumpState = .finished
 

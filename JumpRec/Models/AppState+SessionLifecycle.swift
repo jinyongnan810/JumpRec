@@ -107,7 +107,11 @@ extension JumpRecState {
 
         if isMirroredWatchSession {
             cancelMinuteAnnouncements()
-            ConnectivityManager.shared.sendStopSessionCommand()
+            connectivityManager.sendStopSessionCommand { [weak self] in
+                // A delayed delivery failure must not stop a subsequent workout.
+                guard let self, self.startTime == startTime, sessionState == .active else { return }
+                workoutMirrorManager.sendStopSessionCommand()
+            }
             return
         }
 
