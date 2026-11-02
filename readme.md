@@ -4,6 +4,10 @@
 
 *Languages: [English](readme.md) | [日本語](readme_ja.md)*
 
+<a href="https://apps.apple.com/jp/app/jumprec/id6760456262">
+  <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store" height="44">
+</a>
+
 ---
 
 **JumpRec** tracks your rope jumping sessions using your Apple Watch, compatible headphones, or your iPhone in your pocket. It counts your jumps, logs your workout duration and heart rate, and keeps your exercise history on your device.

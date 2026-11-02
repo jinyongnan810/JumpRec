@@ -4,6 +4,10 @@
 
 *言語: [English](readme.md) | [日本語](readme_ja.md)*
 
+<a href="https://apps.apple.com/jp/app/jumprec/id6760456262">
+  <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/ja-jp?size=250x83" alt="App Storeからダウンロード" height="44">
+</a>
+
 ---
 
 **JumpRec**は、Apple Watch、対応イヤホン、またはポケットに入れたiPhoneを使って縄跳びの回数を記録するアプリです。ジャンプ回数、運動時間、心拍数、消費カロリーを記録し、日々のワークアウト履歴を手元で管理できます。
