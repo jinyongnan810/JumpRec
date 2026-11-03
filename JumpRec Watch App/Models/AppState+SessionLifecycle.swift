@@ -131,7 +131,7 @@ extension JumpRecState {
 
     /// Resets the watch app back to the idle state.
     func reset() {
-        cancelPendingSpeech()
+        stopSpeechAndDeactivateAudio()
         cancelMinuteAnnouncements()
         motionManager?.stopTracking()
         resetSessionMetrics()

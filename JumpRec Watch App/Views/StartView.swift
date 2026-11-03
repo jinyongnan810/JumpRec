@@ -212,6 +212,8 @@ struct StartView: View {
             do {
                 try await WorkoutPermissions.prepareForWorkout()
                 try Task.checkCancellation()
+                // Rebuild and warm up the speech synthesizer during the countdown before workout start.
+                JumpRecState.shared.prepareSpeechForWorkout()
                 isPreparingWorkout = false
                 withAnimation { isCountingDown = true }
             } catch {

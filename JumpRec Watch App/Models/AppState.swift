@@ -5,7 +5,6 @@
 //  Created by kinn on 2025/10/05.
 //
 
-import AVFoundation
 import Foundation
 import Observation
 
@@ -67,15 +66,9 @@ class JumpRecState: NSObject, @unchecked Sendable {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
-    /// Speaks workout announcements on Apple Watch.
+    /// Coordinates background speech synthesis and audio session ducking off the main actor.
     @ObservationIgnored
-    let synthesizer = AVSpeechSynthesizer()
-    /// Tracks the one-time speech warmup for this app lifetime.
-    @ObservationIgnored
-    var hasWarmedUpSpeechSynthesizer = false
-    /// Marks silent warmup speech so real announcements can interrupt it.
-    @ObservationIgnored
-    var isSpeechWarmupInProgress = false
+    let speechCoordinator = WatchSpeechCoordinator()
     /// Owns the latest delayed speech request so obsolete workout cues can be cancelled.
     @ObservationIgnored
     var pendingSpeechTask: Task<Void, Never>?
@@ -109,8 +102,6 @@ class JumpRecState: NSObject, @unchecked Sendable {
                 self.energyBurned = energyBurned
             }
         })
-        // The delegate releases ducking audio after speech finishes.
-        synthesizer.delegate = self
         NotificationCenter.default.addObserver(
             forName: .jumpRecSettingsDidUpdate,
             object: nil,
