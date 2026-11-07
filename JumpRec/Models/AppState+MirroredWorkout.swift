@@ -61,6 +61,7 @@ extension JumpRecState {
         self.caloriesBurned = caloriesBurned
         self.averageHeartRate = averageHeartRate
         self.peakHeartRate = peakHeartRate
+        doubleJumpsCount = session.doubleJumpsCount
         completedSession = session
         sessionState = .complete
         syncIdleTimer()
@@ -89,6 +90,7 @@ extension JumpRecState {
         heartRate = nil
         averageHeartRate = nil
         peakHeartRate = nil
+        doubleJumpsCount = 0
         completedSession = nil
         startTime = payload.startTime ?? Date()
         endTime = nil
@@ -159,6 +161,9 @@ extension JumpRecState {
 
         cancelMinuteAnnouncements()
         endTime = payload.endTime ?? Date()
+        if let doubleJumpsCount = payload.doubleJumpsCount {
+            self.doubleJumpsCount = doubleJumpsCount
+        }
         if let energyBurned = payload.energyBurned {
             caloriesBurned = energyBurned
         }

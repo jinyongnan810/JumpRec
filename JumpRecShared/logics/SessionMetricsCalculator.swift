@@ -19,6 +19,8 @@ public nonisolated enum SessionMetricsCalculator {
     private static let smallBreakLowerBound: TimeInterval = 5
     /// The minimum gap that counts as a long break.
     private static let longBreakLowerBound: TimeInterval = 15
+    /// The maximum gap between two Watch rope turns that counts as a single double-under.
+    private static let doubleJumpUpperBound: TimeInterval = 0.25
 
     // MARK: - Rate Metrics
 
@@ -121,5 +123,25 @@ public nonisolated enum SessionMetricsCalculator {
         }
 
         return (smallBreaksCount, longBreaksCount, max(longestStreak, currentStreak))
+    }
+
+    /// Counts non-overlapping Watch rope-turn pairs separated by at most 0.25 seconds.
+    public static func doubleJumpsCount(from jumpOffsets: [TimeInterval]) -> Int {
+        guard jumpOffsets.count > 1 else { return 0 }
+
+        var count = 0
+        var index = 1
+        while index < jumpOffsets.count {
+            let interval = jumpOffsets[index] - jumpOffsets[index - 1]
+            if interval > 0, interval <= doubleJumpUpperBound {
+                count += 1
+                // Consume both turns so the second turn cannot pair with the following jump.
+                index += 2
+            } else {
+                index += 1
+            }
+        }
+
+        return count
     }
 }

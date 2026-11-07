@@ -44,6 +44,9 @@ public final class JumpSession {
     /// Longest uninterrupted jump streak without a short or long break.
     public var longestStreak: Int = 0
 
+    /// Number of double-unders detected during Watch-recorded sessions.
+    public var doubleJumpsCount: Int?
+
     /// Average heart rate during the session in beats per minute.
     public var averageHeartRate: Int?
 
@@ -77,6 +80,7 @@ public final class JumpSession {
         smallBreaksCount: Int = 0,
         longBreaksCount: Int = 0,
         longestStreak: Int = 0,
+        doubleJumpsCount: Int? = nil,
         averageHeartRate: Int? = nil,
         peakHeartRate: Int? = nil,
         aiComment: String? = nil
@@ -92,6 +96,7 @@ public final class JumpSession {
         self.smallBreaksCount = smallBreaksCount
         self.longBreaksCount = longBreaksCount
         self.longestStreak = longestStreak
+        self.doubleJumpsCount = doubleJumpsCount
         self.averageHeartRate = averageHeartRate
         self.peakHeartRate = peakHeartRate
         self.aiComment = aiComment
@@ -220,6 +225,12 @@ public extension JumpSession {
     /// Returns the formatted longest-streak text.
     var formattedLongestStreak: String {
         longestStreak.formatted()
+    }
+
+    /// Returns the formatted double-jumps count when available.
+    func formattedDoubleJumpsCount(placeholder: String = "--") -> String {
+        guard let doubleJumpsCount else { return placeholder }
+        return doubleJumpsCount.formatted()
     }
 
     /// Returns the formatted small-break count.

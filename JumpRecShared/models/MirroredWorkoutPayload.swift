@@ -33,6 +33,8 @@ public struct MirroredWorkoutPayload: Codable, Sendable {
     public let goalValue: Int?
     /// The current jump count, when included.
     public let jumpCount: Int?
+    /// The detected double-under count for Watch workouts, when included.
+    public let doubleJumpsCount: Int?
     /// The jump offset relative to the session start, when included.
     public let jumpOffset: TimeInterval?
     /// The latest active energy burned value.
@@ -54,6 +56,7 @@ public struct MirroredWorkoutPayload: Codable, Sendable {
         goalType: GoalType? = nil,
         goalValue: Int? = nil,
         jumpCount: Int? = nil,
+        doubleJumpsCount: Int? = nil,
         jumpOffset: TimeInterval? = nil,
         energyBurned: Double? = nil,
         heartRate: Int? = nil,
@@ -66,6 +69,7 @@ public struct MirroredWorkoutPayload: Codable, Sendable {
         self.goalType = goalType
         self.goalValue = goalValue
         self.jumpCount = jumpCount
+        self.doubleJumpsCount = doubleJumpsCount
         self.jumpOffset = jumpOffset
         self.energyBurned = energyBurned
         self.heartRate = heartRate

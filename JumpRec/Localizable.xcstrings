@@ -1172,6 +1172,16 @@
     "Dot Indicator" : {
 
     },
+    "Double Jumps" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "二重跳び"
+          }
+        }
+      }
+    },
     "Downloading from iCloud..." : {
       "localizations" : {
         "en" : {
@@ -4190,6 +4200,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプの間に5秒を超え、15秒以下の休憩・中断が検出された回数です。"
+          }
+        }
+      }
+    },
+    "The number of double-unders detected during your workout. Double-under detection is only available when your workout is recorded with Apple Watch." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウト中に検出された二重跳びの回数です。二重跳びの検出は、Apple Watchでワークアウトを記録した場合にのみ表示されます。"
           }
         }
       }

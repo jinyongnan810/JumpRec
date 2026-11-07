@@ -180,6 +180,7 @@ extension JumpRecState {
         heartRate = nil
         averageHeartRate = nil
         peakHeartRate = nil
+        doubleJumpsCount = nil
         sessionGoalType = nil
         sessionGoalValue = nil
         sessionShouldSpeakJumpCountAnnouncements = true
@@ -231,6 +232,7 @@ extension JumpRecState {
         heartRate = nil
         averageHeartRate = nil
         peakHeartRate = nil
+        doubleJumpsCount = nil
         sessionGoalType = goalType
         sessionGoalValue = goalValue
         isMirroredWatchSession = false

@@ -58,6 +58,7 @@ struct SessionCompleteView: View {
             smallBreaksCount: appState.breakMetrics.small,
             longBreaksCount: appState.breakMetrics.long,
             longestStreak: appState.breakMetrics.longestStreak,
+            doubleJumpsCount: appState.doubleJumpsCount,
             averageHeartRate: appState.averageHeartRate,
             peakHeartRate: appState.peakHeartRate
         )
@@ -140,6 +141,7 @@ struct SessionCompleteView: View {
                     rhythmConsistency: metrics.rhythmConsistency.map { localizedPercentText($0) } ?? "--",
                     caloriesPerMinute: metrics.caloriesPerMinute.map { localizedCaloriesPerMinuteText($0) } ?? "--",
                     longestJumpStrikes: summary.formattedLongestStreak,
+                    doubleJumps: summary.formattedDoubleJumpsCount(),
                     shortBreaks: summary.formattedSmallBreaksCount,
                     longBreaks: summary.formattedLongBreaksCount,
                     averageHeartRate: summary.formattedAverageHeartRate(),
@@ -261,6 +263,7 @@ struct SessionCompleteView: View {
         smallBreaksCount: 4,
         longBreaksCount: 1,
         longestStreak: 286,
+        doubleJumpsCount: 18,
         averageHeartRate: 148,
         peakHeartRate: 176,
         aiComment: "Strong control through the middle section. You kept a high cadence, limited long breaks, and finished with a consistent rhythm."

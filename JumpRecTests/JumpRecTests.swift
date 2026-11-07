@@ -96,6 +96,22 @@ struct JumpRecTests {
         #expect(value == 18.0)
     }
 
+    @Test func testDoubleJumpsCountPairsRapidTurnsWithoutOverlapping() async throws {
+        let offsets: [TimeInterval] = [
+            0.40,
+            0.85,
+            1.03, // Double jump #1 (interval 0.18s)
+            1.20, // Starts next jump even though 0.17s after 1.03, because 1.03 was consumed
+            1.38, // Double jump #2 (interval 0.18s)
+            1.90,
+            2.15, // Double jump #3 (interval 0.25s boundary)
+            2.41, // Single jump (interval 0.26s)
+        ]
+
+        #expect(SessionMetricsCalculator.doubleJumpsCount(from: offsets) == 3)
+        #expect(SessionMetricsCalculator.doubleJumpsCount(from: [0.50]) == 0)
+    }
+
     @Test func testIPhoneProfileCountsMagnitudeAboveThresholdInAnyDirection() async throws {
         let detector = JumpDetector(profile: .iPhonePocket)
         let samples = [
