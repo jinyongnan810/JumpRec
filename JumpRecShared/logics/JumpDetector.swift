@@ -26,37 +26,6 @@ public enum JumpDetectorPolarity: String, Sendable {
     case positiveMagnitude
 }
 
-public struct JumpDetectorDebugState: Sendable {
-    /// The profile currently used by this detector instance.
-    public let profile: JumpDeviceProfile
-    /// The single axis being evaluated for the active profile.
-    public let dominantAxis: JumpDetectorAxis?
-    /// Whether the detector is looking for a positive peak or negative trough.
-    public let chosenPolarity: JumpDetectorPolarity?
-    /// Unused by this detector; always false.
-    public let rhythmLocked: Bool
-    /// Unused by this detector; always nil.
-    public let expectedInterval: TimeInterval?
-    /// Timestamp of the last accepted jump after refractory filtering.
-    public let lastAcceptedJumpTimestamp: TimeInterval?
-
-    public init(
-        profile: JumpDeviceProfile,
-        dominantAxis: JumpDetectorAxis? = nil,
-        chosenPolarity: JumpDetectorPolarity? = nil,
-        rhythmLocked: Bool = false,
-        expectedInterval: TimeInterval? = nil,
-        lastAcceptedJumpTimestamp: TimeInterval? = nil
-    ) {
-        self.profile = profile
-        self.dominantAxis = dominantAxis
-        self.chosenPolarity = chosenPolarity
-        self.rhythmLocked = rhythmLocked
-        self.expectedInterval = expectedInterval
-        self.lastAcceptedJumpTimestamp = lastAcceptedJumpTimestamp
-    }
-}
-
 public final class JumpDetector {
     // MARK: - Configuration
 
@@ -70,6 +39,8 @@ public final class JumpDetector {
         let polarity: JumpDetectorPolarity
         /// Baseline acceleration threshold scaled by the user's percentage adjustment.
         let threshold: Double
+        /// Signal level that must be crossed in the opposite direction to re-arm detection.
+        let rearmThreshold: Double
         /// Minimum time between accepted jumps to prevent double counting.
         let minimumInterval: TimeInterval
 
@@ -81,7 +52,8 @@ public final class JumpDetector {
                     axis: .magnitude,
                     polarity: .positiveMagnitude,
                     threshold: 1.2,
-                    minimumInterval: 0.25
+                    rearmThreshold: 0.5,
+                    minimumInterval: 0.1
                 )
             case .headphones:
                 Config(
@@ -89,15 +61,17 @@ public final class JumpDetector {
                     axis: .z,
                     polarity: .negativeTrough,
                     threshold: -1.2,
-                    minimumInterval: 0.25
+                    rearmThreshold: 0.1,
+                    minimumInterval: 0.1
                 )
             case .watch:
                 Config(
                     profile: .watch,
-                    axis: .y,
+                    axis: .z,
                     polarity: .positivePeak,
                     threshold: 0.8,
-                    minimumInterval: 0.25
+                    rearmThreshold: -0.1,
+                    minimumInterval: 0.1
                 )
             }
         }
@@ -109,8 +83,6 @@ public final class JumpDetector {
     public let profile: JumpDeviceProfile
     /// Optional console logging for debugging live sessions.
     public var debugLoggingEnabled = false
-    /// Snapshot of the detector state used by debugging and inspection.
-    public private(set) var debugState: JumpDetectorDebugState
 
     // MARK: - Private State
 
@@ -120,6 +92,8 @@ public final class JumpDetector {
     private var thresholdAdjustmentPercentage: Double
     /// Cached threshold for frequent motion-sample comparisons.
     private var adjustedThreshold: Double
+    /// Whether the signal has returned past the re-arm threshold since the last accepted jump.
+    private var canDetectNextJump = true
     /// Timestamp of the last jump that passed threshold and refractory checks.
     private var lastAcceptedJumpTimestamp: TimeInterval?
 
@@ -134,11 +108,6 @@ public final class JumpDetector {
             baseThreshold: config.threshold,
             adjustmentPercentage: self.thresholdAdjustmentPercentage
         )
-        debugState = JumpDetectorDebugState(
-            profile: profile,
-            dominantAxis: config.axis,
-            chosenPolarity: config.polarity
-        )
     }
 
     // MARK: - Public Methods
@@ -152,25 +121,31 @@ public final class JumpDetector {
         )
     }
 
-    /// Checks one motion sample against the profile's signal and threshold.
+    /// Checks one motion sample against the profile's signal, re-arm level, and threshold.
     public func processMotionSample(_ sample: MotionSample) -> Bool {
         let value = axisValue(from: sample, axis: config.axis)
+
+        if !canDetectNextJump {
+            guard rearmSatisfied(value: value) else {
+                return false
+            }
+            canDetectNextJump = true
+        }
+
         let isCandidate = thresholdSatisfied(value: value)
 
         guard isCandidate else {
-            syncDebugState()
             return false
         }
 
         if let lastAcceptedJumpTimestamp,
            sample.timestamp - lastAcceptedJumpTimestamp < config.minimumInterval
         {
-            syncDebugState()
             return false
         }
 
+        canDetectNextJump = false
         lastAcceptedJumpTimestamp = sample.timestamp
-        syncDebugState()
 
         if debugLoggingEnabled {
             print(
@@ -182,10 +157,10 @@ public final class JumpDetector {
         return true
     }
 
-    /// Clears the simple refractory state so a new session starts fresh.
+    /// Clears the refractory and re-arm state so a new session starts fresh.
     public func reset() {
+        canDetectNextJump = true
         lastAcceptedJumpTimestamp = nil
-        syncDebugState()
     }
 
     // MARK: - Private Helpers
@@ -218,6 +193,16 @@ public final class JumpDetector {
         }
     }
 
+    /// Returns whether the signal has crossed back past the profile's re-arm threshold.
+    private func rearmSatisfied(value: Double) -> Bool {
+        switch config.polarity {
+        case .positivePeak, .positiveMagnitude:
+            value <= config.rearmThreshold
+        case .negativeTrough:
+            value >= config.rearmThreshold
+        }
+    }
+
     /// Calculates the signed threshold once whenever user tuning changes.
     private static func adjustedThreshold(baseThreshold: Double, adjustmentPercentage: Double) -> Double {
         baseThreshold * (1 + (adjustmentPercentage / 100))
@@ -226,17 +211,5 @@ public final class JumpDetector {
     /// Restricts sensitivity tuning to the supported settings range.
     private static func clampedThresholdAdjustmentPercentage(_ percentage: Double) -> Double {
         min(50, max(-50, percentage))
-    }
-
-    /// Updates debug state to match the active detector.
-    private func syncDebugState() {
-        debugState = JumpDetectorDebugState(
-            profile: profile,
-            dominantAxis: config.axis,
-            chosenPolarity: config.polarity,
-            rhythmLocked: false,
-            expectedInterval: nil,
-            lastAcceptedJumpTimestamp: lastAcceptedJumpTimestamp
-        )
     }
 }

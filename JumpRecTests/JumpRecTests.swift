@@ -100,10 +100,14 @@ struct JumpRecTests {
         let detector = JumpDetector(profile: .iPhonePocket)
         let samples = [
             makeSample(x: 1.19, timestamp: 0.00),
-            makeSample(x: 1.21, timestamp: 0.30),
-            makeSample(y: 1.30, timestamp: 0.60),
-            makeSample(z: -1.35, timestamp: 0.90),
-            makeSample(x: 0.40, y: 0.50, z: 0.60, timestamp: 1.20),
+            makeSample(x: 1.21, timestamp: 0.15),
+            makeSample(x: 0.60, timestamp: 0.25),
+            makeSample(y: 1.30, timestamp: 0.35),
+            makeSample(x: 0.50, timestamp: 0.45),
+            makeSample(y: 1.30, timestamp: 0.55),
+            makeSample(x: 0.20, y: 0.20, z: 0.20, timestamp: 0.65),
+            makeSample(z: -1.35, timestamp: 0.75),
+            makeSample(x: 0.40, y: 0.50, z: 0.60, timestamp: 0.90),
         ]
 
         let count = samples.reduce(into: 0) { partialResult, sample in
@@ -113,17 +117,18 @@ struct JumpRecTests {
         }
 
         #expect(count == 3)
-        #expect(detector.debugState.dominantAxis == .magnitude)
-        #expect(detector.debugState.chosenPolarity == .positiveMagnitude)
     }
 
-    @Test func testHeadphoneProfileCountsOnlyNegativeZBelowThreshold() async throws {
+    @Test func testHeadphoneProfileCountsOnlyNegativeZBelowThresholdAfterRearm() async throws {
         let detector = JumpDetector(profile: .headphones)
         let samples = [
             makeSample(z: -1.10, timestamp: 0.00),
-            makeSample(z: -1.25, timestamp: 0.30),
-            makeSample(z: -1.35, timestamp: 0.61),
-            makeSample(z: -0.80, timestamp: 0.95),
+            makeSample(z: -1.25, timestamp: 0.15),
+            makeSample(z: 0.05, timestamp: 0.25),
+            makeSample(z: -1.30, timestamp: 0.35),
+            makeSample(z: 0.10, timestamp: 0.45),
+            makeSample(z: -1.35, timestamp: 0.55),
+            makeSample(z: -0.80, timestamp: 0.70),
         ]
 
         let count = samples.reduce(into: 0) { partialResult, sample in
@@ -133,17 +138,18 @@ struct JumpRecTests {
         }
 
         #expect(count == 2)
-        #expect(detector.debugState.dominantAxis == .z)
-        #expect(detector.debugState.chosenPolarity == .negativeTrough)
     }
 
-    @Test func testWatchProfileCountsOnlyPositiveYAboveThreshold() async throws {
+    @Test func testWatchProfileCountsOnlyPositiveZAboveThresholdAfterRearm() async throws {
         let detector = JumpDetector(profile: .watch)
         let samples = [
-            makeSample(y: 0.79, timestamp: 0.00),
-            makeSample(y: 0.81, timestamp: 0.30),
-            makeSample(y: 1.00, timestamp: 0.62),
-            makeSample(y: 0.40, timestamp: 1.00),
+            makeSample(z: 0.79, timestamp: 0.00),
+            makeSample(z: 0.81, timestamp: 0.15),
+            makeSample(z: -0.05, timestamp: 0.25),
+            makeSample(z: 0.95, timestamp: 0.35),
+            makeSample(z: -0.10, timestamp: 0.45),
+            makeSample(z: 1.00, timestamp: 0.55),
+            makeSample(z: 0.40, timestamp: 0.70),
         ]
 
         let count = samples.reduce(into: 0) { partialResult, sample in
@@ -153,8 +159,6 @@ struct JumpRecTests {
         }
 
         #expect(count == 2)
-        #expect(detector.debugState.dominantAxis == .y)
-        #expect(detector.debugState.chosenPolarity == .positivePeak)
     }
 
     @Test func testPositiveThresholdAdjustmentRaisesPositiveProfileThreshold() async throws {
@@ -174,8 +178,8 @@ struct JumpRecTests {
     @Test func testNegativeThresholdAdjustmentLowersPositiveProfileThreshold() async throws {
         let detector = JumpDetector(profile: .watch, thresholdAdjustmentPercentage: -50)
 
-        #expect(!detector.processMotionSample(makeSample(y: 0.39, timestamp: 0.00)))
-        #expect(detector.processMotionSample(makeSample(y: 0.41, timestamp: 0.30)))
+        #expect(!detector.processMotionSample(makeSample(z: 0.39, timestamp: 0.00)))
+        #expect(detector.processMotionSample(makeSample(z: 0.41, timestamp: 0.30)))
     }
 
     @Test func testThresholdAdjustmentIsClampedToSupportedRange() async throws {
@@ -185,15 +189,16 @@ struct JumpRecTests {
         #expect(detector.processMotionSample(makeSample(z: -1.81, timestamp: 0.30)))
     }
 
-    @Test func testAllProfilesUse250MillisecondMinimumInterval() async throws {
+    @Test func testAllProfilesUse100MillisecondMinimumInterval() async throws {
         let iPhoneDetector = JumpDetector(profile: .iPhonePocket)
         let headphoneDetector = JumpDetector(profile: .headphones)
         let watchDetector = JumpDetector(profile: .watch)
 
         let iPhoneCount = [
             makeSample(x: 1.30, timestamp: 0.00),
-            makeSample(y: 1.35, timestamp: 0.10),
-            makeSample(z: -1.40, timestamp: 0.26),
+            makeSample(x: 0.40, timestamp: 0.04),
+            makeSample(y: 1.35, timestamp: 0.08),
+            makeSample(z: -1.40, timestamp: 0.11),
         ].reduce(into: 0) { partialResult, sample in
             if iPhoneDetector.processMotionSample(sample) {
                 partialResult += 1
@@ -202,8 +207,9 @@ struct JumpRecTests {
 
         let headphoneCount = [
             makeSample(z: -1.30, timestamp: 0.00),
-            makeSample(z: -1.40, timestamp: 0.12),
-            makeSample(z: -1.50, timestamp: 0.28),
+            makeSample(z: 0.20, timestamp: 0.04),
+            makeSample(z: -1.40, timestamp: 0.08),
+            makeSample(z: -1.50, timestamp: 0.11),
         ].reduce(into: 0) { partialResult, sample in
             if headphoneDetector.processMotionSample(sample) {
                 partialResult += 1
@@ -211,9 +217,10 @@ struct JumpRecTests {
         }
 
         let watchCount = [
-            makeSample(y: 0.90, timestamp: 0.00),
-            makeSample(y: 1.00, timestamp: 0.20),
-            makeSample(y: 1.10, timestamp: 0.30),
+            makeSample(z: 0.90, timestamp: 0.00),
+            makeSample(z: -0.20, timestamp: 0.04),
+            makeSample(z: 1.00, timestamp: 0.08),
+            makeSample(z: 1.10, timestamp: 0.11),
         ].reduce(into: 0) { partialResult, sample in
             if watchDetector.processMotionSample(sample) {
                 partialResult += 1
@@ -225,16 +232,15 @@ struct JumpRecTests {
         #expect(watchCount == 2)
     }
 
-    @Test func testResetClearsRefractoryState() async throws {
+    @Test func testResetClearsRefractoryAndRearmState() async throws {
         let detector = JumpDetector(profile: .watch)
 
-        #expect(detector.processMotionSample(makeSample(y: 0.90, timestamp: 0.00)))
-        #expect(!detector.processMotionSample(makeSample(y: 0.95, timestamp: 0.10)))
+        #expect(detector.processMotionSample(makeSample(z: 0.90, timestamp: 0.00)))
+        #expect(!detector.processMotionSample(makeSample(z: 0.95, timestamp: 0.05)))
 
         detector.reset()
 
-        #expect(detector.processMotionSample(makeSample(y: 0.95, timestamp: 0.10)))
-        #expect(detector.debugState.lastAcceptedJumpTimestamp == 0.10)
+        #expect(detector.processMotionSample(makeSample(z: 0.95, timestamp: 0.05)))
     }
 }
 
