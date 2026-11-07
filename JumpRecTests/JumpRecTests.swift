@@ -52,6 +52,41 @@ struct JumpRecTests {
         #expect(records.first { $0.kind == .longestSession }?.metricValue == 120)
     }
 
+    @MainActor
+    @Test func testMostDoubleUndersRecordRequiresPositiveWatchCount() throws {
+        let store = try MyDataStore.makePreviewStore(qualifiedWorkoutCount: 0)
+        let startedAt = Date(timeIntervalSince1970: 1_000_000)
+
+        func makeSession(doubleJumpsCount: Int?, offsetSeconds: TimeInterval = 0) -> JumpSession {
+            let start = startedAt.addingTimeInterval(offsetSeconds)
+            return JumpSession(
+                startedAt: start,
+                endedAt: start.addingTimeInterval(180),
+                jumpCount: 300,
+                peakRate: 160,
+                caloriesBurned: 35,
+                doubleJumpsCount: doubleJumpsCount
+            )
+        }
+
+        let unsupportedSession = makeSession(doubleJumpsCount: nil)
+        let zeroDoubleUndersSession = makeSession(doubleJumpsCount: 0, offsetSeconds: 300)
+        #expect(!store.upsertPersonalRecords(for: unsupportedSession).contains(.mostDoubleUnders))
+        #expect(!store.upsertPersonalRecords(for: zeroDoubleUndersSession).contains(.mostDoubleUnders))
+
+        let firstRecordSession = makeSession(doubleJumpsCount: 12, offsetSeconds: 600)
+        #expect(store.upsertPersonalRecords(for: firstRecordSession).contains(.mostDoubleUnders))
+
+        let lowerCountSession = makeSession(doubleJumpsCount: 8, offsetSeconds: 900)
+        #expect(!store.upsertPersonalRecords(for: lowerCountSession).contains(.mostDoubleUnders))
+
+        let higherCountSession = makeSession(doubleJumpsCount: 25, offsetSeconds: 1200)
+        #expect(store.upsertPersonalRecords(for: higherCountSession).contains(.mostDoubleUnders))
+
+        let records = try store.modelContext.fetch(FetchDescriptor<PersonalRecord>())
+        #expect(records.first { $0.kind == .mostDoubleUnders }?.metricValue == 25)
+    }
+
     @Test func testMakeRateSamplesForSteady150Rate() async throws {
         let jumpOffsets = stride(from: 0.4, through: 60.0, by: 0.4).map(\.self)
         let samples = SessionMetricsCalculator.makeRateSamples(

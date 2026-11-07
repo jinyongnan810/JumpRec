@@ -134,6 +134,28 @@
         }
       }
     },
+    "Allow JumpRec to save workouts in Health before starting. Review access in JumpRec Settings." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始する前に、JumpRecによるヘルスケアへのワークアウトの保存を許可してください。JumpRecの設定でアクセス許可を確認できます。"
+          }
+        }
+      }
+    },
+    "Allow Motion & Fitness access in JumpRec’s system settings before starting a headphone workout." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘッドフォンでワークアウトを開始する前に、システム設定のJumpRecで「モーションとフィットネス」へのアクセスを許可してください。"
+          }
+        }
+      }
+    },
     "Allowed" : {
       "localizations" : {
         "ja" : {
@@ -150,6 +172,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "音声設定"
+          }
+        }
+      }
+    },
+    "Best Average Jump Rate" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最高平均ペース"
+          }
+        }
+      }
+    },
+    "Best Jump Rate" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最高ペース"
           }
         }
       }
@@ -317,6 +359,16 @@
         }
       }
     },
+    "Highest Jump Count" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最多ジャンプ回数"
+          }
+        }
+      }
+    },
     "Idle" : {
       "localizations" : {
         "ja" : {
@@ -393,6 +445,26 @@
         }
       }
     },
+    "Longest Jump Streak" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最長連続ジャンプ回数"
+          }
+        }
+      }
+    },
+    "Longest Session" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最長セッション"
+          }
+        }
+      }
+    },
     "Low" : {
       "localizations" : {
         "ja" : {
@@ -425,6 +497,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メンバーシップ"
+          }
+        }
+      }
+    },
+    "Most Calories" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最大消費カロリー"
+          }
+        }
+      }
+    },
+    "Most Double Unders" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "二重跳び最大回数"
           }
         }
       }
@@ -705,6 +797,16 @@
         }
       }
     },
+    "Sneaky Burn" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "高効率カロリーバーン"
+          }
+        }
+      }
+    },
     "Speak Jump Count" : {
       "localizations" : {
         "ja" : {
@@ -741,6 +843,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト開始前に3秒のカウントダウンを開始します。"
+          }
+        }
+      }
+    },
+    "Steady Rhythm" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "安定リズム"
           }
         }
       }
@@ -837,6 +949,17 @@
         }
       }
     },
+    "Unable to prepare workout permissions. Please try again or review access in Settings." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトのアクセス許可を確認できません。もう一度お試しいただくか、設定でアクセス許可を確認してください。"
+          }
+        }
+      }
+    },
     "Unknown" : {
       "localizations" : {
         "ja" : {
@@ -879,6 +1002,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト完了"
+          }
+        }
+      }
+    },
+    "Workout Permissions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトのアクセス許可"
           }
         }
       }
@@ -940,51 +1074,7 @@
           }
         }
       }
-    },
-    "Workout Permissions" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ワークアウトのアクセス許可"
-          }
-        }
-      }
-    },
-    "Allow JumpRec to save workouts in Health before starting. Review access in JumpRec Settings." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開始する前に、JumpRecによるヘルスケアへのワークアウトの保存を許可してください。JumpRecの設定でアクセス許可を確認できます。"
-          }
-        }
-      }
-    },
-    "Allow Motion & Fitness access in JumpRec’s system settings before starting a headphone workout." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ヘッドフォンでワークアウトを開始する前に、システム設定のJumpRecで「モーションとフィットネス」へのアクセスを許可してください。"
-          }
-        }
-      }
-    },
-    "Unable to prepare workout permissions. Please try again or review access in Settings." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ワークアウトのアクセス許可を確認できません。もう一度お試しいただくか、設定でアクセス許可を確認してください。"
-          }
-        }
-      }
     }
   },
-  "version" : "1.1"
+  "version" : "1.3"
 }

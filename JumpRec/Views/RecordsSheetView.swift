@@ -211,6 +211,14 @@ struct RecordsSheetView: View {
             achievedAt: calendar.date(byAdding: .day, value: -8, to: now)!
         )
     )
+    container.mainContext.insert(
+        PersonalRecord(
+            kind: .mostDoubleUnders,
+            metricValue: 48,
+            displayValue: "48 jumps",
+            achievedAt: calendar.date(byAdding: .day, value: -2, to: now)!
+        )
+    )
 
     dataStore.markUnseenPersonalRecordUpdates([.highestJumpCount, .steadyRhythm, .sneakyBurn])
 
@@ -247,7 +255,7 @@ private struct RecordCardView: View {
                 .frame(width: 24, height: 24)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(LocalizedStringKey(record.kind.title))
+                Text(record.kind.title)
                     .font(AppFonts.bodyRegular)
                     .foregroundStyle(AppColors.textPrimary)
 
@@ -284,7 +292,7 @@ private struct RecordCardView: View {
 
     /// Names the record type for VoiceOver using the same localized title shown visually.
     private var accessibilityLabel: Text {
-        Text(LocalizedStringKey(record.kind.title))
+        Text(record.kind.title)
     }
 
     /// Combines the record value and date so the compact row is understandable without relying on layout.
@@ -323,6 +331,11 @@ private struct RecordCardView: View {
             return localizedRateText(Int(record.metricValue.rounded()))
         case .sneakyBurn:
             return localizedCaloriesPerMinuteText(record.metricValue)
+        case .mostDoubleUnders:
+            return String(
+                format: String(localized: "%@ jumps"),
+                Int(record.metricValue.rounded()).formatted()
+            )
         @unknown default:
             return record.metricValue.formatted()
         }

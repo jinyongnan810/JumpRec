@@ -13,6 +13,7 @@ extension MyDataStore {
         static let longestJumpStreak = 100
         static let longestSessionDurationSeconds = 60
         static let mostCalories = 20.0
+        static let mostDoubleUnders = 0
         static let steadyRhythmSampleCount = 12
         static let averageJumpRateDurationSeconds = 60
         static let sneakyBurnDurationSeconds = 60
@@ -131,6 +132,22 @@ extension MyDataStore {
                     displayValue: String(
                         format: String(localized: "%@ jumps"),
                         session.longestStreak.formatted()
+                    ),
+                    achievedAt: session.startedAt
+                )
+            )
+        }
+
+        if let doubleJumpsCount = session.doubleJumpsCount,
+           doubleJumpsCount > PersonalRecordThreshold.mostDoubleUnders
+        {
+            candidates.append(
+                PersonalRecordCandidate(
+                    kind: .mostDoubleUnders,
+                    metricValue: Double(doubleJumpsCount),
+                    displayValue: String(
+                        format: String(localized: "%@ jumps"),
+                        doubleJumpsCount.formatted()
                     ),
                     achievedAt: session.startedAt
                 )

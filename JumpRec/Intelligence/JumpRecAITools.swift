@@ -56,7 +56,7 @@ import SwiftData
     @available(iOS 26.0, *)
     public struct GetPersonalRecordsAITool: Tool {
         public let name = "getPersonalRecords"
-        public let description = "Retrieves all-time personal records and milestones in JumpRec (highest jumps, best pace, longest duration, longest streak, calories)."
+        public let description = "Retrieves all-time personal records and milestones in JumpRec (highest jumps, most double-unders, best pace, longest duration, longest streak, calories)."
 
         @Generable
         public struct Arguments: Sendable {

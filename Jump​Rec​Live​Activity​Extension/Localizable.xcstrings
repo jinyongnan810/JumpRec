@@ -44,6 +44,28 @@
         }
       }
     },
+    "Allow JumpRec to save workouts in Health before starting. Review access in JumpRec Settings." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始する前に、JumpRecによるヘルスケアへのワークアウトの保存を許可してください。JumpRecの設定でアクセス許可を確認できます。"
+          }
+        }
+      }
+    },
+    "Allow Motion & Fitness access in JumpRec’s system settings before starting a headphone workout." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘッドフォンでワークアウトを開始する前に、システム設定のJumpRecで「モーションとフィットネス」へのアクセスを許可してください。"
+          }
+        }
+      }
+    },
     "Allowed" : {
       "localizations" : {
         "ja" : {
@@ -53,6 +75,12 @@
           }
         }
       }
+    },
+    "Best Average Jump Rate" : {
+
+    },
+    "Best Jump Rate" : {
+
     },
     "Calories" : {
       "localizations" : {
@@ -135,6 +163,9 @@
         }
       }
     },
+    "Highest Jump Count" : {
+
+    },
     "Idle" : {
       "localizations" : {
         "ja" : {
@@ -164,6 +195,18 @@
           }
         }
       }
+    },
+    "Longest Jump Streak" : {
+
+    },
+    "Longest Session" : {
+
+    },
+    "Most Calories" : {
+
+    },
+    "Most Double Unders" : {
+
     },
     "Motion access is requested when you start a workout with supported headphones." : {
       "extractionState" : "stale",
@@ -357,6 +400,9 @@
         }
       }
     },
+    "Sneaky Burn" : {
+
+    },
     "Source" : {
       "localizations" : {
         "ja" : {
@@ -366,6 +412,9 @@
           }
         }
       }
+    },
+    "Steady Rhythm" : {
+
     },
     "Sync Failed" : {
       "localizations" : {
@@ -405,6 +454,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アクセス許可を更新できません"
+          }
+        }
+      }
+    },
+    "Unable to prepare workout permissions. Please try again or review access in Settings." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトのアクセス許可を確認できません。もう一度お試しいただくか、設定でアクセス許可を確認してください。"
           }
         }
       }
@@ -449,6 +509,17 @@
         }
       }
     },
+    "Workout Permissions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトのアクセス許可"
+          }
+        }
+      }
+    },
     "cal" : {
       "localizations" : {
         "ja" : {
@@ -487,50 +558,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iPhone"
-          }
-        }
-      }
-    },
-    "Workout Permissions" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ワークアウトのアクセス許可"
-          }
-        }
-      }
-    },
-    "Allow JumpRec to save workouts in Health before starting. Review access in JumpRec Settings." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開始する前に、JumpRecによるヘルスケアへのワークアウトの保存を許可してください。JumpRecの設定でアクセス許可を確認できます。"
-          }
-        }
-      }
-    },
-    "Allow Motion & Fitness access in JumpRec’s system settings before starting a headphone workout." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ヘッドフォンでワークアウトを開始する前に、システム設定のJumpRecで「モーションとフィットネス」へのアクセスを許可してください。"
-          }
-        }
-      }
-    },
-    "Unable to prepare workout permissions. Please try again or review access in Settings." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ワークアウトのアクセス許可を確認できません。もう一度お試しいただくか、設定でアクセス許可を確認してください。"
           }
         }
       }

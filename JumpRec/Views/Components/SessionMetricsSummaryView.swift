@@ -123,7 +123,8 @@ struct SessionMetricsSummaryView: View {
                         id: "double-jumps",
                         title: "Double Jumps",
                         message: "The number of double-unders detected during your workout. Double-under detection is only available when your workout is recorded with Apple Watch."
-                    )
+                    ),
+                    showsBadge: achievedRecordKinds.contains(.mostDoubleUnders)
                 ) {
                     Text(doubleJumps)
                         .font(AppFonts.metricDetailMonospaced)

@@ -24,6 +24,8 @@ public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
     case bestAverageJumpRate
     /// Highest calorie burn efficiency measured in kilocalories per minute.
     case sneakyBurn
+    /// Highest number of double-unders achieved in a single session.
+    case mostDoubleUnders
 
     // MARK: - Display Metadata
 
@@ -31,21 +33,23 @@ public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
     public nonisolated var title: String {
         switch self {
         case .highestJumpCount:
-            "Highest Jump Count"
+            String(localized: "Highest Jump Count")
         case .longestJumpStreak:
-            "Longest Jump Streak"
+            String(localized: "Longest Jump Streak")
         case .longestSession:
-            "Longest Session"
+            String(localized: "Longest Session")
         case .mostCalories:
-            "Most Calories"
+            String(localized: "Most Calories")
         case .bestJumpRate:
-            "Best Jump Rate"
+            String(localized: "Best Jump Rate")
         case .steadyRhythm:
-            "Steady Rhythm"
+            String(localized: "Steady Rhythm")
         case .bestAverageJumpRate:
-            "Best Average Jump Rate"
+            String(localized: "Best Average Jump Rate")
         case .sneakyBurn:
-            "Sneaky Burn"
+            String(localized: "Sneaky Burn")
+        case .mostDoubleUnders:
+            String(localized: "Most Double Unders")
         }
     }
 
@@ -68,13 +72,15 @@ public enum PersonalRecordKind: String, Codable, CaseIterable, Sendable {
             "speedometer"
         case .sneakyBurn:
             "flame.circle.fill"
+        case .mostDoubleUnders:
+            "chevron.up.2"
         }
     }
 
     /// Returns the comparison rule used when evaluating new record values.
     public var comparison: PersonalRecordComparison {
         switch self {
-        case .highestJumpCount, .longestJumpStreak, .longestSession, .mostCalories, .bestJumpRate, .steadyRhythm, .bestAverageJumpRate, .sneakyBurn:
+        case .highestJumpCount, .longestJumpStreak, .longestSession, .mostCalories, .bestJumpRate, .steadyRhythm, .bestAverageJumpRate, .sneakyBurn, .mostDoubleUnders:
             .largerIsBetter
         }
     }
