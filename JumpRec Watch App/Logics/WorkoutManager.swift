@@ -42,6 +42,8 @@ final class WorkoutManager: NSObject {
     private let encoder = JSONEncoder()
     /// Enables remote updates only after mirroring succeeds; local collection stays independent.
     private var isMirroringActive = false
+    /// Indicates whether the current HealthKit session has transitioned from prepared to active.
+    private var isActivityStarted = false
     /// Stores the current (latest) heart rate for mirrored updates.
     private var currentHeartRate: Int?
     /// Stores the current average heart rate for mirrored updates.
@@ -54,6 +56,10 @@ final class WorkoutManager: NSObject {
     private var pendingFinalizations: [ObjectIdentifier: (session: HKWorkoutSession, builder: HKLiveWorkoutBuilder)] = [:]
     /// Owns asynchronous startup work for the current workout.
     private var workoutLifecycleTask: Task<Void, Never>?
+    /// Owns companion mirroring setup so it can begin during the pre-workout countdown.
+    private var mirroringTask: Task<Void, Never>?
+    /// Buffers the started event while companion mirroring finishes connecting.
+    private var pendingStartedPayload: MirroredWorkoutPayload?
     /// Identifies the workout that owns asynchronous HealthKit completions.
     private var workoutGeneration = UUID()
     /// Minimum time interval between mirrored jump updates to prevent continuous radio transmission.
@@ -98,25 +104,78 @@ final class WorkoutManager: NSObject {
 
     // MARK: - Workout Session
 
-    /// Starts a jump-rope workout locally and attempts to mirror it to the iPhone app.
-    func startWorkout(startDate: Date, goalType: GoalType, goalValue: Int) {
+    /// Creates and prepares a HealthKit workout session and companion mirroring during the countdown.
+    func prepareWorkout() {
+        guard !isActivityStarted else { return }
+
+        cancelPreparedWorkout()
+
         workoutGeneration = UUID()
         let generation = workoutGeneration
+
+        let configuration = makeWorkoutConfiguration()
+        do {
+            let (session, builder) = try makeSessionAndBuilder(configuration: configuration)
+            self.session = session
+            self.builder = builder
+            session.prepare()
+            startMirroring(for: session, builder: builder, generation: generation)
+        } catch {
+            print("[WorkoutManager] Failed to prepare workout: \(error.localizedDescription)")
+        }
+    }
+
+    /// Starts a jump-rope workout locally and attempts to mirror it to the iPhone app.
+    func startWorkout(startDate: Date, goalType: GoalType, goalValue: Int) {
         workoutLifecycleTask?.cancel()
         throttledJumpTask?.cancel()
         throttledJumpTask = nil
         pendingMirroredJumpPayload = nil
         lastMirroredJumpSentAt = .distantPast
-
-        isMirroringActive = false
         currentHeartRate = nil
         averageHeartRate = nil
         peakHeartRate = nil
 
-        let configuration = HKWorkoutConfiguration()
-        configuration.activityType = .jumpRope
-        configuration.locationType = .outdoor
+        let startedPayload = MirroredWorkoutPayload(
+            kind: .started,
+            startTime: startDate,
+            goalType: goalType,
+            goalValue: goalValue
+        )
 
+        // Reuse the session prepared during the countdown when available.
+        if let session, let builder, !isActivityStarted {
+            let generation = workoutGeneration
+            isActivityStarted = true
+            session.startActivity(with: startDate)
+
+            if isMirroringActive {
+                pendingStartedPayload = nil
+                sendPayload(startedPayload)
+            } else {
+                pendingStartedPayload = startedPayload
+                if mirroringTask == nil {
+                    startMirroring(for: session, builder: builder, generation: generation)
+                }
+            }
+
+            workoutLifecycleTask = Task { [weak self] in
+                guard let self else { return }
+                await beginCollection(for: builder, session: session, at: startDate, generation: generation)
+            }
+            return
+        }
+
+        // Fall back to full creation when starting without a prior countdown preparation.
+        mirroringTask?.cancel()
+        mirroringTask = nil
+        workoutGeneration = UUID()
+        let generation = workoutGeneration
+        isMirroringActive = false
+        isActivityStarted = true
+        pendingStartedPayload = startedPayload
+
+        let configuration = makeWorkoutConfiguration()
         workoutLifecycleTask = Task { [weak self] in
             guard let self else { return }
 
@@ -125,67 +184,39 @@ final class WorkoutManager: NSObject {
                 try Task.checkCancellation()
                 guard workoutGeneration == generation else { return }
 
-                let session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
-                let builder = session.associatedWorkoutBuilder()
-                builder.dataSource = HKLiveWorkoutDataSource(
-                    healthStore: healthStore,
-                    workoutConfiguration: configuration
-                )
-                session.delegate = self
-                builder.delegate = self
+                let (session, builder) = try makeSessionAndBuilder(configuration: configuration)
                 self.session = session
                 self.builder = builder
                 session.startActivity(with: startDate)
-
-                do {
-                    try Task.checkCancellation()
-                    try await builder.beginCollection(at: startDate)
-                    try Task.checkCancellation()
-                } catch is CancellationError {
-                    return
-                } catch {
-                    print("[WorkoutManager] Failed to start workout collection: \(error.localizedDescription)")
-                    return
-                }
-
-                guard workoutGeneration == generation,
-                      self.session === session,
-                      self.builder === builder
-                else {
-                    return
-                }
-
-                do {
-                    try await session.startMirroringToCompanionDevice()
-                    try Task.checkCancellation()
-                } catch is CancellationError {
-                    return
-                } catch {
-                    // Keep local collection running if mirroring fails; skip remote payloads for this workout.
-                    isMirroringActive = false
-                    print("[WorkoutManager] Companion mirroring unavailable: \(error.localizedDescription)")
-                    return
-                }
-
-                guard workoutGeneration == generation,
-                      self.session === session,
-                      self.builder === builder
-                else {
-                    return
-                }
-
-                isMirroringActive = true
-                sendPayload(
-                    MirroredWorkoutPayload(
-                        kind: .started,
-                        startTime: startDate,
-                        goalType: goalType,
-                        goalValue: goalValue
-                    )
-                )
+                startMirroring(for: session, builder: builder, generation: generation)
+                await beginCollection(for: builder, session: session, at: startDate, generation: generation)
             } catch {
                 print("[WorkoutManager] Failed to start workout: \(error.localizedDescription)")
             }
+        }
+    }
+
+    /// Ends a prepared workout session that was cancelled before starting.
+    func cancelPreparedWorkout() {
+        guard !isActivityStarted else { return }
+        workoutGeneration = UUID()
+        workoutLifecycleTask?.cancel()
+        workoutLifecycleTask = nil
+        mirroringTask?.cancel()
+        mirroringTask = nil
+        throttledJumpTask?.cancel()
+        throttledJumpTask = nil
+        pendingMirroredJumpPayload = nil
+        pendingStartedPayload = nil
+        isMirroringActive = false
+        currentHeartRate = nil
+        averageHeartRate = nil
+        peakHeartRate = nil
+
+        if let session {
+            self.session = nil
+            builder = nil
+            session.end()
         }
     }
 
@@ -194,12 +225,27 @@ final class WorkoutManager: NSObject {
         workoutGeneration = UUID()
         workoutLifecycleTask?.cancel()
         workoutLifecycleTask = nil
+        mirroringTask?.cancel()
+        mirroringTask = nil
+        pendingStartedPayload = nil
 
-        guard let session, let builder else { return }
+        guard let session, let builder else {
+            isActivityStarted = false
+            return
+        }
         throttledJumpTask?.cancel()
         throttledJumpTask = nil
         pendingMirroredJumpPayload = nil
 
+        guard isActivityStarted else {
+            self.session = nil
+            self.builder = nil
+            isMirroringActive = false
+            session.end()
+            return
+        }
+
+        isActivityStarted = false
         let endDate = Date()
         sendPayload(
             MirroredWorkoutPayload(
@@ -222,6 +268,93 @@ final class WorkoutManager: NSObject {
         self.builder = nil
         Self.logger.info("Stopping workout activity; waiting for HealthKit's stopped state")
         session.stopActivity(with: endDate)
+    }
+
+    /// Creates the jump-rope workout configuration used on Apple Watch.
+    private func makeWorkoutConfiguration() -> HKWorkoutConfiguration {
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .jumpRope
+        configuration.locationType = .outdoor
+        return configuration
+    }
+
+    /// Creates a configured workout session and live builder for the given configuration.
+    private func makeSessionAndBuilder(
+        configuration: HKWorkoutConfiguration
+    ) throws -> (HKWorkoutSession, HKLiveWorkoutBuilder) {
+        let session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
+        let builder = session.associatedWorkoutBuilder()
+        builder.dataSource = HKLiveWorkoutDataSource(
+            healthStore: healthStore,
+            workoutConfiguration: configuration
+        )
+        session.delegate = self
+        builder.delegate = self
+        return (session, builder)
+    }
+
+    /// Starts HealthKit sample collection for the active workout builder.
+    private func beginCollection(
+        for builder: HKLiveWorkoutBuilder,
+        session: HKWorkoutSession,
+        at startDate: Date,
+        generation: UUID
+    ) async {
+        do {
+            try Task.checkCancellation()
+            guard workoutGeneration == generation,
+                  self.session === session,
+                  self.builder === builder
+            else {
+                return
+            }
+            try await builder.beginCollection(at: startDate)
+        } catch is CancellationError {
+            return
+        } catch {
+            print("[WorkoutManager] Failed to start workout collection: \(error.localizedDescription)")
+        }
+    }
+
+    /// Establishes companion mirroring and flushes any buffered start payload once connected.
+    private func startMirroring(
+        for session: HKWorkoutSession,
+        builder: HKLiveWorkoutBuilder,
+        generation: UUID
+    ) {
+        mirroringTask?.cancel()
+        mirroringTask = Task { [weak self] in
+            guard let self else { return }
+
+            do {
+                try await session.startMirroringToCompanionDevice()
+                try Task.checkCancellation()
+            } catch is CancellationError {
+                return
+            } catch {
+                // Keep local collection running if mirroring fails; skip remote payloads for this workout.
+                if workoutGeneration == generation, self.session === session {
+                    mirroringTask = nil
+                    isMirroringActive = false
+                }
+                print("[WorkoutManager] Companion mirroring unavailable: \(error.localizedDescription)")
+                return
+            }
+
+            guard workoutGeneration == generation,
+                  self.session === session,
+                  self.builder === builder
+            else {
+                return
+            }
+
+            mirroringTask = nil
+            isMirroringActive = true
+            if let pendingStartedPayload {
+                self.pendingStartedPayload = nil
+                sendPayload(pendingStartedPayload)
+            }
+        }
     }
 
     /// Keeps background execution available until the stopped workout has been saved.
@@ -304,7 +437,7 @@ final class WorkoutManager: NSObject {
 
     /// Reads live HealthKit builder statistics for newly collected samples.
     func processCollectedData(from workoutBuilder: HKLiveWorkoutBuilder, types: Set<HKSampleType>) {
-        guard builder === workoutBuilder else { return }
+        guard isActivityStarted, builder === workoutBuilder else { return }
 
         var metricsChanged = false
 

@@ -64,6 +64,26 @@ class MotionManager: NSObject {
 
     // MARK: - Public Methods
 
+    /// Warms up Core Motion and prepares the HealthKit workout session during the countdown.
+    func prepareForWorkout(
+        thresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage
+    ) {
+        guard motionManager.isDeviceMotionAvailable else {
+            print("Device motion is not available")
+            return
+        }
+
+        workoutManager.prepareWorkout()
+
+        queue.addOperation { [weak self] in
+            guard let self, !isTracking else { return }
+            jumpDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+            resetSession()
+        }
+
+        startDeviceMotionStreamIfNeeded()
+    }
+
     /// Starts Watch motion tracking with a relative sensitivity adjustment.
     func startTracking(
         startDate: Date,
@@ -78,30 +98,44 @@ class MotionManager: NSObject {
 
         workoutManager.startWorkout(startDate: startDate, goalType: goalType, goalValue: goalValue)
 
-        // Apply sensitivity before resetting the detector for the new workout.
-        updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
-        resetSession()
-        isTracking = true
-        motionRecording = [csvHeader]
-
-        // The watch forwards every sample into the shared detector and only owns workout/session plumbing.
-        motionManager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
-            guard let self, let motion else { return }
-            processMotionData(motion)
+        // Apply sensitivity and arm tracking on the serial motion queue before the first active sample.
+        queue.addOperation { [weak self] in
+            guard let self else { return }
+            jumpDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+            resetSession()
+            motionRecording = [csvHeader]
+            isTracking = true
         }
+
+        startDeviceMotionStreamIfNeeded()
+    }
+
+    /// Stops pre-warmed motion updates and ends the prepared HealthKit session when cancelled before start.
+    func cancelPreparation() {
+        motionManager.stopDeviceMotionUpdates()
+        queue.addOperation { [weak self] in
+            guard let self, !isTracking else { return }
+            resetSession()
+        }
+        workoutManager.cancelPreparedWorkout()
     }
 
     /// Changes sensitivity without clearing jump counts, CSV samples, or refractory timing.
     func updateThresholdAdjustmentPercentage(_ percentage: Double) {
-        jumpDetector.updateThresholdAdjustmentPercentage(percentage)
+        queue.addOperation { [weak self] in
+            self?.jumpDetector.updateThresholdAdjustmentPercentage(percentage)
+        }
     }
 
     /// Stop motion tracking
     func stopTracking() {
-        isTracking = false
         motionManager.stopDeviceMotionUpdates()
+        queue.addOperation { [weak self] in
+            guard let self else { return }
+            isTracking = false
+            motionRecording.removeAll()
+        }
         workoutManager.stopWorkout()
-        motionRecording.removeAll()
     }
 
     /// Sends jump progress updates to the mirrored workout session.
@@ -124,6 +158,17 @@ class MotionManager: NSObject {
     }
 
     // MARK: - Private Methods
+
+    /// Starts the 40 Hz Core Motion stream if it is not already running.
+    private func startDeviceMotionStreamIfNeeded() {
+        guard !motionManager.isDeviceMotionActive else { return }
+
+        // Forward samples into the detector only after tracking is armed at countdown completion.
+        motionManager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
+            guard let self, let motion, isTracking else { return }
+            processMotionData(motion)
+        }
+    }
 
     /// Converts raw device motion into normalized samples for the jump detector.
     private func processMotionData(_ motion: CMDeviceMotion) {

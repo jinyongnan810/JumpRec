@@ -167,6 +167,7 @@ struct StartView: View {
                 preparationTask?.cancel()
                 preparationTask = nil
                 isPreparingWorkout = false
+                JumpRecState.shared.cancelPreparedStart()
                 cancelCompanionStartIfNeeded()
             }
         }
@@ -199,7 +200,7 @@ struct StartView: View {
         .padding(.horizontal, 8)
     }
 
-    /// Asks for access before displaying or animating the countdown.
+    /// Asks for access and pre-warms workout services before animating the countdown.
     private func prepareWorkout() {
         guard !isPreparingWorkout, !isCountingDown else { return }
         guard !settings.isQuotaExceeded else {
@@ -212,8 +213,10 @@ struct StartView: View {
             do {
                 try await WorkoutPermissions.prepareForWorkout()
                 try Task.checkCancellation()
-                // Rebuild and warm up the speech synthesizer during the countdown before workout start.
-                JumpRecState.shared.prepareSpeechForWorkout()
+                // Warm up speech, Core Motion, HealthKit session, and mirroring during the countdown.
+                JumpRecState.shared.prepareForStart(
+                    jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
+                )
                 isPreparingWorkout = false
                 withAnimation { isCountingDown = true }
             } catch {

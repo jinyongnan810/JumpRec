@@ -146,21 +146,48 @@ final class MotionManager: NSObject {
 
     // MARK: - Tracking
 
+    /// Warms up iPhone and headphone motion streams during the countdown without recording jumps.
+    func prepareForWorkout(thresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage) {
+        guard !isTracking else { return }
+
+        if !hasConnectedHeadphoneRoute() {
+            isHeadphoneConnected = false
+        }
+        connectedHeadphoneName = currentConnectedHeadphoneName()
+        notifyAvailabilityChanged()
+
+        queue.addOperation { [weak self] in
+            guard let self, !isTracking else { return }
+            phoneDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+            headphoneDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+            phoneDetector.reset()
+            headphoneDetector.reset()
+            resetRecordedSamples()
+        }
+
+        startPhoneMotionUpdatesIfAvailable()
+        startHeadphoneMonitoringIfAvailable()
+    }
+
     /// Starts phone and headphone tracking with a shared relative sensitivity adjustment.
     func startTracking(thresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage) {
         guard !isTracking else { return }
 
         isTracking = true
-        // Apply sensitivity before motion samples start arriving.
-        updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
-        // Clear motion history before starting a new workout.
-        phoneDetector.reset()
-        headphoneDetector.reset()
-        resetRecordedSamples()
         if !hasConnectedHeadphoneRoute() {
             isHeadphoneConnected = false
         }
         connectedHeadphoneName = currentConnectedHeadphoneName()
+
+        queue.addOperation { [weak self] in
+            guard let self else { return }
+            // Apply sensitivity and clear motion history before processing active workout samples.
+            phoneDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+            headphoneDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+            phoneDetector.reset()
+            headphoneDetector.reset()
+            resetRecordedSamples()
+        }
 
         notifyAvailabilityChanged()
         startPhoneMotionUpdatesIfAvailable()
@@ -168,10 +195,28 @@ final class MotionManager: NSObject {
         updatePreferredSourceIfNeeded()
     }
 
+    /// Stops pre-warmed motion streams when the countdown is cancelled before the workout starts.
+    func cancelPreparation() {
+        guard !isTracking else { return }
+
+        phoneMotionManager.stopDeviceMotionUpdates()
+        headphoneMotionManager.stopDeviceMotionUpdates()
+        queue.addOperation { [weak self] in
+            guard let self, !isTracking else { return }
+            phoneDetector.reset()
+            headphoneDetector.reset()
+            resetRecordedSamples()
+        }
+        updatePreferredSourceIfNeeded(force: true)
+    }
+
     /// Changes sensitivity without clearing jumps, recorded samples, or refractory timing.
     func updateThresholdAdjustmentPercentage(_ percentage: Double) {
-        phoneDetector.updateThresholdAdjustmentPercentage(percentage)
-        headphoneDetector.updateThresholdAdjustmentPercentage(percentage)
+        queue.addOperation { [weak self] in
+            guard let self else { return }
+            phoneDetector.updateThresholdAdjustmentPercentage(percentage)
+            headphoneDetector.updateThresholdAdjustmentPercentage(percentage)
+        }
     }
 
     /// Stops local motion tracking and clears the active preferred source.
@@ -200,7 +245,9 @@ final class MotionManager: NSObject {
 
     /// Starts iPhone device-motion updates when they are available.
     private func startPhoneMotionUpdatesIfAvailable() {
-        guard phoneMotionManager.isDeviceMotionAvailable else { return }
+        guard phoneMotionManager.isDeviceMotionAvailable,
+              !phoneMotionManager.isDeviceMotionActive
+        else { return }
 
         phoneMotionManager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
             guard let self, let motion, isTracking else { return }
@@ -237,12 +284,15 @@ final class MotionManager: NSObject {
 
     /// Starts headphone motion updates when supported hardware is available.
     private func startHeadphoneMonitoringIfAvailable() {
-        guard headphoneMotionManager.isDeviceMotionAvailable else { return }
+        guard headphoneMotionManager.isDeviceMotionAvailable,
+              !headphoneMotionManager.isDeviceMotionActive
+        else { return }
 
         headphoneMotionManager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
-            guard let self, let motion, isTracking else { return }
+            guard let self, let motion else { return }
             // A live motion sample confirms compatible headphones if status updates are unavailable.
             applyConfirmedHeadphoneAvailability(isConnected: true)
+            guard isTracking else { return }
 
             // Promote headphones immediately on the first live headphone sample.
             if lastPreferredSource != .headphones {

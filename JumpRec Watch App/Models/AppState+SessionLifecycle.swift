@@ -9,6 +9,24 @@ import WatchKit
 extension JumpRecState {
     // MARK: - Session Lifecycle
 
+    /// Warms up speech, motion sensors, and the HealthKit workout session during the countdown.
+    func prepareForStart(
+        jumpDetectorThresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage
+    ) {
+        guard jumpState == .idle else { return }
+        prepareSpeechForWorkout()
+        motionManager?.prepareForWorkout(
+            thresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage
+        )
+    }
+
+    /// Tears down pre-warmed workout resources when the countdown is cancelled before start.
+    func cancelPreparedStart() {
+        guard jumpState == .idle else { return }
+        stopSpeechAndDeactivateAudio()
+        motionManager?.cancelPreparation()
+    }
+
     /// Starts a Watch workout with settings that can be refreshed during the session.
     func start(
         goalType: GoalType,

@@ -9,6 +9,8 @@ import HealthKit
 /// Manages the iPhone-side HealthKit workout session used for local tracking.
 @MainActor
 final class PhoneWorkoutManager: NSObject {
+    // MARK: - Public API
+
     /// Publishes live iPhone workout metrics back to app state.
     var onMetricsUpdated: ((_ caloriesBurned: Double, _ heartRate: Int?, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
 
@@ -28,21 +30,54 @@ final class PhoneWorkoutManager: NSObject {
     /// Shared singleton used by app state.
     static let shared = PhoneWorkoutManager()
 
+    // MARK: - Stored Properties
+
     /// ⭐️The HealthKit store used for authorization and workout creation.
     private let healthStore = HKHealthStore()
-    /// Holds the active iOS 26 workout implementation when available.
+    /// Holds the iOS 26+ `PhoneWorkoutStore` as `AnyObject` so stored properties compile on earlier OS versions.
     private var workoutStore: AnyObject?
     /// Builds and saves local workouts on iOS versions that predate iPhone workout sessions.
     private var workoutBuilder: HKWorkoutBuilder?
     /// Deduplicates in-flight authorization requests.
     private var authorizationTask: Task<Void, Error>?
 
+    // MARK: - Initialization
+
     /// Restricts creation to the shared singleton.
     override private init() {
         super.init()
     }
 
-    /// Starts a HealthKit workout at the provided time.
+    // MARK: - Workout Lifecycle
+
+    /// Creates and prepares a HealthKit workout session during the pre-session countdown.
+    func prepareWorkout() async throws {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+
+        try await ensureAuthorization()
+
+        let configuration = makeWorkoutConfiguration()
+        if #available(iOS 26.0, *) {
+            if workoutStore == nil {
+                workoutStore = PhoneWorkoutStore(
+                    healthStore: healthStore,
+                    onMetricsUpdated: onMetricsUpdated
+                )
+            }
+            try await (workoutStore as? PhoneWorkoutStore)?.prepareWorkout(
+                configuration: configuration
+            )
+        } else if workoutBuilder == nil {
+            // Pre-allocate the builder during the countdown so start only begins collection.
+            workoutBuilder = HKWorkoutBuilder(
+                healthStore: healthStore,
+                configuration: configuration,
+                device: .local()
+            )
+        }
+    }
+
+    /// Starts a HealthKit workout at the provided time, reusing any session prepared during the countdown.
     func startWorkout(at startDate: Date) async throws {
         guard HKHealthStore.isHealthDataAvailable() else { return }
 
@@ -63,8 +98,8 @@ final class PhoneWorkoutManager: NSObject {
                 configuration: configuration
             )
         } else {
-            // Before iOS 26, use a regular builder to save the workout to Health.
-            let builder = HKWorkoutBuilder(
+            // Before iOS 26, reuse the prepared builder or create one to save the workout to Health.
+            let builder = workoutBuilder ?? HKWorkoutBuilder(
                 healthStore: healthStore,
                 configuration: configuration,
                 device: .local()
@@ -97,7 +132,7 @@ final class PhoneWorkoutManager: NSObject {
         print("[PhoneWorkoutManager] Workout finish request completed.")
     }
 
-    /// Discards the active workout without saving it.
+    /// Discards any prepared or active workout without saving it to HealthKit.
     func discardWorkout() {
         print("[PhoneWorkoutManager] Discarding active workout.")
         if #available(iOS 26.0, *) {
@@ -108,6 +143,8 @@ final class PhoneWorkoutManager: NSObject {
         // Releasing an unfinished builder discards the unsaved workout before iOS 26.
         workoutBuilder = nil
     }
+
+    // MARK: - Helpers & Authorization
 
     /// Creates the configuration shared by live and builder-only iPhone workout implementations.
     private func makeWorkoutConfiguration() -> HKWorkoutConfiguration {
@@ -152,13 +189,25 @@ final class PhoneWorkoutManager: NSObject {
     }
 }
 
+/// Wraps iOS 26+ `HKWorkoutSession` and `HKLiveWorkoutBuilder` APIs for local iPhone workouts.
 @available(iOS 26.0, *)
 private final class PhoneWorkoutStore: NSObject {
-    private let healthStore: HKHealthStore
-    private let onMetricsUpdated: ((_ caloriesBurned: Double, _ heartRate: Int?, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
-    private var session: HKWorkoutSession?
-    private var builder: HKLiveWorkoutBuilder?
+    // MARK: - Stored Properties
 
+    /// Shared HealthKit store used to create sessions and live data sources.
+    private let healthStore: HKHealthStore
+    /// Forwards live calorie and heart-rate statistics to `PhoneWorkoutManager`.
+    private let onMetricsUpdated: ((_ caloriesBurned: Double, _ heartRate: Int?, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
+    /// Tracks the current prepared or active workout session.
+    private var session: HKWorkoutSession?
+    /// Collects live samples and builds the final workout for `session`.
+    private var builder: HKLiveWorkoutBuilder?
+    /// Distinguishes a pre-warmed `.prepared` session from one that has started recording activity.
+    private var isActivityStarted = false
+
+    // MARK: - Initialization
+
+    /// Creates a store bound to the shared HealthKit store and metrics callback.
     init(
         healthStore: HKHealthStore,
         onMetricsUpdated: ((_ caloriesBurned: Double, _ heartRate: Int?, _ averageHeartRate: Int?, _ peakHeartRate: Int?) -> Void)?
@@ -167,36 +216,68 @@ private final class PhoneWorkoutStore: NSObject {
         self.onMetricsUpdated = onMetricsUpdated
     }
 
+    // MARK: - Session Lifecycle
+
+    /// Warms up HealthKit sensors in the `.prepared` state without starting sample collection.
+    func prepareWorkout(configuration: HKWorkoutConfiguration) async throws {
+        // Keep the existing session if it is already prepared and waiting for countdown completion.
+        if session != nil, !isActivityStarted {
+            return
+        }
+        if session != nil {
+            await endWorkout(at: Date())
+        }
+
+        let (session, builder) = try makeSessionAndBuilder(configuration: configuration)
+        self.session = session
+        self.builder = builder
+        isActivityStarted = false
+        session.prepare()
+    }
+
+    /// Transitions a prepared session into active collection, or creates and starts a new session.
     func startWorkout(
         at startDate: Date,
         configuration: HKWorkoutConfiguration
     ) async throws {
+        // Fast path: activate the session that was prepared during the countdown.
+        if let session, let builder, !isActivityStarted {
+            isActivityStarted = true
+            session.startActivity(with: startDate)
+            try await builder.beginCollection(at: startDate)
+            print("[PhoneWorkoutManager] Prepared HKWorkoutSession and builder started.")
+            return
+        }
+
         if session != nil {
             print("[PhoneWorkoutManager] Existing workout detected. Ending it before starting a new one.")
             await endWorkout(at: Date())
         }
 
-        let session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
-        let builder = session.associatedWorkoutBuilder()
-        builder.dataSource = HKLiveWorkoutDataSource(
-            healthStore: healthStore,
-            workoutConfiguration: configuration
-        )
-
-        session.delegate = self
-        builder.delegate = self
-
+        let (session, builder) = try makeSessionAndBuilder(configuration: configuration)
         self.session = session
         self.builder = builder
+        isActivityStarted = true
 
         session.startActivity(with: startDate)
         try await builder.beginCollection(at: startDate)
         print("[PhoneWorkoutManager] HKWorkoutSession and builder started.")
     }
 
+    /// Ends sample collection and saves the workout, or discards a session that never started.
     func endWorkout(at endDate: Date) async {
-        guard let session, let builder else { return }
+        guard let session, let builder else {
+            isActivityStarted = false
+            return
+        }
 
+        // A session that was only prepared has no collected activity to save.
+        guard isActivityStarted else {
+            discardWorkout()
+            return
+        }
+
+        isActivityStarted = false
         session.end()
 
         do {
@@ -215,17 +296,40 @@ private final class PhoneWorkoutStore: NSObject {
         }
     }
 
+    /// Ends the current session immediately without saving a workout to HealthKit.
     func discardWorkout() {
+        isActivityStarted = false
         session?.end()
         session = nil
         builder = nil
     }
 
+    // MARK: - Helpers
+
+    /// Creates a workout session, attaches its live builder and data source, and assigns delegates.
+    private func makeSessionAndBuilder(
+        configuration: HKWorkoutConfiguration
+    ) throws -> (HKWorkoutSession, HKLiveWorkoutBuilder) {
+        let session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
+        let builder = session.associatedWorkoutBuilder()
+        builder.dataSource = HKLiveWorkoutDataSource(
+            healthStore: healthStore,
+            workoutConfiguration: configuration
+        )
+
+        session.delegate = self
+        builder.delegate = self
+        return (session, builder)
+    }
+
+    /// Delivers updated live workout metrics on the main actor.
     @MainActor
     private func publishMetrics(caloriesBurned: Double, heartRate: Int?, averageHeartRate: Int?, peakHeartRate: Int?) {
         onMetricsUpdated?(caloriesBurned, heartRate, averageHeartRate, peakHeartRate)
     }
 }
+
+// MARK: - HKWorkoutSessionDelegate
 
 @available(iOS 26.0, *)
 extension PhoneWorkoutStore: HKWorkoutSessionDelegate {
@@ -240,8 +344,11 @@ extension PhoneWorkoutStore: HKWorkoutSessionDelegate {
     }
 }
 
+// MARK: - HKLiveWorkoutBuilderDelegate
+
 @available(iOS 26.0, *)
 extension PhoneWorkoutStore: HKLiveWorkoutBuilderDelegate {
+    /// Reads updated heart-rate and active-energy statistics whenever HealthKit collects new samples.
     nonisolated func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder, didCollectDataOf collectedTypes: Set<HKSampleType>) {
         let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)
         let energyBurnedType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)

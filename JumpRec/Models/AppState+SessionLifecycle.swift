@@ -14,6 +14,34 @@ extension JumpRecState {
         connectivityManager.isPaired && connectivityManager.isWatchAppInstalled && !preferLocalHeadphonesOverWatch
     }
 
+    /// Pre-warms local motion sensors, HealthKit session, speech, and haptics during the countdown.
+    func prepareLocalSession(
+        thresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage
+    ) {
+        guard sessionState == .idle else { return }
+        prepareHaptics()
+        warmUpSpeechSynthesizerIfNeeded()
+        motionManager?.prepareForWorkout(thresholdAdjustmentPercentage: thresholdAdjustmentPercentage)
+        phoneWorkoutLifecycleTask?.cancel()
+        phoneWorkoutLifecycleTask = Task { [weak self, phoneWorkoutManager] in
+            do {
+                try await phoneWorkoutManager.prepareWorkout()
+            } catch {
+                guard let self, !Task.isCancelled, sessionState == .idle else { return }
+                print("[JumpRecState] Failed to prepare iPhone workout session: \(error)")
+            }
+        }
+    }
+
+    /// Releases pre-warmed local workout resources when the countdown is cancelled.
+    func cancelPreparedLocalSession() {
+        guard sessionState == .idle else { return }
+        phoneWorkoutLifecycleTask?.cancel()
+        phoneWorkoutLifecycleTask = nil
+        motionManager?.cancelPreparation()
+        phoneWorkoutManager.discardWorkout()
+    }
+
     /// Starts locally or on Watch; the caller resolves headphone availability and preference.
     func start(
         goalType: GoalType,
@@ -24,7 +52,8 @@ extension JumpRecState {
         jumpDetectorThresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage
     ) {
         cancelPendingSpeech()
-        let generation = beginSessionAttempt()
+        let startsOnWatch = shouldStartOnWatch(preferLocalHeadphonesOverWatch: preferLocalHeadphonesOverWatch)
+        let generation = beginSessionAttempt(preservePreparedLocalWorkout: !startsOnWatch)
 
         // Enter the starting state to block duplicate requests during the Watch handshake.
         sessionGoalType = goalType
@@ -33,7 +62,7 @@ extension JumpRecState {
         sessionShouldSpeakJumpTimeAnnouncements = shouldSpeakJumpTimeAnnouncements
         sessionState = .starting
 
-        if shouldStartOnWatch(preferLocalHeadphonesOverWatch: preferLocalHeadphonesOverWatch) {
+        if startsOnWatch {
             pendingMirroredStart = true
             connectivityManager.syncSettings(
                 goalType: goalType,
@@ -166,6 +195,7 @@ extension JumpRecState {
         cancelPendingSpeech()
         cancelMinuteAnnouncements()
         motionManager?.stopTracking()
+        motionManager?.cancelPreparation()
 
         // Preserve completed-workout finalization when Done resets the UI.
         if !shouldFinishSavingCompletedWorkout {
@@ -245,7 +275,10 @@ extension JumpRecState {
         notificationFeedbackGenerator.notificationOccurred(.success)
         speak(text: localizedSessionStartedAnnouncement)
         syncLiveActivity()
+        let precedingWorkoutTask = phoneWorkoutLifecycleTask
         phoneWorkoutLifecycleTask = Task { [weak self, phoneWorkoutManager] in
+            // Wait for any in-flight countdown preparation before transitioning the session to active.
+            await precedingWorkoutTask?.value
             do {
                 try await phoneWorkoutManager.startWorkout(at: sessionStartDate)
             } catch {
@@ -274,9 +307,12 @@ extension JumpRecState {
     }
 
     /// Creates a fresh identity for a new session and cancels work owned by the previous one.
-    private func beginSessionAttempt() -> UUID {
-        invalidateWorkoutOperations()
-        phoneWorkoutManager.discardWorkout()
+    private func beginSessionAttempt(preservePreparedLocalWorkout: Bool = false) -> UUID {
+        invalidateWorkoutOperations(cancelPhoneWorkoutTask: !preservePreparedLocalWorkout)
+        if !preservePreparedLocalWorkout {
+            motionManager?.cancelPreparation()
+            phoneWorkoutManager.discardWorkout()
+        }
         return sessionGeneration
     }
 
@@ -287,8 +323,8 @@ extension JumpRecState {
         companionWorkoutStartTask = nil
         if cancelPhoneWorkoutTask {
             phoneWorkoutLifecycleTask?.cancel()
+            phoneWorkoutLifecycleTask = nil
         }
-        phoneWorkoutLifecycleTask = nil
     }
 
     /// Clears the live metrics used by the active session UI.

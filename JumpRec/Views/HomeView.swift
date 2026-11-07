@@ -263,6 +263,11 @@ struct HomeView: View {
             } message: {
                 Text(permissionErrorMessage)
             }
+            .onChange(of: appState.sessionState) { _, newValue in
+                if newValue != .idle, isCountingDown {
+                    cancelCountdown()
+                }
+            }
             .onDisappear {
                 cancelCountdown()
             }
@@ -352,6 +357,9 @@ struct HomeView: View {
                 onStart()
                 return
             }
+            appState.prepareLocalSession(
+                thresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
+            )
             withAnimation(.easeInOut(duration: 0.35)) {
                 countdownValue = 3
                 countdownProgress = 1
@@ -388,6 +396,7 @@ struct HomeView: View {
         isPreparingWorkout = false
         countdownValue = nil
         countdownProgress = 1
+        appState.cancelPreparedLocalSession()
     }
 }
 

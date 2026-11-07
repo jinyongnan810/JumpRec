@@ -82,6 +82,8 @@ extension JumpRecState {
         companionWorkoutStartTask = nil
         phoneWorkoutLifecycleTask?.cancel()
         phoneWorkoutLifecycleTask = nil
+        motionManager?.stopTracking()
+        motionManager?.cancelPreparation()
         phoneWorkoutManager.discardWorkout()
 
         cancelMinuteAnnouncements()
