@@ -22,7 +22,7 @@ Every workout passes through up to five phases. To keep the transition at `t = 0
 
 ### Device Selection Rule (When Starting on iPhone)
 
-When the user taps **START WORKOUT** on iPhone, [`JumpRecState.shouldStartOnWatch(preferLocalHeadphonesOverWatch:)`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec/Models/AppState+SessionLifecycle.swift#L13-L15) decides where the workout runs:
+When the user taps **START** on iPhone, [`JumpRecState.shouldStartOnWatch(preferLocalHeadphonesOverWatch:)`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec/Models/AppState+SessionLifecycle.swift#L13-L15) decides where the workout runs:
 
 ```text
 usesWatch = isPaired && isWatchAppInstalled && !(preferHeadphonesForIPhoneSessions && isHeadphoneMotionAvailable)
@@ -55,7 +55,7 @@ sequenceDiagram
     participant HK as PhoneWorkoutManager / HealthKit
     participant Store as MyDataStore & LiveActivity
 
-    User->>Home: Tap "START WORKOUT"
+    User->>Home: Tap "START"
     Home->>Home: Check free workout quota
     Home->>HK: WorkoutPermissions.prepareForWorkout(requestMotion: true)
     HK-->>Home: Permissions granted
@@ -197,7 +197,7 @@ sequenceDiagram
     participant WWork as Watch (MotionManager & WorkoutManager)
 
     Note over User,WWork: 1. Companion Handshake (When Started from iPhone)
-    User->>PState: Tap "START WORKOUT" on iPhone
+    User->>PState: Tap "START" on iPhone
     PState->>PState: WorkoutPermissions.prepareForWorkout(requestMotion: false)
     PState->>PState: sessionState = .starting, pendingMirroredStart = true
     PState->>Mirror: syncSettings(...) via WCSession

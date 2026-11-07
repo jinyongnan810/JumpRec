@@ -88,7 +88,7 @@ struct HomeView: View {
         } else if isCountingDown {
             String(localized: "CANCEL")
         } else {
-            String(localized: "START WORKOUT")
+            String(localized: "START")
         }
     }
 

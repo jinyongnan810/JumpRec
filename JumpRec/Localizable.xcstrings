@@ -3202,12 +3202,11 @@
       }
     },
     "START" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "はじめる"
+            "value" : "開始"
           }
         }
       }
@@ -3224,6 +3223,7 @@
       }
     },
     "START WORKOUT" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {

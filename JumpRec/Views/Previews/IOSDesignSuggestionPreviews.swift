@@ -51,7 +51,7 @@
                 compactDeviceStatus
 
                 Button(action: {}) {
-                    Text("START WORKOUT")
+                    Text("START")
                         .font(AppFonts.primaryButtonLabel)
                         .foregroundStyle(AppColors.bgPrimary)
                         .frame(maxWidth: .infinity)
