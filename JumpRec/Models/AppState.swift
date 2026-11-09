@@ -79,10 +79,10 @@ final class JumpRecState: NSObject, @unchecked Sendable {
 
     /// Indicates which device is currently providing motion data.
     var activeMotionSource: DeviceSource?
-    /// Indicates whether iPhone motion is currently available.
-    var isPhoneMotionAvailable = false
     /// Indicates whether headphone motion is currently available.
     var isHeadphoneMotionAvailable = false
+    /// Controls presentation of the alert shown when neither Apple Watch nor supported headphones can be used.
+    var showNoTrackingDeviceAlert = false
     /// Stores the current headphone route name so the selector can show a real product label when iOS provides one.
     var connectedHeadphoneName: String?
     #if DEBUG
@@ -171,8 +171,7 @@ final class JumpRecState: NSObject, @unchecked Sendable {
                 #endif
                 self?.activeMotionSource = Self.deviceSource(from: source)
             },
-            onAvailabilityChanged: { [weak self] isPhoneAvailable, isHeadphoneAvailable, headphoneName in
-                self?.isPhoneMotionAvailable = isPhoneAvailable
+            onAvailabilityChanged: { [weak self] isHeadphoneAvailable, headphoneName in
                 self?.isHeadphoneMotionAvailable = isHeadphoneAvailable
                 self?.connectedHeadphoneName = headphoneName
             }
@@ -266,8 +265,6 @@ final class JumpRecState: NSObject, @unchecked Sendable {
     /// Converts a motion-manager source into a shared display source.
     static func deviceSource(from source: MotionManager.Source?) -> DeviceSource? {
         switch source {
-        case .iPhone:
-            .iPhone
         case .headphones:
             .airpods
         case nil:

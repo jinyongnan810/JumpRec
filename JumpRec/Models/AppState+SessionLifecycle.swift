@@ -9,9 +9,28 @@ import UIKit
 extension JumpRecState {
     // MARK: - Session Lifecycle
 
+    /// Returns whether an Apple Watch with the JumpRec app installed is available.
+    var isWatchAvailable: Bool {
+        connectivityManager.isPaired && connectivityManager.isWatchAppInstalled
+    }
+
+    /// Returns whether Apple Watch or supported headphones are connected and usable.
+    var hasUsableTrackingDevice: Bool {
+        isWatchAvailable || isHeadphoneMotionAvailable
+    }
+
+    /// Refreshes Watch and headphone availability before checking whether a workout can start.
+    func refreshTrackingDeviceAvailability() {
+        connectivityManager.refreshStateIfActivated()
+        guard let motionManager else { return }
+        motionManager.refreshAvailability()
+        isHeadphoneMotionAvailable = motionManager.isHeadphoneMotionAvailable
+        connectedHeadphoneName = motionManager.currentHeadphoneName
+    }
+
     /// Uses the same device selection for permission preparation and workout startup.
     func shouldStartOnWatch(preferLocalHeadphonesOverWatch: Bool) -> Bool {
-        connectivityManager.isPaired && connectivityManager.isWatchAppInstalled && !preferLocalHeadphonesOverWatch
+        isWatchAvailable && !(preferLocalHeadphonesOverWatch && isHeadphoneMotionAvailable)
     }
 
     /// Pre-warms local motion sensors, HealthKit session, speech, and haptics during the countdown.
@@ -52,7 +71,13 @@ extension JumpRecState {
         jumpDetectorThresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage
     ) {
         cancelPendingSpeech()
+        refreshTrackingDeviceAvailability()
         let startsOnWatch = shouldStartOnWatch(preferLocalHeadphonesOverWatch: preferLocalHeadphonesOverWatch)
+        guard startsOnWatch || isHeadphoneMotionAvailable else {
+            reset()
+            showNoTrackingDeviceAlert = true
+            return
+        }
         let generation = beginSessionAttempt(preservePreparedLocalWorkout: !startsOnWatch)
 
         // Enter the starting state to block duplicate requests during the Watch handshake.
@@ -86,8 +111,13 @@ extension JumpRecState {
                         return
                     }
 
-                    // Fall back to local tracking only if this request still owns startup.
                     pendingMirroredStart = false
+                    refreshTrackingDeviceAvailability()
+                    guard isHeadphoneMotionAvailable else {
+                        reset()
+                        showNoTrackingDeviceAlert = true
+                        return
+                    }
                     startLocalSession(
                         goalType: goalType,
                         goalValue: goalValue,
@@ -228,12 +258,7 @@ extension JumpRecState {
     func addJump(from source: MotionManager.Source) {
         guard sessionState == .active, let startTime else { return }
 
-        let resolvedSource = Self.deviceSource(from: source)
-        if activeMotionSource == .airpods, resolvedSource == .iPhone {
-            return
-        }
-
-        activeMotionSource = resolvedSource
+        activeMotionSource = Self.deviceSource(from: source)
         jumpCount += 1
         jumps.append(Date().timeIntervalSince(startTime))
         checkFeedbackLandmarks()
@@ -267,6 +292,7 @@ extension JumpRecState {
         sessionGoalValue = goalValue
         isMirroredWatchSession = false
         pendingMirroredStart = false
+        activeMotionSource = .airpods
         sessionState = .active
         motionManager?.startTracking(thresholdAdjustmentPercentage: thresholdAdjustmentPercentage)
         // Announce elapsed minutes for both goal types; goal completion is checked separately.

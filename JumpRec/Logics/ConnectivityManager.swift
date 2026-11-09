@@ -48,6 +48,14 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
 
+    /// Refreshes cached Watch flags from the active session when already activated.
+    func refreshStateIfActivated() {
+        guard isSupported, session.activationState == .activated else { return }
+        isPaired = session.isPaired
+        isWatchAppInstalled = session.isWatchAppInstalled
+        isReachable = session.isReachable
+    }
+
     // MARK: - WCSessionDelegate
 
     /// Handles WatchConnectivity activation completion and refreshes local session flags.

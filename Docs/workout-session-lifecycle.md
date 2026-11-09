@@ -2,7 +2,7 @@
 
 This document explains how JumpRec prepares, starts, tracks, cancels, and finalizes workout sessions across all three operating modes:
 
-1. **📱 iPhone Alone** (iPhone pocket sensors or AirPods motion sensors)
+1. **📱 iPhone Alone** (supported headphone motion sensors)
 2. **⌚ Apple Watch Alone** (standalone Watch workout)
 3. **📱 + ⌚ iPhone + Apple Watch** (companion launch and live mirrored workout)
 
@@ -14,7 +14,7 @@ Every workout passes through up to five phases. To keep the transition at `t = 0
 
 | Phase | Timing | What Happens |
 | :--- | :--- | :--- |
-| **1. Quota & Permission Check** | Before countdown | Verifies free-tier workout quota and awaits HealthKit (plus Core Motion on iPhone) authorization via [`WorkoutPermissions.prepareForWorkout`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRecShared/WorkoutPermissions.swift#L22-L50). |
+| **1. Quota & Permission Check** | Before countdown | Verifies free-tier workout quota, tracking device availability (Apple Watch or supported headphones), and awaits HealthKit (plus Core Motion on iPhone) authorization via [`WorkoutPermissions.prepareForWorkout`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRecShared/WorkoutPermissions.swift#L22-L50). |
 | **2. Countdown & Pre-warming** | `t = -3s … 0s` | Animates the 3–2–1 ring while warming up speech synthesis, starting Core Motion sensor streams (with jump counting disarmed), calling `HKWorkoutSession.prepare()`, and initiating companion mirroring. |
 | **3. Active Tracking** | `t = 0s … end` | Arms jump detection (`isTracking = true`), calls `session.startActivity(with:)` and `builder.beginCollection(at:)`, announces milestones, and updates UI / Live Activity. |
 | **4. Completion & Persistence** | On Stop or Goal Reached | Stops motion updates, finalizes and saves the `HKWorkout` in HealthKit, and persists the [`JumpSession`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRecShared/models/JumpSession.swift) record in SwiftData. |
@@ -22,25 +22,26 @@ Every workout passes through up to five phases. To keep the transition at `t = 0
 
 ### Device Selection Rule (When Starting on iPhone)
 
-When the user taps **START** on iPhone, [`JumpRecState.shouldStartOnWatch(preferLocalHeadphonesOverWatch:)`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec/Models/AppState+SessionLifecycle.swift#L13-L15) decides where the workout runs:
+When the user taps **START** on iPhone, [`JumpRecState.shouldStartOnWatch(preferLocalHeadphonesOverWatch:)`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec/Models/AppState+SessionLifecycle.swift#L32-L34) decides where the workout runs:
 
 ```text
 usesWatch = isPaired && isWatchAppInstalled && !(preferHeadphonesForIPhoneSessions && isHeadphoneMotionAvailable)
 ```
 
-* If `usesWatch == false` ➔ runs **Mode 1 (iPhone Alone)**.
+* If neither Apple Watch nor supported headphones are connected and usable ➔ displays the **No Tracking Device Available** dialog.
+* If `usesWatch == false` (and supported headphones are available) ➔ runs **Mode 1 (iPhone Alone)**.
 * If `usesWatch == true` ➔ runs **Mode 3 (iPhone + Apple Watch)**.
 
 ---
 
-## 1. 📱 iPhone Alone (iPhone Sensors or AirPods)
+## 1. 📱 iPhone Alone (Supported Headphones)
 
-Used when no Apple Watch is paired/installed, or when compatible headphones (such as AirPods Pro/Max/3+) are connected and preferred in Settings.
+Used when no Apple Watch is paired/installed and supported headphones (such as AirPods Pro/Max/3+) are connected, or when compatible headphones are connected and preferred in Settings.
 
 ### Key Components
 * **UI & Countdown**: [`HomeView.swift`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec/Views/HomeView.swift)
 * **Session State**: [`AppState+SessionLifecycle.swift (iPhone)`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec/Models/AppState+SessionLifecycle.swift)
-* **Motion Tracking**: [`MotionManager.swift (iPhone)`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec/Logics/MotionManager.swift) (`CMMotionManager` + `CMHeadphoneMotionManager`)
+* **Motion Tracking**: [`MotionManager.swift (iPhone)`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec/Logics/MotionManager.swift) (`CMHeadphoneMotionManager`)
 * **HealthKit Workout**: [`PhoneWorkoutManager.swift`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec/Logics/PhoneWorkoutManager.swift) (`HKWorkoutSession` + `HKLiveWorkoutBuilder` on iOS 26+)
 
 ### Sequence Diagram
@@ -56,7 +57,7 @@ sequenceDiagram
     participant Store as MyDataStore & LiveActivity
 
     User->>Home: Tap "START"
-    Home->>Home: Check free workout quota
+    Home->>Home: Check free workout quota & tracking device availability
     Home->>HK: WorkoutPermissions.prepareForWorkout(requestMotion: true)
     HK-->>Home: Permissions granted
 
@@ -65,7 +66,7 @@ sequenceDiagram
         Home->>State: prepareLocalSession(thresholdAdjustmentPercentage)
         State->>State: prepareHaptics() + warmUpSpeechSynthesizerIfNeeded()
         State->>Motion: prepareForWorkout() (isTracking = false)
-        Motion->>Motion: Start iPhone & headphone CMDeviceMotion streams (sensor fusion settles)
+        Motion->>Motion: Start headphone CMDeviceMotion stream (sensor fusion settles)
         State->>HK: prepareWorkout()
         HK->>HK: Create HKWorkoutSession + HKLiveWorkoutBuilder, call session.prepare()
         Home->>Home: Animate 3 … 2 … 1 countdown ring
@@ -79,13 +80,13 @@ sequenceDiagram
     else Countdown reaches 0 (t = 0s)
         Home->>State: start(...) -> startLocalSession()
         State->>State: sessionState = .active, startTime = Date()
-        State->>Motion: startTracking() (reset detectors, isTracking = true)
+        State->>Motion: startTracking() (reset detector, isTracking = true)
         State->>HK: startWorkout(at: startTime)
         HK->>HK: session.startActivity(with:) + builder.beginCollection(at:)
         State->>Store: Start Live Activity + speak("Workout Started!")
 
         loop Active Workout
-            Motion->>State: onJumpDetected(.iPhone / .headphones)
+            Motion->>State: onJumpDetected(.headphones)
             State->>State: Increment jumpCount, check 100-jump & 1-min landmarks
             HK->>State: onMetricsUpdated(calories, heartRate)
             State->>Store: Update Live Activity
@@ -204,7 +205,7 @@ sequenceDiagram
     PState->>Mirror: startCompanionWorkout() (HKHealthStore.startWatchApp)
     alt Watch fails to launch
         Mirror-->>PState: Error thrown
-        PState->>PState: Fall back to Mode 1 (startLocalSession on iPhone)
+        PState->>PState: Fall back to Mode 1 if supported headphones available, else reset & show alert
     else Watch launches handle(_ workoutConfiguration:)
         Mirror->>WStart: WatchAppDelegate.handle(configuration) -> startFromCompanion()
     end

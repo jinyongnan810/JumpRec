@@ -741,6 +741,7 @@
       }
     },
     "Check Apple Watch, headphone, or iPhone motion availability." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -875,6 +876,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "確認"
+          }
+        }
+      }
+    },
+    "Connect an Apple Watch or supported headphones to start a workout." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウトを開始するには、Apple Watchまたは対応ヘッドフォンを接続する必要があります。"
           }
         }
       }
@@ -1480,6 +1491,7 @@
       }
     },
     "Headphone motion is preferred; iPhone will be used if it becomes unavailable." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -1635,12 +1647,12 @@
         }
       }
     },
-    "If Apple Watch cannot start, iPhone will be used." : {
+    "If Apple Watch cannot start, supported headphones will be used when available." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apple Watchでワークアウトを開始できない場合は、iPhoneを使用します。"
+            "value" : "Apple Watchでワークアウトを開始できない場合は、利用可能であれば対応ヘッドフォンを使用します。"
           }
         }
       }
@@ -2254,6 +2266,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "翌年"
+          }
+        }
+      }
+    },
+    "No Tracking Device Available" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "計測デバイスが接続されていません"
           }
         }
       }
@@ -4096,6 +4118,7 @@
       }
     },
     "The motion source is managed automatically during this iPhone workout." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -4177,12 +4200,22 @@
         }
       }
     },
-    "This workout cannot switch to iPhone after it starts." : {
+    "This workout cannot switch to headphones after it starts." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このワークアウトは開始後にiPhoneへ切り替えられません。"
+            "value" : "このワークアウトは開始後にヘッドフォンへ切り替えられません。"
+          }
+        }
+      }
+    },
+    "This workout uses supported headphone motion." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このワークアウトは対応ヘッドフォンのモーションで計測します。"
           }
         }
       }
@@ -4310,6 +4343,7 @@
       }
     },
     "Tracking with iPhone" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -4779,6 +4813,7 @@
       }
     },
     "Workout will use iPhone" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {

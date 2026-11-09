@@ -105,8 +105,6 @@ extension JumpRecState {
         switch activeMotionSource {
         case .watch:
             DeviceSource.watch.shortName
-        case .iPhone:
-            DeviceSource.iPhone.shortName
         case .airpods:
             DeviceSource.airpods.shortName
         case nil:

@@ -8,7 +8,6 @@
 import Foundation
 
 public enum JumpDeviceProfile: String, Sendable {
-    case iPhonePocket
     case headphones
     case watch
 }
@@ -17,13 +16,11 @@ public enum JumpDetectorAxis: String, Sendable {
     case x
     case y
     case z
-    case magnitude
 }
 
 public enum JumpDetectorPolarity: String, Sendable {
     case positivePeak
     case negativeTrough
-    case positiveMagnitude
 }
 
 public final class JumpDetector {
@@ -33,7 +30,7 @@ public final class JumpDetector {
     private struct Config {
         /// The device profile this config belongs to.
         let profile: JumpDeviceProfile
-        /// Raw motion signal; magnitude is independent of device orientation.
+        /// Raw motion signal axis evaluated for jump detection.
         let axis: JumpDetectorAxis
         /// The extremum direction that represents a jump on the selected signal.
         let polarity: JumpDetectorPolarity
@@ -46,15 +43,6 @@ public final class JumpDetector {
 
         static func profile(_ profile: JumpDeviceProfile) -> Config {
             switch profile {
-            case .iPhonePocket:
-                Config(
-                    profile: .iPhonePocket,
-                    axis: .magnitude,
-                    polarity: .positiveMagnitude,
-                    threshold: 1.2,
-                    rearmThreshold: 0.5,
-                    minimumInterval: 0.1
-                )
             case .headphones:
                 Config(
                     profile: .headphones,
@@ -100,7 +88,7 @@ public final class JumpDetector {
     // MARK: - Initialization
 
     /// Creates a detector for a profile with a threshold adjustment from -50% to 50%.
-    public init(profile: JumpDeviceProfile = .iPhonePocket, thresholdAdjustmentPercentage: Double = 0) {
+    public init(profile: JumpDeviceProfile = .headphones, thresholdAdjustmentPercentage: Double = 0) {
         self.profile = profile
         config = .profile(profile)
         self.thresholdAdjustmentPercentage = Self.clampedThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
@@ -174,19 +162,13 @@ public final class JumpDetector {
             sample.userAccelerationY
         case .z:
             sample.userAccelerationZ
-        case .magnitude:
-            sqrt(
-                (sample.userAccelerationX * sample.userAccelerationX) +
-                    (sample.userAccelerationY * sample.userAccelerationY) +
-                    (sample.userAccelerationZ * sample.userAccelerationZ)
-            )
         }
     }
 
     /// Applies the cached threshold rule for the active profile.
     private func thresholdSatisfied(value: Double) -> Bool {
         switch config.polarity {
-        case .positivePeak, .positiveMagnitude:
+        case .positivePeak:
             value > adjustedThreshold
         case .negativeTrough:
             value < adjustedThreshold
@@ -196,7 +178,7 @@ public final class JumpDetector {
     /// Returns whether the signal has crossed back past the profile's re-arm threshold.
     private func rearmSatisfied(value: Double) -> Bool {
         switch config.polarity {
-        case .positivePeak, .positiveMagnitude:
+        case .positivePeak:
             value <= config.rearmThreshold
         case .negativeTrough:
             value >= config.rearmThreshold

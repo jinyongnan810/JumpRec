@@ -80,8 +80,6 @@ struct MotionSourceStatusView: View {
         switch (presentation, source) {
         case (.preSession, .watch):
             String(localized: "Workout will start on Apple Watch")
-        case (.preSession, .iPhone):
-            String(localized: "Workout will use iPhone")
         case (.preSession, .airpods):
             String(
                 format: String(localized: "Workout will use %@ when available"),
@@ -91,8 +89,6 @@ struct MotionSourceStatusView: View {
             String(localized: "No motion source available")
         case (.activeSession, .watch):
             String(localized: "Tracking on Apple Watch")
-        case (.activeSession, .iPhone):
-            String(localized: "Tracking with iPhone")
         case (.activeSession, .airpods):
             String(
                 format: String(localized: "Tracking with %@"),
@@ -103,21 +99,19 @@ struct MotionSourceStatusView: View {
         }
     }
 
-    /// Explains the automatic routing rules, including the important boundary between Watch and iPhone sessions.
+    /// Explains the automatic routing rules, including the important boundary between Watch and headphone sessions.
     private var statusDetail: String {
         switch (presentation, source) {
         case (.preSession, .watch):
-            String(localized: "If Apple Watch cannot start, iPhone will be used.")
+            String(localized: "If Apple Watch cannot start, supported headphones will be used when available.")
         case (.preSession, .airpods):
-            String(localized: "Headphone motion is preferred; iPhone will be used if it becomes unavailable.")
-        case (.preSession, .iPhone):
             String(localized: "Selected automatically when the workout starts.")
         case (.preSession, nil):
-            String(localized: "Check Apple Watch, headphone, or iPhone motion availability.")
+            String(localized: "Connect an Apple Watch or supported headphones to start a workout.")
         case (.activeSession, .watch):
-            String(localized: "This workout cannot switch to iPhone after it starts.")
-        case (.activeSession, .airpods), (.activeSession, .iPhone), (.activeSession, nil):
-            String(localized: "The motion source is managed automatically during this iPhone workout.")
+            String(localized: "This workout cannot switch to headphones after it starts.")
+        case (.activeSession, .airpods), (.activeSession, nil):
+            String(localized: "This workout uses supported headphone motion.")
         }
     }
 

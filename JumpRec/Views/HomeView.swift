@@ -140,7 +140,7 @@ struct HomeView: View {
 
     /// Returns the compact symbol used in the active-session header badge.
     private var deviceSourceIconName: String {
-        appState.activeMotionSource?.iconName ?? "iphone.slash"
+        appState.activeMotionSource?.iconName ?? "sensor.tag.radiowaves.forward"
     }
 
     /// Returns a VoiceOver label for the active device source badge.
@@ -263,6 +263,11 @@ struct HomeView: View {
             } message: {
                 Text(permissionErrorMessage)
             }
+            .alert("No Tracking Device Available", isPresented: $appState.showNoTrackingDeviceAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Connect an Apple Watch or supported headphones to start a workout.")
+            }
             .onChange(of: appState.sessionState) { _, newValue in
                 if newValue != .idle, isCountingDown {
                     cancelCountdown()
@@ -329,6 +334,12 @@ struct HomeView: View {
         // Check the workout quota before starting the countdown.
         guard canStartWorkout else {
             showPaywall = true
+            return
+        }
+
+        appState.refreshTrackingDeviceAvailability()
+        guard appState.hasUsableTrackingDevice else {
+            appState.showNoTrackingDeviceAlert = true
             return
         }
 
@@ -516,7 +527,7 @@ private struct ActiveWorkoutControls: View {
 #Preview("Accessible Workout", traits: .fixedLayout(width: 390, height: 600)) {
     let appState = JumpRecState()
     appState.sessionState = .active
-    appState.activeMotionSource = .iPhone
+    appState.activeMotionSource = .airpods
     appState.startTime = .now.addingTimeInterval(-180)
     return HomeView(settings: JumpRecSettings(), appState: appState, onStart: {}, onStop: {})
         .environment(MyDataStore.shared)

@@ -9,8 +9,6 @@ import Foundation
 enum DeviceSource: String, CaseIterable {
     /// Uses Apple Watch motion data.
     case watch = "Watch"
-    /// Uses the iPhone motion sensors.
-    case iPhone
     /// Uses supported headphone motion data.
     case airpods = "Headphone"
 
@@ -25,7 +23,6 @@ enum DeviceSource: String, CaseIterable {
     var iconName: String {
         switch self {
         case .watch: "applewatch"
-        case .iPhone: "iphone"
         case .airpods: "airpodspro"
         }
     }
