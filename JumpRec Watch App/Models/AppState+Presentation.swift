@@ -17,6 +17,8 @@ actor WatchSpeechCoordinator {
     private var synthesizer = AVSpeechSynthesizer()
     /// Forwards nonisolated `AVSpeechSynthesizerDelegate` events back into the actor.
     private var delegateProxy: DelegateProxy?
+    /// Caches resolved voices by language code to avoid repeated catalog lookups when speaking.
+    private var cachedVoices: [String: AVSpeechSynthesisVoice] = [:]
     /// Tracks whether the current synthesizer is executing a silent warmup.
     private var isWarmupInProgress = false
     /// Tracks whether the ducking audio session is currently active.
@@ -39,18 +41,23 @@ actor WatchSpeechCoordinator {
         rebuildSynthesizer()
         isWarmupInProgress = true
 
-        // Warm up with `.mixWithOthers` so background music never dips during silent preparation.
+        // Activate `.mixWithOthers` so the audio route warms up without dipping background music.
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, options: [.mixWithOthers])
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, options: [.mixWithOthers])
+            try session.setActive(true)
+            isAudioSessionActive = true
         } catch {
-            Self.logger.error("Warmup audio category error: \(error.localizedDescription, privacy: .public)")
+            Self.logger.error("Warmup audio session error: \(error.localizedDescription, privacy: .public)")
         }
 
         let utterance = AVSpeechUtterance(string: text)
         utterance.volume = 0
-        utterance.voice = AVSpeechSynthesisVoice(language: languageCode)
-        activeUtteranceID = ObjectIdentifier(utterance)
-        scheduleWatchdog(for: ObjectIdentifier(utterance), timeoutSeconds: 5)
+        utterance.rate = AVSpeechUtteranceMaximumSpeechRate
+        utterance.voice = voice(for: languageCode)
+        let utteranceID = ObjectIdentifier(utterance)
+        activeUtteranceID = utteranceID
+        scheduleWatchdog(for: utteranceID, timeoutSeconds: 5)
         synthesizer.speak(utterance)
     }
 
@@ -68,7 +75,7 @@ actor WatchSpeechCoordinator {
         activateDuckingAudioSession()
 
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: languageCode)
+        utterance.voice = voice(for: languageCode)
         let utteranceID = ObjectIdentifier(utterance)
         activeUtteranceID = utteranceID
         scheduleWatchdog(for: utteranceID, timeoutSeconds: 15)
@@ -89,6 +96,18 @@ actor WatchSpeechCoordinator {
     }
 
     // MARK: - Helpers
+
+    /// Returns the cached synthesis voice for a language code, resolving it on first use.
+    private func voice(for languageCode: String) -> AVSpeechSynthesisVoice? {
+        if let cachedVoice = cachedVoices[languageCode] {
+            return cachedVoice
+        }
+        if let resolvedVoice = AVSpeechSynthesisVoice(language: languageCode) {
+            cachedVoices[languageCode] = resolvedVoice
+            return resolvedVoice
+        }
+        return nil
+    }
 
     /// Creates a fresh synthesizer instance and attaches a new delegate proxy.
     private func setupSynthesizer() {
@@ -148,8 +167,12 @@ actor WatchSpeechCoordinator {
         watchdogTask?.cancel()
         watchdogTask = nil
         activeUtteranceID = nil
+        let wasWarmup = isWarmupInProgress
         isWarmupInProgress = false
-        deactivateAudioSessionIfNeeded()
+        // Keep the `.mixWithOthers` session warm through the countdown until the start cue finishes or is cancelled.
+        if !wasWarmup {
+            deactivateAudioSessionIfNeeded()
+        }
     }
 
     /// Rebuilds the synthesizer and restores audio volume if the TTS daemon fails to report completion.
@@ -199,7 +222,7 @@ extension JumpRecState {
     /// Rebuilds and warms up the speech synthesizer during the pre-workout countdown.
     func prepareSpeechForWorkout() {
         cancelPendingSpeech()
-        let text = isJapanesePreferred ? "こんにちは" : "Hello"
+        let text = isJapanesePreferred ? "あ" : "a"
         let languageCode = preferredSpeechLanguageCode
         Task { [speechCoordinator] in
             await speechCoordinator.prepareForWorkout(text: text, languageCode: languageCode)
@@ -213,6 +236,15 @@ extension JumpRecState {
         cancelPendingSpeech()
         let requestID = pendingSpeechRequestID
         let languageCode = preferredSpeechLanguageCode
+
+        // Dispatch immediate announcements straight to the speech actor without yielding the main actor.
+        guard delay > 0 else {
+            pendingSpeechTask = Task { [speechCoordinator] in
+                guard !Task.isCancelled else { return }
+                await speechCoordinator.speak(text: text, languageCode: languageCode)
+            }
+            return
+        }
 
         pendingSpeechTask = Task { [weak self, speechCoordinator] in
             do {

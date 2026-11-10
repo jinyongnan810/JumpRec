@@ -57,11 +57,11 @@ extension JumpRecState {
                 thresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage
             )
         }
+        WKInterfaceDevice.current().play(.start)
+        speak(text: localizedSessionStartedAnnouncement)
         jumpState = .jumping
         // Announce elapsed minutes for both count and time goals.
         startMinuteAnnouncements()
-        WKInterfaceDevice.current().play(.start)
-        speak(text: localizedSessionStartedAnnouncement)
         ConnectivityManager.shared.sendWorkoutEvent(
             MirroredWorkoutPayload(kind: .started, startTime: startTime, goalType: goalType, goalValue: goal)
         )
