@@ -83,7 +83,7 @@ public extension MyDataStore {
         jumpCount: Int,
         caloriesBurned: Double,
         jumpOffsets: [TimeInterval],
-        doubleJumpsCount: Int? = nil,
+        doubleUndersCount: Int? = nil,
         averageHeartRate: Int? = nil,
         peakHeartRate: Int? = nil,
         goalType: GoalType? = nil
@@ -98,7 +98,7 @@ public extension MyDataStore {
             smallBreaksCount: breakMetrics.small,
             longBreaksCount: breakMetrics.long,
             longestStreak: breakMetrics.longestStreak,
-            doubleJumpsCount: doubleJumpsCount,
+            doubleUndersCount: doubleUndersCount,
             averageHeartRate: averageHeartRate,
             peakHeartRate: peakHeartRate
         )

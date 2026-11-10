@@ -124,7 +124,7 @@ extension JumpRecState {
 
         motionManager?.stopTracking()
         endTime = Date()
-        let doubleJumpsCount = SessionMetricsCalculator.doubleJumpsCount(from: jumps)
+        let doubleUndersCount = SessionMetricsCalculator.doubleUndersCount(from: jumps)
         speak(text: localizedSessionFinishedAnnouncement, delay: 0.5)
         WKInterfaceDevice.current().play(.stop)
         ConnectivityManager.shared.sendWorkoutEvent(
@@ -132,7 +132,7 @@ extension JumpRecState {
                 kind: .ended,
                 startTime: startTime,
                 endTime: endTime,
-                doubleJumpsCount: doubleJumpsCount
+                doubleUndersCount: doubleUndersCount
             )
         )
 
@@ -145,7 +145,7 @@ extension JumpRecState {
             jumpCount: jumpCount,
             caloriesBurned: energyBurned,
             jumpOffsets: jumps,
-            doubleJumpsCount: doubleJumpsCount,
+            doubleUndersCount: doubleUndersCount,
             averageHeartRate: averageHeartRate,
             peakHeartRate: peakHeartRateValue,
             goalType: goalType

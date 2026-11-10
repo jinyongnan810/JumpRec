@@ -138,16 +138,16 @@ extension MyDataStore {
             )
         }
 
-        if let doubleJumpsCount = session.doubleJumpsCount,
-           doubleJumpsCount > PersonalRecordThreshold.mostDoubleUnders
+        if let doubleUndersCount = session.doubleUndersCount,
+           doubleUndersCount > PersonalRecordThreshold.mostDoubleUnders
         {
             candidates.append(
                 PersonalRecordCandidate(
                     kind: .mostDoubleUnders,
-                    metricValue: Double(doubleJumpsCount),
+                    metricValue: Double(doubleUndersCount),
                     displayValue: String(
                         format: String(localized: "%@ jumps"),
-                        doubleJumpsCount.formatted()
+                        doubleUndersCount.formatted()
                     ),
                     achievedAt: session.startedAt
                 )

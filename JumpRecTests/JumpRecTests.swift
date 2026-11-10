@@ -57,7 +57,7 @@ struct JumpRecTests {
         let store = try MyDataStore.makePreviewStore(qualifiedWorkoutCount: 0)
         let startedAt = Date(timeIntervalSince1970: 1_000_000)
 
-        func makeSession(doubleJumpsCount: Int?, offsetSeconds: TimeInterval = 0) -> JumpSession {
+        func makeSession(doubleUndersCount: Int?, offsetSeconds: TimeInterval = 0) -> JumpSession {
             let start = startedAt.addingTimeInterval(offsetSeconds)
             return JumpSession(
                 startedAt: start,
@@ -65,22 +65,22 @@ struct JumpRecTests {
                 jumpCount: 300,
                 peakRate: 160,
                 caloriesBurned: 35,
-                doubleJumpsCount: doubleJumpsCount
+                doubleUndersCount: doubleUndersCount
             )
         }
 
-        let unsupportedSession = makeSession(doubleJumpsCount: nil)
-        let zeroDoubleUndersSession = makeSession(doubleJumpsCount: 0, offsetSeconds: 300)
+        let unsupportedSession = makeSession(doubleUndersCount: nil)
+        let zeroDoubleUndersSession = makeSession(doubleUndersCount: 0, offsetSeconds: 300)
         #expect(!store.upsertPersonalRecords(for: unsupportedSession).contains(.mostDoubleUnders))
         #expect(!store.upsertPersonalRecords(for: zeroDoubleUndersSession).contains(.mostDoubleUnders))
 
-        let firstRecordSession = makeSession(doubleJumpsCount: 12, offsetSeconds: 600)
+        let firstRecordSession = makeSession(doubleUndersCount: 12, offsetSeconds: 600)
         #expect(store.upsertPersonalRecords(for: firstRecordSession).contains(.mostDoubleUnders))
 
-        let lowerCountSession = makeSession(doubleJumpsCount: 8, offsetSeconds: 900)
+        let lowerCountSession = makeSession(doubleUndersCount: 8, offsetSeconds: 900)
         #expect(!store.upsertPersonalRecords(for: lowerCountSession).contains(.mostDoubleUnders))
 
-        let higherCountSession = makeSession(doubleJumpsCount: 25, offsetSeconds: 1200)
+        let higherCountSession = makeSession(doubleUndersCount: 25, offsetSeconds: 1200)
         #expect(store.upsertPersonalRecords(for: higherCountSession).contains(.mostDoubleUnders))
 
         let records = try store.modelContext.fetch(FetchDescriptor<PersonalRecord>())
@@ -131,20 +131,20 @@ struct JumpRecTests {
         #expect(value == 18.0)
     }
 
-    @Test func testDoubleJumpsCountPairsRapidTurnsWithoutOverlapping() async throws {
+    @Test func testDoubleUndersCountPairsRapidTurnsWithoutOverlapping() async throws {
         let offsets: [TimeInterval] = [
             0.40,
             0.85,
-            1.03, // Double jump #1 (interval 0.18s)
+            1.03, // Double under #1 (interval 0.18s)
             1.20, // Starts next jump even though 0.17s after 1.03, because 1.03 was consumed
-            1.38, // Double jump #2 (interval 0.18s)
+            1.38, // Double under #2 (interval 0.18s)
             1.90,
-            2.15, // Double jump #3 (interval 0.25s boundary)
+            2.15, // Double under #3 (interval 0.25s boundary)
             2.41, // Single jump (interval 0.26s)
         ]
 
-        #expect(SessionMetricsCalculator.doubleJumpsCount(from: offsets) == 3)
-        #expect(SessionMetricsCalculator.doubleJumpsCount(from: [0.50]) == 0)
+        #expect(SessionMetricsCalculator.doubleUndersCount(from: offsets) == 3)
+        #expect(SessionMetricsCalculator.doubleUndersCount(from: [0.50]) == 0)
     }
 
     @Test func testHeadphoneProfileCountsOnlyNegativeZBelowThresholdAfterRearm() async throws {

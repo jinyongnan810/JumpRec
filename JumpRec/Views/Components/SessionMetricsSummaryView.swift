@@ -23,8 +23,8 @@ struct SessionMetricsSummaryView: View {
     let caloriesPerMinute: String
     /// The formatted longest streak value.
     let longestJumpStrikes: String
-    /// The formatted double-jumps count.
-    let doubleJumps: String
+    /// The formatted double-unders count.
+    let doubleUnders: String
     /// The formatted short-break count.
     let shortBreaks: String
     /// The formatted long-break count.
@@ -118,15 +118,15 @@ struct SessionMetricsSummaryView: View {
                 }
 
                 SessionBreakdownRow(
-                    label: "Double Jumps",
+                    label: "Double Unders",
                     explanation: SessionBreakdownExplanation(
-                        id: "double-jumps",
-                        title: "Double Jumps",
+                        id: "double-unders",
+                        title: "Double Unders",
                         message: "The number of double-unders detected during your workout. Double-under detection is only available when your workout is recorded with Apple Watch."
                     ),
                     showsBadge: achievedRecordKinds.contains(.mostDoubleUnders)
                 ) {
-                    Text(doubleJumps)
+                    Text(doubleUnders)
                         .font(AppFonts.metricDetailMonospaced)
                         .foregroundStyle(AppColors.textPrimary)
                 }

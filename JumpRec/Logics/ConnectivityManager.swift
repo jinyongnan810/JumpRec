@@ -227,8 +227,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
         let startedAt = Date(timeIntervalSince1970: startedAtTimestamp)
         let endedAt = Date(timeIntervalSince1970: endedAtTimestamp)
-        let doubleJumpsCount = NumberParser.int(userInfo["doubleJumpsCount"])
-            ?? SessionMetricsCalculator.doubleJumpsCount(from: jumpOffsets)
+        let doubleUndersCount = NumberParser.int(userInfo["doubleUndersCount"])
+            ?? SessionMetricsCalculator.doubleUndersCount(from: jumpOffsets)
         let averageHeartRate = NumberParser.int(userInfo["averageHeartRate"])
         let peakHeartRate = NumberParser.int(userInfo["peakHeartRate"])
         let goalType = (userInfo["goalType"] as? String).flatMap(GoalType.init(rawValue:))
@@ -240,7 +240,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
                 jumpCount: jumpCount,
                 caloriesBurned: caloriesBurned,
                 jumpOffsets: jumpOffsets,
-                doubleJumpsCount: doubleJumpsCount,
+                doubleUndersCount: doubleUndersCount,
                 averageHeartRate: averageHeartRate,
                 peakHeartRate: peakHeartRate,
                 goalType: goalType
@@ -255,7 +255,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         jumpCount: Int,
         caloriesBurned: Double,
         jumpOffsets: [TimeInterval],
-        doubleJumpsCount: Int,
+        doubleUndersCount: Int,
         averageHeartRate: Int?,
         peakHeartRate: Int?,
         goalType: GoalType?
@@ -266,7 +266,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             jumpCount: jumpCount,
             caloriesBurned: caloriesBurned,
             jumpOffsets: jumpOffsets,
-            doubleJumpsCount: doubleJumpsCount,
+            doubleUndersCount: doubleUndersCount,
             averageHeartRate: averageHeartRate,
             peakHeartRate: peakHeartRate,
             goalType: goalType

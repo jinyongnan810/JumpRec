@@ -61,7 +61,7 @@ final class JumpRecState: NSObject, @unchecked Sendable {
     /// Stores the peak heart rate for the completed session when available.
     var peakHeartRate: Int?
     /// Stores the detected double-under count for completed Watch sessions.
-    var doubleJumpsCount: Int?
+    var doubleUndersCount: Int?
     /// Stores the selected goal type for the active session.
     var sessionGoalType: GoalType?
     /// Stores the selected goal value for the active session: jumps for count goals, minutes for time goals.

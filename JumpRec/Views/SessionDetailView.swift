@@ -72,7 +72,7 @@ struct SessionDetailView: View {
                     rhythmConsistency: rhythmConsistencyText,
                     caloriesPerMinute: caloriesPerMinuteText,
                     longestJumpStrikes: longestJumpStrikesText,
-                    doubleJumps: doubleJumpsText,
+                    doubleUnders: doubleUndersText,
                     shortBreaks: "\(session.smallBreaksCount)",
                     longBreaks: "\(session.longBreaksCount)",
                     averageHeartRate: averageHeartRateText,
@@ -178,9 +178,9 @@ struct SessionDetailView: View {
         session.formattedLongestStreak
     }
 
-    /// Returns the formatted double-jumps text.
-    private var doubleJumpsText: String {
-        session.formattedDoubleJumpsCount(placeholder: "–")
+    /// Returns the formatted double-unders text.
+    private var doubleUndersText: String {
+        session.formattedDoubleUndersCount(placeholder: "–")
     }
 
     /// Returns the formatted average heart-rate text.
@@ -216,7 +216,7 @@ struct SessionDetailView: View {
         smallBreaksCount: 3,
         longBreaksCount: 1,
         longestStreak: 186,
-        doubleJumpsCount: 12,
+        doubleUndersCount: 12,
         averageHeartRate: 144,
         peakHeartRate: 172,
         aiComment: "Strong mid-session pace with solid consistency. You held a high cadence and kept breaks under control."
