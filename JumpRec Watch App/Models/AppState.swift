@@ -69,12 +69,9 @@ class JumpRecState: NSObject, @unchecked Sendable {
     /// Coordinates background speech synthesis and audio session ducking off the main actor.
     @ObservationIgnored
     let speechCoordinator = WatchSpeechCoordinator()
-    /// Owns the latest delayed speech request so obsolete workout cues can be cancelled.
+    /// Tracks the latest speech request so obsolete workout cues can be cancelled.
     @ObservationIgnored
     var pendingSpeechTask: Task<Void, Never>?
-    /// Identifies the latest speech request even when an older cancelled task resumes.
-    @ObservationIgnored
-    var pendingSpeechRequestID = UUID()
 
     /// Detects watch motion and jump events.
     @ObservationIgnored

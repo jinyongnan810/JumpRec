@@ -25,6 +25,8 @@ actor WatchSpeechCoordinator {
     private var isAudioSessionActive = false
     /// Identifies the currently active utterance so older cancelled utterances cannot deactivate the session.
     private var activeUtteranceID: ObjectIdentifier?
+    /// Suspends the workout finalizer until the active non-warmup utterance completes or resets.
+    private var idleContinuation: CheckedContinuation<Void, Never>?
     /// Guards against a wedged synthesizer leaving background audio ducked indefinitely.
     private var watchdogTask: Task<Void, Never>?
 
@@ -93,6 +95,21 @@ actor WatchSpeechCoordinator {
             synthesizer.stopSpeaking(at: .immediate)
         }
         deactivateAudioSessionIfNeeded()
+        resumeIdleContinuation()
+    }
+
+    /// Suspends until the active non-warmup speech utterance ends, cancels, or hits the watchdog.
+    func waitForActiveSpeech() async {
+        guard activeUtteranceID != nil, !isWarmupInProgress else { return }
+
+        resumeIdleContinuation()
+        await withCheckedContinuation { continuation in
+            guard activeUtteranceID != nil, !isWarmupInProgress else {
+                continuation.resume()
+                return
+            }
+            idleContinuation = continuation
+        }
     }
 
     // MARK: - Helpers
@@ -136,6 +153,7 @@ actor WatchSpeechCoordinator {
         }
         deactivateAudioSessionIfNeeded()
         setupSynthesizer()
+        resumeIdleContinuation()
     }
 
     /// Activates `.playback` with `.duckOthers` right before speaking a real workout cue.
@@ -173,6 +191,13 @@ actor WatchSpeechCoordinator {
         if !wasWarmup {
             deactivateAudioSessionIfNeeded()
         }
+        resumeIdleContinuation()
+    }
+
+    /// Wakes the task waiting on the current utterance, if any.
+    private func resumeIdleContinuation() {
+        idleContinuation?.resume()
+        idleContinuation = nil
     }
 
     /// Rebuilds the synthesizer and restores audio volume if the TTS daemon fails to report completion.
@@ -231,46 +256,19 @@ extension JumpRecState {
 
     // MARK: - Speech
 
-    /// Speaks a localized prompt after an optional, cancellable delay.
-    func speak(text: String, delay: Double = 0) {
+    /// Speaks a localized prompt immediately on the speech coordinator.
+    func speak(text: String) {
         cancelPendingSpeech()
-        let requestID = pendingSpeechRequestID
         let languageCode = preferredSpeechLanguageCode
 
-        // Dispatch immediate announcements straight to the speech actor without yielding the main actor.
-        guard delay > 0 else {
-            pendingSpeechTask = Task { [speechCoordinator] in
-                guard !Task.isCancelled else { return }
-                await speechCoordinator.speak(text: text, languageCode: languageCode)
-            }
-            return
-        }
-
-        pendingSpeechTask = Task { [weak self, speechCoordinator] in
-            do {
-                try await Task.sleep(for: .seconds(delay))
-            } catch is CancellationError {
-                return
-            } catch {
-                print("[JumpRecState] Speech delay failed: \(error.localizedDescription)")
-                return
-            }
-
-            guard let self,
-                  !Task.isCancelled,
-                  pendingSpeechRequestID == requestID
-            else {
-                return
-            }
-
-            pendingSpeechTask = nil
+        pendingSpeechTask = Task { [speechCoordinator] in
+            guard !Task.isCancelled else { return }
             await speechCoordinator.speak(text: text, languageCode: languageCode)
         }
     }
 
-    /// Cancels a speech cue that has not reached the synthesizer yet.
+    /// Cancels a speech task before it reaches the speech coordinator.
     func cancelPendingSpeech() {
-        pendingSpeechRequestID = UUID()
         pendingSpeechTask?.cancel()
         pendingSpeechTask = nil
     }
@@ -281,6 +279,12 @@ extension JumpRecState {
         Task { [speechCoordinator] in
             await speechCoordinator.stopAndDeactivate()
         }
+    }
+
+    /// Waits for any queued or active announcement to finish before ending background execution.
+    func waitForCurrentSpeech() async {
+        await pendingSpeechTask?.value
+        await speechCoordinator.waitForActiveSpeech()
     }
 
     /// Returns whether Japanese is the preferred language.

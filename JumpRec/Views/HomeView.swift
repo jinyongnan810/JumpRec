@@ -274,7 +274,9 @@ struct HomeView: View {
                 }
             }
             .onDisappear {
-                cancelCountdown()
+                if isCountingDown || isPreparingWorkout {
+                    cancelCountdown()
+                }
             }
         }
     }

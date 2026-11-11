@@ -125,8 +125,8 @@ extension JumpRecState {
         motionManager?.stopTracking()
         endTime = Date()
         let doubleUndersCount = SessionMetricsCalculator.doubleUndersCount(from: jumps)
-        speak(text: localizedSessionFinishedAnnouncement, delay: 0.5)
         WKInterfaceDevice.current().play(.stop)
+        speak(text: localizedSessionFinishedAnnouncement)
         ConnectivityManager.shared.sendWorkoutEvent(
             MirroredWorkoutPayload(
                 kind: .ended,

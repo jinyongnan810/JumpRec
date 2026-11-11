@@ -116,8 +116,11 @@ final class PhoneWorkoutManager: NSObject {
         print("[PhoneWorkoutManager] Ending workout at \(endDate)")
 
         if #available(iOS 26.0, *) {
-            await (workoutStore as? PhoneWorkoutStore)?.endWorkout(at: endDate)
-            workoutStore = nil
+            let activeStore = workoutStore as? PhoneWorkoutStore
+            await activeStore?.endWorkout(at: endDate)
+            if workoutStore === activeStore, activeStore?.hasSession == false {
+                workoutStore = nil
+            }
         } else if let workoutBuilder {
             do {
                 try await workoutBuilder.endCollection(at: endDate)
@@ -205,6 +208,11 @@ private final class PhoneWorkoutStore: NSObject {
     /// Distinguishes a pre-warmed `.prepared` session from one that has started recording activity.
     private var isActivityStarted = false
 
+    /// Indicates whether a prepared or active workout session is currently owned by this store.
+    var hasSession: Bool {
+        session != nil
+    }
+
     // MARK: - Initialization
 
     /// Creates a store bound to the shared HealthKit store and metrics callback.
@@ -220,8 +228,8 @@ private final class PhoneWorkoutStore: NSObject {
 
     /// Warms up HealthKit sensors in the `.prepared` state without starting sample collection.
     func prepareWorkout(configuration: HKWorkoutConfiguration) async throws {
-        // Keep the existing session if it is already prepared and waiting for countdown completion.
-        if session != nil, !isActivityStarted {
+        // Keep the existing session only when it is still waiting in `.prepared` or `.notStarted` state.
+        if let session, !isActivityStarted, session.state == .prepared || session.state == .notStarted {
             return
         }
         if session != nil {
@@ -241,7 +249,7 @@ private final class PhoneWorkoutStore: NSObject {
         configuration: HKWorkoutConfiguration
     ) async throws {
         // Fast path: activate the session that was prepared during the countdown.
-        if let session, let builder, !isActivityStarted {
+        if let session, let builder, !isActivityStarted, session.state == .prepared || session.state == .notStarted {
             isActivityStarted = true
             session.startActivity(with: startDate)
             try await builder.beginCollection(at: startDate)
@@ -278,7 +286,18 @@ private final class PhoneWorkoutStore: NSObject {
         }
 
         isActivityStarted = false
-        session.end()
+        // Detach references up front so a newly prepared workout cannot collide with this save.
+        self.session = nil
+        self.builder = nil
+        defer {
+            if session.state != .ended {
+                session.end()
+            }
+        }
+
+        if session.state == .running || session.state == .paused {
+            session.stopActivity(with: endDate)
+        }
 
         do {
             try await builder.endCollection(at: endDate)
@@ -287,19 +306,14 @@ private final class PhoneWorkoutStore: NSObject {
         } catch {
             print("[PhoneWorkoutManager] Failed to finish workout: \(error)")
         }
-
-        if self.session === session {
-            self.session = nil
-        }
-        if self.builder === builder {
-            self.builder = nil
-        }
     }
 
     /// Ends the current session immediately without saving a workout to HealthKit.
     func discardWorkout() {
         isActivityStarted = false
-        session?.end()
+        if let session, session.state != .ended {
+            session.end()
+        }
         session = nil
         builder = nil
     }
@@ -336,8 +350,7 @@ extension PhoneWorkoutStore: HKWorkoutSessionDelegate {
     nonisolated func workoutSession(_: HKWorkoutSession,
                                     didChangeTo _: HKWorkoutSessionState,
                                     from _: HKWorkoutSessionState,
-                                    date _: Date)
-    {}
+                                    date _: Date) {}
 
     nonisolated func workoutSession(_: HKWorkoutSession, didFailWithError error: Error) {
         print("[PhoneWorkoutManager] Workout session error: \(error)")

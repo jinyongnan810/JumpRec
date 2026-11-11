@@ -75,7 +75,6 @@ extension JumpRecState {
         if isMirroredWatchSession, let startTime,
            incomingStartTime.timeIntervalSince(startTime) < 0.001
         { return }
-        cancelPendingSpeech()
 
         // Stop pending and local startup before adopting a late Watch confirmation.
         companionWorkoutStartTask?.cancel()

@@ -41,8 +41,11 @@ extension JumpRecState {
         prepareHaptics()
         warmUpSpeechSynthesizerIfNeeded()
         motionManager?.prepareForWorkout(thresholdAdjustmentPercentage: thresholdAdjustmentPercentage)
-        phoneWorkoutLifecycleTask?.cancel()
+        let precedingWorkoutTask = phoneWorkoutLifecycleTask
         phoneWorkoutLifecycleTask = Task { [weak self, phoneWorkoutManager] in
+            // Wait for any previous workout save to complete before preparing a new session.
+            await precedingWorkoutTask?.value
+            guard !Task.isCancelled else { return }
             do {
                 try await phoneWorkoutManager.prepareWorkout()
             } catch {
@@ -70,7 +73,6 @@ extension JumpRecState {
         shouldSpeakJumpTimeAnnouncements: Bool = true,
         jumpDetectorThresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage
     ) {
-        cancelPendingSpeech()
         refreshTrackingDeviceAvailability()
         let startsOnWatch = shouldStartOnWatch(preferLocalHeadphonesOverWatch: preferLocalHeadphonesOverWatch)
         guard startsOnWatch || isHeadphoneMotionAvailable else {
@@ -180,6 +182,11 @@ extension JumpRecState {
         endTime = Date()
         sessionState = .complete
 
+        syncIdleTimer()
+        notificationFeedbackGenerator.notificationOccurred(.success)
+        speak(text: localizedSessionFinishedAnnouncement)
+        syncLiveActivity()
+
         if let endTime {
             let precedingWorkoutTask = phoneWorkoutLifecycleTask
             phoneWorkoutLifecycleTask = Task { [phoneWorkoutManager] in
@@ -190,10 +197,6 @@ extension JumpRecState {
                 await phoneWorkoutManager.endWorkout(at: endTime)
             }
         }
-        syncIdleTimer()
-        notificationFeedbackGenerator.notificationOccurred(.success)
-        speak(text: localizedSessionFinishedAnnouncement)
-        syncLiveActivity()
 
         if let endTime {
             completedSession = dataStore.saveCompletedSession(
@@ -222,7 +225,6 @@ extension JumpRecState {
     func reset() {
         let shouldFinishSavingCompletedWorkout = sessionState == .complete && !isMirroredWatchSession
         invalidateWorkoutOperations(cancelPhoneWorkoutTask: !shouldFinishSavingCompletedWorkout)
-        cancelPendingSpeech()
         cancelMinuteAnnouncements()
         motionManager?.stopTracking()
         motionManager?.cancelPreparation()
@@ -261,9 +263,10 @@ extension JumpRecState {
         activeMotionSource = Self.deviceSource(from: source)
         jumpCount += 1
         jumps.append(Date().timeIntervalSince(startTime))
+        finishIfGoalReached()
+        guard sessionState == .active else { return }
         checkFeedbackLandmarks()
         syncLiveActivity()
-        finishIfGoalReached()
     }
 
     /// Starts a session that is tracked directly on the iPhone.

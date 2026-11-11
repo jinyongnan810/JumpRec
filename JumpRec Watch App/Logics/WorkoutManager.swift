@@ -54,6 +54,8 @@ final class WorkoutManager: NSObject {
     private var authorizationTask: Task<Void, Error>?
     /// Retains stopped workouts until HealthKit confirms they are ready to save.
     private var pendingFinalizations: [ObjectIdentifier: (session: HKWorkoutSession, builder: HKLiveWorkoutBuilder)] = [:]
+    /// Tracks a saved workout session waiting for post-workout speech to finish before ending.
+    private var sessionPendingSpeechEnd: HKWorkoutSession?
     /// Owns asynchronous startup work for the current workout.
     private var workoutLifecycleTask: Task<Void, Never>?
     /// Owns companion mirroring setup so it can begin during the pre-workout countdown.
@@ -108,6 +110,7 @@ final class WorkoutManager: NSObject {
     func prepareWorkout() {
         guard !isActivityStarted else { return }
 
+        endSessionPendingSpeechIfNeeded()
         cancelPreparedWorkout()
 
         workoutGeneration = UUID()
@@ -127,6 +130,7 @@ final class WorkoutManager: NSObject {
 
     /// Starts a jump-rope workout locally and attempts to mirror it to the iPhone app.
     func startWorkout(startDate: Date, goalType: GoalType, goalValue: Int) {
+        endSessionPendingSpeechIfNeeded()
         workoutLifecycleTask?.cancel()
         throttledJumpTask?.cancel()
         throttledJumpTask = nil
@@ -357,14 +361,19 @@ final class WorkoutManager: NSObject {
         }
     }
 
-    /// Keeps background execution available until the stopped workout has been saved.
+    /// Keeps background execution available until the workout saves and finish speech completes.
     private func finalizeWorkout(_ session: HKWorkoutSession, at endDate: Date) {
         guard let pending = pendingFinalizations.removeValue(forKey: ObjectIdentifier(session)) else { return }
 
         // Saving belongs to this session and must survive resets or another workout starting.
         Task {
             defer {
-                session.end()
+                if sessionPendingSpeechEnd === session {
+                    sessionPendingSpeechEnd = nil
+                }
+                if session.state != .ended {
+                    session.end()
+                }
                 Self.logger.info("Workout finalization completed; ending HealthKit session")
             }
             do {
@@ -378,6 +387,20 @@ final class WorkoutManager: NSObject {
             } catch {
                 Self.logger.error("Failed to finish workout: \(error.localizedDescription, privacy: .public)")
             }
+
+            if session.state != .ended {
+                sessionPendingSpeechEnd = session
+                await JumpRecState.shared.waitForCurrentSpeech()
+            }
+        }
+    }
+
+    /// Ends any finished session still holding background runtime for post-workout speech.
+    private func endSessionPendingSpeechIfNeeded() {
+        guard let pendingSession = sessionPendingSpeechEnd else { return }
+        sessionPendingSpeechEnd = nil
+        if pendingSession.state != .ended {
+            pendingSession.end()
         }
     }
 
@@ -561,6 +584,9 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
     {
         Task { @MainActor [weak self] in
             Self.logger.error("Workout session failed: \(error.localizedDescription, privacy: .public)")
+            if self?.sessionPendingSpeechEnd === workoutSession {
+                self?.endSessionPendingSpeechIfNeeded()
+            }
             if self?.pendingFinalizations.removeValue(forKey: ObjectIdentifier(workoutSession)) != nil {
                 workoutSession.end()
             }

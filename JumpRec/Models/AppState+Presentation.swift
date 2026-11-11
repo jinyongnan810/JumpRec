@@ -206,53 +206,25 @@ extension JumpRecState {
         let utterance = AVSpeechUtterance(string: warmupText)
         utterance.volume = 0
         utterance.voice = AVSpeechSynthesisVoice(language: preferredSpeechLanguageCode)
+        activeSpeechUtteranceID = ObjectIdentifier(utterance)
         synthesizer.speak(utterance)
     }
 
     // MARK: - Speech
 
-    /// Speaks a localized prompt after an optional, cancellable delay.
-    func speak(text: String, delay: TimeInterval = 0.2) {
-        cancelPendingSpeech()
-        let requestID = pendingSpeechRequestID
-
-        pendingSpeechTask = Task { [weak self] in
-            do {
-                try await Task.sleep(for: .seconds(delay))
-            } catch is CancellationError {
-                return
-            } catch {
-                print("[JumpRecState] Speech delay failed: \(error.localizedDescription)")
-                return
-            }
-
-            guard let self,
-                  !Task.isCancelled,
-                  pendingSpeechRequestID == requestID
-            else {
-                return
-            }
-
-            pendingSpeechTask = nil
-
-            // Cancel the silent warmup so real speech can play immediately.
-            if isSpeechWarmupInProgress {
-                synthesizer.stopSpeaking(at: .immediate)
-                isSpeechWarmupInProgress = false
-            }
-
-            configureSpeechAudioSession()
-            let utterance = AVSpeechUtterance(string: text)
-            utterance.voice = AVSpeechSynthesisVoice(language: preferredSpeechLanguageCode)
-            synthesizer.speak(utterance)
+    /// Speaks a localized prompt immediately.
+    func speak(text: String) {
+        // Cancel the silent warmup so real speech can play immediately.
+        if isSpeechWarmupInProgress {
+            synthesizer.stopSpeaking(at: .immediate)
+            isSpeechWarmupInProgress = false
         }
-    }
 
-    /// Cancels a speech cue that has not reached the synthesizer yet.
-    func cancelPendingSpeech() {
-        pendingSpeechRequestID = UUID()
-        pendingSpeechTask?.cancel()
-        pendingSpeechTask = nil
+        configureSpeechAudioSession()
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = AVSpeechSynthesisVoice(language: preferredSpeechLanguageCode)
+        activeSpeechUtteranceID = ObjectIdentifier(utterance)
+        synthesizer.speak(utterance)
     }
 
     /// Returns whether Japanese is the preferred system language.
@@ -289,24 +261,31 @@ extension JumpRecState {
             .units(allowed: [.minutes], width: .wide)
         )
     }
+
+    /// Cleans up audio ducking after the latest utterance ends.
+    private func handleSpeechUtteranceEnded(utteranceID: ObjectIdentifier) {
+        isSpeechWarmupInProgress = false
+        guard activeSpeechUtteranceID == utteranceID else { return }
+        activeSpeechUtteranceID = nil
+        guard !synthesizer.isSpeaking, !synthesizer.isPaused else { return }
+        deactivateSpeechAudioSession()
+    }
 }
 
 extension JumpRecState: AVSpeechSynthesizerDelegate {
     /// Releases ducking audio on the main actor after the last announcement ends.
-    nonisolated func speechSynthesizer(_: AVSpeechSynthesizer, didFinish _: AVSpeechUtterance) {
+    nonisolated func speechSynthesizer(_: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        let utteranceID = ObjectIdentifier(utterance)
         Task { @MainActor in
-            self.isSpeechWarmupInProgress = false
-            guard !self.synthesizer.isSpeaking, !self.synthesizer.isPaused else { return }
-            deactivateSpeechAudioSession()
+            self.handleSpeechUtteranceEnded(utteranceID: utteranceID)
         }
     }
 
     /// Mirrors the normal-finish cleanup path when speech is cancelled early.
-    nonisolated func speechSynthesizer(_: AVSpeechSynthesizer, didCancel _: AVSpeechUtterance) {
+    nonisolated func speechSynthesizer(_: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        let utteranceID = ObjectIdentifier(utterance)
         Task { @MainActor in
-            self.isSpeechWarmupInProgress = false
-            guard !self.synthesizer.isSpeaking, !self.synthesizer.isPaused else { return }
-            deactivateSpeechAudioSession()
+            self.handleSpeechUtteranceEnded(utteranceID: utteranceID)
         }
     }
 }

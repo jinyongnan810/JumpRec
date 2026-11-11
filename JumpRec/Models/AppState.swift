@@ -138,12 +138,9 @@ final class JumpRecState: NSObject, @unchecked Sendable {
     /// Marks silent warmup speech so a real announcement can interrupt it.
     @ObservationIgnored
     var isSpeechWarmupInProgress = false
-    /// Owns the latest delayed speech request so obsolete session cues can be cancelled.
+    /// Identifies the latest utterance so stale delegate callbacks do not release audio early.
     @ObservationIgnored
-    var pendingSpeechTask: Task<Void, Never>?
-    /// Identifies the latest speech request even when an older cancelled task resumes.
-    @ObservationIgnored
-    var pendingSpeechRequestID = UUID()
+    var activeSpeechUtteranceID: ObjectIdentifier?
     /// Emits haptic feedback for session events.
     @ObservationIgnored
     let notificationFeedbackGenerator = UINotificationFeedbackGenerator()
