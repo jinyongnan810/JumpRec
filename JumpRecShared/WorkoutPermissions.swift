@@ -30,7 +30,7 @@ enum WorkoutPermissions {
         }
         #if os(iOS)
             if requestMotion, CMMotionActivityManager.isActivityAvailable() {
-                if CMMotionActivityManager.authorizationStatus() == .notDetermined {
+                if CMHeadphoneMotionManager.authorizationStatus() == .notDetermined {
                     let manager = CMMotionActivityManager()
                     let now = Date()
                     await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
@@ -41,7 +41,7 @@ enum WorkoutPermissions {
                     }
                 }
                 try Task.checkCancellation()
-                let status = CMMotionActivityManager.authorizationStatus()
+                let status = CMHeadphoneMotionManager.authorizationStatus()
                 if status == .denied || status == .restricted {
                     throw PreparationError.motionAccessDenied
                 }

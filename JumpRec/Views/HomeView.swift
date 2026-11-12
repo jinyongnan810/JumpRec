@@ -348,7 +348,7 @@ struct HomeView: View {
         isPreparingWorkout = true
         // Keep countdown state on the main actor and honor cancellation at each suspension.
         countdownTask = Task { @MainActor in
-            let preferHeadphones = settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable
+            let preferHeadphones = settings.preferHeadphonesForIPhoneSessions && appState.canAttemptHeadphoneStart
             let usesWatch = appState.shouldStartOnWatch(preferLocalHeadphonesOverWatch: preferHeadphones)
             do {
                 try await WorkoutPermissions.prepareForWorkout(requestMotion: !usesWatch)
@@ -370,6 +370,8 @@ struct HomeView: View {
                 onStart()
                 return
             }
+            // Start Core Motion headphone observers right after Motion authorization succeeds.
+            appState.refreshTrackingDeviceAvailability()
             appState.prepareLocalSession(
                 thresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
             )

@@ -3,6 +3,7 @@
 //  JumpRec
 //
 
+import CoreMotion
 import Foundation
 import UIKit
 
@@ -14,9 +15,17 @@ extension JumpRecState {
         connectivityManager.isPaired && connectivityManager.isWatchAppInstalled
     }
 
+    /// Allows starting with connected headphones before Motion permission is resolved, while verifying support once authorized.
+    var canAttemptHeadphoneStart: Bool {
+        if CMHeadphoneMotionManager.authorizationStatus() == .authorized {
+            return isHeadphoneMotionAvailable
+        }
+        return motionManager?.hasConnectedAudioHeadphoneRoute ?? false
+    }
+
     /// Returns whether Apple Watch or supported headphones are connected and usable.
     var hasUsableTrackingDevice: Bool {
-        isWatchAvailable || isHeadphoneMotionAvailable
+        isWatchAvailable || canAttemptHeadphoneStart
     }
 
     /// Refreshes Watch and headphone availability before checking whether a workout can start.
@@ -30,7 +39,7 @@ extension JumpRecState {
 
     /// Uses the same device selection for permission preparation and workout startup.
     func shouldStartOnWatch(preferLocalHeadphonesOverWatch: Bool) -> Bool {
-        isWatchAvailable && !(preferLocalHeadphonesOverWatch && isHeadphoneMotionAvailable)
+        isWatchAvailable && !(preferLocalHeadphonesOverWatch && canAttemptHeadphoneStart)
     }
 
     /// Pre-warms local motion sensors, HealthKit session, speech, and haptics during the countdown.

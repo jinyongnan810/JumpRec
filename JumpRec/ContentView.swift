@@ -226,7 +226,7 @@ struct ContentView: View {
         appState.start(
             goalType: goalType,
             goalValue: goalValue,
-            preferLocalHeadphonesOverWatch: settings.preferHeadphonesForIPhoneSessions && appState.isHeadphoneMotionAvailable,
+            preferLocalHeadphonesOverWatch: settings.preferHeadphonesForIPhoneSessions && appState.canAttemptHeadphoneStart,
             shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
             shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
             jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage

@@ -57,6 +57,8 @@ final class MotionManager: NSObject {
     private var connectedHeadphoneName: String?
     /// Stores raw motion samples when recording is enabled.
     private var recordedSamples: [MotionSample] = []
+    /// Tracks whether Core Motion headphone status/connection observers have been started.
+    private var hasStartedConnectionMonitoring = false
 
     // MARK: - Initialization
 
@@ -82,8 +84,7 @@ final class MotionManager: NSObject {
         )
         isHeadphoneConnected = false
         connectedHeadphoneName = nil
-        startHeadphoneStatusUpdatesIfAvailable()
-        headphoneMotionManager.startConnectionStatusUpdates()
+        startHeadphoneConnectionMonitoringIfAuthorized()
         queue.maxConcurrentOperationCount = 1
         queue.name = "JumpRec.iPhoneMotionManager"
     }
@@ -91,9 +92,11 @@ final class MotionManager: NSObject {
     /// Stops route-change observation and Core Motion callbacks when the manager is released.
     isolated deinit {
         NotificationCenter.default.removeObserver(self)
-        headphoneActivityManager.stopStatusUpdates()
+        if hasStartedConnectionMonitoring {
+            headphoneActivityManager.stopStatusUpdates()
+            headphoneMotionManager.stopConnectionStatusUpdates()
+        }
         headphoneMotionManager.stopDeviceMotionUpdates()
-        headphoneMotionManager.stopConnectionStatusUpdates()
         headphoneMotionManager.delegate = nil
         // Cancel queued Core Motion callbacks before disconnecting observers and delegates.
         queue.cancelAllOperations()
@@ -104,6 +107,11 @@ final class MotionManager: NSObject {
     /// Returns whether supported headphone motion is currently available.
     var isHeadphoneMotionAvailable: Bool {
         headphoneMotionManager.isDeviceMotionAvailable && isHeadphoneConnected && hasConnectedHeadphoneRoute()
+    }
+
+    /// Returns whether an audio headphone route is connected without touching Core Motion permissions.
+    var hasConnectedAudioHeadphoneRoute: Bool {
+        hasConnectedHeadphoneRoute()
     }
 
     /// Returns the most recently resolved connected headphone route name.
@@ -118,6 +126,7 @@ final class MotionManager: NSObject {
 
     /// Refreshes local availability flags and republishes the preferred source.
     func refreshAvailability() {
+        startHeadphoneConnectionMonitoringIfAuthorized()
         // Clear availability when headphones disconnect; an audio route alone cannot confirm support.
         if !hasConnectedHeadphoneRoute() {
             isHeadphoneConnected = false
@@ -146,6 +155,7 @@ final class MotionManager: NSObject {
             resetRecordedSamples()
         }
 
+        startHeadphoneConnectionMonitoringIfAuthorized()
         startHeadphoneMonitoringIfAvailable()
     }
 
@@ -168,6 +178,7 @@ final class MotionManager: NSObject {
         }
 
         notifyAvailabilityChanged()
+        startHeadphoneConnectionMonitoringIfAuthorized()
         startHeadphoneMonitoringIfAvailable()
         updatePreferredSourceIfNeeded()
     }
@@ -254,6 +265,19 @@ final class MotionManager: NSObject {
     }
 
     // MARK: - Headphone Status
+
+    /// Starts Core Motion headphone observers only after Motion & Fitness access is granted so launch never prompts.
+    private func startHeadphoneConnectionMonitoringIfAuthorized() {
+        guard !hasStartedConnectionMonitoring,
+              CMHeadphoneMotionManager.authorizationStatus() == .authorized
+        else {
+            return
+        }
+
+        hasStartedConnectionMonitoring = true
+        startHeadphoneStatusUpdatesIfAvailable()
+        headphoneMotionManager.startConnectionStatusUpdates()
+    }
 
     /// Monitors headphone status, including compatible headphones connected before startup.
     private func startHeadphoneStatusUpdatesIfAvailable() {
@@ -374,6 +398,7 @@ final class MotionManager: NSObject {
     /// Recomputes availability and preferred source after an audio-route change.
     @objc
     private func handleAudioRouteChange(_: Notification) {
+        startHeadphoneConnectionMonitoringIfAuthorized()
         let wasConnected = isHeadphoneConnected
         if !hasConnectedHeadphoneRoute() {
             isHeadphoneConnected = false
