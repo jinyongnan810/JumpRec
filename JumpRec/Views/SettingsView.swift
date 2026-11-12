@@ -290,19 +290,12 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityHint(Text(String(localized: "Shows an explanation for detection sensitivity.")))
-                    .popover(isPresented: $isShowingSensitivityExplanation) {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text(String(localized: "If there are false detections, try lowering the sensitivity."))
-                                .font(AppFonts.bodySmall)
-                                .fixedSize(horizontal: false, vertical: true)
+                    .hintPopover(isPresented: $isShowingSensitivityExplanation) {
+                        Text(String(localized: "If there are false detections, try lowering the sensitivity."))
+                            .font(AppFonts.bodySmall)
 
-                            Text(String(localized: "If jumps are not detected, try increasing the sensitivity."))
-                                .font(AppFonts.bodySmall)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .padding(16)
-                        .frame(maxWidth: 400, alignment: .leading)
-                        .presentationCompactAdaptation(.popover)
+                        Text(String(localized: "If jumps are not detected, try increasing the sensitivity."))
+                            .font(AppFonts.bodySmall)
                     }
 
                     Spacer(minLength: 12)
@@ -607,15 +600,9 @@ private struct SettingsToggleRow: View {
             }
             .buttonStyle(.plain)
             .accessibilityHint(Text(description))
-            .popover(isPresented: $isShowingExplanation) {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text(description)
-                        .font(AppFonts.bodySmall)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding(16)
-                .frame(maxWidth: 280, alignment: .leading)
-                .presentationCompactAdaptation(.popover)
+            .hintPopover(isPresented: $isShowingExplanation) {
+                Text(description)
+                    .font(AppFonts.bodySmall)
             }
         }
         .toggleStyle(.switch)

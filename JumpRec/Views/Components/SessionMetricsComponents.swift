@@ -114,21 +114,15 @@ struct SessionBreakdownRow<Content: View>: View {
             guard explanation != nil else { return }
             isShowingExplanation = true
         }
-        .popover(isPresented: $isShowingExplanation) {
+        .hintPopover(isPresented: $isShowingExplanation) {
             if let explanation {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text(explanation.title)
-                        .font(AppFonts.detailValue)
-                        .foregroundStyle(AppColors.textPrimary)
+                Text(explanation.title)
+                    .font(AppFonts.detailValue)
+                    .foregroundStyle(AppColors.textPrimary)
 
-                    Text(explanation.message)
-                        .font(AppFonts.bodySmall)
-                        .foregroundStyle(AppColors.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding(16)
-                .frame(maxWidth: 280, alignment: .leading)
-                .presentationCompactAdaptation(.popover)
+                Text(explanation.message)
+                    .font(AppFonts.bodySmall)
+                    .foregroundStyle(AppColors.textSecondary)
             }
         }
     }
