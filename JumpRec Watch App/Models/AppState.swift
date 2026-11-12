@@ -88,9 +88,9 @@ class JumpRecState: NSObject, @unchecked Sendable {
     /// Configures motion tracking and speech for the watch app.
     override init() {
         super.init()
-        motionManager = MotionManager(addJump: { by in
+        motionManager = MotionManager(addJump: { by, jumpOffset in
             Task { @MainActor in
-                self.addJump(by: by)
+                self.addJump(by: by, jumpOffset: jumpOffset)
             }
         }, updateHeartRate: { heartRate in
             Task { @MainActor in

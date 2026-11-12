@@ -110,7 +110,7 @@ Used when the user starts a workout directly from the Apple Watch app without th
 ### Key Components
 * **UI & Countdown**: [`StartView.swift`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec%20Watch%20App/Views/StartView.swift), [`JumpingView.swift`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec%20Watch%20App/Views/JumpingView.swift), [`ResultView.swift`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec%20Watch%20App/Views/ResultView.swift)
 * **Session State**: [`AppState+SessionLifecycle.swift (Watch)`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec%20Watch%20App/Models/AppState+SessionLifecycle.swift)
-* **Motion Tracking**: [`MotionManager.swift (Watch)`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec%20Watch%20App/Logics/MotionManager.swift) (40 Hz `CMMotionManager`)
+* **Motion Tracking**: [`MotionManager.swift (Watch)`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec%20Watch%20App/Logics/MotionManager.swift) (100 Hz `CMMotionManager`)
 * **HealthKit Workout**: [`WorkoutManager.swift (Watch)`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec%20Watch%20App/Logics/WorkoutManager.swift)
 * **Speech & Haptics**: [`WatchSpeechCoordinator`](file:///Users/kin/Documents/GitHub/JumpRec/JumpRec%20Watch%20App/Models/AppState+Presentation.swift#L11-L194)
 
@@ -136,7 +136,7 @@ sequenceDiagram
         Start->>WState: prepareForStart(thresholdAdjustmentPercentage)
         WState->>WState: prepareSpeechForWorkout() (silent AVSpeechSynthesizer warmup)
         WState->>WMotion: prepareForWorkout()
-        WMotion->>WMotion: Start 40 Hz startDeviceMotionUpdates (isTracking = false)
+        WMotion->>WMotion: Start 100 Hz startDeviceMotionUpdates (isTracking = false)
         WMotion->>WHK: prepareWorkout()
         WHK->>WHK: Create HKWorkoutSession + HKLiveWorkoutBuilder
         WHK->>WHK: session.prepare() (warms up optical HR & calorie sensors)
@@ -157,8 +157,8 @@ sequenceDiagram
         WHK->>WHK: session.startActivity(with:) + builder.beginCollection(at:)
         WState->>WState: Play .start haptic + speak("Workout Started!")
 
-        loop Active Workout (40 Hz IMU + Live HealthKit)
-            WMotion->>WState: addJump(1)
+        loop Active Workout (100 Hz IMU + Live HealthKit)
+            WMotion->>WState: addJump(1, jumpOffset)
             WState->>WState: Check 100-jump & 1-min landmarks / goal completion
             WHK->>WState: updateHeartRate(bpm) & updateEnergyBurned(kcal)
         end
@@ -176,7 +176,7 @@ sequenceDiagram
 
 ## 3. 📱 + ⌚ iPhone + Apple Watch (Companion & Mirrored Workout)
 
-Used when both devices are active together. The Watch acts as the **sensor and workout authority** (40 Hz wrist motion + optical heart rate + active energy), while the iPhone acts as a **live mirrored dashboard and Live Activity host**.
+Used when both devices are active together. The Watch acts as the **sensor and workout authority** (100 Hz wrist motion + optical heart rate + active energy), while the iPhone acts as a **live mirrored dashboard and Live Activity host**.
 
 This mode can be triggered in two ways:
 * **3A. Started from iPhone**: iPhone syncs settings and calls `HKHealthStore.startWatchApp(toHandle:)`, waking the Watch app to run its 3-second countdown and mirror back to the iPhone.
@@ -213,7 +213,7 @@ sequenceDiagram
     rect rgb(35, 55, 75)
         Note over PState,WWork: 2. Watch Countdown & Pre-warming (t = -3s … 0s)
         WStart->>WStart: WorkoutPermissions.prepareForWorkout()
-        WStart->>WWork: prepareForStart() (speech + 40 Hz Core Motion warmup)
+        WStart->>WWork: prepareForStart() (speech + 100 Hz Core Motion warmup)
         WWork->>WWork: HKWorkoutSession.prepare() (warms up HR & calorie sensors)
         WWork->>Mirror: session.startMirroringToCompanionDevice()
         Mirror->>PState: workoutSessionMirroringStartHandler attaches mirroredSession

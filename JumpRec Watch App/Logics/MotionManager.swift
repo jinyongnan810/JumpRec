@@ -15,6 +15,8 @@ class MotionManager: NSObject {
     private final nonisolated class SampleProcessor: Sendable {
         private struct State {
             var isTracking = false
+            var trackingStartDate: Date?
+            var trackingStartTimestamp: TimeInterval?
             let jumpDetector = JumpDetector(profile: .watch)
             #if DEBUG
                 var recordedSamples: [MotionSample] = []
@@ -35,10 +37,11 @@ class MotionManager: NSObject {
             }
         }
 
-        func startTracking(thresholdAdjustmentPercentage: Double) {
+        func startTracking(startDate: Date, thresholdAdjustmentPercentage: Double) {
             state.withLock { state in
                 state.jumpDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
                 Self.resetDetectionState(&state)
+                state.trackingStartDate = startDate
                 state.isTracking = true
             }
         }
@@ -68,13 +71,21 @@ class MotionManager: NSObject {
             }
         }
 
-        func processSample(_ sample: MotionSample) -> Bool {
+        /// Evaluates one motion sample and returns its session-relative hardware offset if a jump is detected.
+        func processSample(_ sample: MotionSample) -> TimeInterval? {
             state.withLock { state in
-                guard state.isTracking else { return false }
+                guard state.isTracking else { return nil }
                 #if DEBUG
                     state.recordedSamples.append(sample)
                 #endif
-                return state.jumpDetector.processMotionSample(sample)
+                // Anchor sensor timestamps to session start on the first tracked sample so jump deltas avoid MainActor jitter.
+                if state.trackingStartTimestamp == nil {
+                    let elapsedAtFirstSample = state.trackingStartDate.map { max(0, Date().timeIntervalSince($0)) } ?? 0
+                    state.trackingStartTimestamp = sample.timestamp - elapsedAtFirstSample
+                }
+                guard state.jumpDetector.processMotionSample(sample) else { return nil }
+                guard let trackingStartTimestamp = state.trackingStartTimestamp else { return 0 }
+                return max(0, sample.timestamp - trackingStartTimestamp)
             }
         }
 
@@ -92,6 +103,8 @@ class MotionManager: NSObject {
             #if DEBUG
                 state.recordedSamples.removeAll(keepingCapacity: true)
             #endif
+            state.trackingStartDate = nil
+            state.trackingStartTimestamp = nil
             state.jumpDetector.reset()
         }
     }
@@ -106,8 +119,8 @@ class MotionManager: NSObject {
     /// Stores the local jump count used by the watch detector.
     var jumpCount = 0
 
-    /// Delivers accepted jumps back to app state.
-    var addJump: @Sendable (Int) -> Void
+    /// Delivers accepted jumps and their hardware-derived session offsets back to app state.
+    var addJump: @Sendable (Int, TimeInterval) -> Void
 
     // MARK: - Motion Components
 
@@ -122,7 +135,7 @@ class MotionManager: NSObject {
     // MARK: - Detection
 
     /// Watch sample interval captures brief acceleration impacts.
-    private var updateInterval: TimeInterval = 0.025 // 40Hz sampling rate when supported
+    private var updateInterval: TimeInterval = 0.01 // 100Hz sampling rate when supported
     /// Synchronizes tracking state, jump detection, and debug samples across actors and the motion queue.
     private let sampleProcessor = SampleProcessor()
 
@@ -130,7 +143,7 @@ class MotionManager: NSObject {
 
     /// Configures the watch motion manager and workout callbacks.
     init(
-        addJump: @escaping @Sendable (Int) -> Void,
+        addJump: @escaping @Sendable (Int, TimeInterval) -> Void,
         updateHeartRate: @escaping (Int) -> Void,
         updateEnergyBurned: @escaping (Double) -> Void
     ) {
@@ -142,7 +155,7 @@ class MotionManager: NSObject {
 
     /// Sets up Core Motion update intervals and processing queue configuration.
     private func setupMotionManager() {
-        // Sample fused motion at 40 Hz without magnetometer calibration prompts.
+        // Sample fused motion at 100 Hz without magnetometer calibration prompts.
         motionManager.deviceMotionUpdateInterval = updateInterval
 
         // Set up operation queue
@@ -179,7 +192,10 @@ class MotionManager: NSObject {
         }
 
         workoutManager.startWorkout(startDate: startDate, goalType: goalType, goalValue: goalValue)
-        sampleProcessor.startTracking(thresholdAdjustmentPercentage: thresholdAdjustmentPercentage)
+        sampleProcessor.startTracking(
+            startDate: startDate,
+            thresholdAdjustmentPercentage: thresholdAdjustmentPercentage
+        )
         startDeviceMotionStreamIfNeeded()
     }
 
@@ -222,7 +238,7 @@ class MotionManager: NSObject {
 
     // MARK: - Private Methods
 
-    /// Starts the 40 Hz Core Motion stream if it is not already running.
+    /// Starts the 100 Hz Core Motion stream if it is not already running.
     private func startDeviceMotionStreamIfNeeded() {
         guard !motionManager.isDeviceMotionActive else { return }
 
@@ -242,9 +258,9 @@ class MotionManager: NSObject {
                 timestamp: motion.timestamp
             )
 
-            // Each accepted sample reports one jump to app state.
-            if sampleProcessor.processSample(sample) {
-                addJump(1)
+            // Each accepted sample reports one jump and its hardware timestamp offset to app state.
+            if let jumpOffset = sampleProcessor.processSample(sample) {
+                addJump(1, jumpOffset)
             }
         }
     }

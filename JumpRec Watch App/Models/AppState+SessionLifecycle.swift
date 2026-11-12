@@ -185,12 +185,11 @@ extension JumpRecState {
 
     // MARK: - Goal Tracking
 
-    /// Adds newly detected jumps to the active session.
-    func addJump(by: Int) {
-        guard jumpState == .jumping, let startTime else { return }
+    /// Adds newly detected jumps to the active session using the sensor-derived offset.
+    func addJump(by: Int, jumpOffset: TimeInterval) {
+        guard jumpState == .jumping, startTime != nil else { return }
         let before = jumpCount
         jumpCount += by
-        let jumpOffset = Date().timeIntervalSince(startTime)
         jumps.append(jumpOffset)
         motionManager?.recordJump(jumpCount: jumpCount, jumpOffset: jumpOffset)
         checkJumpLandmark(before: before, after: jumpCount)
