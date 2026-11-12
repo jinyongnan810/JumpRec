@@ -8,8 +8,6 @@
 import CoreMotion
 import Foundation
 
-let csvHeader = "Timestamp,AX,AY,AZ,RX,RY,RZ,Jump\n"
-
 /// Manages motion detection and jump counting using device sensors
 class MotionManager: NSObject {
     // MARK: - Published Properties
@@ -39,8 +37,12 @@ class MotionManager: NSObject {
     /// Shared jump detector configured for watch motion data.
     private let jumpDetector = JumpDetector(profile: .watch)
 
-    /// Stores CSV rows when motion recording is enabled.
-    private var motionRecording: [String] = []
+    #if DEBUG
+        /// Protects recorded sample access across the motion-processing queue and main actor.
+        private let recordedSamplesLock = NSLock()
+        /// Stores raw motion samples during active tracking for debug CSV export.
+        private var recordedSamples: [MotionSample] = []
+    #endif
 
     // MARK: - Initialization
 
@@ -103,7 +105,6 @@ class MotionManager: NSObject {
             guard let self else { return }
             jumpDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
             resetSession()
-            motionRecording = [csvHeader]
             isTracking = true
         }
 
@@ -133,7 +134,6 @@ class MotionManager: NSObject {
         queue.addOperation { [weak self] in
             guard let self else { return }
             isTracking = false
-            motionRecording.removeAll()
         }
         workoutManager.stopWorkout()
     }
@@ -143,17 +143,24 @@ class MotionManager: NSObject {
         workoutManager.sendJumpUpdate(jumpCount: jumpCount, jumpOffset: jumpOffset)
     }
 
-    /// Sends the recorded motion CSV to the iPhone companion app.
-    func saveCSVtoICloud(filename _: String = "motion.csv") {
-        let csvText = motionRecording.joined()
-        ConnectivityManager.shared
-            .sendCSV(csvText, filename: "motion_\(Date().timeIntervalSince1970).csv")
-    }
+    #if DEBUG
+        /// Returns and clears recorded motion samples collected during the session.
+        func consumeRecordedSamples() -> [MotionSample] {
+            recordedSamplesLock.lock()
+            defer { recordedSamplesLock.unlock() }
+
+            let samples = recordedSamples
+            recordedSamples.removeAll(keepingCapacity: false)
+            return samples
+        }
+    #endif
 
     /// Reset the current session
     func resetSession() {
         jumpCount = 0
-        motionRecording.removeAll()
+        #if DEBUG
+            resetRecordedSamples()
+        #endif
         jumpDetector.reset()
     }
 
@@ -182,9 +189,29 @@ class MotionManager: NSObject {
             timestamp: motion.timestamp
         )
 
+        #if DEBUG
+            record(sample)
+        #endif
+
         // Each accepted sample reports one jump to app state.
         if jumpDetector.processMotionSample(sample) {
             addJump(1)
         }
     }
+
+    #if DEBUG
+        /// Appends a motion sample to the debug export buffer.
+        private func record(_ sample: MotionSample) {
+            recordedSamplesLock.lock()
+            recordedSamples.append(sample)
+            recordedSamplesLock.unlock()
+        }
+
+        /// Clears buffered motion samples before a new tracking session.
+        private func resetRecordedSamples() {
+            recordedSamplesLock.lock()
+            recordedSamples.removeAll(keepingCapacity: true)
+            recordedSamplesLock.unlock()
+        }
+    #endif
 }

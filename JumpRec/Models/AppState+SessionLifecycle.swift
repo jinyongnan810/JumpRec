@@ -293,6 +293,9 @@ extension JumpRecState {
         let sessionStartDate = Date()
         cancelMinuteAnnouncements()
         resetLiveMetrics()
+        #if DEBUG
+            motionCSVShareURL = nil
+        #endif
         completedSession = nil
         startTime = sessionStartDate
         endTime = nil

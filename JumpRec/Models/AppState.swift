@@ -209,6 +209,11 @@ final class JumpRecState: NSObject, @unchecked Sendable {
             guard let self, sessionState == .starting, pendingMirroredStart else { return }
             reset()
         }
+        #if DEBUG
+            connectivityManager.onMotionCSVReceived = { [weak self] fileURL, startedAt in
+                self?.attachWatchMotionCSV(fileURL: fileURL, startedAt: startedAt)
+            }
+        #endif
         // The delegate restores background-audio volume after speech finishes.
         synthesizer.delegate = self
         prepareHaptics()

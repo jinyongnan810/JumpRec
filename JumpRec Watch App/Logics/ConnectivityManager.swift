@@ -42,24 +42,71 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         }
 
         parseSettingsPayload(session.receivedApplicationContext)
+
+        #if DEBUG
+            if activationState == .activated {
+                Task { @MainActor [weak self] in
+                    self?.flushPendingMotionCSVs()
+                }
+            }
+        #endif
     }
 
-    /// Transfers CSV to iPhone as a file, falling back to user info if file creation fails.
-    func sendCSV(_ csvText: String, filename: String) {
-        guard session.isReachable else {
-            print("[WatchConnectivityManager] Session not reachable or not paired")
-            return
+    #if DEBUG
+        /// Returns the number of debug motion CSV files still waiting to finish transferring to iPhone.
+        var pendingMotionCSVCount: Int {
+            pendingMotionCSVURLs().count
         }
-        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
-        do {
-            try csvText.write(to: tempURL, atomically: true, encoding: .utf8)
-            session.transferFile(tempURL, metadata: ["filename": filename])
-            print("[WatchConnectivityManager] Sent CSV file via transferFile: \(filename)")
-        } catch {
-            print("[WatchConnectivityManager] Failed to write temp CSV file: \(error.localizedDescription). Falling back to transferUserInfo.")
-            session.transferUserInfo(["csvText": csvText, "filename": filename])
+
+        /// Queues a debug motion CSV for background-durable transfer to iPhone without requiring live reachability.
+        func sendMotionCSV(_ csvText: String, filename: String, startedAt: Date) {
+            guard WCSession.isSupported() else { return }
+
+            do {
+                let fileURL = try writePendingMotionCSV(csvText: csvText, filename: filename)
+                guard session.activationState == .activated else {
+                    print("[WatchConnectivityManager] Queued motion CSV until WCSession activates: \(filename)")
+                    return
+                }
+                session.transferFile(
+                    fileURL,
+                    metadata: [
+                        "filename": filename,
+                        "startedAt": startedAt.timeIntervalSince1970,
+                    ]
+                )
+                print("[WatchConnectivityManager] Queued motion CSV via transferFile: \(filename)")
+            } catch {
+                print("[WatchConnectivityManager] Failed to write pending CSV file: \(error.localizedDescription). Falling back to transferUserInfo.")
+                guard session.activationState == .activated else { return }
+                session.transferUserInfo([
+                    "csvText": csvText,
+                    "filename": filename,
+                    "startedAt": startedAt.timeIntervalSince1970,
+                ])
+            }
         }
-    }
+
+        /// Retries any locally cached debug CSVs that are not already in WatchConnectivity's transfer queue.
+        func flushPendingMotionCSVs() {
+            guard WCSession.isSupported(), session.activationState == .activated else { return }
+
+            let outstandingURLs = Set(session.outstandingFileTransfers.map(\.file.fileURL.standardizedFileURL))
+            for fileURL in pendingMotionCSVURLs() where !outstandingURLs.contains(fileURL.standardizedFileURL) {
+                session.transferFile(fileURL, metadata: ["filename": fileURL.lastPathComponent])
+                print("[WatchConnectivityManager] Re-queued pending motion CSV: \(fileURL.lastPathComponent)")
+            }
+        }
+
+        /// Cleans up transferred debug CSV files once WatchConnectivity confirms delivery.
+        nonisolated func session(_: WCSession, didFinish fileTransfer: WCSessionFileTransfer, error: Error?) {
+            let fileURL = fileTransfer.file.fileURL
+            let errorDescription = error?.localizedDescription
+            Task { @MainActor [weak self] in
+                self?.handleCompletedFileTransfer(fileURL: fileURL, errorDescription: errorDescription)
+            }
+        }
+    #endif
 
     /// Applies reachable settings messages or action requests from the iPhone app.
     nonisolated func session(_: WCSession, didReceiveMessage message: [String: Any]) {
@@ -125,7 +172,15 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
     /// Logs changes to reachability with the iPhone app.
     nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
-        print("[WatchConnectivityManager] Session reachability changed: \(session.isReachable)")
+        let isReachable = session.isReachable
+        print("[WatchConnectivityManager] Session reachability changed: \(isReachable)")
+        #if DEBUG
+            if isReachable {
+                Task { @MainActor [weak self] in
+                    self?.flushPendingMotionCSVs()
+                }
+            }
+        #endif
     }
 
     /// Applies updated goal settings received from the iPhone app.
@@ -204,4 +259,57 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
         NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)
     }
+
+    #if DEBUG
+        /// Directory storing debug motion CSV files until WatchConnectivity finishes transferring them.
+        private var pendingMotionCSVDirectoryURL: URL {
+            let cachesURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first
+                ?? FileManager.default.temporaryDirectory
+            return cachesURL.appendingPathComponent("PendingDebugMotionCSV", isDirectory: true)
+        }
+
+        /// Writes a debug CSV to the pending directory so it survives interrupted transfers.
+        private func writePendingMotionCSV(csvText: String, filename: String) throws -> URL {
+            let directoryURL = pendingMotionCSVDirectoryURL
+            if !FileManager.default.fileExists(atPath: directoryURL.path) {
+                try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+            }
+            let fileURL = directoryURL.appendingPathComponent(filename)
+            try csvText.write(to: fileURL, atomically: true, encoding: .utf8)
+            return fileURL
+        }
+
+        /// Lists cached debug CSV files waiting for successful transfer.
+        private func pendingMotionCSVURLs() -> [URL] {
+            let directoryURL = pendingMotionCSVDirectoryURL
+            guard let urls = try? FileManager.default.contentsOfDirectory(
+                at: directoryURL,
+                includingPropertiesForKeys: nil,
+                options: [.skipsHiddenFiles]
+            ) else {
+                return []
+            }
+            return urls.filter { $0.pathExtension.lowercased() == "csv" }
+        }
+
+        /// Deletes the local staging copy only after WatchConnectivity succeeds.
+        private func handleCompletedFileTransfer(fileURL: URL, errorDescription: String?) {
+            if let errorDescription {
+                print("[WatchConnectivityManager] Failed to transfer motion CSV \(fileURL.lastPathComponent): \(errorDescription)")
+                return
+            }
+
+            let pendingPath = pendingMotionCSVDirectoryURL.standardizedFileURL.path
+            guard fileURL.standardizedFileURL.path.hasPrefix(pendingPath) else { return }
+
+            do {
+                if FileManager.default.fileExists(atPath: fileURL.path) {
+                    try FileManager.default.removeItem(at: fileURL)
+                }
+                print("[WatchConnectivityManager] Cleaned up transferred motion CSV: \(fileURL.lastPathComponent)")
+            } catch {
+                print("[WatchConnectivityManager] Failed to remove transferred motion CSV: \(error.localizedDescription)")
+            }
+        }
+    #endif
 }

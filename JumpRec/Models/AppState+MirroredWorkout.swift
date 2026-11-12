@@ -88,6 +88,9 @@ extension JumpRecState {
         cancelMinuteAnnouncements()
         pendingMirroredStart = false
         resetLiveMetrics()
+        #if DEBUG
+            motionCSVShareURL = nil
+        #endif
         heartRate = nil
         averageHeartRate = nil
         peakHeartRate = nil
@@ -195,4 +198,24 @@ extension JumpRecState {
             return goalValue
         }
     }
+
+    #if DEBUG
+        /// Attaches a received Watch motion CSV to the active or completed mirrored session summary.
+        func attachWatchMotionCSV(fileURL: URL, startedAt: Date?) {
+            guard isMotionCSVExportEnabled,
+                  isMirroredWatchSession,
+                  sessionState == .active || sessionState == .complete
+            else {
+                return
+            }
+
+            if let startedAt, let currentStartTime = startTime,
+               abs(currentStartTime.timeIntervalSince(startedAt)) >= 1.0
+            {
+                return
+            }
+
+            motionCSVShareURL = fileURL
+        }
+    #endif
 }

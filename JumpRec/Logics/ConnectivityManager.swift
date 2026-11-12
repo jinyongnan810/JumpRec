@@ -34,6 +34,10 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     var onWorkoutStartCancelled: (() -> Void)?
     /// Delivers lifecycle events before HealthKit mirroring is ready.
     var onWorkoutEventReceived: ((MirroredWorkoutPayload) -> Void)?
+    #if DEBUG
+        /// Delivers a received Watch motion CSV local URL and optional session start timestamp.
+        var onMotionCSVReceived: ((URL, Date?) -> Void)?
+    #endif
     /// ⭐️Persists synced settings in the shared ubiquitous key-value store.
     private let settingsStore = NSUbiquitousKeyValueStore.default
     /// Performs potentially delayed iCloud container resolution and file writes away from UI state.
@@ -173,14 +177,15 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     /// Handles incoming files transferred from the watch app.
     nonisolated func session(_: WCSession, didReceive file: WCSessionFile) {
         #if DEBUG
-            let filename = file.fileURL.lastPathComponent
+            let filename = (file.metadata?["filename"] as? String) ?? file.fileURL.lastPathComponent
+            let startedAt = NumberParser.double(file.metadata?["startedAt"]).map(Date.init(timeIntervalSince1970:))
             print("[WatchConnectivityManager] Received file from watch: \(filename)")
             do {
                 // Copy the temporary file during the callback; WatchConnectivity owns its lifetime.
                 let data = try Data(contentsOf: file.fileURL)
                 if let csvText = String(data: data, encoding: .utf8) {
                     Task { @MainActor [weak self] in
-                        await self?.saveCSVToICloud(csvText: csvText, filename: filename)
+                        await self?.handleReceivedMotionCSV(csvText: csvText, filename: filename, startedAt: startedAt)
                     }
                 } else {
                     print("[WatchConnectivityManager] Failed to decode CSV file content")
@@ -207,8 +212,9 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
                 print("[WatchConnectivityManager] userInfo missing csvText or filename")
                 return
             }
+            let startedAt = NumberParser.double(userInfo["startedAt"]).map(Date.init(timeIntervalSince1970:))
             Task { @MainActor [weak self] in
-                await self?.saveCSVToICloud(csvText: csvText, filename: filename)
+                await self?.handleReceivedMotionCSV(csvText: csvText, filename: filename, startedAt: startedAt)
             }
         #endif
     }
@@ -362,6 +368,16 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)
     }
 
+    #if DEBUG
+        /// Saves a received motion CSV locally, notifies active UI observers, and exports to iCloud.
+        private func handleReceivedMotionCSV(csvText: String, filename: String, startedAt: Date?) async {
+            if let fileURL = saveCSVToLocalDocuments(csvText: csvText, filename: filename) {
+                onMotionCSVReceived?(fileURL, startedAt)
+            }
+            await saveCSVToICloud(csvText: csvText, filename: filename)
+        }
+    #endif
+
     /// Exports CSV to iCloud Documents, waiting asynchronously for the container.
     func saveCSVToICloud(
         csvText: String,
@@ -381,21 +397,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     @discardableResult
     func saveCSVToLocalDocuments(csvText: String, filename: String) -> URL? {
         #if DEBUG
-            do {
-                let documentsURL = try FileManager.default.url(
-                    for: .documentDirectory,
-                    in: .userDomainMask,
-                    appropriateFor: nil,
-                    create: true
-                )
-                let fileURL = documentsURL.appendingPathComponent(filename)
-                try csvText.write(to: fileURL, atomically: true, encoding: .utf8)
-                print("[WatchConnectivityManager] Saved CSV to local Documents at \(fileURL.path)")
-                return fileURL
-            } catch {
-                print("[WatchConnectivityManager] Error saving CSV to local Documents: \(error.localizedDescription)")
-                return nil
-            }
+            return DebugMotionCSVStore.shared.save(csvText: csvText, filename: filename)
         #else
             return nil
         #endif

@@ -12,6 +12,10 @@ struct SettingsView: View {
     /// Provides the persisted settings being edited.
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
+    #if DEBUG
+        /// Tracks pending debug motion CSV files waiting for transfer to iPhone.
+        @State private var pendingCSVCount = 0
+    #endif
 
     /// Inverts the threshold adjustment so sliding right increases sensitivity.
     private var sensitivitySliderBinding: Binding<Double> {
@@ -166,8 +170,41 @@ struct SettingsView: View {
             Section("Permissions") {
                 PermissionsSettingsContent()
             }
+
+            #if DEBUG
+                Section("Debug") {
+                    HStack {
+                        Text("Motion CSV")
+                            .font(AppFonts.watchBody)
+                            .foregroundStyle(AppColors.textPrimary)
+                        Spacer()
+                        Text(
+                            pendingCSVCount > 0
+                                ? String(format: String(localized: "Pending: %lld"), Int64(pendingCSVCount))
+                                : String(localized: "Synced")
+                        )
+                        .font(AppFonts.watchGoalChip)
+                        .foregroundStyle(pendingCSVCount > 0 ? AppColors.warning : AppColors.textMuted)
+                    }
+
+                    if pendingCSVCount > 0 {
+                        Button("Send Pending CSVs") {
+                            ConnectivityManager.shared.flushPendingMotionCSVs()
+                            pendingCSVCount = ConnectivityManager.shared.pendingMotionCSVCount
+                        }
+                        .font(AppFonts.watchBody)
+                        .foregroundStyle(AppColors.accent)
+                    }
+                }
+            #endif
         }
         .navigationTitle("Settings")
+        #if DEBUG
+            .onAppear {
+                guard ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" else { return }
+                pendingCSVCount = ConnectivityManager.shared.pendingMotionCSVCount
+            }
+        #endif
     }
 
     /// Formats the row value so selected state is announced without relying on the checkmark symbol alone.

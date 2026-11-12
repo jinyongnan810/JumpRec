@@ -73,6 +73,13 @@ struct SettingsView: View {
                         }
                     }
 
+                    #if DEBUG
+                        if !dataStore.isScreenshotStore {
+                            DebugMotionCSVSettingsSection()
+                                .staggeredAppearance(isVisible: hasContentAppeared, index: 7)
+                        }
+                    #endif
+
                     privacyPolicyLink
                         .staggeredAppearance(isVisible: hasContentAppeared, index: 7)
 

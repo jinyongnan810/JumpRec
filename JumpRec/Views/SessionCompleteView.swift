@@ -196,7 +196,11 @@ struct SessionCompleteView: View {
                     isVisible: hasContentAppeared,
                     index: hasMotionCSVShareAction ? 4 : 3
                 )
-            }.padding(.horizontal, 24)
+            }
+            .padding(.horizontal, 24)
+            #if DEBUG
+                .animation(.easeOut(duration: 0.25), value: hasMotionCSVShareAction)
+            #endif
         }
         .task {
             // Wait one update cycle to render hidden sections before revealing them.

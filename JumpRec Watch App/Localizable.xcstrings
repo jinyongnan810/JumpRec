@@ -267,6 +267,17 @@
         }
       }
     },
+    "Debug" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デバッグ"
+          }
+        }
+      }
+    },
     "Downloading from iCloud..." : {
       "localizations" : {
         "ja" : {
@@ -553,6 +564,17 @@
         }
       }
     },
+    "Motion CSV" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "モーションCSV"
+          }
+        }
+      }
+    },
     "No iCloud account is currently signed in, so previous cloud-backed workouts cannot be restored on this device yet." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -610,6 +632,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apple Watchで「設定」→「ヘルスケア」を開き、JumpRecを選択してアクセス許可を確認してください。"
+          }
+        }
+      }
+    },
+    "Pending: %lld" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未送信: %lld"
           }
         }
       }
@@ -754,6 +787,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "完了したワークアウトをヘルスケアに保存します。"
+          }
+        }
+      }
+    },
+    "Send Pending CSVs" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未送信CSVを送信"
           }
         }
       }
@@ -906,6 +950,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "同期に失敗しました"
+          }
+        }
+      }
+    },
+    "Synced" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "送信済み"
           }
         }
       }

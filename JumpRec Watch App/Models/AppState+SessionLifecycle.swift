@@ -123,6 +123,9 @@ extension JumpRecState {
         cancelMinuteAnnouncements()
 
         motionManager?.stopTracking()
+        #if DEBUG
+            let motionSamples = motionManager?.consumeRecordedSamples() ?? []
+        #endif
         endTime = Date()
         let doubleUndersCount = SessionMetricsCalculator.doubleUndersCount(from: jumps)
         WKInterfaceDevice.current().play(.stop)
@@ -150,6 +153,9 @@ extension JumpRecState {
             peakHeartRate: peakHeartRateValue,
             goalType: goalType
         )
+        #if DEBUG
+            exportMotionCSVIfNeeded(samples: motionSamples, startedAt: startTime, endedAt: endTime)
+        #endif
 
         print("end finished")
     }
@@ -159,9 +165,23 @@ extension JumpRecState {
         stopSpeechAndDeactivateAudio()
         cancelMinuteAnnouncements()
         motionManager?.stopTracking()
+        #if DEBUG
+            _ = motionManager?.consumeRecordedSamples()
+        #endif
         resetSessionMetrics()
         jumpState = .idle
     }
+
+    #if DEBUG
+        /// Formats and sends recorded watch motion samples to the companion iPhone app.
+        private func exportMotionCSVIfNeeded(samples: [MotionSample], startedAt: Date, endedAt: Date) {
+            guard !samples.isEmpty else { return }
+
+            let csvText = MotionCSVFormatter.makeCSV(from: samples)
+            let filename = MotionCSVFormatter.makeFilename(prefix: "watch-motion", startedAt: startedAt, endedAt: endedAt)
+            ConnectivityManager.shared.sendMotionCSV(csvText, filename: filename, startedAt: startedAt)
+        }
+    #endif
 
     // MARK: - Goal Tracking
 
