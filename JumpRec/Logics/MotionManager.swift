@@ -6,9 +6,129 @@
 import AVFAudio
 import CoreMotion
 import Foundation
+import Synchronization
 
 /// Manages jump detection on iPhone using supported headphone motion.
 final class MotionManager: NSObject {
+    /// Holds lock-protected motion detection state shared between the main actor and Core Motion queue.
+    private final nonisolated class SampleProcessor: Sendable {
+        struct LiveMotionEvents {
+            let needsAvailabilityConfirmation: Bool
+            let didDetectJump: Bool
+        }
+
+        private struct State {
+            var isTracking = false
+            var isHeadphoneConnected = false
+            var isAvailabilityConfirmationInFlight = false
+            let headphoneDetector = JumpDetector(profile: .headphones)
+            var recordedSamples: [MotionSample] = []
+        }
+
+        private let shouldRecordMotionSamples: Bool
+        private let state = Mutex(State())
+
+        init(shouldRecordMotionSamples: Bool) {
+            self.shouldRecordMotionSamples = shouldRecordMotionSamples
+        }
+
+        var isTracking: Bool {
+            state.withLock { $0.isTracking }
+        }
+
+        func prepareIfNotTracking(thresholdAdjustmentPercentage: Double) {
+            state.withLock { state in
+                guard !state.isTracking else { return }
+                state.headphoneDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+                state.headphoneDetector.reset()
+                if shouldRecordMotionSamples {
+                    state.recordedSamples.removeAll(keepingCapacity: true)
+                }
+            }
+        }
+
+        func startTracking(thresholdAdjustmentPercentage: Double) {
+            state.withLock { state in
+                state.isTracking = true
+                state.headphoneDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+                state.headphoneDetector.reset()
+                if shouldRecordMotionSamples {
+                    state.recordedSamples.removeAll(keepingCapacity: true)
+                }
+            }
+        }
+
+        func resetIfNotTracking() {
+            state.withLock { state in
+                guard !state.isTracking else { return }
+                state.headphoneDetector.reset()
+                if shouldRecordMotionSamples {
+                    state.recordedSamples.removeAll(keepingCapacity: true)
+                }
+            }
+        }
+
+        func updateThresholdAdjustmentPercentage(_ percentage: Double) {
+            state.withLock { state in
+                state.headphoneDetector.updateThresholdAdjustmentPercentage(percentage)
+            }
+        }
+
+        func stopTracking() {
+            state.withLock { state in
+                state.isTracking = false
+            }
+        }
+
+        func syncAvailability(isHeadphoneConnected: Bool) {
+            state.withLock { state in
+                state.isHeadphoneConnected = isHeadphoneConnected
+            }
+        }
+
+        func finishAvailabilityConfirmation(isHeadphoneConnected: Bool) {
+            state.withLock { state in
+                state.isHeadphoneConnected = isHeadphoneConnected
+                state.isAvailabilityConfirmationInFlight = false
+            }
+        }
+
+        func consumeRecordedSamples() -> [MotionSample] {
+            guard shouldRecordMotionSamples else { return [] }
+            return state.withLock { state in
+                let samples = state.recordedSamples
+                state.recordedSamples.removeAll(keepingCapacity: false)
+                return samples
+            }
+        }
+
+        func processSample(_ sample: MotionSample) -> LiveMotionEvents {
+            state.withLock { state in
+                let needsAvailabilityConfirmation = !state.isHeadphoneConnected && !state.isAvailabilityConfirmationInFlight
+                if needsAvailabilityConfirmation {
+                    state.isAvailabilityConfirmationInFlight = true
+                }
+
+                guard state.isTracking else {
+                    return LiveMotionEvents(
+                        needsAvailabilityConfirmation: needsAvailabilityConfirmation,
+                        didDetectJump: false
+                    )
+                }
+
+                if shouldRecordMotionSamples {
+                    state.recordedSamples.append(sample)
+                }
+
+                let didDetectJump = state.headphoneDetector.processMotionSample(sample)
+                return LiveMotionEvents(
+                    needsAvailabilityConfirmation: needsAvailabilityConfirmation,
+                    didDetectJump: didDetectJump
+                )
+            }
+        }
+    }
+
     /// Identifies which local device produced a detected jump.
     enum Source: Equatable {
         /// A jump detected from supported headphone motion sensors.
@@ -18,7 +138,9 @@ final class MotionManager: NSObject {
     // MARK: - Public State
 
     /// Indicates whether local motion tracking is currently active.
-    var isTracking = false
+    var isTracking: Bool {
+        sampleProcessor.isTracking
+    }
 
     // MARK: - Motion Managers
 
@@ -31,32 +153,22 @@ final class MotionManager: NSObject {
 
     // MARK: - Detection
 
-    /// Detects jumps from headphone motion samples.
-    private let headphoneDetector = JumpDetector(profile: .headphones)
-    /// Indicates whether raw motion samples should be stored for export.
-    private let shouldRecordMotionSamples: Bool
-    /// Protects recorded sample access across the motion-processing queue and UI.
-    private let recordedSamplesLock = NSLock()
+    /// Synchronizes tracking state, jump detection, and debug samples across actors and the motion queue.
+    private let sampleProcessor: SampleProcessor
 
     // MARK: - Callbacks
 
     /// Reports accepted jumps back to app state.
     private let onJumpDetected: @MainActor (Source) -> Void
-    /// Reports active motion-source changes back to app state.
-    private let onSourceChanged: @MainActor (Source?) -> Void
     /// Reports headphone availability changes and the best-known headphone name back to app state.
     private let onAvailabilityChanged: @MainActor (_ headphoneAvailable: Bool, _ headphoneName: String?) -> Void
 
     // MARK: - Private State
 
-    /// Remembers the last published preferred source to avoid duplicate updates.
-    private var lastPreferredSource: Source?
     /// Headphone motion support confirmed by Core Motion, not by the audio route alone.
     private var isHeadphoneConnected = false
     /// Stores the latest route name for the connected headphones so the UI can show a real product name.
     private var connectedHeadphoneName: String?
-    /// Stores raw motion samples when recording is enabled.
-    private var recordedSamples: [MotionSample] = []
     /// Tracks whether Core Motion headphone status/connection observers have been started.
     private var hasStartedConnectionMonitoring = false
 
@@ -66,12 +178,10 @@ final class MotionManager: NSObject {
     init(
         shouldRecordMotionSamples: Bool = false,
         onJumpDetected: @escaping @MainActor (Source) -> Void,
-        onSourceChanged: @escaping @MainActor (Source?) -> Void,
         onAvailabilityChanged: @escaping @MainActor (_ headphoneAvailable: Bool, _ headphoneName: String?) -> Void
     ) {
-        self.shouldRecordMotionSamples = shouldRecordMotionSamples
+        sampleProcessor = SampleProcessor(shouldRecordMotionSamples: shouldRecordMotionSamples)
         self.onJumpDetected = onJumpDetected
-        self.onSourceChanged = onSourceChanged
         self.onAvailabilityChanged = onAvailabilityChanged
         super.init()
         headphoneMotionManager.delegate = self
@@ -119,21 +229,13 @@ final class MotionManager: NSObject {
         connectedHeadphoneName
     }
 
-    /// Returns the preferred live motion source based on current connectivity.
-    var preferredSource: Source? {
-        isHeadphoneMotionAvailable ? .headphones : nil
-    }
-
-    /// Refreshes local availability flags and republishes the preferred source.
+    /// Refreshes local availability flags and publishes headphone availability.
     func refreshAvailability() {
         startHeadphoneConnectionMonitoringIfAuthorized()
         // Clear availability when headphones disconnect; an audio route alone cannot confirm support.
-        if !hasConnectedHeadphoneRoute() {
-            isHeadphoneConnected = false
-        }
+        clearHeadphoneConnectionIfRouteMissing()
         connectedHeadphoneName = currentConnectedHeadphoneName()
         notifyAvailabilityChanged()
-        updatePreferredSourceIfNeeded(force: true)
     }
 
     // MARK: - Tracking
@@ -142,18 +244,11 @@ final class MotionManager: NSObject {
     func prepareForWorkout(thresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage) {
         guard !isTracking else { return }
 
-        if !hasConnectedHeadphoneRoute() {
-            isHeadphoneConnected = false
-        }
+        clearHeadphoneConnectionIfRouteMissing()
         connectedHeadphoneName = currentConnectedHeadphoneName()
         notifyAvailabilityChanged()
 
-        queue.addOperation { [weak self] in
-            guard let self, !isTracking else { return }
-            headphoneDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
-            headphoneDetector.reset()
-            resetRecordedSamples()
-        }
+        sampleProcessor.prepareIfNotTracking(thresholdAdjustmentPercentage: thresholdAdjustmentPercentage)
 
         startHeadphoneConnectionMonitoringIfAuthorized()
         startHeadphoneMonitoringIfAvailable()
@@ -163,24 +258,15 @@ final class MotionManager: NSObject {
     func startTracking(thresholdAdjustmentPercentage: Double = DefaultJumpDetectorThresholdAdjustmentPercentage) {
         guard !isTracking else { return }
 
-        isTracking = true
-        if !hasConnectedHeadphoneRoute() {
-            isHeadphoneConnected = false
-        }
+        clearHeadphoneConnectionIfRouteMissing()
         connectedHeadphoneName = currentConnectedHeadphoneName()
 
-        queue.addOperation { [weak self] in
-            guard let self else { return }
-            // Apply sensitivity and clear motion history before processing active workout samples.
-            headphoneDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
-            headphoneDetector.reset()
-            resetRecordedSamples()
-        }
+        // Apply sensitivity and clear motion history before processing active workout samples.
+        sampleProcessor.startTracking(thresholdAdjustmentPercentage: thresholdAdjustmentPercentage)
 
         notifyAvailabilityChanged()
         startHeadphoneConnectionMonitoringIfAuthorized()
         startHeadphoneMonitoringIfAvailable()
-        updatePreferredSourceIfNeeded()
     }
 
     /// Stops pre-warmed motion streams when the countdown is cancelled before the workout starts.
@@ -188,41 +274,25 @@ final class MotionManager: NSObject {
         guard !isTracking else { return }
 
         headphoneMotionManager.stopDeviceMotionUpdates()
-        queue.addOperation { [weak self] in
-            guard let self, !isTracking else { return }
-            headphoneDetector.reset()
-            resetRecordedSamples()
-        }
-        updatePreferredSourceIfNeeded(force: true)
+        sampleProcessor.resetIfNotTracking()
     }
 
     /// Changes sensitivity without clearing jumps, recorded samples, or refractory timing.
     func updateThresholdAdjustmentPercentage(_ percentage: Double) {
-        queue.addOperation { [weak self] in
-            guard let self else { return }
-            headphoneDetector.updateThresholdAdjustmentPercentage(percentage)
-        }
+        sampleProcessor.updateThresholdAdjustmentPercentage(percentage)
     }
 
-    /// Stops local motion tracking and clears the active preferred source.
+    /// Stops local motion tracking.
     func stopTracking() {
         guard isTracking else { return }
 
-        isTracking = false
+        sampleProcessor.stopTracking()
         headphoneMotionManager.stopDeviceMotionUpdates()
-        updatePreferredSourceIfNeeded(force: true)
     }
 
     /// Returns and clears any recorded motion samples collected during the session.
     func consumeRecordedSamples() -> [MotionSample] {
-        guard shouldRecordMotionSamples else { return [] }
-
-        recordedSamplesLock.lock()
-        defer { recordedSamplesLock.unlock() }
-
-        let samples = recordedSamples
-        recordedSamples.removeAll(keepingCapacity: false)
-        return samples
+        sampleProcessor.consumeRecordedSamples()
     }
 
     // MARK: - Motion Updates
@@ -233,16 +303,9 @@ final class MotionManager: NSObject {
               !headphoneMotionManager.isDeviceMotionActive
         else { return }
 
+        let sampleProcessor = sampleProcessor
         headphoneMotionManager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
-            guard let self, let motion else { return }
-            // A live motion sample confirms compatible headphones if status updates are unavailable.
-            applyConfirmedHeadphoneAvailability(isConnected: true)
-            guard isTracking else { return }
-
-            // Promote headphones immediately on the first live headphone sample.
-            if lastPreferredSource != .headphones {
-                updatePreferredSourceIfNeeded(force: true)
-            }
+            guard let motion else { return }
 
             let sample = MotionSample(
                 userAccelerationX: motion.userAcceleration.x,
@@ -253,13 +316,16 @@ final class MotionManager: NSObject {
                 rotationRateZ: motion.rotationRate.z,
                 timestamp: motion.timestamp
             )
-            record(sample)
+            let events = sampleProcessor.processSample(sample)
+            guard events.needsAvailabilityConfirmation || events.didDetectJump else {
+                return
+            }
 
-            // Use the headphone detector's separate profile and state.
-            if headphoneDetector.processMotionSample(sample) {
-                Task { @MainActor in
-                    self.onJumpDetected(.headphones)
-                }
+            Task { @MainActor [weak self] in
+                self?.handleLiveMotionEvents(
+                    needsAvailabilityConfirmation: events.needsAvailabilityConfirmation,
+                    didDetectJump: events.didDetectJump
+                )
             }
         }
     }
@@ -284,21 +350,39 @@ final class MotionManager: NSObject {
         guard headphoneActivityManager.isStatusAvailable else { return }
 
         headphoneActivityManager.startStatusUpdates(to: queue) { [weak self] status, _ in
-            guard let self else { return }
-
+            let isConnected: Bool
             switch status {
             case .connected:
-                applyConfirmedHeadphoneAvailability(isConnected: true)
+                isConnected = true
             case .disconnected:
-                applyConfirmedHeadphoneAvailability(isConnected: false)
+                isConnected = false
             @unknown default:
-                break
+                return
             }
+
+            Task { @MainActor [weak self] in
+                self?.applyConfirmedHeadphoneAvailability(isConnected: isConnected)
+            }
+        }
+    }
+
+    /// Commits availability confirmation and detected jumps signaled from the motion queue.
+    private func handleLiveMotionEvents(
+        needsAvailabilityConfirmation: Bool,
+        didDetectJump: Bool
+    ) {
+        if needsAvailabilityConfirmation {
+            applyConfirmedHeadphoneAvailability(isConnected: true)
+            sampleProcessor.finishAvailabilityConfirmation(isHeadphoneConnected: isHeadphoneConnected)
+        }
+        if didDetectJump, isTracking {
+            onJumpDetected(.headphones)
         }
     }
 
     /// Applies confirmed headphone availability from status, delegate, or motion callbacks.
     private func applyConfirmedHeadphoneAvailability(isConnected: Bool) {
+        sampleProcessor.syncAvailability(isHeadphoneConnected: isConnected)
         let previousConnection = isHeadphoneConnected
         let previousHeadphoneName = connectedHeadphoneName
 
@@ -310,21 +394,9 @@ final class MotionManager: NSObject {
         }
 
         notifyAvailabilityChanged()
-        updatePreferredSourceIfNeeded(force: true)
     }
 
     // MARK: - State Publishing
-
-    /// Publishes preferred-source changes only when the effective source changed.
-    private func updatePreferredSourceIfNeeded(force: Bool = false) {
-        let source = isTracking ? preferredSource : nil
-        // Only publish source changes when the effective source actually changes.
-        guard force || source != lastPreferredSource else { return }
-        lastPreferredSource = source
-        Task { @MainActor in
-            onSourceChanged(source)
-        }
-    }
 
     /// Publishes the latest headphone availability flag and route name.
     private func notifyAvailabilityChanged() {
@@ -332,26 +404,6 @@ final class MotionManager: NSObject {
             // Use the audio-route name only when it is more specific than the fallback label.
             onAvailabilityChanged(isHeadphoneMotionAvailable, connectedHeadphoneName)
         }
-    }
-
-    // MARK: - Sample Recording
-
-    /// Appends a motion sample to the export buffer when recording is enabled.
-    private func record(_ sample: MotionSample) {
-        guard shouldRecordMotionSamples else { return }
-
-        recordedSamplesLock.lock()
-        recordedSamples.append(sample)
-        recordedSamplesLock.unlock()
-    }
-
-    /// Clears the motion-sample export buffer for a new session.
-    private func resetRecordedSamples() {
-        guard shouldRecordMotionSamples else { return }
-
-        recordedSamplesLock.lock()
-        recordedSamples.removeAll(keepingCapacity: true)
-        recordedSamplesLock.unlock()
     }
 
     // MARK: - Audio Routing
@@ -395,32 +447,47 @@ final class MotionManager: NSObject {
         }
     }
 
-    /// Recomputes availability and preferred source after an audio-route change.
+    /// Recomputes availability after an audio-route change.
     @objc
-    private func handleAudioRouteChange(_: Notification) {
+    private nonisolated func handleAudioRouteChange(_: Notification) {
+        Task { @MainActor [weak self] in
+            self?.refreshAvailabilityAfterAudioRouteChange()
+        }
+    }
+
+    /// Clears confirmed availability when no headphone audio route is connected.
+    private func clearHeadphoneConnectionIfRouteMissing() {
+        guard !hasConnectedHeadphoneRoute() else { return }
+        isHeadphoneConnected = false
+        sampleProcessor.syncAvailability(isHeadphoneConnected: false)
+    }
+
+    /// Applies audio-route changes on the main actor.
+    private func refreshAvailabilityAfterAudioRouteChange() {
         startHeadphoneConnectionMonitoringIfAuthorized()
         let wasConnected = isHeadphoneConnected
-        if !hasConnectedHeadphoneRoute() {
-            isHeadphoneConnected = false
-        }
+        clearHeadphoneConnectionIfRouteMissing()
         let previousHeadphoneName = connectedHeadphoneName
         connectedHeadphoneName = currentConnectedHeadphoneName()
         guard isHeadphoneConnected != wasConnected || connectedHeadphoneName != previousHeadphoneName else { return }
         notifyAvailabilityChanged()
-        updatePreferredSourceIfNeeded(force: true)
     }
 }
 
 extension MotionManager: CMHeadphoneMotionManagerDelegate {
     /// Refreshes availability when supported headphones connect.
-    func headphoneMotionManagerDidConnect(_: CMHeadphoneMotionManager) {
-        // Refresh availability on connection; select headphones for tracking only after live samples arrive.
-        applyConfirmedHeadphoneAvailability(isConnected: hasConnectedHeadphoneRoute())
+    nonisolated func headphoneMotionManagerDidConnect(_: CMHeadphoneMotionManager) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            applyConfirmedHeadphoneAvailability(isConnected: hasConnectedHeadphoneRoute())
+        }
     }
 
     /// Refreshes availability when supported headphones disconnect.
-    func headphoneMotionManagerDidDisconnect(_: CMHeadphoneMotionManager) {
-        // A disconnect invalidates headphone priority, so the preferred source is recomputed.
-        applyConfirmedHeadphoneAvailability(isConnected: false)
+    nonisolated func headphoneMotionManagerDidDisconnect(_: CMHeadphoneMotionManager) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            applyConfirmedHeadphoneAvailability(isConnected: false)
+        }
     }
 }

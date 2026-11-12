@@ -129,18 +129,15 @@ final class JumpRecState: NSObject, @unchecked Sendable {
     /// Serializes Live Activity calls and cancels superseded metric updates.
     @ObservationIgnored
     var liveActivitySyncTask: Task<Void, Never>?
-    /// Speaks audible session prompts and milestones.
+    /// Coordinates speech synthesis and audio session ducking off the main actor.
     @ObservationIgnored
-    let synthesizer = AVSpeechSynthesizer()
+    let speechCoordinator = PhoneSpeechCoordinator()
     /// Tracks the one-time speech warmup for this app lifetime.
     @ObservationIgnored
     var hasWarmedUpSpeechSynthesizer = false
-    /// Marks silent warmup speech so a real announcement can interrupt it.
+    /// Serializes warmup and spoken announcements onto `speechCoordinator`.
     @ObservationIgnored
-    var isSpeechWarmupInProgress = false
-    /// Identifies the latest utterance so stale delegate callbacks do not release audio early.
-    @ObservationIgnored
-    var activeSpeechUtteranceID: ObjectIdentifier?
+    var speechTask: Task<Void, Never>?
     /// Emits haptic feedback for session events.
     @ObservationIgnored
     let notificationFeedbackGenerator = UINotificationFeedbackGenerator()
@@ -159,18 +156,19 @@ final class JumpRecState: NSObject, @unchecked Sendable {
             onJumpDetected: { [weak self] source in
                 self?.addJump(from: source)
             },
-            onSourceChanged: { [weak self] source in
-                #if DEBUG && targetEnvironment(simulator)
-                    if ScreenshotFixtures.state == "active" {
-                        self?.activeMotionSource = .airpods
-                        return
-                    }
-                #endif
-                self?.activeMotionSource = Self.deviceSource(from: source)
-            },
             onAvailabilityChanged: { [weak self] isHeadphoneAvailable, headphoneName in
-                self?.isHeadphoneMotionAvailable = isHeadphoneAvailable
-                self?.connectedHeadphoneName = headphoneName
+                guard let self else { return }
+                isHeadphoneMotionAvailable = isHeadphoneAvailable
+                connectedHeadphoneName = headphoneName
+                if sessionState == .active, !isMirroredWatchSession {
+                    #if DEBUG && targetEnvironment(simulator)
+                        if ScreenshotFixtures.state == "active" {
+                            activeMotionSource = .airpods
+                            return
+                        }
+                    #endif
+                    activeMotionSource = isHeadphoneAvailable ? .airpods : nil
+                }
             }
         )
         motionManager?.refreshAvailability()
@@ -214,8 +212,6 @@ final class JumpRecState: NSObject, @unchecked Sendable {
                 self?.attachWatchMotionCSV(fileURL: fileURL, startedAt: startedAt)
             }
         #endif
-        // The delegate restores background-audio volume after speech finishes.
-        synthesizer.delegate = self
         prepareHaptics()
         #if DEBUG && targetEnvironment(simulator)
             if let state = ScreenshotFixtures.state, ["active", "complete"].contains(state) {

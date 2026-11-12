@@ -30,12 +30,6 @@ actor WatchSpeechCoordinator {
     /// Guards against a wedged synthesizer leaving background audio ducked indefinitely.
     private var watchdogTask: Task<Void, Never>?
 
-    // MARK: - Initialization
-
-    init() {
-        setupSynthesizer()
-    }
-
     // MARK: - Public API
 
     /// Rebuilds the speech synthesizer and warms it up silently without ducking other audio.
@@ -65,6 +59,7 @@ actor WatchSpeechCoordinator {
 
     /// Activates ducking audio and speaks a workout announcement, recovering if a prior cue wedged.
     func speak(text: String, languageCode: String) {
+        ensureSynthesizerConfigured()
         watchdogTask?.cancel()
         watchdogTask = nil
 
@@ -126,13 +121,20 @@ actor WatchSpeechCoordinator {
         return nil
     }
 
+    /// Lazily attaches the delegate proxy on the actor before speaking when warmup was skipped.
+    private func ensureSynthesizerConfigured() {
+        if delegateProxy == nil {
+            setupSynthesizer()
+        }
+    }
+
     /// Creates a fresh synthesizer instance and attaches a new delegate proxy.
     private func setupSynthesizer() {
         let newSynthesizer = AVSpeechSynthesizer()
-        let proxy = DelegateProxy { [weak self] synthesizer, utterance in
+        let proxy = DelegateProxy { [weak self] synthesizerID, utteranceID in
             guard let self else { return }
             Task {
-                await self.handleUtteranceEnded(synthesizer: synthesizer, utteranceID: ObjectIdentifier(utterance))
+                await self.handleUtteranceEnded(synthesizerID: synthesizerID, utteranceID: utteranceID)
             }
         }
         newSynthesizer.delegate = proxy
@@ -180,8 +182,8 @@ actor WatchSpeechCoordinator {
     }
 
     /// Cleans up state when the active utterance finishes or cancels, ignoring stale callbacks.
-    private func handleUtteranceEnded(synthesizer sourceSynthesizer: AVSpeechSynthesizer, utteranceID: ObjectIdentifier) {
-        guard sourceSynthesizer === synthesizer, activeUtteranceID == utteranceID else { return }
+    private func handleUtteranceEnded(synthesizerID: ObjectIdentifier, utteranceID: ObjectIdentifier) {
+        guard synthesizerID == ObjectIdentifier(synthesizer), activeUtteranceID == utteranceID else { return }
         watchdogTask?.cancel()
         watchdogTask = nil
         activeUtteranceID = nil
@@ -225,18 +227,18 @@ actor WatchSpeechCoordinator {
 
     /// Bridges `AVSpeechSynthesizerDelegate` callbacks to the actor without main-actor hops.
     private final class DelegateProxy: NSObject, AVSpeechSynthesizerDelegate, @unchecked Sendable {
-        private let onEnded: @Sendable (AVSpeechSynthesizer, AVSpeechUtterance) -> Void
+        private let onEnded: @Sendable (ObjectIdentifier, ObjectIdentifier) -> Void
 
-        init(onEnded: @escaping @Sendable (AVSpeechSynthesizer, AVSpeechUtterance) -> Void) {
+        init(onEnded: @escaping @Sendable (ObjectIdentifier, ObjectIdentifier) -> Void) {
             self.onEnded = onEnded
         }
 
         nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-            onEnded(synthesizer, utterance)
+            onEnded(ObjectIdentifier(synthesizer), ObjectIdentifier(utterance))
         }
 
         nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
-            onEnded(synthesizer, utterance)
+            onEnded(ObjectIdentifier(synthesizer), ObjectIdentifier(utterance))
         }
     }
 }

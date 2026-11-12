@@ -8,7 +8,7 @@
 import Foundation
 
 /// Motion sample shared by Watch, iPhone, and headphone detectors.
-public struct MotionSample: Sendable {
+public nonisolated struct MotionSample: Sendable {
     // MARK: - Stored Properties
 
     /// User acceleration with gravity removed (in g's), per axis.

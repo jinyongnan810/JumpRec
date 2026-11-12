@@ -7,18 +7,107 @@
 
 import CoreMotion
 import Foundation
+import Synchronization
 
 /// Manages motion detection and jump counting using device sensors
 class MotionManager: NSObject {
+    /// Holds lock-protected motion detection state shared between the main actor and sensor queue.
+    private final nonisolated class SampleProcessor: Sendable {
+        private struct State {
+            var isTracking = false
+            let jumpDetector = JumpDetector(profile: .watch)
+            #if DEBUG
+                var recordedSamples: [MotionSample] = []
+            #endif
+        }
+
+        private let state = Mutex(State())
+
+        var isTracking: Bool {
+            state.withLock { $0.isTracking }
+        }
+
+        func prepareIfNotTracking(thresholdAdjustmentPercentage: Double) {
+            state.withLock { state in
+                guard !state.isTracking else { return }
+                state.jumpDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+                Self.resetDetectionState(&state)
+            }
+        }
+
+        func startTracking(thresholdAdjustmentPercentage: Double) {
+            state.withLock { state in
+                state.jumpDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+                Self.resetDetectionState(&state)
+                state.isTracking = true
+            }
+        }
+
+        func resetIfNotTracking() {
+            state.withLock { state in
+                guard !state.isTracking else { return }
+                Self.resetDetectionState(&state)
+            }
+        }
+
+        func updateThresholdAdjustmentPercentage(_ percentage: Double) {
+            state.withLock { state in
+                state.jumpDetector.updateThresholdAdjustmentPercentage(percentage)
+            }
+        }
+
+        func stopTracking() {
+            state.withLock { state in
+                state.isTracking = false
+            }
+        }
+
+        func reset() {
+            state.withLock { state in
+                Self.resetDetectionState(&state)
+            }
+        }
+
+        func processSample(_ sample: MotionSample) -> Bool {
+            state.withLock { state in
+                guard state.isTracking else { return false }
+                #if DEBUG
+                    state.recordedSamples.append(sample)
+                #endif
+                return state.jumpDetector.processMotionSample(sample)
+            }
+        }
+
+        #if DEBUG
+            func consumeRecordedSamples() -> [MotionSample] {
+                state.withLock { state in
+                    let samples = state.recordedSamples
+                    state.recordedSamples.removeAll(keepingCapacity: false)
+                    return samples
+                }
+            }
+        #endif
+
+        private static func resetDetectionState(_ state: inout State) {
+            #if DEBUG
+                state.recordedSamples.removeAll(keepingCapacity: true)
+            #endif
+            state.jumpDetector.reset()
+        }
+    }
+
     // MARK: - Published Properties
 
     /// Indicates whether motion tracking is currently active.
-    var isTracking = false
+    var isTracking: Bool {
+        sampleProcessor.isTracking
+    }
+
     /// Stores the local jump count used by the watch detector.
     var jumpCount = 0
 
     /// Delivers accepted jumps back to app state.
-    var addJump: (Int) -> Void
+    var addJump: @Sendable (Int) -> Void
 
     // MARK: - Motion Components
 
@@ -34,20 +123,17 @@ class MotionManager: NSObject {
 
     /// Watch sample interval captures brief acceleration impacts.
     private var updateInterval: TimeInterval = 0.025 // 40Hz sampling rate when supported
-    /// Shared jump detector configured for watch motion data.
-    private let jumpDetector = JumpDetector(profile: .watch)
-
-    #if DEBUG
-        /// Protects recorded sample access across the motion-processing queue and main actor.
-        private let recordedSamplesLock = NSLock()
-        /// Stores raw motion samples during active tracking for debug CSV export.
-        private var recordedSamples: [MotionSample] = []
-    #endif
+    /// Synchronizes tracking state, jump detection, and debug samples across actors and the motion queue.
+    private let sampleProcessor = SampleProcessor()
 
     // MARK: - Initialization
 
     /// Configures the watch motion manager and workout callbacks.
-    init(addJump: @escaping (Int) -> Void, updateHeartRate: @escaping (Int) -> Void, updateEnergyBurned: @escaping (Double) -> Void) {
+    init(
+        addJump: @escaping @Sendable (Int) -> Void,
+        updateHeartRate: @escaping (Int) -> Void,
+        updateEnergyBurned: @escaping (Double) -> Void
+    ) {
         self.addJump = addJump
         workoutManager = WorkoutManager(updateHeartRate: updateHeartRate, updateEnergyBurned: updateEnergyBurned)
         super.init()
@@ -76,13 +162,7 @@ class MotionManager: NSObject {
         }
 
         workoutManager.prepareWorkout()
-
-        queue.addOperation { [weak self] in
-            guard let self, !isTracking else { return }
-            jumpDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
-            resetSession()
-        }
-
+        sampleProcessor.prepareIfNotTracking(thresholdAdjustmentPercentage: thresholdAdjustmentPercentage)
         startDeviceMotionStreamIfNeeded()
     }
 
@@ -99,42 +179,26 @@ class MotionManager: NSObject {
         }
 
         workoutManager.startWorkout(startDate: startDate, goalType: goalType, goalValue: goalValue)
-
-        // Apply sensitivity and arm tracking on the serial motion queue before the first active sample.
-        queue.addOperation { [weak self] in
-            guard let self else { return }
-            jumpDetector.updateThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
-            resetSession()
-            isTracking = true
-        }
-
+        sampleProcessor.startTracking(thresholdAdjustmentPercentage: thresholdAdjustmentPercentage)
         startDeviceMotionStreamIfNeeded()
     }
 
     /// Stops pre-warmed motion updates and ends the prepared HealthKit session when cancelled before start.
     func cancelPreparation() {
         motionManager.stopDeviceMotionUpdates()
-        queue.addOperation { [weak self] in
-            guard let self, !isTracking else { return }
-            resetSession()
-        }
+        sampleProcessor.resetIfNotTracking()
         workoutManager.cancelPreparedWorkout()
     }
 
     /// Changes sensitivity without clearing jump counts, CSV samples, or refractory timing.
     func updateThresholdAdjustmentPercentage(_ percentage: Double) {
-        queue.addOperation { [weak self] in
-            self?.jumpDetector.updateThresholdAdjustmentPercentage(percentage)
-        }
+        sampleProcessor.updateThresholdAdjustmentPercentage(percentage)
     }
 
     /// Stop motion tracking
     func stopTracking() {
         motionManager.stopDeviceMotionUpdates()
-        queue.addOperation { [weak self] in
-            guard let self else { return }
-            isTracking = false
-        }
+        sampleProcessor.stopTracking()
         workoutManager.stopWorkout()
     }
 
@@ -146,22 +210,14 @@ class MotionManager: NSObject {
     #if DEBUG
         /// Returns and clears recorded motion samples collected during the session.
         func consumeRecordedSamples() -> [MotionSample] {
-            recordedSamplesLock.lock()
-            defer { recordedSamplesLock.unlock() }
-
-            let samples = recordedSamples
-            recordedSamples.removeAll(keepingCapacity: false)
-            return samples
+            sampleProcessor.consumeRecordedSamples()
         }
     #endif
 
     /// Reset the current session
     func resetSession() {
         jumpCount = 0
-        #if DEBUG
-            resetRecordedSamples()
-        #endif
-        jumpDetector.reset()
+        sampleProcessor.reset()
     }
 
     // MARK: - Private Methods
@@ -170,48 +226,26 @@ class MotionManager: NSObject {
     private func startDeviceMotionStreamIfNeeded() {
         guard !motionManager.isDeviceMotionActive else { return }
 
+        let sampleProcessor = sampleProcessor
+        let addJump = addJump
+
         // Forward samples into the detector only after tracking is armed at countdown completion.
-        motionManager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
-            guard let self, let motion, isTracking else { return }
-            processMotionData(motion)
+        motionManager.startDeviceMotionUpdates(to: queue) { motion, _ in
+            guard let motion else { return }
+            let sample = MotionSample(
+                userAccelerationX: motion.userAcceleration.x,
+                userAccelerationY: motion.userAcceleration.y,
+                userAccelerationZ: motion.userAcceleration.z,
+                rotationRateX: motion.rotationRate.x,
+                rotationRateY: motion.rotationRate.y,
+                rotationRateZ: motion.rotationRate.z,
+                timestamp: motion.timestamp
+            )
+
+            // Each accepted sample reports one jump to app state.
+            if sampleProcessor.processSample(sample) {
+                addJump(1)
+            }
         }
     }
-
-    /// Converts raw device motion into normalized samples for the jump detector.
-    private func processMotionData(_ motion: CMDeviceMotion) {
-        let sample = MotionSample(
-            userAccelerationX: motion.userAcceleration.x,
-            userAccelerationY: motion.userAcceleration.y,
-            userAccelerationZ: motion.userAcceleration.z,
-            rotationRateX: motion.rotationRate.x,
-            rotationRateY: motion.rotationRate.y,
-            rotationRateZ: motion.rotationRate.z,
-            timestamp: motion.timestamp
-        )
-
-        #if DEBUG
-            record(sample)
-        #endif
-
-        // Each accepted sample reports one jump to app state.
-        if jumpDetector.processMotionSample(sample) {
-            addJump(1)
-        }
-    }
-
-    #if DEBUG
-        /// Appends a motion sample to the debug export buffer.
-        private func record(_ sample: MotionSample) {
-            recordedSamplesLock.lock()
-            recordedSamples.append(sample)
-            recordedSamplesLock.unlock()
-        }
-
-        /// Clears buffered motion samples before a new tracking session.
-        private func resetRecordedSamples() {
-            recordedSamplesLock.lock()
-            recordedSamples.removeAll(keepingCapacity: true)
-            recordedSamplesLock.unlock()
-        }
-    #endif
 }

@@ -94,7 +94,7 @@
         /// Sample workouts for a selected year.
         static func yearSessions(for year: Int) -> [MockSession] {
             let calendar = Calendar.current
-            var components = DateComponents(year: year, month: 10, day: 15, hour: 8, minute: 30)
+            let components = DateComponents(year: year, month: 10, day: 15, hour: 8, minute: 30)
             let baseDate = calendar.date(from: components) ?? Date()
 
             return [

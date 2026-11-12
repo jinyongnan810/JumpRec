@@ -7,23 +7,23 @@
 
 import Foundation
 
-public enum JumpDeviceProfile: String, Sendable {
+public nonisolated enum JumpDeviceProfile: String, Sendable {
     case headphones
     case watch
 }
 
-public enum JumpDetectorAxis: String, Sendable {
+public nonisolated enum JumpDetectorAxis: String, Sendable {
     case x
     case y
     case z
 }
 
-public enum JumpDetectorPolarity: String, Sendable {
+public nonisolated enum JumpDetectorPolarity: String, Sendable {
     case positivePeak
     case negativeTrough
 }
 
-public final class JumpDetector {
+public final nonisolated class JumpDetector {
     // MARK: - Configuration
 
     /// Signal, threshold, and timing settings for a device profile.

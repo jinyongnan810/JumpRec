@@ -342,10 +342,19 @@ public final class MyDataStore {
         defaults.set(kinds.map(\.rawValue), forKey: DefaultsKey.unseenPersonalRecordKinds)
     }
 
+    /// Snapshot of CloudKit event fields safe to transfer across concurrency boundaries.
+    private nonisolated struct CloudKitEventSnapshot: Sendable {
+        let type: NSPersistentCloudKitContainer.EventType
+        let endDate: Date?
+        let succeeded: Bool
+        let errorDescription: String?
+        let debugErrorDescription: String
+    }
+
     /// Updates observable state and diagnostics in response to NSPersistentCloudKitContainer lifecycle events.
-    private func handleCloudKitEvent(_ event: NSPersistentCloudKitContainer.Event) {
+    private func handleCloudKitEvent(_ event: CloudKitEventSnapshot) {
         let isOngoing = event.endDate == nil
-        print("[DataStore] CloudKit event: type=\(event.type), ongoing=\(isOngoing), succeeded=\(event.succeeded), error=\(String(describing: event.error))")
+        print("[DataStore] CloudKit event: type=\(event.type), ongoing=\(isOngoing), succeeded=\(event.succeeded), error=\(event.debugErrorDescription)")
 
         if isOngoing {
             isCloudSyncActive = true
@@ -368,7 +377,7 @@ public final class MyDataStore {
                 cloudSyncPhase = .idle
                 refreshLocalSessionCount()
             } else {
-                let errorDesc = event.error?.localizedDescription ?? "Unknown sync error"
+                let errorDesc = event.errorDescription ?? "Unknown sync error"
                 lastSyncErrorDescription = errorDesc
                 cloudSyncPhase = .failed(errorDesc)
                 print("[DataStore] CloudKit sync event failed: \(errorDesc)")
@@ -383,12 +392,18 @@ public final class MyDataStore {
             object: nil,
             queue: .main
         ) { [weak self] notification in
+            guard let event = notification.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey] as? NSPersistentCloudKitContainer.Event else {
+                return
+            }
+            let snapshot = CloudKitEventSnapshot(
+                type: event.type,
+                endDate: event.endDate,
+                succeeded: event.succeeded,
+                errorDescription: event.error?.localizedDescription,
+                debugErrorDescription: String(describing: event.error)
+            )
             MainActor.assumeIsolated {
-                guard let self else { return }
-                guard let event = notification.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey] as? NSPersistentCloudKitContainer.Event else {
-                    return
-                }
-                self.handleCloudKitEvent(event)
+                self?.handleCloudKitEvent(snapshot)
             }
         }
     }

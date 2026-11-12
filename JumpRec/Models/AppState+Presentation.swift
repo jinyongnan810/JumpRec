@@ -5,7 +5,144 @@
 
 import AVFoundation
 import Foundation
+import OSLog
 import UIKit
+
+/// Serializes iPhone speech synthesis and audio session ducking off the main actor.
+actor PhoneSpeechCoordinator {
+    // MARK: - Stored Properties
+
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "JumpRec", category: "Speech")
+
+    /// Synthesizer owned by the actor so audio session work never blocks the main thread.
+    private let synthesizer = AVSpeechSynthesizer()
+    /// Forwards nonisolated `AVSpeechSynthesizerDelegate` events back into the actor.
+    private var delegateProxy: DelegateProxy?
+    /// Caches resolved voices by language code to avoid repeated catalog lookups when speaking.
+    private var cachedVoices: [String: AVSpeechSynthesisVoice] = [:]
+    /// Marks silent warmup speech so a real announcement can interrupt it.
+    private var isWarmupInProgress = false
+    /// Tracks whether the audio session is currently active for speech.
+    private var isAudioSessionActive = false
+    /// Identifies the latest utterance so stale delegate callbacks do not release audio early.
+    private var activeUtteranceID: ObjectIdentifier?
+
+    // MARK: - Public API
+
+    /// Warms up speech synthesis once with a silent, non-ducking utterance.
+    func warmUp(text: String, languageCode: String) {
+        ensureSynthesizerConfigured()
+        isWarmupInProgress = true
+
+        // Use `.mixWithOthers` so launch warmup does not dip background audio.
+        activateAudioSession(options: [.mixWithOthers])
+
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.volume = 0
+        utterance.voice = voice(for: languageCode)
+        activeUtteranceID = ObjectIdentifier(utterance)
+        synthesizer.speak(utterance)
+    }
+
+    /// Activates ducking audio and speaks a localized workout announcement immediately.
+    func speak(text: String, languageCode: String) {
+        ensureSynthesizerConfigured()
+
+        // Cancel the silent warmup so real speech can play immediately.
+        if isWarmupInProgress {
+            synthesizer.stopSpeaking(at: .immediate)
+            isWarmupInProgress = false
+        }
+
+        activateAudioSession(options: [.duckOthers])
+
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = voice(for: languageCode)
+        activeUtteranceID = ObjectIdentifier(utterance)
+        synthesizer.speak(utterance)
+    }
+
+    // MARK: - Helpers
+
+    /// Lazily attaches the delegate proxy on the actor before any speech starts.
+    private func ensureSynthesizerConfigured() {
+        guard delegateProxy == nil else { return }
+
+        let proxy = DelegateProxy { [weak self] synthesizerID, utteranceID in
+            guard let self else { return }
+            Task {
+                await self.handleUtteranceEnded(synthesizerID: synthesizerID, utteranceID: utteranceID)
+            }
+        }
+        synthesizer.delegate = proxy
+        delegateProxy = proxy
+    }
+
+    /// Returns the cached synthesis voice for a language code, resolving it on first use.
+    private func voice(for languageCode: String) -> AVSpeechSynthesisVoice? {
+        if let cachedVoice = cachedVoices[languageCode] {
+            return cachedVoice
+        }
+        if let resolvedVoice = AVSpeechSynthesisVoice(language: languageCode) {
+            cachedVoices[languageCode] = resolvedVoice
+            return resolvedVoice
+        }
+        return nil
+    }
+
+    /// Configures and activates the audio session off the main thread to avoid UI hangs.
+    private func activateAudioSession(options: AVAudioSession.CategoryOptions) {
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, options: options)
+            try session.setActive(true)
+            isAudioSessionActive = true
+        } catch {
+            Self.logger.error("Audio session config error: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Deactivates speech audio and restores background-audio volume.
+    private func deactivateAudioSessionIfNeeded() {
+        guard isAudioSessionActive else { return }
+        isAudioSessionActive = false
+
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+        } catch {
+            Self.logger.error("Audio session deactivation error: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Cleans up audio ducking after the latest utterance ends.
+    private func handleUtteranceEnded(synthesizerID: ObjectIdentifier, utteranceID: ObjectIdentifier) {
+        guard synthesizerID == ObjectIdentifier(synthesizer) else { return }
+        isWarmupInProgress = false
+        guard activeUtteranceID == utteranceID else { return }
+        activeUtteranceID = nil
+        guard !synthesizer.isSpeaking, !synthesizer.isPaused else { return }
+        deactivateAudioSessionIfNeeded()
+    }
+
+    // MARK: - Delegate Proxy
+
+    /// Bridges `AVSpeechSynthesizerDelegate` callbacks to the actor without sending non-Sendable types.
+    private final class DelegateProxy: NSObject, AVSpeechSynthesizerDelegate, @unchecked Sendable {
+        private let onEnded: @Sendable (ObjectIdentifier, ObjectIdentifier) -> Void
+
+        init(onEnded: @escaping @Sendable (ObjectIdentifier, ObjectIdentifier) -> Void) {
+            self.onEnded = onEnded
+        }
+
+        nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+            onEnded(ObjectIdentifier(synthesizer), ObjectIdentifier(utterance))
+        }
+
+        nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+            onEnded(ObjectIdentifier(synthesizer), ObjectIdentifier(utterance))
+        }
+    }
+}
 
 extension JumpRecState {
     // MARK: - Live Activity And Idle Timer
@@ -131,26 +268,7 @@ extension JumpRecState {
         }
     #endif
 
-    // MARK: - Audio And Haptics
-
-    /// Activates the ducking audio session only when an announcement is about to play.
-    private func configureSpeechAudioSession() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("Audio session config error: \(error)")
-        }
-    }
-
-    /// Deactivates speech audio and restores background-audio volume.
-    private func deactivateSpeechAudioSession() {
-        do {
-            try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
-        } catch {
-            print("Audio session deactivation error: \(error)")
-        }
-    }
+    // MARK: - Haptics And Speech
 
     /// Prepares haptic generators used during the session.
     func prepareHaptics() {
@@ -162,33 +280,30 @@ extension JumpRecState {
         guard !hasWarmedUpSpeechSynthesizer else { return }
 
         hasWarmedUpSpeechSynthesizer = true
-        isSpeechWarmupInProgress = true
-
-        configureSpeechAudioSession()
-
         let warmupText = isJapanesePreferred ? "こんにちは" : "Hello"
-        let utterance = AVSpeechUtterance(string: warmupText)
-        utterance.volume = 0
-        utterance.voice = AVSpeechSynthesisVoice(language: preferredSpeechLanguageCode)
-        activeSpeechUtteranceID = ObjectIdentifier(utterance)
-        synthesizer.speak(utterance)
+        let languageCode = preferredSpeechLanguageCode
+        enqueueSpeechOperation { [speechCoordinator] in
+            await speechCoordinator.warmUp(text: warmupText, languageCode: languageCode)
+        }
     }
 
     // MARK: - Speech
 
     /// Speaks a localized prompt immediately.
     func speak(text: String) {
-        // Cancel the silent warmup so real speech can play immediately.
-        if isSpeechWarmupInProgress {
-            synthesizer.stopSpeaking(at: .immediate)
-            isSpeechWarmupInProgress = false
+        let languageCode = preferredSpeechLanguageCode
+        enqueueSpeechOperation { [speechCoordinator] in
+            await speechCoordinator.speak(text: text, languageCode: languageCode)
         }
+    }
 
-        configureSpeechAudioSession()
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: preferredSpeechLanguageCode)
-        activeSpeechUtteranceID = ObjectIdentifier(utterance)
-        synthesizer.speak(utterance)
+    /// Chains speech operations in order so warmup cannot run after a spoken announcement.
+    private func enqueueSpeechOperation(_ operation: @escaping @Sendable () async -> Void) {
+        let previousTask = speechTask
+        speechTask = Task {
+            await previousTask?.value
+            await operation()
+        }
     }
 
     /// Returns whether Japanese is the preferred system language.
@@ -224,32 +339,5 @@ extension JumpRecState {
         Duration.seconds(Double(minutesElapsed) * 60).formatted(
             .units(allowed: [.minutes], width: .wide)
         )
-    }
-
-    /// Cleans up audio ducking after the latest utterance ends.
-    private func handleSpeechUtteranceEnded(utteranceID: ObjectIdentifier) {
-        isSpeechWarmupInProgress = false
-        guard activeSpeechUtteranceID == utteranceID else { return }
-        activeSpeechUtteranceID = nil
-        guard !synthesizer.isSpeaking, !synthesizer.isPaused else { return }
-        deactivateSpeechAudioSession()
-    }
-}
-
-extension JumpRecState: AVSpeechSynthesizerDelegate {
-    /// Releases ducking audio on the main actor after the last announcement ends.
-    nonisolated func speechSynthesizer(_: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        let utteranceID = ObjectIdentifier(utterance)
-        Task { @MainActor in
-            self.handleSpeechUtteranceEnded(utteranceID: utteranceID)
-        }
-    }
-
-    /// Mirrors the normal-finish cleanup path when speech is cancelled early.
-    nonisolated func speechSynthesizer(_: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
-        let utteranceID = ObjectIdentifier(utterance)
-        Task { @MainActor in
-            self.handleSpeechUtteranceEnded(utteranceID: utteranceID)
-        }
     }
 }
