@@ -2974,12 +2974,12 @@
         }
       }
     },
-    "Reads heart rate, active energy, and activity summaries." : {
+    "Reads heart rate and active energy." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "心拍数、アクティブエネルギー、アクティビティの概要を読み取ります。"
+            "value" : "心拍数とアクティブエネルギーを読み取ります。"
           }
         }
       }

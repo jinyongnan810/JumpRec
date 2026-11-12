@@ -37,7 +37,7 @@ struct PermissionsSettingsContent: View {
                 permissionRow(
                     title: "Read Health Data",
                     status: .reviewInHealth,
-                    explanation: "Reads heart rate, active energy, and activity summaries."
+                    explanation: "Reads heart rate and active energy."
                 )
                 if canRequestHealthAccess {
                     Button("Allow Health Access") {

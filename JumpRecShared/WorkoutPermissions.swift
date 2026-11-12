@@ -61,13 +61,16 @@ enum WorkoutPermissions {
         var types: Set<HKObjectType> = [
             HKQuantityType(.activeEnergyBurned),
             HKQuantityType(.heartRate),
-            HKObjectType.activitySummaryType(),
         ]
         #if os(iOS)
             types.insert(HKObjectType.workoutType())
         #endif
         return types
     }
+
+    /// Deduplicates overlapping HealthKit authorization prompts across launch and workout start.
+    @MainActor
+    private static var authorizationTask: Task<Void, Error>?
 
     static func requestStatus(using healthStore: HKHealthStore) async throws -> HKAuthorizationRequestStatus {
         try await withCheckedThrowingContinuation { continuation in
@@ -82,9 +85,20 @@ enum WorkoutPermissions {
     }
 
     /// A completed request means the person answered, not that every permission was granted.
+    @MainActor
     static func requestAuthorization(using healthStore: HKHealthStore) async throws {
         guard HKHealthStore.isHealthDataAvailable() else { return }
-        guard try await requestStatus(using: healthStore) == .shouldRequest else { return }
-        try await healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead)
+        if let authorizationTask {
+            try await authorizationTask.value
+            return
+        }
+
+        let task = Task { @MainActor in
+            guard try await requestStatus(using: healthStore) == .shouldRequest else { return }
+            try await healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead)
+        }
+        authorizationTask = task
+        defer { authorizationTask = nil }
+        try await task.value
     }
 }

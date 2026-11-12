@@ -11,6 +11,9 @@
         }
       }
     },
+    "--" : {
+      "shouldTranslate" : false
+    },
     "%@ jumps" : {
       "localizations" : {
         "ja" : {
@@ -93,9 +96,6 @@
           }
         }
       }
-    },
-    "--" : {
-      "shouldTranslate" : false
     },
     "100+ jump sessions" : {
       "extractionState" : "stale",
@@ -192,6 +192,16 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "最高ペース"
+          }
+        }
+      }
+    },
+    "cal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kcal"
           }
         }
       }
@@ -319,22 +329,22 @@
         }
       }
     },
-    "Health Permissions" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ヘルスケアのアクセス許可"
-          }
-        }
-      }
-    },
     "Health data is unavailable on this device." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "このデバイスではヘルスケアデータを利用できません。"
+          }
+        }
+      }
+    },
+    "Health Permissions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルスケアのアクセス許可"
           }
         }
       }
@@ -369,6 +379,28 @@
         }
       }
     },
+    "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたワークアウトは現在復元できません。"
+          }
+        }
+      }
+    },
+    "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたワークアウトが再表示される場合があります。"
+          }
+        }
+      }
+    },
     "Idle" : {
       "localizations" : {
         "ja" : {
@@ -379,12 +411,12 @@
         }
       }
     },
-    "JUMPS" : {
+    "Jump count goal" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ジャンプ"
+            "value" : "ジャンプ回数目標"
           }
         }
       }
@@ -395,16 +427,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプ検出"
-          }
-        }
-      }
-    },
-    "Jump count goal" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ジャンプ回数目標"
           }
         }
       }
@@ -425,6 +447,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "回数"
+          }
+        }
+      }
+    },
+    "JUMPS" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンプ"
           }
         }
       }
@@ -475,16 +507,6 @@
         }
       }
     },
-    "MINUTES" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分"
-          }
-        }
-      }
-    },
     "Membership" : {
       "localizations" : {
         "en" : {
@@ -497,6 +519,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メンバーシップ"
+          }
+        }
+      }
+    },
+    "MINUTES" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分"
           }
         }
       }
@@ -642,7 +674,18 @@
         }
       }
     },
+    "Reads heart rate and active energy." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "心拍数とアクティブエネルギーを読み取ります。"
+          }
+        }
+      }
+    },
     "Reads heart rate, active energy, and activity summaries." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -671,37 +714,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ヘルスケアで確認"
-          }
-        }
-      }
-    },
-    "SESSION COMPLETE" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション完了"
-          }
-        }
-      }
-    },
-    "START" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開始"
-          }
-        }
-      }
-    },
-    "STOP" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "終了"
           }
         }
       }
@@ -752,6 +764,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "感度"
+          }
+        }
+      }
+    },
+    "SESSION COMPLETE" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション完了"
           }
         }
       }
@@ -837,6 +860,16 @@
         }
       }
     },
+    "START" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開始"
+          }
+        }
+      }
+    },
     "Starts a three second countdown before the workout begins." : {
       "localizations" : {
         "ja" : {
@@ -853,6 +886,16 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "安定リズム"
+          }
+        }
+      }
+    },
+    "STOP" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "終了"
           }
         }
       }
@@ -939,16 +982,6 @@
         }
       }
     },
-    "Unable to Update Permissions" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アクセス許可を更新できません"
-          }
-        }
-      }
-    },
     "Unable to prepare workout permissions. Please try again or review access in Settings." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -956,6 +989,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトのアクセス許可を確認できません。もう一度お試しいただくか、設定でアクセス許可を確認してください。"
+          }
+        }
+      }
+    },
+    "Unable to Update Permissions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセス許可を更新できません"
           }
         }
       }
@@ -1006,6 +1049,16 @@
         }
       }
     },
+    "Workout countdown" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウト開始カウントダウン"
+          }
+        }
+      }
+    },
     "Workout Permissions" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1013,16 +1066,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトのアクセス許可"
-          }
-        }
-      }
-    },
-    "Workout countdown" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ワークアウト開始カウントダウン"
           }
         }
       }
@@ -1039,38 +1082,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無料のワークアウト10回分を使い切りました。iPhoneのJumpRecで購入すると、ワークアウトを無制限に記録できます。"
-          }
-        }
-      }
-    },
-    "cal" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "kcal"
-          }
-        }
-      }
-    },
-    "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたワークアウトは現在復元できません。"
-          }
-        }
-      }
-    },
-    "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたワークアウトが再表示される場合があります。"
           }
         }
       }

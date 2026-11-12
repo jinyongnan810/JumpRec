@@ -82,6 +82,16 @@
     "Best Jump Rate" : {
 
     },
+    "cal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kcal"
+          }
+        }
+      }
+    },
     "Calories" : {
       "localizations" : {
         "ja" : {
@@ -143,16 +153,6 @@
         }
       }
     },
-    "Health Permissions" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ヘルスケアのアクセス許可"
-          }
-        }
-      }
-    },
     "Health data is unavailable on this device." : {
       "localizations" : {
         "ja" : {
@@ -163,8 +163,40 @@
         }
       }
     },
+    "Health Permissions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルスケアのアクセス許可"
+          }
+        }
+      }
+    },
     "Highest Jump Count" : {
 
+    },
+    "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたワークアウトは現在復元できません。"
+          }
+        }
+      }
+    },
+    "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたワークアウトが再表示される場合があります。"
+          }
+        }
+      }
     },
     "Idle" : {
       "localizations" : {
@@ -172,6 +204,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "待機中"
+          }
+        }
+      }
+    },
+    "iPhone" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone"
           }
         }
       }
@@ -340,7 +382,11 @@
         }
       }
     },
+    "Reads heart rate and active energy." : {
+
+    },
     "Reads heart rate, active energy, and activity summaries." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -448,16 +494,6 @@
         }
       }
     },
-    "Unable to Update Permissions" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アクセス許可を更新できません"
-          }
-        }
-      }
-    },
     "Unable to prepare workout permissions. Please try again or review access in Settings." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -465,6 +501,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトのアクセス許可を確認できません。もう一度お試しいただくか、設定でアクセス許可を確認してください。"
+          }
+        }
+      }
+    },
+    "Unable to Update Permissions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセス許可を更新できません"
           }
         }
       }
@@ -516,48 +562,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトのアクセス許可"
-          }
-        }
-      }
-    },
-    "cal" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "kcal"
-          }
-        }
-      }
-    },
-    "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたワークアウトは現在復元できません。"
-          }
-        }
-      }
-    },
-    "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたワークアウトが再表示される場合があります。"
-          }
-        }
-      }
-    },
-    "iPhone" : {
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone"
           }
         }
       }

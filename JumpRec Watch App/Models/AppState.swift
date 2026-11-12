@@ -28,6 +28,9 @@ class JumpRecState: NSObject, @unchecked Sendable {
     var jumpState: JumpState = .idle
     /// Queues companion starts until the start screen can resolve permissions.
     var isCompanionStartRequested = false
+    /// Prevents repeating the automatic launch permission prompt within the same app session.
+    @ObservationIgnored
+    var hasRequestedInitialHealthPermissions = false
     /// Stores when the current or last session started.
     var startTime: Date?
     /// Stores when the current or last session ended.

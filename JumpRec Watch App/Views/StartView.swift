@@ -5,10 +5,13 @@
 //  Created by kinn on 2025/10/05.
 //
 
+import HealthKit
+import OSLog
 import SwiftUI
 
 /// Displays the watch start screen and pre-session countdown.
 struct StartView: View {
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "JumpRec.watch", category: "Permissions")
     /// Indicates whether the countdown is currently showing.
     @State var isCountingDown: Bool = false
     /// Drives the countdown ring animation.
@@ -163,6 +166,9 @@ struct StartView: View {
                 isCompanionAttempt = true
                 prepareWorkout()
             }
+            .task {
+                await requestInitialHealthPermissionsIfNeeded()
+            }
             .onDisappear {
                 preparationTask?.cancel()
                 preparationTask = nil
@@ -198,6 +204,28 @@ struct StartView: View {
             .buttonStyle(.plain)
         }
         .padding(.horizontal, 8)
+    }
+
+    /// Requests HealthKit access once on launch so the multi-step sheet does not interrupt tapping Start.
+    private func requestInitialHealthPermissionsIfNeeded() async {
+        guard ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" else { return }
+        #if DEBUG && targetEnvironment(simulator)
+            guard !ScreenshotFixtures.isEnabled else { return }
+        #endif
+        guard !JumpRecState.shared.hasRequestedInitialHealthPermissions,
+              !isCompanionStartRequested,
+              !isPreparingWorkout,
+              !isCountingDown
+        else {
+            return
+        }
+
+        JumpRecState.shared.hasRequestedInitialHealthPermissions = true
+        do {
+            try await WorkoutPermissions.requestAuthorization(using: HKHealthStore())
+        } catch {
+            Self.logger.error("Could not request initial Health permissions: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     /// Asks for access and pre-warms workout services before animating the countdown.
