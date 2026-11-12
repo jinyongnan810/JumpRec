@@ -15,10 +15,10 @@ public nonisolated enum SessionMetricsCalculator {
     private static let bucketSeconds = 5
     /// The rolling window used to compute jump-rate samples.
     private static let rollingWindowSeconds = 5
-    /// The minimum gap that counts as a short break.
-    private static let smallBreakLowerBound: TimeInterval = 5
-    /// The minimum gap that counts as a long break.
-    private static let longBreakLowerBound: TimeInterval = 15
+    /// The minimum gap that counts as a short break.(extra 1 second for buffer)
+    private static let smallBreakLowerBound: TimeInterval = 6
+    /// The minimum gap that counts as a long break.(extra 1 second for buffer)
+    private static let longBreakLowerBound: TimeInterval = 16
     /// The maximum gap between two Watch rope turns that counts as a single double-under.
     private static let doubleUnderUpperBound: TimeInterval = 0.25
 
