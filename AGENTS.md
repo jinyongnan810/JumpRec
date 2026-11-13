@@ -80,3 +80,6 @@ When making changes in this repository:
 - Explain non-obvious choices without implementation history.
 - Avoid unnecessary complexity.
 - Preserve maintainability for future readers.
+
+## Publishing
+- Follow publish.md for Apple Store Connect submissions.
