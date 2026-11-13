@@ -11,6 +11,9 @@ import SwiftUI
 struct MainView: View {
     /// Holds the shared watch app state.
     @State var appState = JumpRecState.shared
+    /// Tracks foreground/background transitions to refresh stale Watch TTS XPC handles when idle.
+    @Environment(\.scenePhase)
+    private var scenePhase
     /// Provides persisted goal settings.
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
@@ -42,6 +45,20 @@ struct MainView: View {
         }
         .onChange(of: appState.jumpState) { _, newValue in
             print("current appState: \(newValue)")
+        }
+        .onChange(of: scenePhase, initial: true) { _, newPhase in
+            switch newPhase {
+            case .active:
+                if appState.jumpState == .idle {
+                    appState.prepareSpeechForWorkout()
+                }
+            case .background:
+                if appState.jumpState != .jumping {
+                    appState.markSpeechWarmupNeeded()
+                }
+            default:
+                break
+            }
         }
     }
 }

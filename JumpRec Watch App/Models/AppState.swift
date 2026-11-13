@@ -75,6 +75,9 @@ class JumpRecState: NSObject, @unchecked Sendable {
     /// Tracks the latest speech request so obsolete workout cues can be cancelled.
     @ObservationIgnored
     var pendingSpeechTask: Task<Void, Never>?
+    /// Requests a fresh speech synthesizer rebuild and warmup before the next workout.
+    @ObservationIgnored
+    var needsSpeechWarmup = true
 
     /// Detects watch motion and jump events.
     @ObservationIgnored

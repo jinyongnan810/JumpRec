@@ -26,6 +26,8 @@ actor PhoneSpeechCoordinator {
     private var isAudioSessionActive = false
     /// Identifies the latest utterance so stale delegate callbacks do not release audio early.
     private var activeUtteranceID: ObjectIdentifier?
+    /// Retries audio session deactivation once when `didFinish` races with audio teardown.
+    private var deactivationRetryTask: Task<Void, Never>?
 
     // MARK: - Public API
 
@@ -92,6 +94,9 @@ actor PhoneSpeechCoordinator {
 
     /// Configures and activates the audio session off the main thread to avoid UI hangs.
     private func activateAudioSession(options: AVAudioSession.CategoryOptions) {
+        deactivationRetryTask?.cancel()
+        deactivationRetryTask = nil
+
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.playback, options: options)
@@ -103,15 +108,38 @@ actor PhoneSpeechCoordinator {
     }
 
     /// Deactivates speech audio and restores background-audio volume.
-    private func deactivateAudioSessionIfNeeded() {
+    private func deactivateAudioSessionIfNeeded(allowRetry: Bool = true) {
         guard isAudioSessionActive else { return }
-        isAudioSessionActive = false
 
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+            isAudioSessionActive = false
         } catch {
             Self.logger.error("Audio session deactivation error: \(error.localizedDescription, privacy: .public)")
+            guard allowRetry else { return }
+            scheduleDeactivationRetry()
         }
+    }
+
+    /// Retries deactivation briefly if the synthesizer audio unit was still tearing down on `didFinish`.
+    private func scheduleDeactivationRetry() {
+        deactivationRetryTask?.cancel()
+        deactivationRetryTask = Task { [weak self] in
+            do {
+                try await Task.sleep(for: .milliseconds(250))
+            } catch {
+                return
+            }
+            guard let self, !Task.isCancelled else { return }
+            await retryDeactivateAudioSession()
+        }
+    }
+
+    /// Attempts one deferred deactivation if no newer speech utterance has started.
+    private func retryDeactivateAudioSession() {
+        deactivationRetryTask = nil
+        guard activeUtteranceID == nil else { return }
+        deactivateAudioSessionIfNeeded(allowRetry: false)
     }
 
     /// Cleans up audio ducking after the latest utterance ends.
@@ -120,7 +148,9 @@ actor PhoneSpeechCoordinator {
         isWarmupInProgress = false
         guard activeUtteranceID == utteranceID else { return }
         activeUtteranceID = nil
-        guard !synthesizer.isSpeaking, !synthesizer.isPaused else { return }
+        if synthesizer.isPaused {
+            synthesizer.stopSpeaking(at: .immediate)
+        }
         deactivateAudioSessionIfNeeded()
     }
 

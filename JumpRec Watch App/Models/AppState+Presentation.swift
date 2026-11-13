@@ -34,6 +34,7 @@ actor WatchSpeechCoordinator {
 
     /// Rebuilds the speech synthesizer and warms it up silently without ducking other audio.
     func prepareForWorkout(text: String, languageCode: String) {
+        guard activeUtteranceID == nil || isWarmupInProgress else { return }
         rebuildSynthesizer()
         isWarmupInProgress = true
 
@@ -187,12 +188,8 @@ actor WatchSpeechCoordinator {
         watchdogTask?.cancel()
         watchdogTask = nil
         activeUtteranceID = nil
-        let wasWarmup = isWarmupInProgress
         isWarmupInProgress = false
-        // Keep the `.mixWithOthers` session warm through the countdown until the start cue finishes or is cancelled.
-        if !wasWarmup {
-            deactivateAudioSessionIfNeeded()
-        }
+        deactivateAudioSessionIfNeeded()
         resumeIdleContinuation()
     }
 
@@ -246,14 +243,21 @@ actor WatchSpeechCoordinator {
 extension JumpRecState {
     // MARK: - Audio
 
-    /// Rebuilds and warms up the speech synthesizer during the pre-workout countdown.
+    /// Rebuilds and warms up the speech synthesizer once per foreground session when idle.
     func prepareSpeechForWorkout() {
+        guard needsSpeechWarmup else { return }
+        needsSpeechWarmup = false
         cancelPendingSpeech()
         let text = isJapanesePreferred ? "あ" : "a"
         let languageCode = preferredSpeechLanguageCode
         Task { [speechCoordinator] in
             await speechCoordinator.prepareForWorkout(text: text, languageCode: languageCode)
         }
+    }
+
+    /// Marks speech for rebuild and warmup on the next foreground activation.
+    func markSpeechWarmupNeeded() {
+        needsSpeechWarmup = true
     }
 
     // MARK: - Speech
