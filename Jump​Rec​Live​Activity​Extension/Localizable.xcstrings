@@ -8,6 +8,24 @@
             "state" : "translated",
             "value" : "%@ 回"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "%@회"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "%@ 次"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "%@ 下"
+          }
         }
       }
     },
@@ -17,6 +35,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ kcal/分"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "%@ kcal/분"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "%@ kcal/分钟"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "%@ kcal/分鐘"
           }
         }
       }
@@ -31,6 +67,24 @@
             "state" : "translated",
             "value" : "AirPods"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "AirPods"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "AirPods"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "AirPods"
+          }
         }
       }
     },
@@ -40,6 +94,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ヘルスケアへのアクセスを許可"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "건강 접근 허용"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "允许访问健康"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "允許存取「健康」"
           }
         }
       }
@@ -52,6 +124,24 @@
             "state" : "translated",
             "value" : "開始する前に、JumpRecによるヘルスケアへのワークアウトの保存を許可してください。JumpRecの設定でアクセス許可を確認できます。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "시작하기 전에 JumpRec이 건강에 운동을 저장하도록 허용해 주세요. JumpRec 설정에서 접근 권한을 확인할 수 있습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "开始前，请允许 JumpRec 将训练保存到“健康”。请在 JumpRec 的“设置”中查看访问权限。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "開始前，請允許JumpRec將運動儲存至「健康」。請在JumpRec的「設定」中查看存取權限。"
+          }
         }
       }
     },
@@ -63,6 +153,24 @@
             "state" : "translated",
             "value" : "ヘッドフォンでワークアウトを開始する前に、システム設定のJumpRecで「モーションとフィットネス」へのアクセスを許可してください。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "헤드폰으로 운동을 시작하기 전에 시스템 설정의 JumpRec에서 ‘동작 및 피트니스’ 접근을 허용해 주세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "开始耳机训练前，请在 JumpRec 的系统设置中允许访问“运动与健身”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "開始耳機運動前，請在JumpRec的系統設定中允許存取「動作與健身」。"
+          }
         }
       }
     },
@@ -73,21 +181,79 @@
             "state" : "translated",
             "value" : "許可済み"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "허용됨"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "已允许"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "已允許"
+          }
         }
       }
     },
     "Best Average Jump Rate" : {
-
-    },
-    "Best Jump Rate" : {
-
-    },
-    "cal" : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "kcal"
+            "state" : "machine_translated",
+            "value" : "最高平均ペース"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "최고 평균 페이스"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最佳平均跳绳频率"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最佳平均跳躍頻率"
+          }
+        }
+      }
+    },
+    "Best Jump Rate" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最高ペース"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "최고 페이스"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最佳跳绳频率"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最佳跳躍頻率"
           }
         }
       }
@@ -98,6 +264,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カロリー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "칼로리"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "卡路里"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "卡路里"
           }
         }
       }
@@ -110,6 +294,24 @@
             "state" : "translated",
             "value" : "保存済みのワークアウトに対する iCloud の利用状況を確認しています。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "저장된 운동의 iCloud 사용 가능 여부를 확인하고 있습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "正在检查已保存训练的 iCloud 可用性。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "正在檢查已儲存運動的iCloud可用性。"
+          }
         }
       }
     },
@@ -119,6 +321,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloudに接続中..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iCloud에 연결 중…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "正在连接 iCloud…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "正在連線至iCloud⋯"
           }
         }
       }
@@ -130,6 +350,24 @@
             "state" : "translated",
             "value" : "iCloudからダウンロード中..."
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iCloud에서 다운로드 중…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "正在从 iCloud 下载…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "正在從iCloud下載⋯"
+          }
         }
       }
     },
@@ -139,6 +377,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ヘッドフォン"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "헤드폰"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "耳机"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "耳機"
           }
         }
       }
@@ -150,15 +406,23 @@
             "state" : "translated",
             "value" : "ヘッドフォンのモーション"
           }
-        }
-      }
-    },
-    "Health data is unavailable on this device." : {
-      "localizations" : {
-        "ja" : {
+        },
+        "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "このデバイスではヘルスケアデータを利用できません。"
+            "state" : "machine_translated",
+            "value" : "헤드폰 동작"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "耳机运动数据"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "耳機動作"
           }
         }
       }
@@ -170,30 +434,79 @@
             "state" : "translated",
             "value" : "ヘルスケアのアクセス許可"
           }
-        }
-      }
-    },
-    "Highest Jump Count" : {
-
-    },
-    "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
+        },
+        "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたワークアウトは現在復元できません。"
+            "state" : "machine_translated",
+            "value" : "건강 권한"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "健康权限"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "「健康」權限"
           }
         }
       }
     },
-    "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again." : {
-      "extractionState" : "stale",
+    "Health data is unavailable on this device." : {
       "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたワークアウトが再表示される場合があります。"
+            "value" : "このデバイスではヘルスケアデータを利用できません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "이 기기에서는 건강 데이터를 사용할 수 없습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "此设备上无法使用健康数据。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "此裝置無法使用「健康」資料。"
+          }
+        }
+      }
+    },
+    "Highest Jump Count" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最多ジャンプ回数"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "최다 점프 횟수"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最高跳跃次数"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最高跳躍次數"
           }
         }
       }
@@ -205,15 +518,23 @@
             "state" : "translated",
             "value" : "待機中"
           }
-        }
-      }
-    },
-    "iPhone" : {
-      "localizations" : {
-        "ja" : {
+        },
+        "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone"
+            "state" : "machine_translated",
+            "value" : "대기 중"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "空闲"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "待機中"
           }
         }
       }
@@ -223,6 +544,24 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "JumpRec"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
             "value" : "JumpRec"
           }
         }
@@ -235,20 +574,138 @@
             "state" : "translated",
             "value" : "回数"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "횟수"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "次数"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "次數"
+          }
         }
       }
     },
     "Longest Jump Streak" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最長連続ジャンプ回数"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "최장 연속 점프"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最长连续跳跃次数"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最長連續跳躍次數"
+          }
+        }
+      }
     },
     "Longest Session" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最長セッション"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "최장 운동"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最长训练"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最長運動時間"
+          }
+        }
+      }
     },
     "Most Calories" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最大消費カロリー"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "최대 소모 칼로리"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最多消耗卡路里"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最高消耗卡路里"
+          }
+        }
+      }
     },
     "Most Double Unders" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "二重跳び最大回数"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "최다 이단뛰기"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最多双摇次数"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "最多雙迴旋次數"
+          }
+        }
+      }
     },
     "Motion access is requested when you start a workout with supported headphones." : {
       "extractionState" : "stale",
@@ -257,6 +714,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "対応するヘッドフォンでワークアウトを開始すると、モーションへのアクセスが求められます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "지원되는 헤드폰으로 운동을 시작할 때 동작 접근 권한을 요청합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "使用支持的耳机开始训练时，系统会请求运动访问权限。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "使用支援的耳機開始運動時，系統會要求動作存取權限。"
           }
         }
       }
@@ -269,6 +744,24 @@
             "state" : "translated",
             "value" : "現在このデバイスでは iCloud にサインインしていないため、以前 iCloud に保存されたワークアウトはまだ復元できません。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "현재 iCloud 계정에 로그인되어 있지 않아 이전에 클라우드에 백업된 운동을 아직 이 기기에서 복원할 수 없습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "当前未登录 iCloud 账户，因此暂无法在此设备上恢复之前备份在云端的训练。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "目前尚未登入iCloud帳號，因此暫時無法在此裝置上回復先前備份在雲端的運動。"
+          }
         }
       }
     },
@@ -278,6 +771,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未許可"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "허용 안 됨"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "未允许"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "未允許"
           }
         }
       }
@@ -289,6 +800,24 @@
             "state" : "translated",
             "value" : "未リクエスト"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "요청 안 됨"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "未请求"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "未要求"
+          }
         }
       }
     },
@@ -298,6 +827,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "확인"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "好"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "好"
           }
         }
       }
@@ -309,6 +856,24 @@
             "state" : "translated",
             "value" : "アプリの設定を開く"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "앱 설정 열기"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "打开 App 设置"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "開啟App設定"
+          }
         }
       }
     },
@@ -318,6 +883,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iPhoneで「ヘルスケア」を開き、プロフィール→「プライバシー」の「アプリ」→JumpRecを選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iPhone에서 ‘건강’을 열고 프로필을 탭한 다음 ‘개인정보 보호’ 아래의 ‘앱’에서 JumpRec을 선택하세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "在 iPhone 上打开“健康”，轻点你的个人资料，然后在“隐私”下选择“App”，再选择 JumpRec。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "在iPhone上開啟「健康」，點一下個人檔案，然後在「隱私權」下點選「App」，再選擇JumpRec。"
           }
         }
       }
@@ -329,6 +912,24 @@
             "state" : "translated",
             "value" : "もう一度お試しいただくか、システム設定でJumpRecのアクセス許可を確認してください。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "다시 시도하거나 시스템 설정에서 JumpRec의 권한을 확인해 주세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "请重试，或在系统设置中查看 JumpRec 的权限。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "請再試一次，或在系統設定中查看JumpRec的權限。"
+          }
         }
       }
     },
@@ -338,6 +939,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "App Storeから製品情報を読み込めませんでした。通信環境をご確認ください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "App Store에서 제품 정보를 불러올 수 없습니다. 인터넷 연결을 확인해 주세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "无法从 App Store 加载产品信息。请检查你的网络连接。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "無法從App Store載入產品詳細資訊。請檢查網路連線。"
           }
         }
       }
@@ -349,6 +968,24 @@
             "state" : "translated",
             "value" : "購入の承認待ちです。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "구입이 승인 대기 중입니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "购买正在等待批准。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "購買正在等待核准。"
+          }
         }
       }
     },
@@ -358,6 +995,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "購入の検証に失敗しました。もう一度お試しください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "구입 확인에 실패했습니다. 다시 시도해 주세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "购买验证失败。请重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "購買驗證失敗。請再試一次。"
           }
         }
       }
@@ -369,6 +1024,24 @@
             "state" : "translated",
             "value" : "ペース"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "페이스"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "频率"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "頻率"
+          }
         }
       }
     },
@@ -379,11 +1052,54 @@
             "state" : "translated",
             "value" : "ヘルスケアデータの読み取り"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "건강 데이터 읽기"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "读取健康数据"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "讀取「健康」資料"
+          }
         }
       }
     },
     "Reads heart rate and active energy." : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "心拍数とアクティブエネルギーを読み取ります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "심박수와 활동 에너지를 읽습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "读取心率和活动能量。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "讀取心率與動態能量。"
+          }
+        }
+      }
     },
     "Reads heart rate, active energy, and activity summaries." : {
       "extractionState" : "stale",
@@ -392,6 +1108,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "心拍数、アクティブエネルギー、アクティビティの概要を読み取ります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "심박수, 활동 에너지 및 활동 요약을 읽습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "读取心率、活动能量和活动摘要。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "讀取心率、動態能量與活動摘要。"
           }
         }
       }
@@ -403,6 +1137,24 @@
             "state" : "translated",
             "value" : "制限あり"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "제한됨"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "受限制"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "受限制"
+          }
         }
       }
     },
@@ -412,6 +1164,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ヘルスケアのアクセス許可を確認"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "건강 권한 확인"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "查看健康权限"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "查看「健康」權限"
           }
         }
       }
@@ -423,6 +1193,24 @@
             "state" : "translated",
             "value" : "ヘルスケアで確認"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "건강에서 확인"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "在“健康”中查看"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "在「健康」中查看"
+          }
         }
       }
     },
@@ -432,6 +1220,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトの保存"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "운동 저장"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "保存训练"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "儲存運動"
           }
         }
       }
@@ -443,11 +1249,54 @@
             "state" : "translated",
             "value" : "完了したワークアウトをヘルスケアに保存します。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "완료한 운동을 건강에 저장합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "将已完成的训练保存到“健康”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "將已完成的運動儲存至「健康」。"
+          }
         }
       }
     },
     "Sneaky Burn" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "高効率カロリーバーン"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "고효율 칼로리 소모"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "高效卡路里消耗"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "高效卡路里消耗"
+          }
+        }
+      }
     },
     "Source" : {
       "localizations" : {
@@ -456,11 +1305,54 @@
             "state" : "translated",
             "value" : "デバイス"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "기기"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "数据源"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "來源"
+          }
         }
       }
     },
     "Steady Rhythm" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "安定リズム"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "안정적인 리듬"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "稳定节奏"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "穩定節奏"
+          }
+        }
+      }
     },
     "Sync Failed" : {
       "localizations" : {
@@ -468,6 +1360,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "同期に失敗しました"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "동기화 실패"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "同步失败"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "同步失敗"
           }
         }
       }
@@ -480,6 +1390,24 @@
             "state" : "translated",
             "value" : "iCloud から同期しています。アプリを再インストールした後は、保存済みのワークアウトが再表示されるまで少し時間がかかる場合があります。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iCloud에서 동기화하고 있습니다. 앱을 다시 설치한 후에는 저장된 운동이 다시 표시되기까지 잠시 시간이 걸릴 수 있습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "正在从 iCloud 同步。重新安装 App 后，你保存的训练可能需要片刻才会重新显示。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "正在從iCloud同步。重新安裝App後，已儲存的運動可能需要一點時間才會重新顯示。"
+          }
         }
       }
     },
@@ -490,6 +1418,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アプリが iCloud の利用状況を確認できなかったため、ワークアウトの復元状況は不明です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "앱에서 iCloud 사용 가능 여부를 확인할 수 없어 운동 복원 상태를 알 수 없습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "App 无法确认 iCloud 可用性，因此训练恢复状态未知。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "App無法確認iCloud可用性，因此運動回復狀態未知。"
+          }
+        }
+      }
+    },
+    "Unable to Update Permissions" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセス許可を更新できません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "권한을 업데이트할 수 없음"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "无法更新权限"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "無法更新權限"
           }
         }
       }
@@ -502,15 +1476,23 @@
             "state" : "translated",
             "value" : "ワークアウトのアクセス許可を確認できません。もう一度お試しいただくか、設定でアクセス許可を確認してください。"
           }
-        }
-      }
-    },
-    "Unable to Update Permissions" : {
-      "localizations" : {
-        "ja" : {
+        },
+        "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "アクセス許可を更新できません"
+            "state" : "machine_translated",
+            "value" : "운동 권한을 준비할 수 없습니다. 다시 시도하거나 설정에서 접근 권한을 확인해 주세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "无法准备训练权限。请重试，或在“设置”中查看访问权限。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "無法準備運動權限。請再試一次，或在「設定」中查看存取權限。"
           }
         }
       }
@@ -522,6 +1504,24 @@
             "state" : "translated",
             "value" : "不明"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "알 수 없음"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "未知"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "未知"
+          }
         }
       }
     },
@@ -531,6 +1531,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloudにアップロード中..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iCloud에 업로드 중…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "正在上传到 iCloud…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "正在上傳至iCloud⋯"
           }
         }
       }
@@ -542,6 +1560,24 @@
             "state" : "translated",
             "value" : "対応するヘッドフォンを使ってジャンプ数を数えます。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "지원되는 헤드폰을 사용해 점프 횟수를 셉니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "使用支持的耳机统计跳跃次数。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "使用支援的耳機計算跳躍次數。"
+          }
         }
       }
     },
@@ -550,6 +1586,24 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Watch"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Watch"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Watch"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
             "value" : "Watch"
           }
         }
@@ -563,9 +1617,141 @@
             "state" : "translated",
             "value" : "ワークアウトのアクセス許可"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "운동 권한"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "训练权限"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "運動權限"
+          }
+        }
+      }
+    },
+    "cal" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kcal"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "kcal"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "kcal"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "kcal"
+          }
+        }
+      }
+    },
+    "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたワークアウトは現在復元できません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "이 기기에서 iCloud 접근이 제한되어 있어 지금은 클라우드에 백업된 운동을 복원할 수 없습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "此设备上的 iCloud 访问权限受限，因此目前无法恢复备份在云端的训练。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "此裝置上的iCloud存取權限受限制，因此目前無法回復備份在雲端的運動。"
+          }
+        }
+      }
+    },
+    "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたワークアウトが再表示される場合があります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iCloud를 일시적으로 사용할 수 없습니다. 계정에 다시 연결되면 이전에 동기화된 운동이 다시 표시될 수 있습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iCloud 暂时不可用。账户恢复连接后，之前同步的训练可能会重新显示。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iCloud暫時無法使用。帳號恢復連線後，先前同步的運動可能會重新顯示。"
+          }
+        }
+      }
+    },
+    "iPhone" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iPhone"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iPhone"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "iPhone"
+          }
         }
       }
     }
   },
-  "version" : "1.1"
+  "version" : "1.3"
 }

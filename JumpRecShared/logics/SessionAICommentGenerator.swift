@@ -12,16 +12,6 @@ import SwiftData
 
 @MainActor
 public enum SessionAICommentGenerator {
-    // MARK: - Output Language
-
-    /// Defines the language used for generated AI recap text.
-    enum OutputLanguage {
-        /// Generates English output.
-        case english
-        /// Generates Japanese output.
-        case japanese
-    }
-
     // MARK: - Availability
 
     /// Enables AI comments only in debug builds.
@@ -80,10 +70,10 @@ public enum SessionAICommentGenerator {
             guard #available(iOS 26.0, *) else { return nil }
 
             let model = SystemLanguageModel.default
-            let outputLanguage = preferredOutputLanguage
+            let outputLanguage = AppLanguage.current
             let languageSession = LanguageModelSession(
                 model: model,
-                instructions: instructions(for: outputLanguage)
+                instructions: AppLocalization.aiCommentInstructions(for: outputLanguage)
             )
 
             do {
@@ -107,65 +97,10 @@ public enum SessionAICommentGenerator {
 
     // MARK: - Prompt Construction
 
-    /// Returns the preferred output language based on the current locale.
-    private static var preferredOutputLanguage: OutputLanguage {
-        Locale.isJapanesePreferredLanguage ? .japanese : .english
-    }
-
-    /// Returns the system instructions used for AI comment generation.
-    private static func instructions(for language: OutputLanguage) -> String {
-        switch language {
-        case .english:
-            """
-            Generate two short fields for a jump rope workout recap.
-            Keep the tone casual, gentle, simple, and human.
-            The highlight should be one short sentence about the workout's most notable point.
-            The phrase should be either a gentle reflective question or a kind supportive phrase.
-            Keep the combined output around 40 words total.
-            Use at most one emoji across both fields, and only if it fits naturally.
-            Do not guess or describe the user's emotions.
-            Do not repeat raw stats back to the user.
-            Do not overpraise or sound overly excited.
-            Do not use markdown.
-            Do not assume this is the best record.
-            Write the response in English.
-            """
-        case .japanese:
-            """
-            縄跳びワークアウトの振り返りとして、短い highlight と phrase の2項目を生成してください。
-            トーンはやさしく、自然で、シンプルにしてください。
-            highlight はそのワークアウトの特徴を一文で短く伝えてください。
-            phrase はやさしい振り返りの問いかけ、または思いやりのある一言にしてください。
-            合計は40語相当以内の短さに収めてください。
-            絵文字は両方合わせて最大1つまで、自然な場合のみ使ってください。
-            ユーザーの感情を決めつけないでください。
-            数字や統計をそのまま並べ直さないでください。
-            大げさに褒めすぎたり、過度に興奮した口調にしないでください。
-            Markdown は使わないでください。
-            自己ベストだと決めつけないでください。
-            出力は日本語で書いてください。
-            """
-        }
-    }
-
     /// Builds the per-session prompt passed to the language model.
-    private static func prompt(for session: JumpSession, language: OutputLanguage) -> String {
+    private static func prompt(for session: JumpSession, language: AppLanguage) -> String {
         let metrics = session.promptMetrics(language: language)
-
-        switch language {
-        case .english:
-            return """
-            Create a short highlight and a short phrase for this jump rope workout.
-            The phrase must be either a gentle reflective question or a kind supportive phrase.
-            \(metrics.joined(separator: "\n"))
-            """
-        case .japanese:
-            return """
-            この縄跳びワークアウトについて、短い highlight と短い phrase を作成してください。
-            phrase は、やさしい振り返りの問いかけ、または思いやりのある一言にしてください。
-            \(metrics.joined(separator: "\n"))
-            """
-        }
+        return AppLocalization.aiCommentPrompt(metrics: metrics, language: language)
     }
 }
 
@@ -194,32 +129,29 @@ public enum SessionAICommentGenerator {
 
 private extension JumpSession {
     /// Returns the prompt metrics, omitting calories and heart rate when they are missing or zero.
-    func promptMetrics(language: SessionAICommentGenerator.OutputLanguage) -> [String] {
+    func promptMetrics(language: AppLanguage) -> [String] {
         var metrics = [
-            promptLine(english: "Duration", japanese: "時間", value: durationText, language: language),
-            promptLine(english: "Jumps", japanese: "ジャンプ回数", value: "\(jumpCount)", language: language),
-            promptLine(
-                english: "Average rate",
-                japanese: "平均レート",
+            AppLocalization.aiCommentPromptLine(.duration, value: durationText, language: language),
+            AppLocalization.aiCommentPromptLine(.jumps, value: "\(jumpCount)", language: language),
+            AppLocalization.aiCommentPromptLine(
+                .averageRate,
                 value: rateText(from: averageRate, language: language),
                 language: language
             ),
-            promptLine(
-                english: "Peak rate",
-                japanese: "最高レート",
+            AppLocalization.aiCommentPromptLine(
+                .peakRate,
                 value: rateText(from: peakRate, language: language),
                 language: language
             ),
-            promptLine(english: "Longest streak", japanese: "最長連続回数", value: "\(longestStreak)", language: language),
-            promptLine(english: "Short breaks", japanese: "短い休憩", value: "\(smallBreaksCount)", language: language),
-            promptLine(english: "Long breaks", japanese: "長い休憩", value: "\(longBreaksCount)", language: language),
+            AppLocalization.aiCommentPromptLine(.longestStreak, value: "\(longestStreak)", language: language),
+            AppLocalization.aiCommentPromptLine(.shortBreaks, value: "\(smallBreaksCount)", language: language),
+            AppLocalization.aiCommentPromptLine(.longBreaks, value: "\(longBreaksCount)", language: language),
         ]
 
         if caloriesBurned > 0 {
             metrics.insert(
-                promptLine(
-                    english: "Calories",
-                    japanese: "消費カロリー",
+                AppLocalization.aiCommentPromptLine(
+                    .calories,
                     value: "\(Int(caloriesBurned.rounded()))",
                     language: language
                 ),
@@ -229,9 +161,8 @@ private extension JumpSession {
 
         if let averageHeartRate, averageHeartRate > 0 {
             metrics.append(
-                promptLine(
-                    english: "Average heart rate",
-                    japanese: "平均心拍数",
+                AppLocalization.aiCommentPromptLine(
+                    .averageHeartRate,
                     value: heartRateText(from: averageHeartRate, language: language),
                     language: language
                 )
@@ -240,9 +171,8 @@ private extension JumpSession {
 
         if let peakHeartRate, peakHeartRate > 0 {
             metrics.append(
-                promptLine(
-                    english: "Peak heart rate",
-                    japanese: "最高心拍数",
+                AppLocalization.aiCommentPromptLine(
+                    .peakHeartRate,
                     value: heartRateText(from: peakHeartRate, language: language),
                     language: language
                 )
@@ -261,38 +191,14 @@ private extension JumpSession {
     }
 
     /// Formats an optional jump-rate value for the requested output language.
-    func rateText(from value: Double?, language: SessionAICommentGenerator.OutputLanguage) -> String {
+    func rateText(from value: Double?, language: AppLanguage) -> String {
         guard let value else { return "--" }
-        switch language {
-        case .english:
-            return "\(Int(value.rounded()))/min"
-        case .japanese:
-            return "\(Int(value.rounded()))/分"
-        }
+        return AppLocalization.rateText(Int(value.rounded()), language: language)
     }
 
     /// Formats an optional heart-rate value for the requested output language.
-    func heartRateText(from value: Int?, language: SessionAICommentGenerator.OutputLanguage) -> String {
+    func heartRateText(from value: Int?, language: AppLanguage) -> String {
         guard let value else { return "--" }
-        switch language {
-        case .english:
-            return "\(value) bpm"
-        case .japanese:
-            return "\(value) bpm"
-        }
-    }
-
-    private func promptLine(
-        english: String,
-        japanese: String,
-        value: String,
-        language: SessionAICommentGenerator.OutputLanguage
-    ) -> String {
-        switch language {
-        case .english:
-            "\(english): \(value)"
-        case .japanese:
-            "\(japanese): \(value)"
-        }
+        return AppLocalization.heartRateText(value, language: language)
     }
 }

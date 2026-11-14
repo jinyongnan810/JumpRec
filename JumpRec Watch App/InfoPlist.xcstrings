@@ -10,6 +10,30 @@
             "state" : "new",
             "value" : "JumpRec"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec"
+          }
         }
       }
     },
@@ -20,6 +44,30 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "JumpRec Watch App"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec Watch App"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec Watch 앱"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec Watch App"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
             "value" : "JumpRec Watch App"
           }
         }
@@ -39,6 +87,24 @@
             "state" : "translated",
             "value" : "JumpRecは、ワークアウトを計測してまとめるために、ヘルスケア情報を読み取ります。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec이 운동을 측정하고 요약하기 위해 건강 정보를 읽습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec 会读取健康信息，用于测量并汇总你的训练。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec會讀取健康資訊，用來測量並彙整你的運動。"
+          }
         }
       }
     },
@@ -55,6 +121,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "JumpRecは、ワークアウトとアクティブエネルギーのデータをヘルスケアに保存します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec이 운동 및 활동 에너지 데이터를 건강에 저장합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec 会将你的训练和活动能量数据保存到“健康”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec會將你的運動與動態能量資料儲存至「健康」。"
           }
         }
       }
@@ -73,9 +157,27 @@
             "state" : "translated",
             "value" : "JumpRecは、ジャンプを検出するためにモーションデータを使用します。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec이 점프를 감지하기 위해 동작 데이터를 사용합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec 会使用运动数据来检测跳跃。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "JumpRec會使用動作資料來偵測跳躍。"
+          }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.3"
 }

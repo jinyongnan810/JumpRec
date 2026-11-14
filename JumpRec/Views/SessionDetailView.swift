@@ -112,7 +112,7 @@ struct SessionDetailView: View {
             await generateCommentIfNeeded()
         }
         .userActivity("com.kinn.JumpRec.viewSession") { activity in
-            activity.title = "View Jump Rope Workout"
+            activity.title = String(localized: "View Jump Rope Workout")
             if #available(iOS 18.2, *) {
                 activity.appEntityIdentifier = EntityIdentifier(for: JumpSessionEntity(from: session))
             }

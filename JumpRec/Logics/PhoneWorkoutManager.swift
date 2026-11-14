@@ -22,7 +22,7 @@ final class PhoneWorkoutManager: NSObject {
         var errorDescription: String? {
             switch self {
             case .workoutWriteDenied:
-                "Workout write permission is not granted."
+                String(localized: "Workout write permission is not granted.")
             }
         }
     }

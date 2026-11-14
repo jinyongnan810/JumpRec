@@ -271,9 +271,9 @@ extension JumpRecState {
     private var liveActivitySourceLabel: String {
         switch activeMotionSource {
         case .watch:
-            DeviceSource.watch.shortName
+            DeviceSource.watch.rawValue
         case .airpods:
-            DeviceSource.airpods.shortName
+            DeviceSource.airpods.rawValue
         case nil:
             "--"
         }
@@ -310,8 +310,8 @@ extension JumpRecState {
         guard !hasWarmedUpSpeechSynthesizer else { return }
 
         hasWarmedUpSpeechSynthesizer = true
-        let warmupText = isJapanesePreferred ? "こんにちは" : "Hello"
-        let languageCode = preferredSpeechLanguageCode
+        let warmupText = AppLocalization.speechWarmupText()
+        let languageCode = AppLocalization.speechLanguageCode()
         enqueueSpeechOperation { [speechCoordinator] in
             await speechCoordinator.warmUp(text: warmupText, languageCode: languageCode)
         }
@@ -321,7 +321,7 @@ extension JumpRecState {
 
     /// Speaks a localized prompt immediately.
     func speak(text: String) {
-        let languageCode = preferredSpeechLanguageCode
+        let languageCode = AppLocalization.speechLanguageCode()
         enqueueSpeechOperation { [speechCoordinator] in
             await speechCoordinator.speak(text: text, languageCode: languageCode)
         }
@@ -336,32 +336,19 @@ extension JumpRecState {
         }
     }
 
-    /// Returns whether Japanese is the preferred system language.
-    private var isJapanesePreferred: Bool {
-        Locale.isJapanesePreferredLanguage
-    }
-
-    /// Returns the language code used for speech synthesis.
-    private var preferredSpeechLanguageCode: String {
-        isJapanesePreferred ? "ja-JP" : "en-US"
-    }
-
     /// Returns the localized spoken phrase for session start.
     var localizedSessionStartedAnnouncement: String {
-        isJapanesePreferred ? "ワークアウトを開始しました" : "Workout Started!"
+        AppLocalization.sessionStartedAnnouncement()
     }
 
     /// Returns the localized spoken phrase for session end.
     var localizedSessionFinishedAnnouncement: String {
-        isJapanesePreferred ? "ワークアウトが終了しました" : "Workout Finished!"
+        AppLocalization.sessionFinishedAnnouncement()
     }
 
     /// Returns the localized spoken phrase for jump milestones.
     func localizedJumpAnnouncement(for jumpCount: Int) -> String {
-        if isJapanesePreferred {
-            return "\(jumpCount) 回"
-        }
-        return "\(jumpCount) Jumps"
+        AppLocalization.jumpMilestoneAnnouncement(for: jumpCount)
     }
 
     /// Returns the localized spoken phrase for minute milestones.
