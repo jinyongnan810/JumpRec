@@ -272,8 +272,7 @@ struct SettingsView: View {
 
     /// Resolves the hosted privacy policy URL according to the user's current locale.
     private var privacyPolicyURL: URL {
-        let isJapanese = Locale.current.language.languageCode?.identifier == "ja"
-        let filename = isJapanese ? "PRIVACY_POLICY_ja.md" : "PRIVACY_POLICY.md"
+        let filename = AppLocalization.privacyPolicyFilename()
         return URL(string: "https://github.com/jinyongnan810/JumpRec/blob/main/\(filename)")!
     }
 

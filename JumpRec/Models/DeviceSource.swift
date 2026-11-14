@@ -14,9 +14,12 @@ enum DeviceSource: String, CaseIterable {
 
     // MARK: - Display Metadata
 
-    /// Returns the short label shown in the UI.
+    /// Returns the localized short label shown in the UI.
     var shortName: String {
-        rawValue
+        switch self {
+        case .watch: String(localized: "Watch")
+        case .airpods: String(localized: "Headphone")
+        }
     }
 
     /// Returns the SF Symbol associated with the source.

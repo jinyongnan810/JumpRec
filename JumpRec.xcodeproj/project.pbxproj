@@ -104,6 +104,30 @@
 			);
 			target = 3F2D44832F6164700063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension */;
 		};
+		3F30079930A80B0B00759137 /* Exceptions for "JumpRecShared" folder in "JumpRec" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"JumpRecShared-InfoPlist.xcstrings",
+				Localizable.xcstrings,
+			);
+			target = 3FCE40202E7589A8009C271D /* JumpRec */;
+		};
+		3F30079A30A80B0B00759137 /* Exceptions for "JumpRecShared" folder in "JumpRec Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"JumpRecShared-InfoPlist.xcstrings",
+				Localizable.xcstrings,
+			);
+			target = 3FCE402D2E7589A9009C271D /* JumpRec Watch App */;
+		};
+		3F30079B30A80B0B00759137 /* Exceptions for "JumpRecShared" folder in "Jump​Rec​Live​Activity​ExtensionExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"JumpRecShared-InfoPlist.xcstrings",
+				Localizable.xcstrings,
+			);
+			target = 3F2D44832F6164700063B4C3 /* Jump​Rec​Live​Activity​ExtensionExtension */;
+		};
 		3FA3A7D53092C4B50047E95E /* Exceptions for "JumpRecComplications" folder in "JumpRecComplicationsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -157,6 +181,11 @@
 		};
 		3FCE404A2E758A82009C271D /* JumpRecShared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3F30079930A80B0B00759137 /* Exceptions for "JumpRecShared" folder in "JumpRec" target */,
+				3F30079A30A80B0B00759137 /* Exceptions for "JumpRecShared" folder in "JumpRec Watch App" target */,
+				3F30079B30A80B0B00759137 /* Exceptions for "JumpRecShared" folder in "Jump​Rec​Live​Activity​ExtensionExtension" target */,
+			);
 			path = JumpRecShared;
 			sourceTree = "<group>";
 		};
@@ -450,6 +479,9 @@
 				en,
 				Base,
 				ja,
+				"zh-Hans",
+				"zh-Hant",
+				ko,
 			);
 			mainGroup = 3FCE40182E7589A8009C271D;
 			minimizedProjectReferenceProxies = 1;
