@@ -13,26 +13,26 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec"
+            "state" : "translated",
+            "value" : "Jump​Rec​Live​Activity​Extension"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec"
+            "state" : "translated",
+            "value" : "Jump​Rec​Live​Activity​Extension"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec"
+            "state" : "translated",
+            "value" : "Jump​Rec​Live​Activity​Extension"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec"
+            "state" : "translated",
+            "value" : "Jump​Rec​Live​Activity​Extension"
           }
         }
       }
@@ -49,25 +49,25 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "Jump​Rec​Live​Activity​ExtensionExtension"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "Jump​Rec​Live​Activity​ExtensionExtension"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "Jump​Rec​Live​Activity​ExtensionExtension"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "Jump​Rec​Live​Activity​ExtensionExtension"
           }
         }
@@ -85,25 +85,25 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : ""
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : ""
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : ""
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : ""
           }
         }

@@ -13,25 +13,25 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "JumpRec"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "JumpRec"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "JumpRec"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "JumpRec"
           }
         }
@@ -49,25 +49,25 @@
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "JumpRec"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "JumpRec"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "JumpRec"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "JumpRec"
           }
         }
@@ -90,20 +90,20 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec이 진행 중인 Apple Watch 운동을 iPhone에 미러링하기 위해 운동 데이터를 읽습니다."
+            "state" : "translated",
+            "value" : "JumpRec은 운동을 측정하고 요약하기 위해 건강 정보를 읽습니다."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec 会读取训练数据，用于在 iPhone 上同步显示 Apple Watch 正在进行的训练。"
+            "state" : "translated",
+            "value" : "JumpRec 读取健康信息以测量并总结您的训练数据。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec會讀取運動資料，用來在iPhone上同步顯示進行中的Apple Watch運動。"
+            "state" : "translated",
+            "value" : "JumpRec 會讀取健康資訊以測量並彙整您的運動資料。"
           }
         }
       }
@@ -125,20 +125,20 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec이 Apple Watch 활동을 iPhone에 표시하기 위해 운동을 저장합니다."
+            "state" : "translated",
+            "value" : "JumpRec은 운동 및 활동 에너지 데이터를 건강 앱에 저장합니다."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec 会保存训练，以便在 iPhone 上显示你的 Apple Watch 活动记录。"
+            "state" : "translated",
+            "value" : "JumpRec 会将您的训练和活动能量数据保存至“健康”。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec會儲存運動，讓你的Apple Watch活動紀錄顯示在iPhone上。"
+            "state" : "translated",
+            "value" : "JumpRec 會將您的運動與活動能量資料儲存至「健康」。"
           }
         }
       }
@@ -160,20 +160,20 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec이 점프를 감지하기 위해 동작 데이터를 사용합니다."
+            "state" : "translated",
+            "value" : "JumpRec은 점프를 감지하기 위해 동작 데이터를 사용합니다."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec 会使用运动数据来检测跳跃。"
+            "state" : "translated",
+            "value" : "JumpRec 使用动作数据来检测跳跃。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "JumpRec會使用動作資料來偵測跳躍。"
+            "state" : "translated",
+            "value" : "JumpRec 使用動作資料來偵測跳躍。"
           }
         }
       }

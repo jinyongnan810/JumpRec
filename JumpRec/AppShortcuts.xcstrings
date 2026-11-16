@@ -20,7 +20,7 @@
         },
         "ja" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
               "${applicationName}の通算ジャンプ回数",
               "${applicationName}の合計ジャンプ数",
@@ -34,43 +34,43 @@
         },
         "ko" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
-              "${applicationName}의 누적 줄넘기 횟수",
-              "${applicationName}의 총 줄넘기 횟수",
-              "${applicationName}에서 전체 점프 횟수 확인",
-              "${applicationName}의 총 운동 횟수",
-              "${applicationName}의 운동 통계",
+              "${applicationName}에서 누적 줄넘기 횟수 보기",
+              "${applicationName} 총 줄넘기 횟수",
+              "${applicationName}에서 지금까지 몇 번 뛰었는지 확인",
+              "${applicationName} 총 운동 횟수",
+              "${applicationName} 운동 통계",
               "${applicationName}에서 운동 통계 확인",
-              "${applicationName}에서 운동 통계 가져오기"
+              "${applicationName} 운동 통계 가져오기"
             ]
           }
         },
         "zh-Hans" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
-              "${applicationName} 的累计跳跃次数",
-              "${applicationName} 的总跳跃次数",
-              "在 ${applicationName} 查看一共跳了多少次",
-              "${applicationName} 的总训练次数",
-              "${applicationName} 的训练统计",
-              "在 ${applicationName} 中查看训练统计",
-              "获取 ${applicationName} 的训练统计数据"
+              "在${applicationName}查看累计跳跃次数",
+              "在${applicationName}查看总跳跃次数",
+              "在${applicationName}一共跳了多少次",
+              "在${applicationName}查看累计训练次数",
+              "在${applicationName}查看训练统计",
+              "查看${applicationName}的训练统计",
+              "获取${applicationName}的训练数据统计"
             ]
           }
         },
         "zh-Hant" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
-              "${applicationName}的累計跳躍次數",
-              "${applicationName}的總跳躍次數",
-              "在${applicationName}查詢總共跳了幾下",
-              "${applicationName}的總運動次數",
-              "${applicationName}的運動統計",
+              "在${applicationName}查看累計跳躍次數",
+              "在${applicationName}查看總跳躍次數",
+              "在${applicationName}總共跳了幾下",
+              "在${applicationName}查看累計運動次數",
               "在${applicationName}查看運動統計",
-              "取得${applicationName}的運動統計"
+              "查看${applicationName}的運動統計",
+              "取得${applicationName}的運動統計資料"
             ]
           }
         }
@@ -92,7 +92,7 @@
         },
         "ja" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
               "${applicationName}で自己ベストを確認",
               "${applicationName}で記録を表示",
@@ -103,34 +103,34 @@
         },
         "ko" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
               "${applicationName}에서 개인 최고 기록 확인",
               "${applicationName}에서 내 기록 보기",
-              "${applicationName}의 내 점프 기록",
-              "${applicationName}에서 최고 점프 기록 확인"
+              "${applicationName} 내 줄넘기 기록",
+              "${applicationName} 최고 기록 확인"
             ]
           }
         },
         "zh-Hans" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
-              "在 ${applicationName} 中查看个人最佳记录",
-              "在 ${applicationName} 显示我的记录",
-              "我在 ${applicationName} 的跳跃记录",
-              "查看我在 ${applicationName} 的最佳跳绳数据"
+              "在${applicationName}查看个人纪录",
+              "在${applicationName}显示我的纪录",
+              "我在${applicationName}的跳绳纪录",
+              "我在${applicationName}的最高纪录是什么"
             ]
           }
         },
         "zh-Hant" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
               "在${applicationName}查看個人紀錄",
-              "顯示我在${applicationName}的紀錄",
+              "在${applicationName}顯示我的紀錄",
               "我在${applicationName}的跳繩紀錄",
-              "在${applicationName}查詢我的最佳跳躍紀錄"
+              "我在${applicationName}的最佳紀錄是什麼"
             ]
           }
         }
@@ -152,7 +152,7 @@
         },
         "ja" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
               "${applicationName}で最新のワークアウトを取得",
               "${applicationName}の前回のワークアウト",
@@ -163,10 +163,10 @@
         },
         "ko" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
               "${applicationName}에서 최근 운동 가져오기",
-              "${applicationName}의 마지막 운동",
+              "${applicationName} 지난 운동",
               "${applicationName}에서 마지막 운동 확인",
               "${applicationName}에서 지난 줄넘기 결과 확인"
             ]
@@ -174,23 +174,23 @@
         },
         "zh-Hans" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
-              "获取 ${applicationName} 的最新训练",
-              "${applicationName} 的上次训练",
-              "在 ${applicationName} 中查看上次训练",
-              "我在 ${applicationName} 上次跳绳的表现怎么样"
+              "获取${applicationName}最近一次训练",
+              "在${applicationName}查看上次训练",
+              "在${applicationName}检查上次训练",
+              "我上次在${applicationName}跳得怎么样"
             ]
           }
         },
         "zh-Hant" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
-              "取得${applicationName}最近的運動",
-              "${applicationName}的上一次運動",
+              "取得${applicationName}最近一次運動",
               "在${applicationName}查看上次運動",
-              "我在${applicationName}上次跳繩表現如何"
+              "在${applicationName}檢查上次運動",
+              "我上次在${applicationName}跳得如何"
             ]
           }
         }
@@ -211,7 +211,7 @@
         },
         "ja" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
               "${applicationName}で縄跳びを開始",
               "${applicationName}でワークアウトを開始",
@@ -221,7 +221,7 @@
         },
         "ko" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
               "${applicationName}에서 줄넘기 시작",
               "${applicationName}에서 운동 시작",
@@ -231,17 +231,17 @@
         },
         "zh-Hans" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
-              "在 ${applicationName} 中开始跳绳",
-              "在 ${applicationName} 中开始训练",
-              "用 ${applicationName} 开始跳绳训练"
+              "在${applicationName}开始跳绳",
+              "在${applicationName}开始训练",
+              "在${applicationName}开始跳跃"
             ]
           }
         },
         "zh-Hant" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
               "在${applicationName}開始跳繩",
               "在${applicationName}開始運動",
@@ -267,7 +267,7 @@
         },
         "ja" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
               "${applicationName}で今日の縄跳び",
               "${applicationName}で今日のジャンプ回数を確認",
@@ -278,34 +278,34 @@
         },
         "ko" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
-              "${applicationName}의 오늘 줄넘기 횟수",
-              "${applicationName}에서 오늘 점프 횟수 확인",
-              "${applicationName}의 오늘 운동",
+              "${applicationName}에서 오늘 줄넘기 보기",
+              "오늘 ${applicationName}에서 몇 번 뛰었는지 확인",
+              "${applicationName} 오늘의 운동",
               "${applicationName}에서 오늘 운동 확인"
             ]
           }
         },
         "zh-Hans" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
-              "${applicationName} 的今日跳跃次数",
-              "在 ${applicationName} 查看今天跳了多少次",
-              "${applicationName} 的今日训练",
-              "在 ${applicationName} 中查看今天的训练"
+              "在${applicationName}查看今日跳绳",
+              "今天在${applicationName}跳了多少次",
+              "今天在${applicationName}的训练",
+              "查看今天在${applicationName}的训练"
             ]
           }
         },
         "zh-Hant" : {
           "stringSet" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "values" : [
-              "${applicationName}今天的跳躍次數",
-              "在${applicationName}查詢今天跳了幾下",
-              "${applicationName}今天的運動",
-              "在${applicationName}查看今天的運動"
+              "在${applicationName}查看今日跳繩",
+              "今天在${applicationName}跳了幾下",
+              "今天在${applicationName}的運動",
+              "查看今天在${applicationName}的運動"
             ]
           }
         }

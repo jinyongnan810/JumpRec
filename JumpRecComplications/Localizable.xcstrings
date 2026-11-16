@@ -14,20 +14,20 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "JumpRec 열기"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "打开 JumpRec"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "開啟JumpRec"
+            "state" : "translated",
+            "value" : "開啟 JumpRec"
           }
         }
       }
@@ -42,20 +42,20 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "machine_translated",
+            "state" : "translated",
             "value" : "JumpRec을 열어 줄넘기 운동을 시작하세요."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "打开 JumpRec 开始跳绳训练。"
+            "state" : "translated",
+            "value" : "打开 JumpRec，开始跳绳训练吧。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "machine_translated",
-            "value" : "開啟JumpRec即可開始跳繩運動。"
+            "state" : "translated",
+            "value" : "開啟 JumpRec，開始跳繩運動吧。"
           }
         }
       }
