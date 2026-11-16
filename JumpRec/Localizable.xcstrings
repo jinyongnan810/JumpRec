@@ -113,70 +113,6 @@
         }
       }
     },
-    "%@ sensitivity adjustment" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ sensitivity adjustment"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ の感度調整"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 민감도 조절"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 灵敏度调整"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 靈敏度調整"
-          }
-        }
-      }
-    },
-    "%@ threshold adjustment" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ のしきい値調整"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 임계값 조절"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 阈值调整"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ 閾值調整"
-          }
-        }
-      }
-    },
     "%@ • %@ • %@" : {
       "localizations" : {
         "en" : {
@@ -643,35 +579,6 @@
         }
       }
     },
-    "A normalized score that reflects how evenly you maintained your jumping pace throughout the session." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション全体を通して、どれだけ一定のペースで跳び続けられたかを示す正規化スコアです。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 전체에서 줄넘기 페이스를 얼마나 일정하게 유지했는지 나타내는 정규화된 점수입니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "反映您在整个训练过程中保持均匀跳跃节奏的标准化评分。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "反映您在整個運動過程中維持穩定跳躍節奏的標準化分數。"
-          }
-        }
-      }
-    },
     "A normalized score that reflects how evenly you maintained your jumping pace throughout the workout." : {
       "localizations" : {
         "ja" : {
@@ -696,70 +603,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "反映您在整個運動過程中維持穩定跳躍節奏的標準化分數。"
-          }
-        }
-      }
-    },
-    "ACTIVE SOURCE" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使用中のデバイス"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사용 중인 기기"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "当前使用设备"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "目前使用裝置"
-          }
-        }
-      }
-    },
-    "AI Recap" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AI Recap"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AIサマリー"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AI 요약"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AI 总结"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AI 摘要"
           }
         }
       }
@@ -890,93 +733,6 @@
         }
       }
     },
-    "Active" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使用中"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사용 중"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使用中"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使用中"
-          }
-        }
-      }
-    },
-    "Active source" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使用中のデバイス"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사용 중인 기기"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "当前使用设备"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "目前使用裝置"
-          }
-        }
-      }
-    },
-    "Adjusts every detector threshold as a percentage of its default value." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "各検出しきい値をデフォルト値に対する割合で調整します。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "기본값에 대한 백분율로 모든 감지 임계값을 조절합니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "按默认值的百分比调整各项检测阈值。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "依預設值的百分比調整各項偵測閾值。"
-          }
-        }
-      }
-    },
     "Adjusts jump detection sensitivity." : {
       "localizations" : {
         "en" : {
@@ -1069,76 +825,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "所有過往運動紀錄、個人紀錄與統計資料仍可隨時查看。"
-          }
-        }
-      }
-    },
-    "All time, you have completed %1$@ with %2$@ total jumps, burning %3$lld kcal." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All time, you have completed %1$@ with %2$@ total jumps, burning %3$lld kcal."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "通算で%1$@完了し、合計%2$@回、%3$lld kcal消費しました。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "누적 %1$@ 완료, 총 %2$@회 줄넘기로 %3$lld kcal를 소모했습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "累计已完成 %1$@，总计跳绳 %2$@ 次，消耗 %3$lld 千卡。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "累計已完成 %1$@，總計跳繩 %2$@ 下，消耗 %3$lld 大卡。"
-          }
-        }
-      }
-    },
-    "All-Time Stats" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All-Time Stats"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "通算統計"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "전체 통계"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "累计统计"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "累計統計"
           }
         }
       }
@@ -1373,151 +1059,6 @@
         }
       }
     },
-    "Apple Watch" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch"
-          }
-        }
-      }
-    },
-    "Apple Watch is ready." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watchは利用可能です。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch가 준비되었습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch 已就绪。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch 已就緒。"
-          }
-        }
-      }
-    },
-    "Apple Watch is unavailable because no paired watch was found." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ペアリングされたApple Watchが見つからないため、Apple Watchは利用できません。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "페어링된 워치를 찾을 수 없어 Apple Watch를 사용할 수 없습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未找到配对的手表，因此 Apple Watch 不可用。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "找不到已配對的手錶，因此 Apple Watch 無法使用。"
-          }
-        }
-      }
-    },
-    "Apple Watch is unavailable because the JumpRec Watch app is not installed." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JumpRec Watch アプリがインストールされていないため、Apple Watchは利用できません。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JumpRec Watch 앱이 설치되어 있지 않아 Apple Watch를 사용할 수 없습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未安装 JumpRec Watch 应用，因此 Apple Watch 不可用。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未安裝 JumpRec Watch App，因此 Apple Watch 無法使用。"
-          }
-        }
-      }
-    },
-    "Apple Watch is unavailable for this session." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このセッションでは Apple Watchを利用できません。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이번 세션에서는 Apple Watch를 사용할 수 없습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "本次训练无法使用 Apple Watch。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "本次運動無法使用 Apple Watch。"
-          }
-        }
-      }
-    },
     "Audio Settings" : {
       "localizations" : {
         "ja" : {
@@ -1542,64 +1083,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "語音設定"
-          }
-        }
-      }
-    },
-    "Automatically switches to the best available device." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自動で最適のデバイスが選択されます"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사용 가능한 최적의 기기로 자동 전환됩니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自动切换至最佳可用设备。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "自動切換至最佳可用裝置。"
-          }
-        }
-      }
-    },
-    "Available" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "利用可能"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사용 가능"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "可用"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "可用"
           }
         }
       }
@@ -1747,35 +1230,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "藍色"
-          }
-        }
-      }
-    },
-    "Browse All Exports" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてのエクスポートを表示"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "모든 내보내기 보기"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "查看全部导出文件"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "瀏覽所有匯出檔案"
           }
         }
       }
@@ -1988,35 +1442,6 @@
         }
       }
     },
-    "Check Apple Watch, headphone, or iPhone motion availability." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch、ヘッドフォン、またはiPhoneでモーションを計測できるか確認してください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch, 헤드폰 또는 iPhone의 동작 감지 사용 가능 여부를 확인합니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "检查 Apple Watch、耳机或 iPhone 的动作感应是否可用。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "檢查 Apple Watch、耳機或 iPhone 的動作感測是否可用。"
-          }
-        }
-      }
-    },
     "Check Personal Records" : {
       "localizations" : {
         "en" : {
@@ -2047,99 +1472,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "查看個人紀錄"
-          }
-        }
-      }
-    },
-    "Check iCloud Again" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check iCloud Again"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloudを再確認"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 다시 확인"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重新检查 iCloud"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "重新檢查 iCloud"
-          }
-        }
-      }
-    },
-    "Checking iCloud availability for your saved sessions." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存済みのセッションに対する iCloud の利用状況を確認しています。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "저장된 세션의 iCloud 사용 가능 여부를 확인하고 있습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在检查已保存训练的 iCloud 可用状态。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在檢查已儲存運動的 iCloud 可用狀態。"
-          }
-        }
-      }
-    },
-    "Checking iCloud availability for your saved workouts." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存済みのワークアウトに対する iCloud の利用状況を確認しています。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "저장된 운동의 iCloud 사용 가능 여부를 확인하고 있습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在检查已保存训练的 iCloud 可用状态。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在檢查已儲存運動的 iCloud 可用狀態。"
           }
         }
       }
@@ -2202,128 +1534,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "從歷史紀錄中選擇一次運動以查看詳細資料。"
-          }
-        }
-      }
-    },
-    "Clear All" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべて削除"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "모두 지우기"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全部清除"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全部清除"
-          }
-        }
-      }
-    },
-    "Clear All Motion CSVs?" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてのモーションCSVを削除しますか？"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "모든 동작 CSV 파일을 지울까요?"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "清除所有动作 CSV 文件？"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "清除所有動作 CSV 檔案？"
-          }
-        }
-      }
-    },
-    "Close" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Close"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "閉じる"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "닫기"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "关闭"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "關閉"
-          }
-        }
-      }
-    },
-    "Complete sessions to set personal records!" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッションを完了して自己ベストを記録しましょう！"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션을 완료해 개인 최고 기록을 세워 보세요!"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完成训练来创造您的个人纪录吧！"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完成運動來創下您的個人紀錄吧！"
           }
         }
       }
@@ -2446,41 +1656,6 @@
         }
       }
     },
-    "Continue reviewing past workouts" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue reviewing past workouts"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "過去のワークアウトを確認する"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "과거 운동 계속 보기"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "继续查看过往训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "繼續瀏覽過往運動"
-          }
-        }
-      }
-    },
     "Could not restore purchases." : {
       "localizations" : {
         "en" : {
@@ -2511,64 +1686,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無法回復購買項目。"
-          }
-        }
-      }
-    },
-    "Count" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "回数"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "횟수"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "次数"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "次數"
-          }
-        }
-      }
-    },
-    "Currently selected for motion data" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在選択中"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "현재 동작 데이터로 선택됨"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "当前已选为动作数据源"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "目前已選為動作資料來源"
           }
         }
       }
@@ -2742,35 +1859,6 @@
         }
       }
     },
-    "Debug" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "デバッグ"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "디버그"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "调试"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "除錯"
-          }
-        }
-      }
-    },
     "Decrease jump count goal" : {
       "localizations" : {
         "ja" : {
@@ -2855,36 +1943,6 @@
         }
       }
     },
-    "Delete All" : {
-      "comment" : "Debug history toolbar delete-all accessibility label.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべて削除"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "모두 삭제"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全部删除"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全部刪除"
-          }
-        }
-      }
-    },
     "Delete Records" : {
       "localizations" : {
         "ja" : {
@@ -2909,64 +1967,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "刪除紀錄"
-          }
-        }
-      }
-    },
-    "Delete Session" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッションを削除"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 삭제"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "删除训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "刪除運動"
-          }
-        }
-      }
-    },
-    "Delete Sessions" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッションを削除"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 삭제"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "删除训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "刪除運動"
           }
         }
       }
@@ -3055,35 +2055,6 @@
         }
       }
     },
-    "Delete these sessions?" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "これらのセッションを削除しますか？"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 세션들을 삭제할까요?"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "删除这些训练？"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "刪除這些運動？"
-          }
-        }
-      }
-    },
     "Delete these workouts?" : {
       "localizations" : {
         "ja" : {
@@ -3108,35 +2079,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "刪除這些運動？"
-          }
-        }
-      }
-    },
-    "Delete this session?" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このセッションを削除しますか？"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 세션을 삭제할까요?"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "删除这次训练？"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "刪除這次運動？"
           }
         }
       }
@@ -3237,35 +2179,6 @@
         }
       }
     },
-    "Done" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完了"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "완료"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完成"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完成"
-          }
-        }
-      }
-    },
     "Dot Indicator" : {
       "localizations" : {
         "ja" : {
@@ -3356,41 +2269,6 @@
         }
       }
     },
-    "Downloading workouts from iCloud. This may take a moment depending on your connection." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Downloading workouts from iCloud. This may take a moment depending on your connection."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloudからワークアウトをダウンロードしています。通信環境によって少し時間がかかる場合があります。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud에서 운동 기록을 다운로드하고 있습니다. 네트워크 상태에 따라 잠시 시간이 걸릴 수 있습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在从 iCloud 下载训练记录。视您的网络情况，可能需要一点时间。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在從 iCloud 下載運動紀錄。視您的網路狀況，可能需要一點時間。"
-          }
-        }
-      }
-    },
     "Duration" : {
       "localizations" : {
         "ja" : {
@@ -3477,35 +2355,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "經過時間"
-          }
-        }
-      }
-    },
-    "Ends the current jump session." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在のジャンプセッションを終了します。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "현재 줄넘기 세션을 종료합니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "结束当前的跳绳训练。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "結束目前的跳繩運動。"
           }
         }
       }
@@ -3624,35 +2473,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "收藏"
-          }
-        }
-      }
-    },
-    "Finish a workout on Apple Watch or iPhone to record motion CSV files here." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch または iPhone でワークアウトを終了すると、モーションCSVファイルがここに保存されます。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch 또는 iPhone에서 운동을 완료하면 동작 CSV 파일이 여기에 저장됩니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在 Apple Watch 或 iPhone 上完成一次训练后，动作 CSV 文件会记录在这里。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在 Apple Watch 或 iPhone 上完成一次運動後，動作 CSV 檔案會記錄在這裡。"
           }
         }
       }
@@ -3967,35 +2787,6 @@
         }
       }
     },
-    "HR(AVG)" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "平均心拍"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "평균 심박수"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "平均心率"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "平均心率"
-          }
-        }
-      }
-    },
     "Headphone" : {
       "localizations" : {
         "ja" : {
@@ -4048,64 +2839,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "耳機動作感測"
-          }
-        }
-      }
-    },
-    "Headphone motion is preferred; iPhone will be used if it becomes unavailable." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ヘッドフォンのモーションを優先し、利用できなくなった場合はiPhoneを使用します。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "헤드폰 동작 감지를 우선 사용하며, 사용할 수 없는 경우 iPhone을 사용합니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "优先使用耳机动作感应；若耳机不可用，将改用 iPhone。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "優先使用耳機動作感測；若耳機無法使用，將改用 iPhone。"
-          }
-        }
-      }
-    },
-    "Headphone motion is unavailable. Connect supported AirPods or Beats and allow motion access." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ヘッドフォンのモーションは利用できません。対応する AirPods または Beats を接続し、モーションへのアクセスを許可してください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "헤드폰 동작 감지를 사용할 수 없습니다. 지원되는 AirPods 또는 Beats를 연결하고 동작 접근 권한을 허용해 주세요."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "耳机动作感应不可用。请连接支持的 AirPods 或 Beats 并允许动作访问权限。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "耳機動作感測無法使用。請連接支援的 AirPods 或 Beats 並允許動作存取權限。"
           }
         }
       }
@@ -4190,35 +2923,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "心率可用說明"
-          }
-        }
-      }
-    },
-    "Heart rate is only available when your session is recorded with Apple Watch or supported headphones that provide heart-rate data." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "心拍数は、Apple Watchまたは心拍データに対応したヘッドホンで記録したセッションでのみ利用できます。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "심박수는 Apple Watch 또는 심박수 데이터를 제공하는 지원 헤드폰으로 세션을 기록한 경우에만 표시됩니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "仅当使用 Apple Watch 或支持心率数据的耳机记录训练时，才会显示心率数据。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "僅當使用 Apple Watch 或支援心率資料的耳機記錄運動時，才會顯示心率資料。"
           }
         }
       }
@@ -4398,35 +3102,6 @@
         }
       }
     },
-    "Home" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ホーム"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "홈"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "首页"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "首頁"
-          }
-        }
-      }
-    },
     "Idle" : {
       "localizations" : {
         "en" : {
@@ -4523,35 +3198,6 @@
         }
       }
     },
-    "If jumps are not detected, try lowering the threshold." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ジャンプが検知されない場合、しきい値を低く設定してみてください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "줄넘기가 감지되지 않으면 임계값을 낮춰 보세요."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "如果未能检测到跳跃，请尝试调低阈值。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "如果未能偵測到跳躍，請嘗試調低閾值。"
-          }
-        }
-      }
-    },
     "If there are false detections, try lowering the sensitivity." : {
       "localizations" : {
         "en" : {
@@ -4586,70 +3232,6 @@
         }
       }
     },
-    "If there are many false detections, try make the threshold higher. " : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "誤検知が多い場合、しきい値を高く設定してみてください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "오감지가 많다면 임계값을 높여 보세요."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "如果误检较多，请尝试调高阈值。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "如果誤判較多，請嘗試調高閾值。"
-          }
-        }
-      }
-    },
-    "In %1$lld, you completed %2$@ with %3$@ total jumps, burning %4$lld kcal." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In %1$lld, you completed %2$@ with %3$@ total jumps, burning %4$lld kcal."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld年は%2$@完了し、合計%3$@回、%4$lld kcal消費しました。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld년에 %2$@ 완료, 총 %3$@회 줄넘기로 %4$lld kcal를 소모했습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld 年您完成了 %2$@，总计跳绳 %3$@ 次，消耗 %4$lld 千卡。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld 年您完成了 %2$@，總計跳繩 %3$@ 下，消耗 %4$lld 大卡。"
-          }
-        }
-      }
-    },
     "Inbox" : {
       "localizations" : {
         "ja" : {
@@ -4674,41 +3256,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "收件匣"
-          }
-        }
-      }
-    },
-    "Includes sessions with 100+ jumps. When you complete 10 workouts, unlock lifetime unlimited tracking with a single purchase." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Includes sessions with 100+ jumps. When you complete 10 workouts, unlock lifetime unlimited tracking with a single purchase."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "100回以上のジャンプを完了したセッションが対象です。10回完了後は、1回限りの購入で無制限のワークアウトをアンロックできます。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "100회 이상 뛴 세션이 포함됩니다. 10회 완료 후 단 한 번의 결제로 평생 무제한 기록을 잠금 해제할 수 있습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "包含 100 次以上跳跃的训练。完成 10 次后，通过一次购买即可终身解锁无限次记录。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "包含 100 下以上跳躍的運動。完成 10 次後，透過單次購買即可終身解鎖無限次記錄。"
           }
         }
       }
@@ -5207,76 +3754,6 @@
         }
       }
     },
-    "Keep the app open while iCloud downloads your history." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keep the app open while iCloud downloads your history."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloudが履歴をダウンロードする間、アプリを開いたままにしてください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud에서 기록을 다운로드하는 동안 앱을 열어 두세요."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 正在下载您的历史记录，请保持应用开启。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 正在下載您的歷史紀錄，請保持 App 開啟。"
-          }
-        }
-      }
-    },
-    "Last checked: %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Last checked: %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最終確認: %@"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "마지막 확인: %@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "上次检查：%@"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "上次檢查：%@"
-          }
-        }
-      }
-    },
     "Latest Workout" : {
       "localizations" : {
         "en" : {
@@ -5549,35 +4026,6 @@
         }
       }
     },
-    "MINUTES" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "분"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分钟"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分鐘"
-          }
-        }
-      }
-    },
     "Matching workout count: %lld." : {
       "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
       "localizations" : {
@@ -5822,64 +4270,6 @@
         }
       }
     },
-    "Motion CSV Exports" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モーションCSVエクスポート"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "동작 CSV 내보내기"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "动作 CSV 导出"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "動作 CSV 匯出"
-          }
-        }
-      }
-    },
-    "Motion access is requested when you start a workout with supported headphones." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "対応するヘッドフォンでワークアウトを開始すると、モーションへのアクセスが求められます。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "지원되는 헤드폰으로 운동을 시작할 때 동작 접근 권한을 요청합니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "当您使用支持的耳机开始训练时，将请求动作访问权限。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "當您使用支援的耳機開始運動時，將要求動作存取權限。"
-          }
-        }
-      }
-    },
     "Motion source" : {
       "localizations" : {
         "ja" : {
@@ -5908,35 +4298,6 @@
         }
       }
     },
-    "New Record" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新記録"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "신기록"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新纪录"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新紀錄"
-          }
-        }
-      }
-    },
     "New personal record." : {
       "localizations" : {
         "ja" : {
@@ -5961,35 +4322,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "創下新個人紀錄！"
-          }
-        }
-      }
-    },
-    "New personal records" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "今回更新した自己ベスト"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "새 개인 최고 기록"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "本次刷新的个人纪录"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "本次創下的個人紀錄"
           }
         }
       }
@@ -6056,35 +4388,6 @@
         }
       }
     },
-    "No Motion CSVs Yet" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "モーションCSVはまだありません"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "아직 동작 CSV 파일이 없습니다"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "暂无动作 CSV 文件"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "尚無動作 CSV 檔案"
-          }
-        }
-      }
-    },
     "No Tracking Device Available" : {
       "localizations" : {
         "ja" : {
@@ -6109,35 +4412,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "沒有可用的追蹤裝置"
-          }
-        }
-      }
-    },
-    "No cloud data restored yet. If you recently reinstalled the app, leave it open for a bit longer so iCloud can finish syncing." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "まだ iCloud のデータは復元されていません。最近アプリを再インストールした場合は、iCloud の同期が完了するまでこのまま少し開いたままにしてください。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "아직 복원된 클라우드 데이터가 없습니다. 최근에 앱을 다시 설치했다면 iCloud 동기화가 완료될 때까지 앱을 잠시 열어 두세요."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "尚未恢复云端数据。如果您最近重新安装了应用，请让应用保持打开一段时间，以便 iCloud 完成同步。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "尚未回復雲端資料。如果您最近重新安裝了 App，請讓 App 保持開啟一段時間，以便 iCloud 完成同步。"
           }
         }
       }
@@ -6194,64 +4468,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "尚無收藏"
-          }
-        }
-      }
-    },
-    "No iCloud account is currently signed in, so previous cloud-backed sessions cannot be restored on this device yet." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在このデバイスでは iCloud にサインインしていないため、以前 iCloud に保存されたセッションはまだ復元できません。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "현재 iCloud 계정에 로그인되어 있지 않아 이전에 클라우드에 백업된 세션을 아직 복원할 수 없습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "当前未登录 iCloud 账户，因此暂无法在此设备上恢复此前备份至云端的训练记录。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "目前未登入 iCloud 帳號，因此暫時無法在此裝置上回復先前備份至雲端的運動紀錄。"
-          }
-        }
-      }
-    },
-    "No iCloud account is currently signed in, so previous cloud-backed workouts cannot be restored on this device yet." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在このデバイスでは iCloud にサインインしていないため、以前 iCloud に保存されたワークアウトはまだ復元できません。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "현재 iCloud 계정에 로그인되어 있지 않아 이전에 클라우드에 백업된 운동을 아직 복원할 수 없습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "当前未登录 iCloud 账户，因此暂无法在此设备上恢复此前备份至云端的训练记录。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "目前未登入 iCloud 帳號，因此暫時無法在此裝置上回復先前備份至雲端的運動紀錄。"
           }
         }
       }
@@ -6389,35 +4605,6 @@
         }
       }
     },
-    "No motion source connected yet" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "利用できるデバイス検索中"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "연결된 동작 소스 없음"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在查找可用设备"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在尋找可用裝置"
-          }
-        }
-      }
-    },
     "No personal records achieved yet. Complete a workout to set your first records!" : {
       "comment" : "Siri/Shortcuts workout response; placeholders follow the English source order.",
       "localizations" : {
@@ -6511,93 +4698,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "尚無紀錄"
-          }
-        }
-      }
-    },
-    "No sessions" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッションなし"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 없음"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無運動"
-          }
-        }
-      }
-    },
-    "No sessions in this month." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この月のセッションはありません。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이번 달 세션이 없습니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "本月暂无训练。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "本月尚無運動。"
-          }
-        }
-      }
-    },
-    "No sessions yet" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "まだセッションがありません"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "아직 세션이 없습니다"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "暂无训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "尚無運動"
           }
         }
       }
@@ -6925,41 +5025,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "單次買斷"
-          }
-        }
-      }
-    },
-    "One-time payment charged to your Apple ID account. Family Sharing supported." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "One-time payment charged to your Apple ID account. Family Sharing supported."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple IDアカウントに課金される1回限りの支払いです。ファミリー共有対応。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple ID 계정으로 한 번만 결제되며 가족 공유가 지원됩니다."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "将通过您的 Apple ID 账户一次性扣款，支持“家人共享”。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "將透過您的 Apple ID 帳號單次扣款，支援「家人共享」。"
           }
         }
       }
@@ -7472,35 +5537,6 @@
         }
       }
     },
-    "Prefer Headphones for iPhone Sessions" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ヘッドフォンを優先"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone 세션에서 헤드폰 우선 사용"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone 训练优先使用耳机"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone 運動優先使用耳機"
-          }
-        }
-      }
-    },
     "Prefer Headphones for iPhone Workouts" : {
       "localizations" : {
         "ja" : {
@@ -7727,35 +5763,6 @@
         }
       }
     },
-    "RATE" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "レート"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "페이스"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "节奏"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "節奏"
-          }
-        }
-      }
-    },
     "RATE(AVG)" : {
       "localizations" : {
         "ja" : {
@@ -7864,93 +5871,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "심박수 및 활동 에너지를 읽습니다."
-          }
-        }
-      }
-    },
-    "Ready to start session" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション開始準備完了"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "准备开始训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "準備開始運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 시작 준비 완료"
-          }
-        }
-      }
-    },
-    "Ready to start workout" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ワークアウト開始準備完了"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "准备开始训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "準備開始運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 시작 준비 완료"
-          }
-        }
-      }
-    },
-    "Ready?" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "準備はいいですか？"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "准备好了吗？"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "準備好了嗎？"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "준비되셨나요?"
           }
         }
       }
@@ -8293,180 +6213,6 @@
         }
       }
     },
-    "SESSION BREAKDOWN" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション内訳"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练详情分段"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動分段明細"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 상세 분석"
-          }
-        }
-      }
-    },
-    "SESSION COMPLETE" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション完了"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练完成"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動完成"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 완료"
-          }
-        }
-      }
-    },
-    "SESSION DEVICE" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッションデバイス"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练设备"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動裝置"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 기기"
-          }
-        }
-      }
-    },
-    "SESSIONS" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练记录"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動紀錄"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션"
-          }
-        }
-      }
-    },
-    "SESSIONS THIS MONTH" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "今月のセッション"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "本月训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "本月運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이번 달 세션"
-          }
-        }
-      }
-    },
-    "SHARE CSV" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CSVを共有"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "共享 CSV"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分享 CSV"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CSV 공유"
-          }
-        }
-      }
-    },
     "START" : {
       "localizations" : {
         "ja" : {
@@ -8495,151 +6241,6 @@
         }
       }
     },
-    "START SESSION" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "はじめる"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开始训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開始運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "시작하기"
-          }
-        }
-      }
-    },
-    "START WORKOUT" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ワークアウトを開始"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开始训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開始運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 시작"
-          }
-        }
-      }
-    },
-    "STOP" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "終了する"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "结束"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "結束"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "종료"
-          }
-        }
-      }
-    },
-    "STOP ON WATCH" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Watchで終了できます"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "请在手表上结束"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "請在手錶上結束"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Watch에서 종료하세요"
-          }
-        }
-      }
-    },
-    "STOP SESSION" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "終了する"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "结束训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "結束運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "종료하기"
-          }
-        }
-      }
-    },
     "STOP WORKOUT" : {
       "localizations" : {
         "ja" : {
@@ -8664,35 +6265,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "운동 종료"
-          }
-        }
-      }
-    },
-    "Save" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "儲存"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "저장"
           }
         }
       }
@@ -8911,35 +6483,6 @@
         }
       }
     },
-    "Searching" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "検索中"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "搜索中"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "搜尋中"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "검색 중"
-          }
-        }
-      }
-    },
     "Select a workout" : {
       "localizations" : {
         "ja" : {
@@ -8964,35 +6507,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "운동 선택"
-          }
-        }
-      }
-    },
-    "Selected automatically when the session starts." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション開始時に自動で選択されます。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练开始时将自动选择。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動開始時將自動選擇。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 시작 시 자동으로 선택됩니다."
           }
         }
       }
@@ -9025,302 +6539,6 @@
         }
       }
     },
-    "Session Complete!" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション完了！"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练完成！"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動完成！"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 완료!"
-          }
-        }
-      }
-    },
-    "Session Count" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Session Count"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ワークアウト数"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练次数"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動次數"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 횟수"
-          }
-        }
-      }
-    },
-    "Session Details" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション詳細"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练详情"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動詳細資料"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 상세 정보"
-          }
-        }
-      }
-    },
-    "Session countdown" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション開始カウントダウン"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练开始倒计时"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動開始倒數"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 카운트다운"
-          }
-        }
-      }
-    },
-    "Session in progress" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション進行中"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练进行中"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動進行中"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 진행 중"
-          }
-        }
-      }
-    },
-    "Session will start on Apple Watch" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッションはApple Watchで開始されます"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练将在 Apple Watch 上开始"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動將在 Apple Watch 上開始"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch에서 세션이 시작됩니다"
-          }
-        }
-      }
-    },
-    "Session will use %@ when available" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "利用可能な場合は %@ を使用します"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "可用时将使用 %@"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "可用時將使用 %@"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사용 가능할 때 %@을(를) 사용합니다"
-          }
-        }
-      }
-    },
-    "Session will use iPhone" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッションはiPhoneを使用します"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练将使用 iPhone"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動將使用 iPhone"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone에서 세션이 진행됩니다"
-          }
-        }
-      }
-    },
-    "Set Goal" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "目標を設定"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "设定目标"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "設定目標"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "목표 설정"
-          }
-        }
-      }
-    },
-    "Set Session Goal" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション目標を設定"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "设定训练目标"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "設定運動目標"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 목표 설정"
-          }
-        }
-      }
-    },
     "Settings" : {
       "localizations" : {
         "ja" : {
@@ -9345,64 +6563,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "설정"
-          }
-        }
-      }
-    },
-    "Share CSV" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CSVを共有"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "共享 CSV"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分享 CSV"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "CSV 공유"
-          }
-        }
-      }
-    },
-    "Share Latest CSV" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "最新のCSVを共有"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "共享最新 CSV"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分享最新 CSV"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "최신 CSV 공유"
           }
         }
       }
@@ -9532,35 +6692,6 @@
         }
       }
     },
-    "Shows the next month of sessions." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "次の月のセッションを表示します。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "显示下个月的训练。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "顯示下個月的運動。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "다음 달 세션을 표시합니다."
-          }
-        }
-      }
-    },
     "Shows the next month of workouts." : {
       "localizations" : {
         "ja" : {
@@ -9623,35 +6754,6 @@
         }
       }
     },
-    "Shows the previous month of sessions." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "前の月のセッションを表示します。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "显示上个月的训练。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "顯示上個月的運動。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이전 달 세션을 표시합니다."
-          }
-        }
-      }
-    },
     "Shows the previous month of workouts." : {
       "localizations" : {
         "ja" : {
@@ -9710,35 +6812,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이전 해 운동을 표시합니다."
-          }
-        }
-      }
-    },
-    "Shows why this device is unavailable" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このデバイスが利用できない理由を表示します"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "显示此设备不可用的原因"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "顯示此裝置無法使用的原因"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 기기를 사용할 수 없는 이유 표시"
           }
         }
       }
@@ -10031,41 +7104,6 @@
         }
       }
     },
-    "Start and track unlimited jump rope sessions without any future limits." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start and track unlimited jump rope sessions without any future limits."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "制限なく何度でもなわとびセッションを開始・記録することができます。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "不受任何次数限制，随时开始并记录无限次跳绳训练。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "不受任何次數限制，隨時開始並記錄無限次跳繩運動。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "앞으로 횟수 제한 없이 무제한으로 줄넘기 세션을 시작하고 기록하세요."
-          }
-        }
-      }
-    },
     "Start and track unlimited jump rope workouts without any future limits." : {
       "localizations" : {
         "ja" : {
@@ -10265,35 +7303,6 @@
         }
       }
     },
-    "Stop the workout from Apple Watch." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watchからワークアウトを停止してください。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "请在 Apple Watch 上结束训练。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "請在 Apple Watch 上結束運動。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch에서 운동을 종료하세요."
-          }
-        }
-      }
-    },
     "Sync Failed" : {
       "localizations" : {
         "en" : {
@@ -10324,64 +7333,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "동기화 실패"
-          }
-        }
-      }
-    },
-    "Syncing from iCloud. Your saved sessions may take a moment to reappear after reinstalling the app." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud から同期しています。アプリを再インストールした後は、保存済みのセッションが再表示されるまで少し時間がかかる場合があります。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在从 iCloud 同步。重新安装应用后，已保存的训练记录可能需要一点时间才会重新显示。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在從 iCloud 同步。重新安裝 App 後，已儲存的運動紀錄可能需要一點時間才會重新顯示。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud에서 동기화하는 중입니다. 앱을 다시 설치한 후 저장된 세션이 다시 표시되기까지 잠시 시간이 걸릴 수 있습니다."
-          }
-        }
-      }
-    },
-    "Syncing from iCloud. Your saved workouts may take a moment to reappear after reinstalling the app." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud から同期しています。アプリを再インストールした後は、保存済みのワークアウトが再表示されるまで少し時間がかかる場合があります。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在从 iCloud 同步。重新安装应用后，已保存的训练记录可能需要一点时间才会重新显示。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在從 iCloud 同步。重新安裝 App 後，已儲存的運動紀錄可能需要一點時間才會重新顯示。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud에서 동기화하는 중입니다. 앱을 다시 설치한 후 저장된 운동이 다시 표시되기까지 잠시 시간이 걸릴 수 있습니다."
           }
         }
       }
@@ -10476,35 +7427,6 @@
         }
       }
     },
-    "Tap Start to begin" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "はじめるボタンでスタート"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "轻点“开始”即可开始跳绳"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "點一下「開始」即可開始跳繩"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "시작을 탭하여 운동 시작"
-          }
-        }
-      }
-    },
     "Tap the heart on any workout to keep it here." : {
       "localizations" : {
         "ja" : {
@@ -10529,93 +7451,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "운동의 하트를 탭하면 여기에 저장됩니다."
-          }
-        }
-      }
-    },
-    "Tap to Start" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "タップしてスタート"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "轻点开始"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "點一下開始"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "탭하여 시작"
-          }
-        }
-      }
-    },
-    "Tap to start or cancel session countdown." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "タップしてカウントダウンを開始／キャンセル。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "轻点以开始或取消训练倒计时。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "點一下以開始或取消運動倒數。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "탭하여 세션 카운트다운을 시작하거나 취소합니다."
-          }
-        }
-      }
-    },
-    "Tap to start or cancel workout countdown." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "タップしてワークアウト開始カウントダウンを開始またはキャンセルします。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "轻点以开始或取消训练倒计时。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "點一下以開始或取消運動倒數。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "탭하여 운동 카운트다운을 시작하거나 취소합니다."
           }
         }
       }
@@ -10654,64 +7489,6 @@
         }
       }
     },
-    "The app could not confirm iCloud availability, so session restore status is unknown." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリが iCloud の利用状況を確認できなかったため、セッションの復元状況は不明です。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "应用无法确认 iCloud 可用状态，因此训练记录的恢复状态未知。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App 無法確認 iCloud 可用狀態，因此運動紀錄的回復狀態不明。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "앱에서 iCloud 사용 가능 여부를 확인할 수 없어 세션 복원 상태를 알 수 없습니다."
-          }
-        }
-      }
-    },
-    "The app could not confirm iCloud availability, so workout restore status is unknown." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリが iCloud の利用状況を確認できなかったため、ワークアウトの復元状況は不明です。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "应用无法确认 iCloud 可用状态，因此训练记录的恢复状态未知。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App 無法確認 iCloud 可用狀態，因此運動紀錄的回復狀態不明。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "앱에서 iCloud 사용 가능 여부를 확인할 수 없어 운동 복원 상태를 알 수 없습니다."
-          }
-        }
-      }
-    },
     "The highest number of consecutive jumps you completed without stopping." : {
       "localizations" : {
         "ja" : {
@@ -10736,64 +7513,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "쉬지 않고 연속으로 뛴 최대 줄넘기 횟수입니다."
-          }
-        }
-      }
-    },
-    "The motion source is managed automatically during this iPhone session." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このiPhoneセッションでは、モーションソースが自動で管理されます。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在此 iPhone 训练期间，动作数据源将自动管理。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在此 iPhone 運動期間，動作資料來源將自動管理。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 iPhone 세션 동안 동작 소스가 자동으로 관리됩니다."
-          }
-        }
-      }
-    },
-    "The motion source is managed automatically during this iPhone workout." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このiPhoneワークアウトでは、モーションソースが自動で管理されます。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在此 iPhone 训练期间，动作数据源将自动管理。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在此 iPhone 運動期間，動作資料來源將自動管理。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 iPhone 운동 동안 동작 소스가 자동으로 관리됩니다."
           }
         }
       }
@@ -10910,64 +7629,6 @@
         }
       }
     },
-    "This deletes all locally saved debug motion CSV files on this iPhone." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このiPhoneにローカル保存されているデバッグ用モーションCSVファイルをすべて削除します。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这将删除此 iPhone 上本地保存的所有调试动作 CSV 文件。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "這將刪除此 iPhone 上本機儲存的所有除錯動作 CSV 檔案。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 iPhone에 로컬로 저장된 모든 디버그 동작 CSV 파일이 삭제됩니다."
-          }
-        }
-      }
-    },
-    "This removes all personal records from this sheet. Your saved sessions stay in history." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このシートからすべての自己ベストを削除します。保存済みのセッション履歴はそのまま残ります。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这将清除本页中的所有个人纪录，已保存的训练记录仍保留在历史中。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "這將清除此頁中的所有個人紀錄，已儲存的運動紀錄仍保留在歷史中。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 시트에서 모든 개인 최고 기록을 삭제합니다. 저장된 세션은 기록에 그대로 남습니다."
-          }
-        }
-      }
-    },
     "This removes all personal records from this sheet. Your saved workouts stay in history." : {
       "localizations" : {
         "ja" : {
@@ -10992,35 +7653,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이 시트에서 모든 개인 최고 기록을 삭제합니다. 저장된 운동은 기록에 그대로 남습니다."
-          }
-        }
-      }
-    },
-    "This session cannot switch to iPhone after it starts." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このセッションは開始後にiPhoneへ切り替えられません。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "本次训练开始后无法切换至 iPhone。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "本次運動開始後無法切換至 iPhone。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 세션은 시작한 후에는 iPhone으로 전환할 수 없습니다."
           }
         }
       }
@@ -11077,93 +7709,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "이 운동은 지원되는 헤드폰 동작 감지를 사용합니다."
-          }
-        }
-      }
-    },
-    "Threshold Adjustment" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "しきい値調整"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "阈值调整"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "閾值調整"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "임계값 조절"
-          }
-        }
-      }
-    },
-    "Threshold adjustment" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "しきい値調整"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "阈值调整"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "閾值調整"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "임계값 조절"
-          }
-        }
-      }
-    },
-    "Time" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "時間"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "时间"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "時間"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "시간"
           }
         }
       }
@@ -11383,35 +7928,6 @@
         }
       }
     },
-    "Tracking with iPhone" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhoneで計測中"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在使用 iPhone 追踪"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在使用 iPhone 追蹤"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone으로 측정 중"
-          }
-        }
-      }
-    },
     "Unable to Update Permissions" : {
       "localizations" : {
         "ja" : {
@@ -11555,35 +8071,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "즐겨찾기를 저장할 수 없음"
-          }
-        }
-      }
-    },
-    "Unavailable" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "利用不可"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "不可用"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無法使用"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사용 불가"
           }
         }
       }
@@ -11752,76 +8239,6 @@
         }
       }
     },
-    "Unlock Unlimited Workouts — ¥100" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock Unlimited Workouts — ¥100"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無制限ワークアウトをアンロック — ¥100"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "解锁无限次训练 — ¥100"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "解鎖無限次運動 — ¥100"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "무제한 운동 잠금 해제 — ¥100"
-          }
-        }
-      }
-    },
-    "Unlock Unlimited — %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock Unlimited — %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無制限をアンロック — %@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "解锁无限版 — %@"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "解鎖無限版 — %@"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "무제한 잠금 해제 — %@"
-          }
-        }
-      }
-    },
     "Uploading to iCloud..." : {
       "localizations" : {
         "en" : {
@@ -11852,41 +8269,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloud에 업로드 중..."
-          }
-        }
-      }
-    },
-    "Uploading workouts to iCloud..." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uploading workouts to iCloud..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloudにワークアウトをアップロード中..."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在将训练上传至 iCloud..."
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在將運動上傳至 iCloud..."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동을 iCloud에 업로드 중..."
           }
         }
       }
@@ -11950,41 +8332,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "버전 %@"
-          }
-        }
-      }
-    },
-    "View Jump Rope Session" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View Jump Rope Session"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "縄跳びセッションを表示"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "查看跳绳训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "查看跳繩運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "줄넘기 세션 보기"
           }
         }
       }
@@ -12575,35 +8922,6 @@
         }
       }
     },
-    "Workout will use iPhone" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ワークアウトはiPhoneで計測します"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "训练将使用 iPhone"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "運動將使用 iPhone"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone으로 운동을 측정합니다"
-          }
-        }
-      }
-    },
     "Workout write permission is not granted." : {
       "localizations" : {
         "ja" : {
@@ -12662,35 +8980,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apple Watch 또는 iPhone에서 기록한 운동이 여기에 표시됩니다."
-          }
-        }
-      }
-    },
-    "Writing your session comment..." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッションコメントを作成しています..."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在撰写训练点评..."
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在撰寫運動評語..."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "세션 코멘트를 작성하는 중..."
           }
         }
       }
@@ -12957,35 +9246,6 @@
         }
       }
     },
-    "Your average calorie burn efficiency across the full session duration." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セッション全体を通した、平均的なカロリー消費効率です。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "整个训练期间的平均热量消耗效率。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "整個運動期間的平均熱量消耗效率。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "전체 세션 동안의 평균 칼로리 소모 효율입니다."
-          }
-        }
-      }
-    },
     "Your average calorie burn efficiency across the full workout duration." : {
       "localizations" : {
         "ja" : {
@@ -13163,215 +9423,6 @@
         }
       }
     },
-    "iCloud access is restricted on this device, so cloud-backed sessions cannot be restored right now." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたセッションは現在復元できません。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "此设备上的 iCloud 访问受到限制，目前无法恢复云端备份的训练记录。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "此裝置上的 iCloud 存取受到限制，目前無法回復雲端備份的運動紀錄。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 기기에서 iCloud 접근이 제한되어 있어 현재 클라우드에 백업된 세션을 복원할 수 없습니다."
-          }
-        }
-      }
-    },
-    "iCloud access is restricted on this device, so cloud-backed workouts cannot be restored right now." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このデバイスでは iCloud へのアクセスが制限されているため、iCloud に保存されたワークアウトは現在復元できません。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "此设备上的 iCloud 访问受到限制，目前无法恢复云端备份的训练记录。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "此裝置上的 iCloud 存取受到限制，目前無法回復雲端備份的運動紀錄。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 기기에서 iCloud 접근이 제한되어 있어 현재 클라우드에 백업된 운동을 복원할 수 없습니다."
-          }
-        }
-      }
-    },
-    "iCloud is temporarily unavailable. Previously synced sessions may reappear once the account becomes reachable again." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたセッションが再表示される場合があります。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 暂时不可用。账户恢复连接后，此前同步的训练记录可能会重新显示。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 暫時無法使用。帳號恢復連線後，先前同步的運動紀錄可能會重新顯示。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud를 일시적으로 사용할 수 없습니다. 계정에 다시 연결되면 이전에 동기화된 세션이 다시 나타날 수 있습니다."
-          }
-        }
-      }
-    },
-    "iCloud is temporarily unavailable. Previously synced workouts may reappear once the account becomes reachable again." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud は一時的に利用できません。アカウントに再び接続できるようになると、以前同期されたワークアウトが再表示される場合があります。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 暂时不可用。账户恢复连接后，此前同步的训练记录可能会重新显示。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 暫時無法使用。帳號恢復連線後，先前同步的運動紀錄可能會重新顯示。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud를 일시적으로 사용할 수 없습니다. 계정에 다시 연결되면 이전에 동기화된 운동이 다시 나타날 수 있습니다."
-          }
-        }
-      }
-    },
-    "iCloud sync encountered an issue: %@. Tap 'Check iCloud Again' to retry." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud sync encountered an issue: %@. Tap 'Check iCloud Again' to retry."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud同期で問題が発生しました: %@。「iCloudを再確認」をタップして再試行してください。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 同步遇到问题：%@。请轻点“重新检查 iCloud”重试。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 同步發生問題：%@。請點一下「重新檢查 iCloud」重試。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 동기화 중 문제가 발생했습니다: %@. ‘iCloud 다시 확인’을 탭하여 재시도하세요."
-          }
-        }
-      }
-    },
-    "iPhone" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone"
-          }
-        }
-      }
-    },
-    "iPhone Session" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhoneから始めるセッション"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone 训练"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone 運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone 세션"
-          }
-        }
-      }
-    },
     "iPhone Workout" : {
       "localizations" : {
         "ja" : {
@@ -13396,35 +9447,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iPhone 운동"
-          }
-        }
-      }
-    },
-    "iPhone motion is not available on this device." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このデバイスでは iPhoneのモーションを利用できません。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "此设备不支持 iPhone 动作感应。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "此裝置不支援 iPhone 動作感測。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 기기에서는 iPhone 동작 감지를 사용할 수 없습니다."
           }
         }
       }
