@@ -155,7 +155,7 @@ sequenceDiagram
         WMotion->>WMotion: Reset JumpDetector & arm tracking (isTracking = true)
         WMotion->>WHK: startWorkout(startDate: startTime, ...)
         WHK->>WHK: session.startActivity(with:) + builder.beginCollection(at:)
-        WState->>WState: Play .start haptic + speak("Workout Started!")
+        WState->>WState: Play .start haptic
 
         loop Active Workout (100 Hz IMU + Live HealthKit)
             WMotion->>WState: addJump(1, jumpOffset)

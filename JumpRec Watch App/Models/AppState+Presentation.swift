@@ -29,24 +29,19 @@ actor WatchSpeechCoordinator {
     private var idleContinuation: CheckedContinuation<Void, Never>?
     /// Guards against a wedged synthesizer leaving background audio ducked indefinitely.
     private var watchdogTask: Task<Void, Never>?
+    /// Retries audio session deactivation once when `didFinish` races with audio teardown.
+    private var deactivationRetryTask: Task<Void, Never>?
 
     // MARK: - Public API
 
     /// Rebuilds the speech synthesizer and warms it up silently without ducking other audio.
     func prepareForWorkout(text: String, languageCode: String) {
-        guard activeUtteranceID == nil || isWarmupInProgress else { return }
+        guard activeUtteranceID == nil else { return }
         rebuildSynthesizer()
         isWarmupInProgress = true
 
         // Activate `.mixWithOthers` so the audio route warms up without dipping background music.
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, options: [.mixWithOthers])
-            try session.setActive(true)
-            isAudioSessionActive = true
-        } catch {
-            Self.logger.error("Warmup audio session error: \(error.localizedDescription, privacy: .public)")
-        }
+        activateAudioSession(options: [.mixWithOthers])
 
         let utterance = AVSpeechUtterance(string: text)
         utterance.volume = 0
@@ -54,7 +49,7 @@ actor WatchSpeechCoordinator {
         utterance.voice = voice(for: languageCode)
         let utteranceID = ObjectIdentifier(utterance)
         activeUtteranceID = utteranceID
-        scheduleWatchdog(for: utteranceID, timeoutSeconds: 5)
+        scheduleWatchdog(for: utteranceID, timeoutSeconds: 30)
         synthesizer.speak(utterance)
     }
 
@@ -161,9 +156,17 @@ actor WatchSpeechCoordinator {
 
     /// Activates `.playback` with `.duckOthers` right before speaking a real workout cue.
     private func activateDuckingAudioSession() {
+        activateAudioSession(options: [.duckOthers])
+    }
+
+    /// Configures and activates the audio session while cancelling any stale deactivation retry.
+    private func activateAudioSession(options: AVAudioSession.CategoryOptions) {
+        deactivationRetryTask?.cancel()
+        deactivationRetryTask = nil
+
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, options: [.duckOthers])
+            try session.setCategory(.playback, options: options)
             try session.setActive(true)
             isAudioSessionActive = true
         } catch {
@@ -172,14 +175,38 @@ actor WatchSpeechCoordinator {
     }
 
     /// Releases the audio session and notifies background music to restore full volume.
-    private func deactivateAudioSessionIfNeeded() {
+    private func deactivateAudioSessionIfNeeded(allowRetry: Bool = true) {
         guard isAudioSessionActive else { return }
-        isAudioSessionActive = false
+
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+            isAudioSessionActive = false
         } catch {
             Self.logger.error("Audio session deactivation error: \(error.localizedDescription, privacy: .public)")
+            guard allowRetry else { return }
+            scheduleDeactivationRetry()
         }
+    }
+
+    /// Retries deactivation briefly if the synthesizer audio unit was still tearing down on `didFinish`.
+    private func scheduleDeactivationRetry() {
+        deactivationRetryTask?.cancel()
+        deactivationRetryTask = Task { [weak self] in
+            do {
+                try await Task.sleep(for: .milliseconds(250))
+            } catch {
+                return
+            }
+            guard let self, !Task.isCancelled else { return }
+            await retryDeactivateAudioSession()
+        }
+    }
+
+    /// Attempts one deferred deactivation if no newer speech utterance has started.
+    private func retryDeactivateAudioSession() {
+        deactivationRetryTask = nil
+        guard activeUtteranceID == nil else { return }
+        deactivateAudioSessionIfNeeded(allowRetry: false)
     }
 
     /// Cleans up state when the active utterance finishes or cancels, ignoring stale callbacks.
@@ -189,6 +216,9 @@ actor WatchSpeechCoordinator {
         watchdogTask = nil
         activeUtteranceID = nil
         isWarmupInProgress = false
+        if synthesizer.isPaused {
+            synthesizer.stopSpeaking(at: .immediate)
+        }
         deactivateAudioSessionIfNeeded()
         resumeIdleContinuation()
     }
@@ -291,11 +321,6 @@ extension JumpRecState {
     func waitForCurrentSpeech() async {
         await pendingSpeechTask?.value
         await speechCoordinator.waitForActiveSpeech()
-    }
-
-    /// Returns the localized spoken phrase for session start.
-    var localizedSessionStartedAnnouncement: String {
-        AppLocalization.sessionStartedAnnouncement()
     }
 
     /// Returns the localized spoken phrase for session finish.

@@ -23,7 +23,6 @@ extension JumpRecState {
     /// Tears down pre-warmed workout resources when the countdown is cancelled before start.
     func cancelPreparedStart() {
         guard jumpState == .idle else { return }
-        stopSpeechAndDeactivateAudio()
         motionManager?.cancelPreparation()
     }
 
@@ -58,7 +57,6 @@ extension JumpRecState {
             )
         }
         WKInterfaceDevice.current().play(.start)
-        speak(text: localizedSessionStartedAnnouncement)
         jumpState = .jumping
         // Announce elapsed minutes for both count and time goals.
         startMinuteAnnouncements()
