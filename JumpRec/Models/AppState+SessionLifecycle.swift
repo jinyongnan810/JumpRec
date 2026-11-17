@@ -193,7 +193,7 @@ extension JumpRecState {
 
         syncIdleTimer()
         notificationFeedbackGenerator.notificationOccurred(.success)
-        speak(text: localizedSessionFinishedAnnouncement)
+        speak(text: localizedSessionFinishedAnnouncement, interruptsCurrentSpeech: true)
         syncLiveActivity()
 
         if let endTime {

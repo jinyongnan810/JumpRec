@@ -11,6 +11,11 @@ import OSLog
 actor WatchSpeechCoordinator {
     // MARK: - Stored Properties
 
+    private struct QueuedUtterance {
+        let text: String
+        let languageCode: String
+    }
+
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "JumpRec.watch", category: "Speech")
 
     /// Holds the active synthesizer; replaced when resetting after standby or a wedged utterance.
@@ -25,6 +30,8 @@ actor WatchSpeechCoordinator {
     private var isAudioSessionActive = false
     /// Identifies the currently active utterance so older cancelled utterances cannot deactivate the session.
     private var activeUtteranceID: ObjectIdentifier?
+    /// Holds milestone utterances waiting to play after the active utterance finishes.
+    private var pendingUtterances: [QueuedUtterance] = []
     /// Suspends the workout finalizer until the active non-warmup utterance completes or resets.
     private var idleContinuation: CheckedContinuation<Void, Never>?
     /// Guards against a wedged synthesizer leaving background audio ducked indefinitely.
@@ -36,7 +43,7 @@ actor WatchSpeechCoordinator {
 
     /// Rebuilds the speech synthesizer and warms it up silently without ducking other audio.
     func prepareForWorkout(text: String, languageCode: String) {
-        guard activeUtteranceID == nil else { return }
+        guard activeUtteranceID == nil, pendingUtterances.isEmpty else { return }
         rebuildSynthesizer()
         isWarmupInProgress = true
 
@@ -53,30 +60,40 @@ actor WatchSpeechCoordinator {
         synthesizer.speak(utterance)
     }
 
-    /// Activates ducking audio and speaks a workout announcement, recovering if a prior cue wedged.
-    func speak(text: String, languageCode: String) {
+    /// Activates ducking audio and queues or interrupts speech depending on priority.
+    func speak(text: String, languageCode: String, interruptsCurrentSpeech: Bool = false) {
         ensureSynthesizerConfigured()
-        watchdogTask?.cancel()
-        watchdogTask = nil
 
-        // If a previous utterance is still marked active, stop it cleanly before starting the new cue.
-        if activeUtteranceID != nil || isWarmupInProgress || synthesizer.isSpeaking || synthesizer.isPaused {
-            synthesizer.stopSpeaking(at: .immediate)
-            isWarmupInProgress = false
+        if interruptsCurrentSpeech {
+            pendingUtterances.removeAll()
+            watchdogTask?.cancel()
+            watchdogTask = nil
+
+            if activeUtteranceID != nil || isWarmupInProgress || synthesizer.isSpeaking || synthesizer.isPaused {
+                synthesizer.stopSpeaking(at: .immediate)
+                isWarmupInProgress = false
+            }
+
+            startUtterance(text: text, languageCode: languageCode)
+            return
         }
 
-        activateDuckingAudioSession()
+        if isWarmupInProgress {
+            watchdogTask?.cancel()
+            watchdogTask = nil
+            synthesizer.stopSpeaking(at: .immediate)
+            isWarmupInProgress = false
+        } else if activeUtteranceID != nil {
+            pendingUtterances.append(QueuedUtterance(text: text, languageCode: languageCode))
+            return
+        }
 
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = voice(for: languageCode)
-        let utteranceID = ObjectIdentifier(utterance)
-        activeUtteranceID = utteranceID
-        scheduleWatchdog(for: utteranceID, timeoutSeconds: 15)
-        synthesizer.speak(utterance)
+        startUtterance(text: text, languageCode: languageCode)
     }
 
     /// Stops any active speech and releases the ducking audio session immediately.
     func stopAndDeactivate() {
+        pendingUtterances.removeAll()
         watchdogTask?.cancel()
         watchdogTask = nil
         activeUtteranceID = nil
@@ -89,13 +106,13 @@ actor WatchSpeechCoordinator {
         resumeIdleContinuation()
     }
 
-    /// Suspends until the active non-warmup speech utterance ends, cancels, or hits the watchdog.
+    /// Suspends until the active and queued non-warmup utterances end, cancel, or hit the watchdog.
     func waitForActiveSpeech() async {
-        guard activeUtteranceID != nil, !isWarmupInProgress else { return }
+        guard (activeUtteranceID != nil && !isWarmupInProgress) || !pendingUtterances.isEmpty else { return }
 
         resumeIdleContinuation()
         await withCheckedContinuation { continuation in
-            guard activeUtteranceID != nil, !isWarmupInProgress else {
+            guard (activeUtteranceID != nil && !isWarmupInProgress) || !pendingUtterances.isEmpty else {
                 continuation.resume()
                 return
             }
@@ -140,6 +157,7 @@ actor WatchSpeechCoordinator {
 
     /// Replaces the synthesizer instance to clear stale XPC state after standby or a hung utterance.
     private func rebuildSynthesizer() {
+        pendingUtterances.removeAll()
         watchdogTask?.cancel()
         watchdogTask = nil
         activeUtteranceID = nil
@@ -152,6 +170,18 @@ actor WatchSpeechCoordinator {
         deactivateAudioSessionIfNeeded()
         setupSynthesizer()
         resumeIdleContinuation()
+    }
+
+    /// Activates ducking audio and starts a single spoken announcement with a watchdog timer.
+    private func startUtterance(text: String, languageCode: String) {
+        activateDuckingAudioSession()
+
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = voice(for: languageCode)
+        let utteranceID = ObjectIdentifier(utterance)
+        activeUtteranceID = utteranceID
+        scheduleWatchdog(for: utteranceID, timeoutSeconds: 15)
+        synthesizer.speak(utterance)
     }
 
     /// Activates `.playback` with `.duckOthers` right before speaking a real workout cue.
@@ -209,13 +239,20 @@ actor WatchSpeechCoordinator {
         deactivateAudioSessionIfNeeded(allowRetry: false)
     }
 
-    /// Cleans up state when the active utterance finishes or cancels, ignoring stale callbacks.
+    /// Cleans up state when the active utterance finishes or cancels, draining any queued utterances first.
     private func handleUtteranceEnded(synthesizerID: ObjectIdentifier, utteranceID: ObjectIdentifier) {
         guard synthesizerID == ObjectIdentifier(synthesizer), activeUtteranceID == utteranceID else { return }
         watchdogTask?.cancel()
         watchdogTask = nil
         activeUtteranceID = nil
         isWarmupInProgress = false
+
+        if !pendingUtterances.isEmpty {
+            let next = pendingUtterances.removeFirst()
+            startUtterance(text: next.text, languageCode: next.languageCode)
+            return
+        }
+
         if synthesizer.isPaused {
             synthesizer.stopSpeaking(at: .immediate)
         }
@@ -292,14 +329,24 @@ extension JumpRecState {
 
     // MARK: - Speech
 
-    /// Speaks a localized prompt immediately on the speech coordinator.
-    func speak(text: String) {
-        cancelPendingSpeech()
+    /// Speaks a localized prompt on the speech coordinator, queuing or overriding active speech.
+    func speak(text: String, interruptsCurrentSpeech: Bool = false) {
+        let previousTask = pendingSpeechTask
+        if interruptsCurrentSpeech {
+            previousTask?.cancel()
+            pendingSpeechTask = nil
+        }
         let languageCode = AppLocalization.speechLanguageCode()
 
         pendingSpeechTask = Task { [speechCoordinator] in
+            // Wait for prior tasks to settle or cancel so interrupting speech cannot be overtaken.
+            await previousTask?.value
             guard !Task.isCancelled else { return }
-            await speechCoordinator.speak(text: text, languageCode: languageCode)
+            await speechCoordinator.speak(
+                text: text,
+                languageCode: languageCode,
+                interruptsCurrentSpeech: interruptsCurrentSpeech
+            )
         }
     }
 

@@ -12,6 +12,11 @@ import UIKit
 actor PhoneSpeechCoordinator {
     // MARK: - Stored Properties
 
+    private struct QueuedUtterance {
+        let text: String
+        let languageCode: String
+    }
+
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "JumpRec", category: "Speech")
 
     /// Synthesizer owned by the actor so audio session work never blocks the main thread.
@@ -26,6 +31,8 @@ actor PhoneSpeechCoordinator {
     private var isAudioSessionActive = false
     /// Identifies the latest utterance so stale delegate callbacks do not release audio early.
     private var activeUtteranceID: ObjectIdentifier?
+    /// Holds milestone utterances waiting to play after the active utterance finishes.
+    private var pendingUtterances: [QueuedUtterance] = []
     /// Retries audio session deactivation once when `didFinish` races with audio teardown.
     private var deactivationRetryTask: Task<Void, Never>?
 
@@ -46,16 +53,36 @@ actor PhoneSpeechCoordinator {
         synthesizer.speak(utterance)
     }
 
-    /// Activates ducking audio and speaks a localized workout announcement immediately.
-    func speak(text: String, languageCode: String) {
+    /// Activates ducking audio and queues or interrupts speech depending on priority.
+    func speak(text: String, languageCode: String, interruptsCurrentSpeech: Bool = false) {
         ensureSynthesizerConfigured()
 
-        // Cancel the silent warmup so real speech can play immediately.
+        if interruptsCurrentSpeech {
+            pendingUtterances.removeAll()
+            if activeUtteranceID != nil || isWarmupInProgress || synthesizer.isSpeaking || synthesizer.isPaused {
+                synthesizer.stopSpeaking(at: .immediate)
+                isWarmupInProgress = false
+            }
+            startUtterance(text: text, languageCode: languageCode)
+            return
+        }
+
+        // Cancel silent warmup so real speech plays immediately, and queue behind active cues.
         if isWarmupInProgress {
             synthesizer.stopSpeaking(at: .immediate)
             isWarmupInProgress = false
+        } else if activeUtteranceID != nil {
+            pendingUtterances.append(QueuedUtterance(text: text, languageCode: languageCode))
+            return
         }
 
+        startUtterance(text: text, languageCode: languageCode)
+    }
+
+    // MARK: - Helpers
+
+    /// Activates ducking audio and starts a single spoken announcement.
+    private func startUtterance(text: String, languageCode: String) {
         activateAudioSession(options: [.duckOthers])
 
         let utterance = AVSpeechUtterance(string: text)
@@ -63,8 +90,6 @@ actor PhoneSpeechCoordinator {
         activeUtteranceID = ObjectIdentifier(utterance)
         synthesizer.speak(utterance)
     }
-
-    // MARK: - Helpers
 
     /// Lazily attaches the delegate proxy on the actor before any speech starts.
     private func ensureSynthesizerConfigured() {
@@ -142,12 +167,18 @@ actor PhoneSpeechCoordinator {
         deactivateAudioSessionIfNeeded(allowRetry: false)
     }
 
-    /// Cleans up audio ducking after the latest utterance ends.
+    /// Cleans up audio ducking after the active utterance ends, draining any queued utterances first.
     private func handleUtteranceEnded(synthesizerID: ObjectIdentifier, utteranceID: ObjectIdentifier) {
-        guard synthesizerID == ObjectIdentifier(synthesizer) else { return }
+        guard synthesizerID == ObjectIdentifier(synthesizer), activeUtteranceID == utteranceID else { return }
         isWarmupInProgress = false
-        guard activeUtteranceID == utteranceID else { return }
         activeUtteranceID = nil
+
+        if !pendingUtterances.isEmpty {
+            let next = pendingUtterances.removeFirst()
+            startUtterance(text: next.text, languageCode: next.languageCode)
+            return
+        }
+
         if synthesizer.isPaused {
             synthesizer.stopSpeaking(at: .immediate)
         }
@@ -319,11 +350,15 @@ extension JumpRecState {
 
     // MARK: - Speech
 
-    /// Speaks a localized prompt immediately.
-    func speak(text: String) {
+    /// Speaks a localized prompt, queuing behind or overriding active announcements.
+    func speak(text: String, interruptsCurrentSpeech: Bool = false) {
         let languageCode = AppLocalization.speechLanguageCode()
         enqueueSpeechOperation { [speechCoordinator] in
-            await speechCoordinator.speak(text: text, languageCode: languageCode)
+            await speechCoordinator.speak(
+                text: text,
+                languageCode: languageCode,
+                interruptsCurrentSpeech: interruptsCurrentSpeech
+            )
         }
     }
 
