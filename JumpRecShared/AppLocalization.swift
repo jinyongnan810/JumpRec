@@ -201,10 +201,16 @@ public nonisolated enum AppLocalization {
     /// Resolves the hosted privacy policy markdown filename for the given language.
     public static func privacyPolicyFilename(for language: AppLanguage = .current) -> String {
         switch language {
+        case .english:
+            "PRIVACY_POLICY.md"
         case .japanese:
             "PRIVACY_POLICY_ja.md"
-        case .english, .simplifiedChinese, .traditionalChinese, .korean:
-            "PRIVACY_POLICY.md"
+        case .simplifiedChinese:
+            "PRIVACY_POLICY_zh-Hans.md"
+        case .traditionalChinese:
+            "PRIVACY_POLICY_zh-Hant.md"
+        case .korean:
+            "PRIVACY_POLICY_ko.md"
         }
     }
 

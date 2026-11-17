@@ -2,7 +2,7 @@
 
 **最終更新日:** 2026年9月20日
 
-*言語: [English](PRIVACY_POLICY.md) | [日本語 (Japanese)](PRIVACY_POLICY_ja.md)*
+*言語: [English](PRIVACY_POLICY.md) | [日本語](PRIVACY_POLICY_ja.md) | [简体中文](PRIVACY_POLICY_zh-Hans.md) | [繁體中文](PRIVACY_POLICY_zh-Hant.md) | [한국어](PRIVACY_POLICY_ko.md)*
 
 ---
 
