@@ -450,7 +450,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%2$d 年共 %1$lld 次训练"
+            "value" : "%2$d 年共 %1$lld 次运动"
           }
         },
         "zh-Hant" : {
@@ -540,7 +540,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "完成 10 次训练里程碑！🎉"
+            "value" : "完成 10 次运动里程碑！🎉"
           }
         },
         "zh-Hant" : {
@@ -596,7 +596,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "反映您在整个训练过程中保持均匀跳跃节奏的标准化评分。"
+            "value" : "反映您在整个运动过程中保持均匀跳跃节奏的标准化评分。"
           }
         },
         "zh-Hant" : {
@@ -818,7 +818,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "所有过往训练记录、个人纪录和统计数据仍可随时查看。"
+            "value" : "所有过往运动记录、个人纪录和统计数据仍可随时查看。"
           }
         },
         "zh-Hant" : {
@@ -876,7 +876,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "累计训练 %lld 次，总计跳跃 %@ 次，消耗热量 %lld 千卡。"
+            "value" : "累计运动 %lld 次，总计跳跃 %@ 次，消耗热量 %lld 千卡。"
           }
         },
         "zh-Hant" : {
@@ -933,7 +933,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请在开始前允许 JumpRec 将训练保存至“健康”。您可以在 JumpRec 设置中查看权限。"
+            "value" : "请在开始前允许 JumpRec 将运动保存至“健康”。您可以在 JumpRec 设置中查看权限。"
           }
         },
         "zh-Hant" : {
@@ -962,7 +962,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "使用耳机开始训练前，请在系统设置的 JumpRec 中允许“运动与健身”访问权限。"
+            "value" : "使用耳机开始运动前，请在系统设置的 JumpRec 中允许“运动与健身”访问权限。"
           }
         },
         "zh-Hant" : {
@@ -1313,7 +1313,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "统计 JumpRec 中全部时间或指定年份的总跳跃次数、训练次数和消耗热量。"
+            "value" : "统计 JumpRec 中全部时间或指定年份的总跳跃次数、运动次数和消耗热量。"
           }
         },
         "zh-Hant" : {
@@ -1499,7 +1499,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "查看您今天已完成多少次跳跃和训练。"
+            "value" : "查看您今天已完成多少次跳跃和运动。"
           }
         },
         "zh-Hant" : {
@@ -1527,7 +1527,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "从历史记录中选择一次训练以查看详情。"
+            "value" : "从历史记录中选择一次运动以查看详情。"
           }
         },
         "zh-Hant" : {
@@ -1555,7 +1555,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "完成训练来创造您的个人纪录吧！"
+            "value" : "完成运动来创造您的个人纪录吧！"
           }
         },
         "zh-Hant" : {
@@ -1611,7 +1611,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "连接 Apple Watch 或支持的耳机即可开始训练。"
+            "value" : "连接 Apple Watch 或支持的耳机即可开始运动。"
           }
         },
         "zh-Hant" : {
@@ -1988,7 +1988,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "删除训练"
+            "value" : "删除运动"
           }
         },
         "zh-Hant" : {
@@ -2016,7 +2016,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "删除训练"
+            "value" : "删除运动"
           }
         },
         "zh-Hant" : {
@@ -2072,7 +2072,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "删除这些训练？"
+            "value" : "删除这些运动？"
           }
         },
         "zh-Hant" : {
@@ -2100,7 +2100,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "删除这次训练？"
+            "value" : "删除这次运动？"
           }
         },
         "zh-Hant" : {
@@ -2376,7 +2376,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "结束当前的跳绳训练。"
+            "value" : "结束当前的跳绳运动。"
           }
         },
         "zh-Hant" : {
@@ -2438,7 +2438,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "已收藏训练"
+            "value" : "已收藏运动"
           }
         },
         "zh-Hant" : {
@@ -2500,7 +2500,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "免费训练"
+            "value" : "免费运动"
           }
         },
         "zh-Hant" : {
@@ -2534,7 +2534,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "获取最近一次训练"
+            "value" : "获取最近一次运动"
           }
         },
         "zh-Hant" : {
@@ -2602,7 +2602,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "获取训练统计"
+            "value" : "获取运动统计"
           }
         },
         "zh-Hant" : {
@@ -2944,7 +2944,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "仅当使用 Apple Watch 或支持心率数据的耳机记录训练时，才会显示心率数据。"
+            "value" : "仅当使用 Apple Watch 或支持心率数据的耳机记录运动时，才会显示心率数据。"
           }
         },
         "zh-Hant" : {
@@ -3153,7 +3153,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "如果 Apple Watch 无法开始训练，将在可用时改用支持的耳机。"
+            "value" : "如果 Apple Watch 无法开始运动，将在可用时改用支持的耳机。"
           }
         },
         "zh-Hant" : {
@@ -3277,7 +3277,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "包含 100 次以上跳跃的训练。完成 10 次后，通过一次购买即可终身解锁无限次记录。"
+            "value" : "包含 100 次以上跳跃的运动。完成 10 次后，通过一次购买即可终身解锁无限次记录。"
           }
         },
         "zh-Hant" : {
@@ -3575,7 +3575,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "跳绳训练"
+            "value" : "跳绳运动"
           }
         },
         "zh-Hant" : {
@@ -3777,7 +3777,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最近一次训练"
+            "value" : "最近一次运动"
           }
         },
         "zh-Hant" : {
@@ -4044,7 +4044,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "匹配的训练次数：%lld。"
+            "value" : "匹配的运动次数：%lld。"
           }
         },
         "zh-Hant" : {
@@ -4496,7 +4496,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 JumpRec 中未找到跳绳训练。"
+            "value" : "在 JumpRec 中未找到跳绳运动。"
           }
         },
         "zh-Hant" : {
@@ -4531,7 +4531,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "JumpRec 中尚未记录 %lld 年的跳绳训练。"
+            "value" : "JumpRec 中尚未记录 %lld 年的跳绳运动。"
           }
         },
         "zh-Hant" : {
@@ -4566,7 +4566,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "JumpRec 中尚未记录任何跳绳训练。"
+            "value" : "JumpRec 中尚未记录任何跳绳运动。"
           }
         },
         "zh-Hant" : {
@@ -4629,7 +4629,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "还没有个人纪录。完成一次训练，创造您的第一项纪录吧！"
+            "value" : "还没有个人纪录。完成一次运动，创造您的第一项纪录吧！"
           }
         },
         "zh-Hant" : {
@@ -4753,7 +4753,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无训练"
+            "value" : "无运动"
           }
         },
         "zh-Hant" : {
@@ -4782,7 +4782,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "未找到匹配“%@”的训练。"
+            "value" : "未找到匹配“%@”的运动。"
           }
         },
         "zh-Hant" : {
@@ -4816,7 +4816,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%d 年暂无训练。"
+            "value" : "%d 年暂无运动。"
           }
         },
         "zh-Hant" : {
@@ -4844,7 +4844,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "本月暂无训练。"
+            "value" : "本月暂无运动。"
           }
         },
         "zh-Hant" : {
@@ -4872,7 +4872,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "暂无训练"
+            "value" : "暂无运动"
           }
         },
         "zh-Hant" : {
@@ -5108,7 +5108,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "自由训练"
+            "value" : "自由运动"
           }
         },
         "zh-Hant" : {
@@ -5142,7 +5142,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "打开 JumpRec 并开始跳绳训练。"
+            "value" : "打开 JumpRec 并开始跳绳运动。"
           }
         },
         "zh-Hant" : {
@@ -5204,7 +5204,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "打开训练详情。"
+            "value" : "打开运动详情。"
           }
         },
         "zh-Hant" : {
@@ -5554,7 +5554,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iPhone 训练优先使用耳机"
+            "value" : "iPhone 运动优先使用耳机"
           }
         },
         "zh-Hant" : {
@@ -6112,7 +6112,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "从 JumpRec 获取您最近一次跳绳训练。"
+            "value" : "从 JumpRec 获取您最近一次跳绳运动。"
           }
         },
         "zh-Hant" : {
@@ -6252,7 +6252,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "结束训练"
+            "value" : "结束运动"
           }
         },
         "zh-Hant" : {
@@ -6280,7 +6280,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "保存训练"
+            "value" : "保存运动"
           }
         },
         "zh-Hant" : {
@@ -6336,7 +6336,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "将已完成的训练保存至“健康”。"
+            "value" : "将已完成的运动保存至“健康”。"
           }
         },
         "zh-Hant" : {
@@ -6432,7 +6432,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "搜索训练"
+            "value" : "搜索运动"
           }
         },
         "zh-Hant" : {
@@ -6466,7 +6466,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "搜索您在 JumpRec 中的跳绳训练历史记录。"
+            "value" : "搜索您在 JumpRec 中的跳绳运动历史记录。"
           }
         },
         "zh-Hant" : {
@@ -6494,7 +6494,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "选择一次训练"
+            "value" : "选择一次运动"
           }
         },
         "zh-Hant" : {
@@ -6522,7 +6522,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练开始时将自动选择。"
+            "value" : "运动开始时将自动选择。"
           }
         },
         "zh-Hant" : {
@@ -6584,7 +6584,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "通过 iCloud 家人共享，让家庭成员一同享受无限次训练记录。"
+            "value" : "通过 iCloud 家人共享，让家庭成员一同享受无限次运动记录。"
           }
         },
         "zh-Hant" : {
@@ -6703,7 +6703,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "显示下个月的训练。"
+            "value" : "显示下个月的运动。"
           }
         },
         "zh-Hant" : {
@@ -6737,7 +6737,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "显示下一年的训练。"
+            "value" : "显示下一年的运动。"
           }
         },
         "zh-Hant" : {
@@ -6765,7 +6765,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "显示上个月的训练。"
+            "value" : "显示上个月的运动。"
           }
         },
         "zh-Hant" : {
@@ -6799,7 +6799,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "显示上一年的训练。"
+            "value" : "显示上一年的运动。"
           }
         },
         "zh-Hant" : {
@@ -7019,7 +7019,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "开始跳绳训练"
+            "value" : "开始跳绳运动"
           }
         },
         "zh-Hant" : {
@@ -7087,7 +7087,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "开始训练"
+            "value" : "开始运动"
           }
         },
         "zh-Hant" : {
@@ -7115,7 +7115,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "不受任何次数限制，随时开始并记录无限次跳绳训练。"
+            "value" : "不受任何次数限制，随时开始并记录无限次跳绳运动。"
           }
         },
         "zh-Hant" : {
@@ -7144,7 +7144,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在 JumpRec 中开始 %lld 次跳绳训练。"
+            "value" : "正在 JumpRec 中开始 %lld 次跳绳运动。"
           }
         },
         "zh-Hant" : {
@@ -7173,7 +7173,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在 JumpRec 中开始 %lld 分钟跳绳训练。"
+            "value" : "正在 JumpRec 中开始 %lld 分钟跳绳运动。"
           }
         },
         "zh-Hant" : {
@@ -7202,7 +7202,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在 JumpRec 中开始跳绳训练。"
+            "value" : "正在 JumpRec 中开始跳绳运动。"
           }
         },
         "zh-Hant" : {
@@ -7438,7 +7438,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "轻点任意训练上的心形图标，即可将其收藏到这里。"
+            "value" : "轻点任意运动上的心形图标，即可将其收藏到这里。"
           }
         },
         "zh-Hant" : {
@@ -7584,7 +7584,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练期间检测到的双摇次数。双摇检测仅在使用 Apple Watch 记录训练时可用。"
+            "value" : "运动期间检测到的双摇次数。双摇检测仅在使用 Apple Watch 记录运动时可用。"
           }
         },
         "zh-Hant" : {
@@ -7640,7 +7640,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "这将清除本页中的所有个人纪录，已保存的训练记录仍保留在历史中。"
+            "value" : "这将清除本页中的所有个人纪录，已保存的运动记录仍保留在历史中。"
           }
         },
         "zh-Hant" : {
@@ -7668,7 +7668,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "本次训练开始后无法切换至耳机。"
+            "value" : "本次运动开始后无法切换至耳机。"
           }
         },
         "zh-Hant" : {
@@ -7696,7 +7696,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "本次训练使用受支持的耳机动作感应。"
+            "value" : "本次运动使用受支持的耳机动作感应。"
           }
         },
         "zh-Hant" : {
@@ -7821,7 +7821,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "今日训练 %lld 次，总计跳跃 %@ 次，消耗热量 %lld 千卡。"
+            "value" : "今日运动 %lld 次，总计跳跃 %@ 次，消耗热量 %lld 千卡。"
           }
         },
         "zh-Hant" : {
@@ -8030,7 +8030,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无法准备训练权限。请重试或在“设置”中查看权限。"
+            "value" : "无法准备运动权限。请重试或在“设置”中查看权限。"
           }
         },
         "zh-Hant" : {
@@ -8120,7 +8120,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无限次训练"
+            "value" : "无限次运动"
           }
         },
         "zh-Hant" : {
@@ -8154,7 +8154,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无限次训练已激活"
+            "value" : "无限次运动已激活"
           }
         },
         "zh-Hant" : {
@@ -8222,7 +8222,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "解锁无限次训练"
+            "value" : "解锁无限次运动"
           }
         },
         "zh-Hant" : {
@@ -8347,7 +8347,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "查看跳绳训练"
+            "value" : "查看跳绳运动"
           }
         },
         "zh-Hant" : {
@@ -8375,7 +8375,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练分段统计"
+            "value" : "运动分段统计"
           }
         },
         "zh-Hant" : {
@@ -8403,7 +8403,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练设备"
+            "value" : "运动设备"
           }
         },
         "zh-Hant" : {
@@ -8431,7 +8431,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练"
+            "value" : "运动"
           }
         },
         "zh-Hant" : {
@@ -8465,7 +8465,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%d 年训练"
+            "value" : "%d 年运动"
           }
         },
         "zh-Hant" : {
@@ -8493,7 +8493,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "本月训练"
+            "value" : "本月运动"
           }
         },
         "zh-Hant" : {
@@ -8549,7 +8549,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "当兼容的耳机可用时，在 iPhone 上开始训练而不是 Apple Watch。"
+            "value" : "当兼容的耳机可用时，在 iPhone 上开始运动而不是 Apple Watch。"
           }
         },
         "zh-Hant" : {
@@ -8577,7 +8577,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练完成！"
+            "value" : "运动完成！"
           }
         },
         "zh-Hant" : {
@@ -8605,7 +8605,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练次数"
+            "value" : "运动次数"
           }
         },
         "zh-Hant" : {
@@ -8633,7 +8633,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练详情"
+            "value" : "运动详情"
           }
         },
         "zh-Hant" : {
@@ -8667,7 +8667,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练目标类型"
+            "value" : "运动目标类型"
           }
         },
         "zh-Hant" : {
@@ -8696,7 +8696,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练权限"
+            "value" : "运动权限"
           }
         },
         "zh-Hant" : {
@@ -8730,7 +8730,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练统计"
+            "value" : "运动统计"
           }
         },
         "zh-Hant" : {
@@ -8764,7 +8764,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练统计"
+            "value" : "运动统计"
           }
         },
         "zh-Hant" : {
@@ -8793,7 +8793,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练 %lld 次 • %lld 千卡"
+            "value" : "运动 %lld 次 • %lld 千卡"
           }
         },
         "zh-Hant" : {
@@ -8821,7 +8821,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练开始倒计时"
+            "value" : "运动开始倒计时"
           }
         },
         "zh-Hant" : {
@@ -8849,7 +8849,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练进行中"
+            "value" : "运动进行中"
           }
         },
         "zh-Hant" : {
@@ -8877,7 +8877,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练将在 Apple Watch 上开始"
+            "value" : "运动将在 Apple Watch 上开始"
           }
         },
         "zh-Hant" : {
@@ -8905,7 +8905,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "可用时将使用 %@ 记录训练"
+            "value" : "可用时将使用 %@ 记录运动"
           }
         },
         "zh-Hant" : {
@@ -8933,7 +8933,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "尚未授予训练写入权限。"
+            "value" : "尚未授予运动写入权限。"
           }
         },
         "zh-Hant" : {
@@ -8967,7 +8967,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 Apple Watch 或 iPhone 上记录的训练将显示在这里。"
+            "value" : "在 Apple Watch 或 iPhone 上记录的运动将显示在这里。"
           }
         },
         "zh-Hant" : {
@@ -8995,7 +8995,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "正在撰写训练点评..."
+            "value" : "正在撰写运动点评..."
           }
         },
         "zh-Hant" : {
@@ -9058,7 +9058,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld 年训练 %lld 次，总计跳跃 %@ 次，消耗热量 %lld 千卡。"
+            "value" : "%lld 年运动 %lld 次，总计跳跃 %@ 次，消耗热量 %lld 千卡。"
           }
         },
         "zh-Hant" : {
@@ -9092,7 +9092,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "您已解锁终身无限次训练记录。"
+            "value" : "您已解锁终身无限次运动记录。"
           }
         },
         "zh-Hant" : {
@@ -9127,7 +9127,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "您今天还没有记录任何跳绳训练。"
+            "value" : "您今天还没有记录任何跳绳运动。"
           }
         },
         "zh-Hant" : {
@@ -9161,7 +9161,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "您已记录 %1$lld / %2$lld 次免费训练。通过一次买断即可解锁无限次训练记录。"
+            "value" : "您已记录 %1$lld / %2$lld 次免费运动。通过一次买断即可解锁无限次运动记录。"
           }
         },
         "zh-Hant" : {
@@ -9195,7 +9195,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "您已经在 JumpRec 中完成了 10 次精彩训练。只需一次买断，即可永久解锁无限次训练记录。"
+            "value" : "您已经在 JumpRec 中完成了 10 次精彩运动。只需一次买断，即可永久解锁无限次运动记录。"
           }
         },
         "zh-Hant" : {
@@ -9257,7 +9257,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "整个训练期间的平均热量消耗效率。"
+            "value" : "整个运动期间的平均热量消耗效率。"
           }
         },
         "zh-Hant" : {
@@ -9286,7 +9286,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "您上次训练是在 %@：在 %@ 内跳了 %@ 次，消耗 %lld 千卡。"
+            "value" : "您上次运动是在 %@：在 %@ 内跳了 %@ 次，消耗 %lld 千卡。"
           }
         },
         "zh-Hant" : {
@@ -9434,7 +9434,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iPhone 训练"
+            "value" : "iPhone 运动"
           }
         },
         "zh-Hant" : {

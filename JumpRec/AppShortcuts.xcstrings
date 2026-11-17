@@ -53,10 +53,10 @@
               "在${applicationName}查看累计跳跃次数",
               "在${applicationName}查看总跳跃次数",
               "在${applicationName}一共跳了多少次",
-              "在${applicationName}查看累计训练次数",
-              "在${applicationName}查看训练统计",
-              "查看${applicationName}的训练统计",
-              "获取${applicationName}的训练数据统计"
+              "在${applicationName}查看累计运动次数",
+              "在${applicationName}查看运动统计",
+              "查看${applicationName}的运动统计",
+              "获取${applicationName}的运动数据统计"
             ]
           }
         },
@@ -176,9 +176,9 @@
           "stringSet" : {
             "state" : "translated",
             "values" : [
-              "获取${applicationName}最近一次训练",
-              "在${applicationName}查看上次训练",
-              "在${applicationName}检查上次训练",
+              "获取${applicationName}最近一次运动",
+              "在${applicationName}查看上次运动",
+              "在${applicationName}检查上次运动",
               "我上次在${applicationName}跳得怎么样"
             ]
           }
@@ -234,7 +234,7 @@
             "state" : "translated",
             "values" : [
               "在${applicationName}开始跳绳",
-              "在${applicationName}开始训练",
+              "在${applicationName}开始运动",
               "在${applicationName}开始跳跃"
             ]
           }
@@ -293,8 +293,8 @@
             "values" : [
               "在${applicationName}查看今日跳绳",
               "今天在${applicationName}跳了多少次",
-              "今天在${applicationName}的训练",
-              "查看今天在${applicationName}的训练"
+              "今天在${applicationName}的运动",
+              "查看今天在${applicationName}的运动"
             ]
           }
         },

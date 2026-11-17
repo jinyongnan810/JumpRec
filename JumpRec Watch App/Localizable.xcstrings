@@ -282,7 +282,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "100 次以上的训练"
+            "value" : "100 次以上的运动"
           }
         },
         "zh-Hant" : {
@@ -339,7 +339,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请在开始前允许 JumpRec 将训练保存至“健康”。您可以在 JumpRec 设置中查看权限。"
+            "value" : "请在开始前允许 JumpRec 将运动保存至“健康”。您可以在 JumpRec 设置中查看权限。"
           }
         },
         "zh-Hant" : {
@@ -368,7 +368,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "使用耳机开始训练前，请在系统设置的 JumpRec 中允许“运动与健身”访问权限。"
+            "value" : "使用耳机开始运动前，请在系统设置的 JumpRec 中允许“运动与健身”访问权限。"
           }
         },
         "zh-Hant" : {
@@ -744,7 +744,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "免费训练"
+            "value" : "免费运动"
           }
         },
         "zh-Hant" : {
@@ -856,7 +856,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "HealthKit 无法结束训练数据收集。"
+            "value" : "HealthKit 无法结束运动数据收集。"
           }
         },
         "zh-Hant" : {
@@ -1142,7 +1142,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "已达到免费上限，欢迎在 iPhone 上解锁无限次训练。"
+            "value" : "已达到免费上限，欢迎在 iPhone 上解锁无限次运动。"
           }
         },
         "zh-Hant" : {
@@ -1876,7 +1876,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "保存训练"
+            "value" : "保存运动"
           }
         },
         "zh-Hant" : {
@@ -1904,7 +1904,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "保存 Apple Watch 训练期间消耗的热量。"
+            "value" : "保存 Apple Watch 运动期间消耗的热量。"
           }
         },
         "zh-Hant" : {
@@ -1932,7 +1932,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "将已完成的训练保存至“健康”。"
+            "value" : "将已完成的运动保存至“健康”。"
           }
         },
         "zh-Hant" : {
@@ -2184,7 +2184,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在训练开始前进行 3 秒倒计时。"
+            "value" : "在运动开始前进行 3 秒倒计时。"
           }
         },
         "zh-Hant" : {
@@ -2437,7 +2437,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "无法准备训练权限。请重试或在“设置”中查看权限。"
+            "value" : "无法准备运动权限。请重试或在“设置”中查看权限。"
           }
         },
         "zh-Hant" : {
@@ -2555,7 +2555,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练完成"
+            "value" : "运动完成"
           }
         },
         "zh-Hant" : {
@@ -2584,7 +2584,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练权限"
+            "value" : "运动权限"
           }
         },
         "zh-Hant" : {
@@ -2612,7 +2612,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "训练开始倒计时"
+            "value" : "运动开始倒计时"
           }
         },
         "zh-Hant" : {
@@ -2646,7 +2646,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "您已完成 10 次免费训练。欢迎在 iPhone 上打开 JumpRec 解锁无限次训练。"
+            "value" : "您已完成 10 次免费运动。欢迎在 iPhone 上打开 JumpRec 解锁无限次运动。"
           }
         },
         "zh-Hant" : {

@@ -102,7 +102,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请在开始前允许 JumpRec 将训练保存至“健康”。您可以在 JumpRec 设置中查看权限。"
+            "value" : "请在开始前允许 JumpRec 将运动保存至“健康”。您可以在 JumpRec 设置中查看权限。"
           }
         },
         "zh-Hant" : {
@@ -130,7 +130,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "使用耳机开始训练前，请在系统设置的 JumpRec 中允许“运动与健身”访问权限。"
+            "value" : "使用耳机开始运动前，请在系统设置的 JumpRec 中允许“运动与健身”访问权限。"
           }
         },
         "zh-Hant" : {
@@ -998,7 +998,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "保存训练"
+            "value" : "保存运动"
           }
         },
         "zh-Hant" : {
@@ -1026,7 +1026,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "保存 Apple Watch 训练期间消耗的热量。"
+            "value" : "保存 Apple Watch 运动期间消耗的热量。"
           }
         },
         "zh-Hant" : {
@@ -1054,7 +1054,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "将已完成的训练保存至“健康”。"
+            "value" : "将已完成的运动保存至“健康”。"
           }
         },
         "zh-Hant" : {

@@ -142,7 +142,7 @@ public nonisolated enum AppLocalization {
         case .japanese:
             "ワークアウトを開始しました"
         case .simplifiedChinese:
-            "训练已开始！"
+            "运动已开始！"
         case .traditionalChinese:
             "運動已開始！"
         case .korean:
@@ -158,7 +158,7 @@ public nonisolated enum AppLocalization {
         case .japanese:
             "ワークアウトが終了しました"
         case .simplifiedChinese:
-            "训练已结束！"
+            "运动已结束！"
         case .traditionalChinese:
             "運動已結束！"
         case .korean:
@@ -314,9 +314,9 @@ public nonisolated enum AppLocalization {
             """
         case .simplifiedChinese:
             """
-            请为一次跳绳训练回顾生成简短的 highlight 和 phrase 两项内容。
+            请为一次跳绳运动回顾生成简短的 highlight 和 phrase 两项内容。
             语气请保持轻松、温和、自然、简洁。
-            highlight 请用一句话简短概括这次训练最突出的亮点。
+            highlight 请用一句话简短概括这次运动最突出的亮点。
             phrase 请写一句温和的回顾提问，或是一句贴心鼓励的话。
             两项合计长度请控制在约40字以内。
             两项合计最多只使用1个表情符号，且仅在自然合适时使用。
@@ -378,7 +378,7 @@ public nonisolated enum AppLocalization {
             """
         case .simplifiedChinese:
             return """
-            请为这次跳绳训练生成简短的 highlight 和 phrase。
+            请为这次跳绳运动生成简短的 highlight 和 phrase。
             phrase 必须是一句温和的回顾提问，或是一句贴心鼓励的话。
             \(joinedMetrics)
             """

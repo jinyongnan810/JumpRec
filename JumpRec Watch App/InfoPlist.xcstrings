@@ -97,7 +97,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "JumpRec 读取健康信息以测量并总结您的训练数据。"
+            "value" : "JumpRec 读取健康信息以测量并总结您的运动数据。"
           }
         },
         "zh-Hant" : {
@@ -132,7 +132,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "JumpRec 会将您的训练和活动能量数据保存至“健康”。"
+            "value" : "JumpRec 会将您的运动和活动能量数据保存至“健康”。"
           }
         },
         "zh-Hant" : {
