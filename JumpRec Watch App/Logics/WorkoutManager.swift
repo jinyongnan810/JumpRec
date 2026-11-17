@@ -17,7 +17,7 @@ final class WorkoutManager: NSObject {
         case endCollectionFailed
 
         var errorDescription: String? {
-            "HealthKit could not end workout data collection."
+            String(localized: "HealthKit could not end workout data collection.")
         }
     }
 

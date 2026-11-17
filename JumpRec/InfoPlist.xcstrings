@@ -10,6 +10,30 @@
             "state" : "new",
             "value" : "JumpRec"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec"
+          }
         }
       }
     },
@@ -20,6 +44,30 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "JumpRec"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "JumpRec"
           }
         }
@@ -39,6 +87,24 @@
             "state" : "translated",
             "value" : "JumpRecは、Apple Watchで実行中のワークアウトをiPhoneに反映するために、ワークアウトデータを読み取ります。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec은 운동을 측정하고 요약하기 위해 건강 정보를 읽습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec 读取健康信息以测量并总结您的运动数据。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec 會讀取健康資訊以測量並彙整您的運動資料。"
+          }
         }
       }
     },
@@ -55,6 +121,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "JumpRecは、Apple WatchのアクティビティをiPhoneに表示するために、ワークアウトをヘルスケアに保存します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec은 운동 및 활동 에너지 데이터를 건강 앱에 저장합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec 会将您的运动和活动能量数据保存至“健康”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec 會將您的運動與活動能量資料儲存至「健康」。"
           }
         }
       }
@@ -73,9 +157,27 @@
             "state" : "translated",
             "value" : "JumpRecは、ジャンプを検出するためにモーションデータを使用します。"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec은 점프를 감지하기 위해 동작 데이터를 사용합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec 使用动作数据来检测跳跃。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec 使用動作資料來偵測跳躍。"
+          }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.3"
 }

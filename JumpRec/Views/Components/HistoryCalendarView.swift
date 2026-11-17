@@ -59,17 +59,9 @@ struct HistoryCalendarView: View {
         return day > todayDay
     }
 
-    /// Sunday-first headers: single kanji for Japanese, two-letter English abbreviations otherwise.
+    /// Sunday-first compact weekday headers matching the active locale.
     private var dayHeaders: [String] {
-        if isJapaneseLocale {
-            return ["日", "月", "火", "水", "木", "金", "土"]
-        }
-        return ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]
-    }
-
-    /// Matches Japanese language variants by language code.
-    private var isJapaneseLocale: Bool {
-        locale.language.languageCode?.identifier == "ja"
+        AppLocalization.calendarDayHeaders(for: locale)
     }
 
     /// The minimum horizontal drag distance used to change months.

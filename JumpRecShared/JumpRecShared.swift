@@ -7,18 +7,9 @@
 
 import Foundation
 
-public nonisolated extension Locale {
-    /// Returns whether Japanese is the preferred system language.
-    static var isJapanesePreferredLanguage: Bool {
-        preferredLanguages.first?.hasPrefix("ja") == true
-    }
-}
-
+/// Formats a jump-rate value with the localized per-minute unit.
 public nonisolated func localizedRateText(_ value: Int) -> String {
-    if Locale.isJapanesePreferredLanguage {
-        return "\(value)/分"
-    }
-    return "\(value)/min"
+    AppLocalization.rateText(value)
 }
 
 /// Formats a normalized score such as `0.92` as a locale-aware percentage for UI display.

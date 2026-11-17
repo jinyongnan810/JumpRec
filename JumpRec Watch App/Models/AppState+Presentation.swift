@@ -248,8 +248,8 @@ extension JumpRecState {
         guard needsSpeechWarmup else { return }
         needsSpeechWarmup = false
         cancelPendingSpeech()
-        let text = isJapanesePreferred ? "あ" : "a"
-        let languageCode = preferredSpeechLanguageCode
+        let text = AppLocalization.speechWarmupText(isCompact: true)
+        let languageCode = AppLocalization.speechLanguageCode()
         Task { [speechCoordinator] in
             await speechCoordinator.prepareForWorkout(text: text, languageCode: languageCode)
         }
@@ -265,7 +265,7 @@ extension JumpRecState {
     /// Speaks a localized prompt immediately on the speech coordinator.
     func speak(text: String) {
         cancelPendingSpeech()
-        let languageCode = preferredSpeechLanguageCode
+        let languageCode = AppLocalization.speechLanguageCode()
 
         pendingSpeechTask = Task { [speechCoordinator] in
             guard !Task.isCancelled else { return }
@@ -293,32 +293,19 @@ extension JumpRecState {
         await speechCoordinator.waitForActiveSpeech()
     }
 
-    /// Returns whether Japanese is the preferred language.
-    private var isJapanesePreferred: Bool {
-        Locale.isJapanesePreferredLanguage
-    }
-
-    /// Returns the speech language code used for announcements.
-    private var preferredSpeechLanguageCode: String {
-        isJapanesePreferred ? "ja-JP" : "en-US"
-    }
-
     /// Returns the localized spoken phrase for session start.
     var localizedSessionStartedAnnouncement: String {
-        isJapanesePreferred ? "ワークアウトを開始しました" : "Workout Started!"
+        AppLocalization.sessionStartedAnnouncement()
     }
 
     /// Returns the localized spoken phrase for session finish.
     var localizedSessionFinishedAnnouncement: String {
-        isJapanesePreferred ? "ワークアウトが終了しました" : "Workout Finished!"
+        AppLocalization.sessionFinishedAnnouncement()
     }
 
     /// Returns the localized spoken phrase for jump milestones.
     func localizedJumpAnnouncement(for jumpCount: Int) -> String {
-        if isJapanesePreferred {
-            return "\(jumpCount) 回"
-        }
-        return "\(jumpCount) Jumps"
+        AppLocalization.jumpMilestoneAnnouncement(for: jumpCount)
     }
 
     /// Returns the localized spoken phrase for minute milestones.
