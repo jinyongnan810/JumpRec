@@ -65,12 +65,21 @@ public final nonisolated class JumpDetector {
         }
     }
 
+    private static let watchDoubleUnderMinimumInterval: TimeInterval = 0.16
+    private static let watchDoubleUnderMaximumInterval: TimeInterval = 0.33
+    private static let watchDoubleUnderFirstTurnMinimumPeak: Double = 5.0
+    private static let watchDoubleUnderFirstTurnMaximumTrough: Double = -4.0
+    private static let watchDoubleUnderMinimumPeakToPeak: Double = 9.5
+    private static let watchDoubleUnderSecondTurnMinimumPeak: Double = 2.5
+
     // MARK: - Public State
 
     /// The public profile exposed to callers and debug tooling.
     public let profile: JumpDeviceProfile
     /// Optional console logging for debugging live sessions.
     public var debugLoggingEnabled = false
+    /// Number of sensor-confirmed double-unders detected in the current Watch session.
+    public private(set) var doubleUndersCount = 0
 
     // MARK: - Private State
 
@@ -84,6 +93,18 @@ public final nonisolated class JumpDetector {
     private var canDetectNextJump = true
     /// Timestamp of the last jump that passed threshold and refractory checks.
     private var lastAcceptedJumpTimestamp: TimeInterval?
+    /// Whether at least one Watch rope turn has been observed in the current session.
+    private var hasTrackedWatchTurn = false
+    /// Trigger timestamp of the most recent Watch turn.
+    private var activeWatchTurnTimestamp: TimeInterval = 0
+    /// Peak Z acceleration observed during the active Watch turn.
+    private var activeWatchTurnMaxValue: Double = 0
+    /// Minimum Z acceleration observed after the active Watch turn re-armed.
+    private var activeWatchTurnMinValue: Double = 0
+    /// Prevents a Watch turn that completed a double-under from starting another pair.
+    private var isActiveWatchTurnConsumedForDoubleUnder = false
+    /// Indicates whether the active Watch turn can confirm a double-under once its peak qualifies.
+    private var isPendingSecondWatchDoubleUnderTurn = false
 
     // MARK: - Initialization
 
@@ -114,10 +135,17 @@ public final nonisolated class JumpDetector {
         let value = axisValue(from: sample, axis: config.axis)
 
         if !canDetectNextJump {
+            if profile == .watch {
+                updateActiveWatchTurnPeak(with: value)
+            }
             guard rearmSatisfied(value: value) else {
                 return false
             }
             canDetectNextJump = true
+        }
+
+        if profile == .watch {
+            updateActiveWatchTurnTrough(with: value)
         }
 
         let isCandidate = thresholdSatisfied(value: value)
@@ -134,6 +162,9 @@ public final nonisolated class JumpDetector {
 
         canDetectNextJump = false
         lastAcceptedJumpTimestamp = sample.timestamp
+        if profile == .watch {
+            beginWatchTurn(at: sample.timestamp, initialValue: value)
+        }
 
         if debugLoggingEnabled {
             print(
@@ -149,9 +180,73 @@ public final nonisolated class JumpDetector {
     public func reset() {
         canDetectNextJump = true
         lastAcceptedJumpTimestamp = nil
+        doubleUndersCount = 0
+        hasTrackedWatchTurn = false
+        activeWatchTurnTimestamp = 0
+        activeWatchTurnMaxValue = 0
+        activeWatchTurnMinValue = 0
+        isActiveWatchTurnConsumedForDoubleUnder = false
+        isPendingSecondWatchDoubleUnderTurn = false
     }
 
     // MARK: - Private Helpers
+
+    /// Multiplier that scales Watch amplitude thresholds in proportion to user sensitivity tuning.
+    private var sensitivityScale: Double {
+        1 + (thresholdAdjustmentPercentage / 100)
+    }
+
+    /// Updates the peak acceleration of the current Watch turn and confirms a pending double-under.
+    private func updateActiveWatchTurnPeak(with value: Double) {
+        guard hasTrackedWatchTurn, value > activeWatchTurnMaxValue else { return }
+        activeWatchTurnMaxValue = value
+        confirmPendingWatchDoubleUnderIfNeeded()
+    }
+
+    /// Tracks the negative whip trough reached after the active Watch turn re-arms.
+    private func updateActiveWatchTurnTrough(with value: Double) {
+        guard hasTrackedWatchTurn, value < activeWatchTurnMinValue else { return }
+        activeWatchTurnMinValue = value
+    }
+
+    /// Starts tracking a newly accepted Watch turn and evaluates whether it pairs with the prior turn.
+    private func beginWatchTurn(at timestamp: TimeInterval, initialValue: Double) {
+        let scale = sensitivityScale
+        let shouldStartPendingSecondTurn: Bool
+        if hasTrackedWatchTurn, !isActiveWatchTurnConsumedForDoubleUnder {
+            let interval = timestamp - activeWatchTurnTimestamp
+            let peakToPeak = activeWatchTurnMaxValue - activeWatchTurnMinValue
+            shouldStartPendingSecondTurn =
+                interval >= Self.watchDoubleUnderMinimumInterval &&
+                interval <= Self.watchDoubleUnderMaximumInterval &&
+                activeWatchTurnMaxValue >= Self.watchDoubleUnderFirstTurnMinimumPeak * scale &&
+                activeWatchTurnMinValue <= Self.watchDoubleUnderFirstTurnMaximumTrough * scale &&
+                peakToPeak >= Self.watchDoubleUnderMinimumPeakToPeak * scale
+        } else {
+            shouldStartPendingSecondTurn = false
+        }
+
+        hasTrackedWatchTurn = true
+        activeWatchTurnTimestamp = timestamp
+        activeWatchTurnMaxValue = initialValue
+        activeWatchTurnMinValue = 0
+        isActiveWatchTurnConsumedForDoubleUnder = false
+        isPendingSecondWatchDoubleUnderTurn = shouldStartPendingSecondTurn
+        confirmPendingWatchDoubleUnderIfNeeded()
+    }
+
+    /// Confirms a pending double-under once the second turn reaches the required acceleration peak.
+    private func confirmPendingWatchDoubleUnderIfNeeded() {
+        guard isPendingSecondWatchDoubleUnderTurn,
+              activeWatchTurnMaxValue >= Self.watchDoubleUnderSecondTurnMinimumPeak * sensitivityScale
+        else {
+            return
+        }
+
+        doubleUndersCount += 1
+        isPendingSecondWatchDoubleUnderTurn = false
+        isActiveWatchTurnConsumedForDoubleUnder = true
+    }
 
     /// Reads the requested raw acceleration signal from a sample.
     private func axisValue(from sample: MotionSample, axis: JumpDetectorAxis) -> Double {

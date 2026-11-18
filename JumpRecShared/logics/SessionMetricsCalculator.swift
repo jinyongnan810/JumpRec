@@ -19,8 +19,18 @@ public nonisolated enum SessionMetricsCalculator {
     private static let smallBreakLowerBound: TimeInterval = 6
     /// The minimum gap that counts as a long break.(extra 1 second for buffer)
     private static let longBreakLowerBound: TimeInterval = 16
-    /// The maximum gap between two Watch rope turns that counts as a single double-under.
+    /// Minimum spacing between two distinct rope turns; closer triggers are split-peak glitches.
+    private static let doubleUnderLowerBound: TimeInterval = 0.16
+    /// Unconditional maximum gap between two Watch rope turns that counts as a single double-under.
     private static let doubleUnderUpperBound: TimeInterval = 0.25
+    /// Adaptive upper bound when a Watch turn pair is markedly faster than the current streak rhythm.
+    private static let adaptiveDoubleUnderUpperBound: TimeInterval = 0.325
+    /// Maximum fraction of recent single-under cadence allowed for adaptive double-under pairing.
+    private static let relativeDoubleUnderPaceFactor: Double = 0.84
+    /// Typical single-under turn interval range used to estimate the current streak cadence.
+    private static let singleUnderCadenceRange: ClosedRange<TimeInterval> = 0.29 ... 0.50
+    /// Pause duration that resets the local single-under cadence baseline.
+    private static let doubleUnderStreakResetGap: TimeInterval = 0.80
 
     // MARK: - Rate Metrics
 
@@ -125,19 +135,67 @@ public nonisolated enum SessionMetricsCalculator {
         return (smallBreaksCount, longBreaksCount, max(longestStreak, currentStreak))
     }
 
-    /// Counts non-overlapping Watch rope-turn pairs separated by at most 0.25 seconds.
+    /// Counts non-overlapping Watch rope-turn pairs using rapid intervals and local cadence drops.
     public static func doubleUndersCount(from jumpOffsets: [TimeInterval]) -> Int {
         guard jumpOffsets.count > 1 else { return 0 }
 
+        // Collapse sub-0.16s triggers caused by rope-snag split peaks on a single jump.
+        var cleanedOffsets: [TimeInterval] = []
+        cleanedOffsets.reserveCapacity(jumpOffsets.count)
+        for offset in jumpOffsets {
+            if let lastOffset = cleanedOffsets.last,
+               offset - lastOffset > 0,
+               offset - lastOffset < doubleUnderLowerBound
+            {
+                continue
+            }
+            cleanedOffsets.append(offset)
+        }
+        guard cleanedOffsets.count > 1 else { return 0 }
+
         var count = 0
         var index = 1
-        while index < jumpOffsets.count {
-            let interval = jumpOffsets[index] - jumpOffsets[index - 1]
-            if interval > 0, interval <= doubleUnderUpperBound {
+        var recentSingleIntervals: [TimeInterval] = []
+
+        while index < cleanedOffsets.count {
+            let interval = cleanedOffsets[index] - cleanedOffsets[index - 1]
+            if interval <= 0 {
+                index += 1
+                continue
+            }
+            if interval > doubleUnderStreakResetGap {
+                recentSingleIntervals.removeAll(keepingCapacity: true)
+                index += 1
+                continue
+            }
+
+            let isUnconditionalDoubleUnder =
+                interval >= doubleUnderLowerBound && interval <= doubleUnderUpperBound
+            let isRhythmRelativeDoubleUnder: Bool
+            if recentSingleIntervals.count >= 2 {
+                let recentCount = recentSingleIntervals.count
+                let recentMean = (recentSingleIntervals[recentCount - 2] + recentSingleIntervals[recentCount - 1]) / 2.0
+                isRhythmRelativeDoubleUnder =
+                    interval >= doubleUnderLowerBound &&
+                    interval <= adaptiveDoubleUnderUpperBound &&
+                    interval <= recentMean * relativeDoubleUnderPaceFactor
+            } else {
+                isRhythmRelativeDoubleUnder = false
+            }
+
+            if isUnconditionalDoubleUnder || isRhythmRelativeDoubleUnder {
                 count += 1
+                if index + 1 < cleanedOffsets.count,
+                   cleanedOffsets[index + 1] - cleanedOffsets[index] > doubleUnderStreakResetGap
+                {
+                    recentSingleIntervals.removeAll(keepingCapacity: true)
+                }
                 // Consume both turns so the second turn cannot pair with the following jump.
                 index += 2
             } else {
+                if singleUnderCadenceRange.contains(interval) {
+                    recentSingleIntervals.append(interval)
+                }
                 index += 1
             }
         }

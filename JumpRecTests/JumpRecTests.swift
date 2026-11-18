@@ -147,6 +147,60 @@ struct JumpRecTests {
         #expect(SessionMetricsCalculator.doubleUndersCount(from: [0.50]) == 0)
     }
 
+    @Test func testDoubleUndersCountDetectsRhythmDropAndIgnoresSplitPeaksAndSteadyFastSingles() async throws {
+        let offsets: [TimeInterval] = [
+            0.40,
+            0.78, // Single (0.38s)
+            1.16, // Single (0.38s)
+            1.54, // Single (0.38s)
+            1.66, // Split-peak glitch (0.12s < 0.16s), collapsed into 1.54
+            1.94, // Single (0.40s from 1.54)
+            2.23, // Double under #1 (0.29s from 1.94)
+            2.63, // Transition to next jump
+            2.92, // Double under #2 (0.29s from 2.63)
+            4.50, // Break > 0.80s resets cadence baseline
+            4.81, // Steady fast single (0.31s)
+            5.11, // Steady fast single (0.30s)
+            5.41, // Steady fast single (0.30s)
+            5.71, // Steady fast single (0.30s)
+            6.01, // Steady fast single (0.30s)
+        ]
+
+        #expect(SessionMetricsCalculator.doubleUndersCount(from: offsets) == 2)
+    }
+
+    @Test func testWatchDetectorCountsWhipConfirmedDoubleUnders() async throws {
+        let detector = JumpDetector(profile: .watch)
+        let samples = [
+            // Fast single-unders (0.30s apart, below whip thresholds)
+            makeSample(z: 1.00, timestamp: 0.00),
+            makeSample(z: 4.50, timestamp: 0.05),
+            makeSample(z: -3.50, timestamp: 0.15),
+            makeSample(z: 1.00, timestamp: 0.30),
+            makeSample(z: 4.50, timestamp: 0.35),
+            makeSample(z: -3.50, timestamp: 0.45),
+            // Double-under pair (0.29s apart, strong wrist whip + >= 2.5g second turn)
+            makeSample(z: 1.20, timestamp: 0.70),
+            makeSample(z: 6.00, timestamp: 0.76),
+            makeSample(z: -4.50, timestamp: 0.85),
+            makeSample(z: 1.00, timestamp: 0.99),
+            makeSample(z: 3.40, timestamp: 1.04),
+            makeSample(z: -1.00, timestamp: 1.12),
+        ]
+
+        let jumps = samples.reduce(into: 0) { partialResult, sample in
+            if detector.processMotionSample(sample) {
+                partialResult += 1
+            }
+        }
+
+        #expect(jumps == 4)
+        #expect(detector.doubleUndersCount == 1)
+
+        detector.reset()
+        #expect(detector.doubleUndersCount == 0)
+    }
+
     @Test func testHeadphoneProfileCountsOnlyNegativeZBelowThresholdAfterRearm() async throws {
         let detector = JumpDetector(profile: .headphones)
         let samples = [
@@ -257,6 +311,31 @@ struct JumpRecTests {
 
         #expect(detector.processMotionSample(makeSample(z: 0.95, timestamp: 0.05)))
     }
+
+    @Test func testRecordedWatchMotionCSVsDetectExpectedJumpsAndDoubleUnders() async throws {
+        let normalResult = try replayMotionCSV(named: "watch-normal.csv", profile: .watch)
+        #expect(normalResult.jumpOffsets.count == 200)
+        #expect(normalResult.detector.doubleUndersCount == 0)
+        #expect(SessionMetricsCalculator.doubleUndersCount(from: normalResult.jumpOffsets) == 0)
+
+        let sevenDoubleUndersResult = try replayMotionCSV(named: "watch-7-doubleunders.csv", profile: .watch)
+        #expect(sevenDoubleUndersResult.jumpOffsets.count == 200)
+        #expect(sevenDoubleUndersResult.detector.doubleUndersCount == 7)
+        #expect(SessionMetricsCalculator.doubleUndersCount(from: sevenDoubleUndersResult.jumpOffsets) == 7)
+
+        let seventeenDoubleUndersResult = try replayMotionCSV(named: "watch-17-doubleunders.csv", profile: .watch)
+        #expect(seventeenDoubleUndersResult.jumpOffsets.count == 200)
+        #expect(seventeenDoubleUndersResult.detector.doubleUndersCount == 17)
+        #expect(SessionMetricsCalculator.doubleUndersCount(from: seventeenDoubleUndersResult.jumpOffsets) == 16)
+    }
+
+    @Test func testRecordedHeadphoneMotionCSVsDetectExpectedJumps() async throws {
+        let normalResult = try replayMotionCSV(named: "headphone-normal.csv", profile: .headphones)
+        #expect(normalResult.jumpOffsets.count == 200)
+
+        let fiveDoubleUndersResult = try replayMotionCSV(named: "headphone-5-doubleunders.csv", profile: .headphones)
+        #expect(fiveDoubleUndersResult.jumpOffsets.count == 200)
+    }
 }
 
 private extension JumpRecTests {
@@ -276,5 +355,65 @@ private extension JumpRecTests {
             rotationRateZ: 0,
             timestamp: timestamp
         )
+    }
+
+    /// Loads recorded sensor rows from `Analysis/motion-data/<filename>`.
+    func loadMotionSamples(named filename: String) throws -> [MotionSample] {
+        let fileURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Analysis")
+            .appendingPathComponent("motion-data")
+            .appendingPathComponent(filename)
+        let contents = try String(contentsOf: fileURL, encoding: .utf8)
+        let lines = contents.split(whereSeparator: \.isNewline)
+        guard lines.count > 1 else {
+            return []
+        }
+
+        var samples: [MotionSample] = []
+        samples.reserveCapacity(lines.count - 1)
+        for line in lines.dropFirst() {
+            let columns = line.split(separator: ",")
+            guard columns.count == 7,
+                  let timestamp = Double(columns[0]),
+                  let ax = Double(columns[1]),
+                  let ay = Double(columns[2]),
+                  let az = Double(columns[3]),
+                  let rx = Double(columns[4]),
+                  let ry = Double(columns[5]),
+                  let rz = Double(columns[6])
+            else {
+                continue
+            }
+            samples.append(
+                MotionSample(
+                    userAccelerationX: ax,
+                    userAccelerationY: ay,
+                    userAccelerationZ: az,
+                    rotationRateX: rx,
+                    rotationRateY: ry,
+                    rotationRateZ: rz,
+                    timestamp: timestamp
+                )
+            )
+        }
+        return samples
+    }
+
+    /// Replays a recorded motion CSV through a fresh detector and returns accepted jump offsets.
+    func replayMotionCSV(
+        named filename: String,
+        profile: JumpDeviceProfile
+    ) throws -> (detector: JumpDetector, jumpOffsets: [TimeInterval]) {
+        let samples = try loadMotionSamples(named: filename)
+        try #require(!samples.isEmpty)
+
+        let detector = JumpDetector(profile: profile)
+        var jumpOffsets: [TimeInterval] = []
+        for sample in samples where detector.processMotionSample(sample) {
+            jumpOffsets.append(sample.timestamp)
+        }
+        return (detector, jumpOffsets)
     }
 }

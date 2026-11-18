@@ -29,6 +29,10 @@ class MotionManager: NSObject {
             state.withLock { $0.isTracking }
         }
 
+        var doubleUndersCount: Int {
+            state.withLock { $0.jumpDetector.doubleUndersCount }
+        }
+
         func prepareIfNotTracking(thresholdAdjustmentPercentage: Double) {
             state.withLock { state in
                 guard !state.isTracking else { return }
@@ -114,6 +118,11 @@ class MotionManager: NSObject {
     /// Indicates whether motion tracking is currently active.
     var isTracking: Bool {
         sampleProcessor.isTracking
+    }
+
+    /// Returns the number of double-unders detected during the current watch session.
+    var doubleUndersCount: Int {
+        sampleProcessor.doubleUndersCount
     }
 
     /// Stores the local jump count used by the watch detector.
