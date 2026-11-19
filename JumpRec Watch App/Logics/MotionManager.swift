@@ -232,6 +232,11 @@ class MotionManager: NSObject {
         workoutManager.sendJumpUpdate(jumpCount: jumpCount, jumpOffset: jumpOffset)
     }
 
+    /// Re-sends the active workout start event over HealthKit mirroring when requested by the companion.
+    func resendStartedEvent(_ payload: MirroredWorkoutPayload) {
+        workoutManager.resendStartedPayload(payload)
+    }
+
     #if DEBUG
         /// Returns and clears recorded motion samples collected during the session.
         func consumeRecordedSamples() -> [MotionSample] {

@@ -12,29 +12,18 @@ import SwiftUI
 /// Displays the watch start screen and pre-session countdown.
 struct StartView: View {
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "JumpRec.watch", category: "Permissions")
-    /// Indicates whether the countdown is currently showing.
-    @State var isCountingDown: Bool = false
-    /// Drives the countdown ring animation.
-    @State var isAnimating: Bool = false
-    /// Stores the current countdown value.
-    @State var countdown = 3
-    var isCompanionStartRequested = false
-    var onCompanionStartConsumed: () -> Void = {}
-    @State private var preparationTask: Task<Void, Never>?
-    @State private var isPreparingWorkout = false
-    @State private var isCompanionAttempt = false
-    @State private var showPermissionError = false
-    @State private var permissionErrorMessage = ""
-    /// Starts the workout when the countdown finishes.
-    var onStart: () -> Void
+
+    /// Holds the shared watch app state driving preparation and countdown transitions.
+    @Bindable var appState: JumpRecState
+
+    /// Drives the countdown ring trim animation from the current countdown second.
+    @State private var countdownTrim: Double = 1.0
 
     /// Provides the currently selected workout goal.
     @Environment(JumpRecSettings.self)
     private var settings: JumpRecSettings
     /// Controls navigation to the goal settings screen.
     @State var showSettings: Bool = false
-    /// Controls presentation of the quota reached explanation.
-    @State private var showQuotaExplanation: Bool = false
 
     /// Returns the formatted goal text shown under the start button.
     var goal: Text {
@@ -69,16 +58,17 @@ struct StartView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                if isCountingDown {
+                if appState.isCountingDown {
                     ZStack {
-                        Text(countdown.formatted())
+                        Text(appState.countdown.formatted())
                             .font(AppFonts.monospaced(displaySize, weight: .bold))
                             .lineLimit(1)
                             .minimumScaleFactor(0.6)
                             .foregroundStyle(AppColors.textPrimary)
                             .contentTransition(.numericText())
+                            .animation(.default, value: appState.countdown)
                         Circle()
-                            .trim(from: 0, to: isAnimating ? 0 : 1)
+                            .trim(from: 0, to: countdownTrim)
                             .stroke(
                                 style: .init(
                                     lineWidth: 8,
@@ -87,9 +77,6 @@ struct StartView: View {
                             )
                             .foregroundStyle(AppColors.accent)
                             .rotationEffect(.degrees(-90))
-                            .animation(.linear(
-                                duration: 3.0
-                            ), value: isAnimating)
                     }
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(Text("Workout countdown"))
@@ -97,19 +84,25 @@ struct StartView: View {
                         Text(
                             String(
                                 format: String(localized: "%lld seconds remaining"),
-                                Int64(countdown)
+                                Int64(appState.countdown)
                             )
                         )
                     )
                     .task {
-                        await runCountdown()
+                        let remaining = max(1, min(3, appState.countdown))
+                        countdownTrim = Double(remaining) / 3.0
+                        await Task.yield()
+                        guard !Task.isCancelled else { return }
+                        withAnimation(.linear(duration: Double(remaining))) {
+                            countdownTrim = 0
+                        }
                     }
-                } else if showQuotaExplanation {
+                } else if appState.showQuotaExplanation {
                     quotaReachedExplanation
                 } else {
                     VStack(spacing: 12) {
                         Button {
-                            prepareWorkout()
+                            appState.requestStart(settings: settings)
                         } label: {
                             Text("START")
                                 .font(AppFonts.watchPrimaryButton)
@@ -121,7 +114,7 @@ struct StartView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         .buttonStyle(.plain)
-                        .disabled(isPreparingWorkout)
+                        .disabled(appState.isPreparingWorkout)
                         .accessibilityHint(Text("Starts a three second countdown before the workout begins."))
 
                         HStack(spacing: 4) {
@@ -145,36 +138,26 @@ struct StartView: View {
                             .foregroundStyle(AppColors.textMuted)
                     }
                     .buttonStyle(.plain)
-                    .disabled(isPreparingWorkout || isCountingDown)
+                    .disabled(appState.isPreparingWorkout || appState.isCountingDown)
                     .accessibilityLabel(Text("Settings"))
                 }
             }
             .navigationDestination(isPresented: $showSettings) {
                 SettingsView()
             }
-            .alert("Workout Permissions", isPresented: $showPermissionError) {
+            .alert("Workout Permissions", isPresented: $appState.showPermissionError) {
                 Button("Settings") { showSettings = true }
                 Button("OK", role: .cancel) {}
             } message: {
-                Text(permissionErrorMessage)
+                Text(appState.permissionErrorMessage)
             }
-            .onChange(of: isCompanionStartRequested, initial: true) { _, requested in
-                guard requested else { return }
-                onCompanionStartConsumed()
-                settings.loadSettings()
-                guard !isPreparingWorkout, !isCountingDown else { return }
-                isCompanionAttempt = true
-                prepareWorkout()
+            .onChange(of: appState.isPreparingWorkout || appState.isCountingDown) { _, isStarting in
+                if isStarting {
+                    showSettings = false
+                }
             }
             .task {
                 await requestInitialHealthPermissionsIfNeeded()
-            }
-            .onDisappear {
-                preparationTask?.cancel()
-                preparationTask = nil
-                isPreparingWorkout = false
-                JumpRecState.shared.cancelPreparedStart()
-                cancelCompanionStartIfNeeded()
             }
         }
     }
@@ -191,7 +174,7 @@ struct StartView: View {
                 .multilineTextAlignment(.center)
 
             Button {
-                showQuotaExplanation = false
+                appState.showQuotaExplanation = false
             } label: {
                 Text("OK")
                     .font(AppFonts.watchGoalLabel)
@@ -213,9 +196,8 @@ struct StartView: View {
             guard !ScreenshotFixtures.isEnabled else { return }
         #endif
         guard !JumpRecState.shared.hasRequestedInitialHealthPermissions,
-              !isCompanionStartRequested,
-              !isPreparingWorkout,
-              !isCountingDown
+              !appState.isPreparingWorkout,
+              !appState.isCountingDown
         else {
             return
         }
@@ -227,84 +209,9 @@ struct StartView: View {
             Self.logger.error("Could not request initial Health permissions: \(error.localizedDescription, privacy: .public)")
         }
     }
-
-    /// Asks for access and pre-warms workout services before animating the countdown.
-    private func prepareWorkout() {
-        guard !isPreparingWorkout, !isCountingDown else { return }
-        guard !settings.isQuotaExceeded else {
-            showQuotaExplanation = true
-            cancelCompanionStartIfNeeded()
-            return
-        }
-        isPreparingWorkout = true
-        preparationTask = Task { @MainActor in
-            do {
-                try await WorkoutPermissions.prepareForWorkout()
-                try Task.checkCancellation()
-                // Warm up speech, Core Motion, HealthKit session, and mirroring during the countdown.
-                JumpRecState.shared.prepareForStart(
-                    jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
-                )
-                isPreparingWorkout = false
-                withAnimation { isCountingDown = true }
-            } catch {
-                guard !Task.isCancelled else { return }
-                isPreparingWorkout = false
-                permissionErrorMessage = (error as? WorkoutPermissions.PreparationError)?.localizedDescription
-                    ?? String(localized: "Unable to prepare workout permissions. Please try again or review access in Settings.")
-                showPermissionError = true
-                cancelCompanionStartIfNeeded()
-            }
-        }
-    }
-
-    private func cancelCompanionStartIfNeeded() {
-        guard isCompanionAttempt else { return }
-        isCompanionAttempt = false
-        ConnectivityManager.shared.sendMessage(["watch app": "startCancelled"])
-    }
-
-    // MARK: - Countdown
-
-    /// Starts a workout after the countdown only while its SwiftUI task remains active.
-    private func runCountdown() async {
-        countdown = 3
-        isAnimating = false
-
-        // Allow SwiftUI to render the full ring before animating its trim to zero.
-        await Task.yield()
-        guard !Task.isCancelled else { return }
-
-        withAnimation(.linear(duration: 3)) {
-            isAnimating = true
-        }
-
-        for value in stride(from: 2, through: 1, by: -1) {
-            do {
-                try await Task.sleep(for: .seconds(1))
-            } catch {
-                return
-            }
-
-            guard !Task.isCancelled else { return }
-            withAnimation {
-                countdown = value
-            }
-        }
-
-        do {
-            try await Task.sleep(for: .seconds(1))
-        } catch {
-            return
-        }
-
-        guard !Task.isCancelled else { return }
-        isCompanionAttempt = false
-        onStart()
-    }
 }
 
 #Preview {
-    StartView(onStart: {})
+    StartView(appState: JumpRecState())
         .environment(JumpRecSettings())
 }

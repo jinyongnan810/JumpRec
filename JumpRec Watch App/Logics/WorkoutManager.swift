@@ -200,6 +200,20 @@ final class WorkoutManager: NSObject {
         }
     }
 
+    /// Re-sends the start payload or re-establishes mirroring when the companion attaches late.
+    func resendStartedPayload(_ payload: MirroredWorkoutPayload) {
+        guard isActivityStarted, let session, let builder else { return }
+
+        if isMirroringActive {
+            sendPayload(payload)
+        } else {
+            pendingStartedPayload = payload
+            if mirroringTask == nil {
+                startMirroring(for: session, builder: builder, generation: workoutGeneration)
+            }
+        }
+    }
+
     /// Ends a prepared workout session that was cancelled before starting.
     func cancelPreparedWorkout() {
         guard !isActivityStarted else { return }
@@ -575,6 +589,8 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
             Self.logger.info("HealthKit state \(fromState.rawValue) -> \(toState.rawValue) at \(date.timeIntervalSince1970)")
             if toState == .stopped {
                 self?.finalizeWorkout(workoutSession, at: date)
+            } else if toState == .ended {
+                self?.pendingFinalizations.removeValue(forKey: ObjectIdentifier(workoutSession))
             }
         }
     }

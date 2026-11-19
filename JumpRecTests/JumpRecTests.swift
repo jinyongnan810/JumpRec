@@ -400,6 +400,53 @@ struct JumpRecTests {
         #expect(appState.localizedSessionEndedAnnouncement(for: .manualStop) == nil)
         #expect(appState.localizedSessionEndedAnnouncement(for: .goalReached) == AppLocalization.goalCompletedAnnouncement())
     }
+
+    @MainActor
+    @Test func testBeginMirroredSessionRecoversFromStartingAndAppliesLiveMetrics() {
+        let appState = JumpRecState()
+        let startedAt = Date(timeIntervalSince1970: 1_700_000_000)
+        appState.sessionState = .starting
+        appState.pendingMirroredStart = true
+
+        appState.handleMirroredWorkoutPayload(
+            MirroredWorkoutPayload(
+                kind: .started,
+                startTime: startedAt,
+                goalType: .count,
+                goalValue: 500,
+                jumpCount: 42,
+                energyBurned: 12.5,
+                heartRate: 138,
+                averageHeartRate: 129,
+                peakHeartRate: 145
+            )
+        )
+
+        #expect(appState.sessionState == .active)
+        #expect(appState.isMirroredWatchSession)
+        #expect(!appState.pendingMirroredStart)
+        #expect(appState.startTime == startedAt)
+        #expect(appState.sessionGoalType == .count)
+        #expect(appState.sessionGoalValue == 500)
+        #expect(appState.jumpCount == 42)
+        #expect(appState.caloriesBurned == 12.5)
+        #expect(appState.heartRate == 138)
+        #expect(appState.averageHeartRate == 129)
+        #expect(appState.peakHeartRate == 145)
+        #expect(appState.activeMotionSource == .watch)
+    }
+
+    @MainActor
+    @Test func testCancelPendingCompanionStartReturnsStartingStateToIdle() {
+        let appState = JumpRecState()
+        appState.sessionState = .starting
+        appState.pendingMirroredStart = true
+
+        appState.cancelPendingCompanionStart()
+
+        #expect(appState.sessionState == .idle)
+        #expect(!appState.pendingMirroredStart)
+    }
 }
 
 private extension JumpRecTests {

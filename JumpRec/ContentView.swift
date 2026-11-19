@@ -142,7 +142,7 @@ struct ContentView: View {
                 appState.sessionState == .complete
             },
             set: { isPresented in
-                if !isPresented {
+                if !isPresented, appState.sessionState == .complete {
                     appState.reset() // Called when sheet is dismissed via swipe
                 }
             }

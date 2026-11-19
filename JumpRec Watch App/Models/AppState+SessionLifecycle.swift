@@ -65,10 +65,181 @@ extension JumpRecState {
         )
     }
 
-    /// Starts a workout using settings received from the companion iPhone app.
+    /// Starts the local permission check, hardware pre-warm, and three-second countdown from the Watch UI.
+    func requestStart(settings: JumpRecSettings) {
+        beginWorkoutCountdown(settings: settings, isCompanion: false)
+    }
+
+    /// Handles a companion start request across idle, active, and finished Watch states.
     func startFromCompanion() {
+        switch jumpState {
+        case .jumping:
+            resendActiveWorkoutStartToCompanion()
+            return
+        case .finished:
+            reset()
+        case .idle:
+            break
+        }
+
+        beginWorkoutCountdown(settings: nil, isCompanion: true)
+    }
+
+    /// Cancels an in-flight permission check or countdown and optionally notifies the companion.
+    func cancelPendingStart(notifyCompanion: Bool = true) {
+        let wasActive = isPreparingWorkout || isCountingDown || startCountdownTask != nil
+        startCountdownTask?.cancel()
+        startCountdownTask = nil
+        isPreparingWorkout = false
+        isCountingDown = false
+        countdown = 3
+
+        if wasActive {
+            cancelPreparedStart()
+        }
+
+        if notifyCompanion {
+            notifyCompanionStartCancelledIfNeeded()
+        } else {
+            isCompanionStartAttempt = false
+        }
+    }
+
+    /// Prepares permissions, warms sensors, counts down three seconds, and starts the workout.
+    private func beginWorkoutCountdown(settings: JumpRecSettings?, isCompanion: Bool) {
         guard jumpState == .idle else { return }
-        isCompanionStartRequested = true
+
+        if isPreparingWorkout || isCountingDown {
+            if isCompanion {
+                isCompanionStartAttempt = true
+            }
+            return
+        }
+
+        showPermissionError = false
+        showQuotaExplanation = false
+        if isCompanion {
+            isCompanionStartAttempt = true
+        }
+
+        let initialSettings = settings.map(Self.storedSettings(from:)) ?? readStoredWorkoutSettings()
+        if initialSettings.isQuotaExceeded {
+            showQuotaExplanation = true
+            notifyCompanionStartCancelledIfNeeded()
+            return
+        }
+
+        isPreparingWorkout = true
+        startCountdownTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            do {
+                try await WorkoutPermissions.prepareForWorkout()
+                try Task.checkCancellation()
+            } catch {
+                guard !Task.isCancelled else { return }
+                isPreparingWorkout = false
+                startCountdownTask = nil
+                permissionErrorMessage = (error as? WorkoutPermissions.PreparationError)?.localizedDescription
+                    ?? String(localized: "Unable to prepare workout permissions. Please try again or review access in Settings.")
+                showPermissionError = true
+                notifyCompanionStartCancelledIfNeeded()
+                return
+            }
+
+            guard jumpState == .idle else {
+                isPreparingWorkout = false
+                startCountdownTask = nil
+                return
+            }
+
+            let preparedSettings = settings.map(Self.storedSettings(from:)) ?? readStoredWorkoutSettings()
+            // Warm up speech, Core Motion, HealthKit session, and mirroring during the countdown.
+            prepareForStart(
+                jumpDetectorThresholdAdjustmentPercentage: preparedSettings.jumpDetectorThresholdAdjustmentPercentage
+            )
+            isPreparingWorkout = false
+            countdown = 3
+            isCountingDown = true
+
+            for value in stride(from: 2, through: 1, by: -1) {
+                do {
+                    try await Task.sleep(for: .seconds(1))
+                } catch {
+                    return
+                }
+
+                guard !Task.isCancelled, jumpState == .idle else {
+                    isCountingDown = false
+                    startCountdownTask = nil
+                    return
+                }
+                countdown = value
+            }
+
+            do {
+                try await Task.sleep(for: .seconds(1))
+            } catch {
+                return
+            }
+
+            guard !Task.isCancelled, jumpState == .idle else {
+                isCountingDown = false
+                startCountdownTask = nil
+                return
+            }
+
+            isCountingDown = false
+            isCompanionStartAttempt = false
+            startCountdownTask = nil
+
+            let finalSettings = settings.map(Self.storedSettings(from:)) ?? readStoredWorkoutSettings()
+            start(
+                goalType: finalSettings.goalType,
+                goalCount: finalSettings.goalCount,
+                shouldSpeakJumpCountAnnouncements: finalSettings.shouldSpeakJumpCountAnnouncements,
+                shouldSpeakJumpTimeAnnouncements: finalSettings.shouldSpeakJumpTimeAnnouncements,
+                jumpDetectorThresholdAdjustmentPercentage: finalSettings.jumpDetectorThresholdAdjustmentPercentage
+            )
+        }
+    }
+
+    /// Notifies the companion iPhone app when a companion-triggered start is aborted before running.
+    private func notifyCompanionStartCancelledIfNeeded() {
+        guard isCompanionStartAttempt else { return }
+        isCompanionStartAttempt = false
+        ConnectivityManager.shared.sendMessage(["watch app": "startCancelled"])
+    }
+
+    /// Re-emits the active workout start event so the iPhone app can re-attach after a stale request.
+    private func resendActiveWorkoutStartToCompanion() {
+        guard jumpState == .jumping, let startTime else { return }
+
+        let payload = MirroredWorkoutPayload(
+            kind: .started,
+            startTime: startTime,
+            goalType: goalType,
+            goalValue: goal,
+            jumpCount: jumpCount,
+            energyBurned: energyBurned,
+            heartRate: heartrate > 0 ? heartrate : nil,
+            averageHeartRate: averageHeartRate,
+            peakHeartRate: peakHeartRateValue
+        )
+        ConnectivityManager.shared.sendWorkoutEvent(payload)
+        motionManager?.resendStartedEvent(payload)
+    }
+
+    /// Captures the observable Watch settings object into a plain value snapshot.
+    private static func storedSettings(from settings: JumpRecSettings) -> StoredWorkoutSettings {
+        StoredWorkoutSettings(
+            goalType: settings.goalType,
+            goalCount: settings.goalCount,
+            shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
+            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
+            jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage,
+            isQuotaExceeded: settings.isQuotaExceeded
+        )
     }
 
     /// Applies synced settings without resetting HealthKit collection or jump history.
@@ -165,6 +336,9 @@ extension JumpRecState {
 
     /// Resets the watch app back to the idle state.
     func reset() {
+        cancelPendingStart(notifyCompanion: true)
+        showPermissionError = false
+        showQuotaExplanation = false
         stopSpeechAndDeactivateAudio()
         cancelMinuteAnnouncements()
         motionManager?.stopTracking()

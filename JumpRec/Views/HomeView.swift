@@ -78,14 +78,14 @@ struct HomeView: View {
 
     /// Returns whether the primary action button should reject input.
     private var isPrimaryButtonDisabled: Bool {
-        isStartingSession || isPreparingWorkout
+        isPreparingWorkout
     }
 
     /// Returns the title for the primary pre-session action button.
     private var primaryButtonTitle: String {
-        if isStartingSession || isPreparingWorkout {
+        if isPreparingWorkout {
             String(localized: "Starting...")
-        } else if isCountingDown {
+        } else if isCountingDown || isStartingSession {
             String(localized: "CANCEL")
         } else {
             String(localized: "START")
@@ -99,9 +99,9 @@ struct HomeView: View {
 
     /// Returns the tint color for the primary pre-session button.
     private var primaryButtonTint: Color {
-        if isStartingSession {
+        if isPreparingWorkout {
             AppColors.textMuted
-        } else if isCountingDown {
+        } else if isCountingDown || isStartingSession {
             AppColors.danger
         } else {
             AppColors.accent
@@ -243,7 +243,7 @@ struct HomeView: View {
                     }
                     .tint(.primary)
                     .matchedTransitionSource(id: Self.settingsTransitionID, in: navigationTransitionNamespace)
-                    .disabled(isCountingDown || isPreparingWorkout)
+                    .disabled(isCountingDown || isPreparingWorkout || isStartingSession)
                 }
             }
             .sheet(isPresented: $showSettingsView) {
@@ -293,6 +293,8 @@ struct HomeView: View {
         Button {
             if isCountingDown {
                 cancelCountdown()
+            } else if isStartingSession {
+                appState.cancelPendingCompanionStart()
             } else {
                 startWithCountdown()
             }

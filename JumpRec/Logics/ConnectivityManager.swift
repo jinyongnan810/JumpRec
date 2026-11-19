@@ -299,10 +299,10 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         shouldSpeakJumpCountAnnouncements: Bool,
         shouldSpeakJumpTimeAnnouncements: Bool,
         jumpDetectorThresholdAdjustmentPercentage: Double,
-        hasUnlockedUnlimitedWorkouts: Bool = false,
-        qualifiedWorkoutCount: Int = 0
+        hasUnlockedUnlimitedWorkouts: Bool? = nil,
+        qualifiedWorkoutCount: Int? = nil
     ) {
-        let payload: [String: Any] = [
+        var payload: [String: Any] = [
             "type": "goalSettings",
             "accentColor": AppAppearance.shared.accent.rawValue,
             "goalType": goalType.rawValue,
@@ -311,9 +311,13 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             "shouldSpeakJumpCountAnnouncements": shouldSpeakJumpCountAnnouncements,
             "shouldSpeakJumpTimeAnnouncements": shouldSpeakJumpTimeAnnouncements,
             "jumpDetectorThresholdAdjustmentPercentage": jumpDetectorThresholdAdjustmentPercentage,
-            "hasUnlockedUnlimitedWorkouts": hasUnlockedUnlimitedWorkouts,
-            "qualifiedWorkoutCount": qualifiedWorkoutCount,
         ]
+        if let hasUnlockedUnlimitedWorkouts {
+            payload["hasUnlockedUnlimitedWorkouts"] = hasUnlockedUnlimitedWorkouts
+        }
+        if let qualifiedWorkoutCount {
+            payload["qualifiedWorkoutCount"] = qualifiedWorkoutCount
+        }
 
         do {
             try session.updateApplicationContext(payload)
@@ -326,6 +330,25 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         // Application context queues the latest settings; reachable messages apply them immediately.
         session.sendMessage(payload, replyHandler: nil) { error in
             print("[WatchConnectivityManager] Failed to send immediate goal settings message: \(error.localizedDescription)")
+        }
+    }
+
+    /// Asks the already-running Watch app to start a companion workout when HealthKit skips re-delivery.
+    func sendStartSessionCommand() {
+        guard session.isReachable else {
+            print("[WatchConnectivityManager] Watch is not reachable for fallback start command")
+            return
+        }
+        session.sendMessage(["action": "startWorkout"], replyHandler: nil) { error in
+            print("[WatchConnectivityManager] Failed to send start workout message: \(error.localizedDescription)")
+        }
+    }
+
+    /// Cancels a pending companion-triggered countdown on Watch when iPhone cancels starting.
+    func sendCancelStartCommand() {
+        guard session.isReachable else { return }
+        session.sendMessage(["action": "cancelStart"], replyHandler: nil) { error in
+            print("[WatchConnectivityManager] Failed to send cancel start message: \(error.localizedDescription)")
         }
     }
 

@@ -22,12 +22,40 @@ class JumpRecState: NSObject, @unchecked Sendable {
     /// Provides the single shared app state used across watch views.
     static let shared = JumpRecState()
 
+    // MARK: - Types
+
+    /// Snapshot of persisted workout settings read directly for background and synced starts.
+    struct StoredWorkoutSettings {
+        let goalType: GoalType
+        let goalCount: Int
+        let shouldSpeakJumpCountAnnouncements: Bool
+        let shouldSpeakJumpTimeAnnouncements: Bool
+        let jumpDetectorThresholdAdjustmentPercentage: Double
+        let isQuotaExceeded: Bool
+    }
+
     // MARK: - Session State
 
     /// Tracks the current watch-side session state.
     var jumpState: JumpState = .idle
-    /// Queues companion starts until the start screen can resolve permissions.
-    var isCompanionStartRequested = false
+    /// Indicates whether permissions and workout startup are currently being prepared.
+    var isPreparingWorkout = false
+    /// Indicates whether the pre-workout countdown is currently running.
+    var isCountingDown = false
+    /// Tracks the current countdown second displayed on the start screen.
+    var countdown = 3
+    /// Controls presentation of the workout-permission alert.
+    var showPermissionError = false
+    /// Describes the permission error shown to the user.
+    var permissionErrorMessage = ""
+    /// Controls presentation of the inline free-tier quota explanation.
+    var showQuotaExplanation = false
+    /// Owns the asynchronous permission preparation and countdown task.
+    @ObservationIgnored
+    var startCountdownTask: Task<Void, Never>?
+    /// Tracks whether the active preparation or countdown originated from the iPhone companion.
+    @ObservationIgnored
+    var isCompanionStartAttempt = false
     /// Prevents repeating the automatic launch permission prompt within the same app session.
     @ObservationIgnored
     var hasRequestedInitialHealthPermissions = false
@@ -136,8 +164,8 @@ class JumpRecState: NSObject, @unchecked Sendable {
         }
     #endif
 
-    /// Applies a synced settings snapshot to the active workout without creating an observer.
-    private func applySyncedSettingsFromStore() {
+    /// Reads the latest persisted workout settings and quota status directly from the shared store.
+    func readStoredWorkoutSettings() -> StoredWorkoutSettings {
         let store = NSUbiquitousKeyValueStore.default
         store.synchronize()
 
@@ -150,13 +178,31 @@ class JumpRecState: NSObject, @unchecked Sendable {
         let shouldSpeakJumpTimeAnnouncements = store.object(forKey: "shouldSpeakJumpTimeAnnouncements") as? Bool ?? true
         let thresholdAdjustmentPercentage = (store.object(forKey: "jumpDetectorThresholdAdjustmentPercentage") as? NSNumber)?.doubleValue
             ?? DefaultJumpDetectorThresholdAdjustmentPercentage
+        let hasUnlockedUnlimitedWorkouts = store.bool(forKey: "hasUnlockedUnlimitedWorkouts")
+        let qualifiedWorkoutCount = Int(store.longLong(forKey: "qualifiedWorkoutCount"))
+        let isQuotaExceeded = !hasUnlockedUnlimitedWorkouts && qualifiedWorkoutCount >= JumpRecSettings.freeWorkoutQuota
 
-        applyActiveSessionSettings(
+        return StoredWorkoutSettings(
             goalType: goalType,
             goalCount: Int(goalType == .count ? jumpCount : jumpTime),
             shouldSpeakJumpCountAnnouncements: shouldSpeakJumpCountAnnouncements,
             shouldSpeakJumpTimeAnnouncements: shouldSpeakJumpTimeAnnouncements,
-            jumpDetectorThresholdAdjustmentPercentage: JumpRecSettings.clampedJumpDetectorThresholdAdjustmentPercentage(thresholdAdjustmentPercentage)
+            jumpDetectorThresholdAdjustmentPercentage: JumpRecSettings.clampedJumpDetectorThresholdAdjustmentPercentage(
+                thresholdAdjustmentPercentage
+            ),
+            isQuotaExceeded: isQuotaExceeded
+        )
+    }
+
+    /// Applies a synced settings snapshot to the active workout without creating an observer.
+    private func applySyncedSettingsFromStore() {
+        let settings = readStoredWorkoutSettings()
+        applyActiveSessionSettings(
+            goalType: settings.goalType,
+            goalCount: settings.goalCount,
+            shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
+            shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
+            jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
         )
     }
 }

@@ -111,10 +111,21 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     /// Applies reachable settings messages or action requests from the iPhone app.
     nonisolated func session(_: WCSession, didReceiveMessage message: [String: Any]) {
         print("[WatchConnectivityManager] Received message: \(message)")
-        if let action = message["action"] as? String, action == "stopWorkout" {
+        if let action = message["action"] as? String {
             Task { @MainActor in
-                // If the watch session is active, finish the workout upon remote iPhone request.
-                JumpRecState.shared.end(reason: .manualStop)
+                switch action {
+                case "stopWorkout":
+                    // If the watch session is active, finish the workout upon remote iPhone request.
+                    JumpRecState.shared.end(reason: .manualStop)
+                case "startWorkout":
+                    JumpRecState.shared.startFromCompanion()
+                case "cancelStart":
+                    if JumpRecState.shared.isCompanionStartAttempt {
+                        JumpRecState.shared.cancelPendingStart(notifyCompanion: false)
+                    }
+                default:
+                    break
+                }
             }
             return
         }

@@ -10,6 +10,11 @@ import UIKit
 extension JumpRecState {
     // MARK: - Session Lifecycle
 
+    /// Delay before falling back to a direct WatchConnectivity start command if HealthKit skips launch delivery.
+    private static let companionStartFallbackDelay: Duration = .milliseconds(1500)
+    /// Maximum wait for Watch confirmation before releasing the iPhone starting state.
+    private static let companionStartTimeout: Duration = .seconds(15)
+
     /// Returns whether an Apple Watch with the JumpRec app installed is available.
     var isWatchAvailable: Bool {
         connectivityManager.isPaired && connectivityManager.isWatchAppInstalled
@@ -135,7 +140,40 @@ extension JumpRecState {
                         thresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage,
                         generation: generation
                     )
+                    return
                 }
+
+                do {
+                    try await Task.sleep(for: Self.companionStartFallbackDelay)
+                } catch {
+                    return
+                }
+
+                guard let self,
+                      !Task.isCancelled,
+                      sessionGeneration == generation,
+                      sessionState == .starting,
+                      pendingMirroredStart
+                else {
+                    return
+                }
+                connectivityManager.sendStartSessionCommand()
+
+                do {
+                    try await Task.sleep(for: Self.companionStartTimeout - Self.companionStartFallbackDelay)
+                } catch {
+                    return
+                }
+
+                guard !Task.isCancelled,
+                      sessionGeneration == generation,
+                      sessionState == .starting,
+                      pendingMirroredStart
+                else {
+                    return
+                }
+                print("[JumpRecState] Timed out waiting for Apple Watch workout start confirmation")
+                reset()
             }
             return
         }
@@ -146,6 +184,13 @@ extension JumpRecState {
             thresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage,
             generation: generation
         )
+    }
+
+    /// Cancels an in-flight companion Watch start request and returns the iPhone UI to idle.
+    func cancelPendingCompanionStart() {
+        guard sessionState == .starting, pendingMirroredStart else { return }
+        connectivityManager.sendCancelStartCommand()
+        reset()
     }
 
     /// Applies live settings; Watch remains responsible for ending mirrored workouts.

@@ -23,20 +23,7 @@ struct MainView: View {
         ZStack {
             switch appState.jumpState {
             case .idle:
-                StartView(
-                    isCompanionStartRequested: appState.isCompanionStartRequested,
-                    onCompanionStartConsumed: { appState.isCompanionStartRequested = false },
-                    onStart: {
-                        appState
-                            .start(
-                                goalType: settings.goalType,
-                                goalCount: settings.goalCount,
-                                shouldSpeakJumpCountAnnouncements: settings.shouldSpeakJumpCountAnnouncements,
-                                shouldSpeakJumpTimeAnnouncements: settings.shouldSpeakJumpTimeAnnouncements,
-                                jumpDetectorThresholdAdjustmentPercentage: settings.jumpDetectorThresholdAdjustmentPercentage
-                            )
-                    }
-                )
+                StartView(appState: appState)
             case .finished:
                 ResultView(appState: appState)
             case .jumping:
@@ -49,11 +36,11 @@ struct MainView: View {
         .onChange(of: scenePhase, initial: true) { _, newPhase in
             switch newPhase {
             case .active:
-                if appState.jumpState == .idle {
+                if appState.jumpState == .idle, !appState.isPreparingWorkout, !appState.isCountingDown {
                     appState.prepareSpeechForWorkout()
                 }
             case .background:
-                if appState.jumpState != .jumping {
+                if appState.jumpState != .jumping, !appState.isCountingDown {
                     appState.markSpeechWarmupNeeded()
                 }
             default:

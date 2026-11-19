@@ -91,12 +91,13 @@ extension JumpRecState {
         #if DEBUG
             motionCSVShareURL = nil
         #endif
-        heartRate = nil
-        averageHeartRate = nil
-        peakHeartRate = nil
+        caloriesBurned = payload.energyBurned ?? 0
+        heartRate = payload.heartRate
+        averageHeartRate = payload.averageHeartRate
+        peakHeartRate = payload.peakHeartRate
         doubleUndersCount = 0
         completedSession = nil
-        startTime = payload.startTime ?? Date()
+        startTime = incomingStartTime
         endTime = nil
         jumpCount = payload.jumpCount ?? 0
         sessionGoalType = payload.goalType

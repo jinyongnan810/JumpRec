@@ -21,6 +21,7 @@ struct JumpRec_Watch_AppApp: App {
     @WKApplicationDelegateAdaptor(WatchAppDelegate.self) private var appDelegate
 
     init() {
+        _ = ConnectivityManager.shared
         #if DEBUG && targetEnvironment(simulator)
             JumpRecState.shared.loadScreenshotState()
         #endif
