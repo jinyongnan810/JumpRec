@@ -81,6 +81,32 @@ extension MyDataStore {
         saveContextIfNeeded()
     }
 
+    /// Deletes a single cached personal record while retaining session history.
+    func deletePersonalRecord(_ record: PersonalRecord) {
+        guard !record.isDeleted else { return }
+
+        let deletedKind = record.kindRawValue.flatMap(PersonalRecordKind.init(rawValue:))
+        let deletedID = record.persistentModelID
+
+        modelContext.delete(record)
+
+        if let deletedKind {
+            let kindRawValue = deletedKind.rawValue
+            let descriptor = FetchDescriptor<PersonalRecord>(
+                predicate: #Predicate { existing in
+                    existing.kindRawValue == kindRawValue
+                }
+            )
+            let remainingMatches = ((try? modelContext.fetch(descriptor)) ?? [])
+                .filter { $0.persistentModelID != deletedID && !$0.isDeleted }
+            if remainingMatches.isEmpty {
+                clearUnseenPersonalRecordUpdate(for: deletedKind)
+            }
+        }
+
+        saveContextIfNeeded()
+    }
+
     func backfillPersonalRecordsIfNeeded() {
         let recordDescriptor = FetchDescriptor<PersonalRecord>()
         let existingRecords = (try? modelContext.fetch(recordDescriptor)) ?? []

@@ -1943,6 +1943,34 @@
         }
       }
     },
+    "Delete Record" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "記録を削除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "기록 삭제"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "删除纪录"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "刪除紀錄"
+          }
+        }
+      }
+    },
     "Delete Records" : {
       "localizations" : {
         "ja" : {
@@ -2079,6 +2107,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "刪除這些運動？"
+          }
+        }
+      }
+    },
+    "Delete this record?" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "この記録を削除しますか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "이 기록을 삭제할까요?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "删除这项纪录？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "刪除這項紀錄？"
           }
         }
       }
@@ -5827,6 +5883,12 @@
             "value" : "ヘルスケアデータの読み取り"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "건강 데이터 읽기"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5837,12 +5899,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "讀取健康資料"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "건강 데이터 읽기"
           }
         }
       }
@@ -5855,6 +5911,12 @@
             "value" : "心拍数とアクティブエネルギーを読み取ります。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "심박수 및 활동 에너지를 읽습니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5865,12 +5927,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "讀取心率與活動能量。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "심박수 및 활동 에너지를 읽습니다."
           }
         }
       }
@@ -5889,6 +5945,12 @@
             "value" : "記録の種類"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기록 유형"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5899,12 +5961,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "紀錄類型"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "기록 유형"
           }
         }
       }
@@ -5923,6 +5979,12 @@
             "value" : "記録値"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기록 값"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5934,12 +5996,6 @@
             "state" : "translated",
             "value" : "紀錄數值"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "기록 값"
-          }
         }
       }
     },
@@ -5949,6 +6005,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "記録"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "기록"
           }
         },
         "zh-Hans" : {
@@ -5962,12 +6024,6 @@
             "state" : "translated",
             "value" : "紀錄"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "기록"
-          }
         }
       }
     },
@@ -5977,6 +6033,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "お気に入りから外す"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "즐겨찾기에서 제거"
           }
         },
         "zh-Hans" : {
@@ -5989,12 +6051,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "取消收藏"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "즐겨찾기에서 제거"
           }
         }
       }
@@ -6013,6 +6069,12 @@
             "value" : "復元"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복원"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6023,12 +6085,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "回復"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "복원"
           }
         }
       }
@@ -6047,6 +6103,12 @@
             "value" : "購入を復元"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "구매 복원"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6057,12 +6119,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "回復購買"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "구매 복원"
           }
         }
       }
@@ -6075,6 +6131,12 @@
             "value" : "制限あり"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제한됨"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6085,12 +6147,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "受限制"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "제한됨"
           }
         }
       }
@@ -6109,6 +6165,12 @@
             "value" : "JumpRecから直近の縄跳びワークアウトを取得します。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec에서 가장 최근 줄넘기 운동을 가져옵니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6120,12 +6182,6 @@
             "state" : "translated",
             "value" : "從 JumpRec 取得您最近一次跳繩運動。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JumpRec에서 가장 최근 줄넘기 운동을 가져옵니다."
-          }
         }
       }
     },
@@ -6135,6 +6191,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ヘルスケアのアクセス許可を確認"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "건강 권한 확인"
           }
         },
         "zh-Hans" : {
@@ -6148,12 +6210,6 @@
             "state" : "translated",
             "value" : "檢視健康權限"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "건강 권한 확인"
-          }
         }
       }
     },
@@ -6163,6 +6219,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ヘルスケアで確認"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "건강 앱에서 확인"
           }
         },
         "zh-Hans" : {
@@ -6176,12 +6238,6 @@
             "state" : "translated",
             "value" : "在「健康」中檢視"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "건강 앱에서 확인"
-          }
         }
       }
     },
@@ -6191,6 +6247,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リズム安定度"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "리듬 일관성"
           }
         },
         "zh-Hans" : {
@@ -6204,12 +6266,6 @@
             "state" : "translated",
             "value" : "節奏穩定度"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "리듬 일관성"
-          }
         }
       }
     },
@@ -6219,6 +6275,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開始"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작"
           }
         },
         "zh-Hans" : {
@@ -6232,12 +6294,6 @@
             "state" : "translated",
             "value" : "開始"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "시작"
-          }
         }
       }
     },
@@ -6247,6 +6303,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトを終了"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 종료"
           }
         },
         "zh-Hans" : {
@@ -6260,12 +6322,6 @@
             "state" : "translated",
             "value" : "結束運動"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 종료"
-          }
         }
       }
     },
@@ -6275,6 +6331,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトの保存"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 저장"
           }
         },
         "zh-Hans" : {
@@ -6288,12 +6350,6 @@
             "state" : "translated",
             "value" : "儲存運動"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 저장"
-          }
         }
       }
     },
@@ -6303,6 +6359,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "お気に入りに追加"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "즐겨찾기에 추가"
           }
         },
         "zh-Hans" : {
@@ -6316,12 +6378,6 @@
             "state" : "translated",
             "value" : "加入收藏"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "즐겨찾기에 추가"
-          }
         }
       }
     },
@@ -6331,6 +6387,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "完了したワークアウトをヘルスケアに保存します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "완료된 운동을 건강 앱에 저장합니다."
           }
         },
         "zh-Hans" : {
@@ -6344,12 +6406,6 @@
             "state" : "translated",
             "value" : "將已完成的運動儲存至「健康」。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "완료된 운동을 건강 앱에 저장합니다."
-          }
         }
       }
     },
@@ -6359,6 +6415,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "表示期間"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "범위"
           }
         },
         "zh-Hans" : {
@@ -6371,12 +6433,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "統計範圍"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "범위"
           }
         }
       }
@@ -6395,6 +6451,12 @@
             "value" : "検索ワード"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "검색어"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6405,12 +6467,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "搜尋關鍵字"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "검색어"
           }
         }
       }
@@ -6429,6 +6485,12 @@
             "value" : "ワークアウトを検索"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 검색"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6439,12 +6501,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "搜尋運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 검색"
           }
         }
       }
@@ -6463,6 +6519,12 @@
             "value" : "JumpRecの縄跳びワークアウト履歴を検索します。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec에서 줄넘기 운동 기록을 검색합니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6474,12 +6536,6 @@
             "state" : "translated",
             "value" : "搜尋您在 JumpRec 中的跳繩運動歷史紀錄。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JumpRec에서 줄넘기 운동 기록을 검색합니다."
-          }
         }
       }
     },
@@ -6489,6 +6545,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトを選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 선택"
           }
         },
         "zh-Hans" : {
@@ -6502,12 +6564,6 @@
             "state" : "translated",
             "value" : "選擇一次運動"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 선택"
-          }
         }
       }
     },
@@ -6517,6 +6573,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト開始時に自動で選択されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 시작 시 자동으로 선택됩니다."
           }
         },
         "zh-Hans" : {
@@ -6530,12 +6592,6 @@
             "state" : "translated",
             "value" : "運動開始時將自動選擇。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 시작 시 자동으로 선택됩니다."
-          }
         }
       }
     },
@@ -6545,6 +6601,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정"
           }
         },
         "zh-Hans" : {
@@ -6557,12 +6619,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "설정"
           }
         }
       }
@@ -6581,6 +6637,12 @@
             "value" : "ファミリー共有で、無制限のワークアウト記録をご家族と共有できます。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud 가족 공유를 통해 가족 구성원 모두와 무제한 이용 혜택을 공유할 수 있습니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6591,12 +6653,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "透過 iCloud 家人共享，讓家庭成員一同享有無限次運動記錄。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud 가족 공유를 통해 가족 구성원 모두와 무제한 이용 혜택을 공유할 수 있습니다."
           }
         }
       }
@@ -6610,6 +6666,12 @@
             "value" : "短い休憩"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "짧은 휴식"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6620,12 +6682,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "短暫休息"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "짧은 휴식"
           }
         }
       }
@@ -6644,6 +6700,12 @@
             "value" : "検出感度の説明を表示します。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "감지 민감도에 대한 설명을 표시합니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6655,12 +6717,6 @@
             "state" : "translated",
             "value" : "顯示偵測靈敏度的說明。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "감지 민감도에 대한 설명을 표시합니다."
-          }
         }
       }
     },
@@ -6670,6 +6726,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この指標の説明を表示します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 지표에 대한 설명을 표시합니다."
           }
         },
         "zh-Hans" : {
@@ -6683,12 +6745,6 @@
             "state" : "translated",
             "value" : "顯示此指標的說明。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 지표에 대한 설명을 표시합니다."
-          }
         }
       }
     },
@@ -6698,6 +6754,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "次の月のワークアウトを表示します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음 달 운동을 표시합니다."
           }
         },
         "zh-Hans" : {
@@ -6710,12 +6772,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "顯示下個月的運動。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "다음 달 운동을 표시합니다."
           }
         }
       }
@@ -6734,6 +6790,12 @@
             "value" : "翌年のワークアウトを表示します。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다음 해 운동을 표시합니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6744,12 +6806,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "顯示下一年的運動。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "다음 해 운동을 표시합니다."
           }
         }
       }
@@ -6762,6 +6818,12 @@
             "value" : "前の月のワークアウトを表示します。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이전 달 운동을 표시합니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6772,12 +6834,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "顯示上個月的運動。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이전 달 운동을 표시합니다."
           }
         }
       }
@@ -6796,6 +6852,12 @@
             "value" : "前年のワークアウトを表示します。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이전 해 운동을 표시합니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6806,12 +6868,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "顯示上一年的運動。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이전 해 운동을 표시합니다."
           }
         }
       }
@@ -6830,6 +6886,12 @@
             "value" : "やや高め"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "약간 높음"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6840,12 +6902,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "略高"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "약간 높음"
           }
         }
       }
@@ -6864,6 +6920,12 @@
             "value" : "やや低め"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "약간 낮음"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6874,12 +6936,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "略低"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "약간 낮음"
           }
         }
       }
@@ -6892,6 +6948,12 @@
             "value" : "高効率カロリーバーン"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "고효율 칼로리 소모"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6903,12 +6965,6 @@
             "state" : "translated",
             "value" : "高效燃脂"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "고효율 칼로리 소모"
-          }
         }
       }
     },
@@ -6918,6 +6974,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプ回数を読み上げる"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "줄넘기 횟수 음성 안내"
           }
         },
         "zh-Hans" : {
@@ -6931,12 +6993,6 @@
             "state" : "translated",
             "value" : "播報跳躍次數"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "줄넘기 횟수 음성 안내"
-          }
         }
       }
     },
@@ -6946,6 +7002,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプ時間を読み上げる"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "줄넘기 시간 음성 안내"
           }
         },
         "zh-Hans" : {
@@ -6958,12 +7020,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "播報跳躍時長"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "줄넘기 시간 음성 안내"
           }
         }
       }
@@ -6982,6 +7038,12 @@
             "value" : "標準"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "표준"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6992,12 +7054,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "標準"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "표준"
           }
         }
       }
@@ -7016,6 +7072,12 @@
             "value" : "縄跳びワークアウトを開始"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "줄넘기 운동 시작"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7026,12 +7088,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開始跳繩運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "줄넘기 운동 시작"
           }
         }
       }
@@ -7050,6 +7106,12 @@
             "value" : "開始時間"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작 시간"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7060,12 +7122,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開始時間"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "시작 시간"
           }
         }
       }
@@ -7084,6 +7140,12 @@
             "value" : "ワークアウト開始"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 시작"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7095,12 +7157,6 @@
             "state" : "translated",
             "value" : "開始運動"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 시작"
-          }
         }
       }
     },
@@ -7110,6 +7166,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "回数制限なく、何度でも縄跳びワークアウトを開始・記録できます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "앞으로 횟수 제한 없이 무제한으로 줄넘기 운동을 시작하고 기록하세요."
           }
         },
         "zh-Hans" : {
@@ -7123,12 +7185,6 @@
             "state" : "translated",
             "value" : "不受任何次數限制，隨時開始並記錄無限次跳繩運動。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "앞으로 횟수 제한 없이 무제한으로 줄넘기 운동을 시작하고 기록하세요."
-          }
         }
       }
     },
@@ -7139,6 +7195,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "JumpRecで%lld回のジャンプワークアウトを開始します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec에서 %lld회 줄넘기 운동을 시작합니다."
           }
         },
         "zh-Hans" : {
@@ -7152,12 +7214,6 @@
             "state" : "translated",
             "value" : "正在 JumpRec 中開始 %lld 下跳繩運動。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JumpRec에서 %lld회 줄넘기 운동을 시작합니다."
-          }
         }
       }
     },
@@ -7168,6 +7224,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "JumpRecで%lld分の縄跳びワークアウトを開始します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec에서 %lld분 줄넘기 운동을 시작합니다."
           }
         },
         "zh-Hans" : {
@@ -7181,12 +7243,6 @@
             "state" : "translated",
             "value" : "正在 JumpRec 中開始 %lld 分鐘跳繩運動。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JumpRec에서 %lld분 줄넘기 운동을 시작합니다."
-          }
         }
       }
     },
@@ -7197,6 +7253,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "JumpRecで縄跳びワークアウトを開始します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec에서 줄넘기 운동을 시작합니다."
           }
         },
         "zh-Hans" : {
@@ -7210,12 +7272,6 @@
             "state" : "translated",
             "value" : "正在 JumpRec 中開始跳繩運動。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JumpRec에서 줄넘기 운동을 시작합니다."
-          }
         }
       }
     },
@@ -7225,6 +7281,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "モーション計測を開始しています"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "동작 측정 시작 중"
           }
         },
         "zh-Hans" : {
@@ -7238,12 +7300,6 @@
             "state" : "translated",
             "value" : "正在啟動動作追蹤"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "동작 측정 시작 중"
-          }
         }
       }
     },
@@ -7253,6 +7309,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開始中..."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작 중..."
           }
         },
         "zh-Hans" : {
@@ -7266,12 +7328,6 @@
             "state" : "translated",
             "value" : "正在開始..."
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "시작 중..."
-          }
         }
       }
     },
@@ -7281,6 +7337,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "安定リズム"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "안정적인 리듬"
           }
         },
         "zh-Hans" : {
@@ -7293,12 +7355,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "穩定節奏"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "안정적인 리듬"
           }
         }
       }
@@ -7317,6 +7373,12 @@
             "value" : "同期に失敗しました"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "동기화 실패"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7327,12 +7389,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "同步失敗"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "동기화 실패"
           }
         }
       }
@@ -7351,6 +7407,12 @@
             "value" : "iCloudから同期中..."
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud에서 동기화 중..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7362,12 +7424,6 @@
             "state" : "translated",
             "value" : "正在從 iCloud 同步..."
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud에서 동기화 중..."
-          }
         }
       }
     },
@@ -7377,6 +7433,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "時間"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시간"
           }
         },
         "zh-Hans" : {
@@ -7390,12 +7452,6 @@
             "state" : "translated",
             "value" : "時間"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "시간"
-          }
         }
       }
     },
@@ -7405,6 +7461,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "計測デバイス"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "측정 기기"
           }
         },
         "zh-Hans" : {
@@ -7418,12 +7480,6 @@
             "state" : "translated",
             "value" : "追蹤裝置"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "측정 기기"
-          }
         }
       }
     },
@@ -7433,6 +7489,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトのハートをタップすると、ここに表示されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동의 하트를 탭하면 여기에 저장됩니다."
           }
         },
         "zh-Hans" : {
@@ -7445,12 +7507,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "點一下任一運動上的愛心圖示，即可將其收藏到這裡。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동의 하트를 탭하면 여기에 저장됩니다."
           }
         }
       }
@@ -7469,6 +7525,12 @@
             "value" : "目標値"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "목표값"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7480,12 +7542,6 @@
             "state" : "translated",
             "value" : "目標值"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "목표값"
-          }
         }
       }
     },
@@ -7495,6 +7551,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "休憩を挟まずに跳び続けたジャンプの最多回数です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "쉬지 않고 연속으로 뛴 최대 줄넘기 횟수입니다."
           }
         },
         "zh-Hans" : {
@@ -7508,12 +7570,6 @@
             "state" : "translated",
             "value" : "單次未中斷的最高連續跳躍次數。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "쉬지 않고 연속으로 뛴 최대 줄넘기 횟수입니다."
-          }
         }
       }
     },
@@ -7523,6 +7579,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプの間に15秒を超える休憩・中断が検出された回数です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "줄넘기 도중 15초를 초과해 멈춘 횟수입니다."
           }
         },
         "zh-Hans" : {
@@ -7536,12 +7598,6 @@
             "state" : "translated",
             "value" : "跳躍之間偵測到超過 15 秒的停頓次數。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "줄넘기 도중 15초를 초과해 멈춘 횟수입니다."
-          }
         }
       }
     },
@@ -7551,6 +7607,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンプの間に5秒を超え、15秒以下の休憩・中断が検出された回数です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "줄넘기 도중 5초 초과 15초 이하로 멈춘 횟수입니다."
           }
         },
         "zh-Hans" : {
@@ -7564,12 +7626,6 @@
             "state" : "translated",
             "value" : "跳躍之間偵測到超過 5 秒且在 15 秒以內的停頓次數。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "줄넘기 도중 5초 초과 15초 이하로 멈춘 횟수입니다."
-          }
         }
       }
     },
@@ -7579,6 +7635,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト中に検出された二重跳びの回数です。二重跳びの検出は、Apple Watchでワークアウトを記録した場合にのみ表示されます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 중 감지된 이단뛰기 횟수입니다. 이단뛰기 감지는 Apple Watch로 운동을 기록한 경우에만 제공됩니다."
           }
         },
         "zh-Hans" : {
@@ -7592,12 +7654,6 @@
             "state" : "translated",
             "value" : "運動期間偵測到的雙迴旋次數。雙迴旋偵測僅在使用 Apple Watch 記錄運動時可用。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 중 감지된 이단뛰기 횟수입니다. 이단뛰기 감지는 Apple Watch로 운동을 기록한 경우에만 제공됩니다."
-          }
         }
       }
     },
@@ -7607,6 +7663,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この操作は取り消せません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 작업은 취소할 수 없습니다."
           }
         },
         "zh-Hans" : {
@@ -7620,12 +7682,6 @@
             "state" : "translated",
             "value" : "此操作無法復原。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 작업은 취소할 수 없습니다."
-          }
         }
       }
     },
@@ -7635,6 +7691,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての自己ベストを削除します。保存済みのワークアウトは履歴に残ります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 시트에서 모든 개인 최고 기록을 삭제합니다. 저장된 운동은 기록에 그대로 남습니다."
           }
         },
         "zh-Hans" : {
@@ -7648,11 +7710,33 @@
             "state" : "translated",
             "value" : "這將清除此頁中的所有個人紀錄，已儲存的運動紀錄仍保留在歷史中。"
           }
+        }
+      }
+    },
+    "This removes this personal record from this sheet. Your saved workouts stay in history." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "この自己ベストを削除します。保存済みのワークアウトは履歴に残ります。"
+          }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 시트에서 모든 개인 최고 기록을 삭제합니다. 저장된 운동은 기록에 그대로 남습니다."
+            "state" : "machine_translated",
+            "value" : "이 시트에서 이 개인 최고 기록을 삭제합니다. 저장된 운동은 기록에 그대로 남습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "这将从本页中清除这项个人纪录，已保存的运动记录仍保留在历史中。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "這將從此頁中清除這項個人紀錄，已儲存的運動紀錄仍保留在歷史中。"
           }
         }
       }
@@ -7663,6 +7747,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このワークアウトは開始後にヘッドフォンへ切り替えられません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 운동은 시작한 후에는 헤드폰으로 전환할 수 없습니다."
           }
         },
         "zh-Hans" : {
@@ -7676,12 +7766,6 @@
             "state" : "translated",
             "value" : "本次運動開始後無法切換至耳機。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 운동은 시작한 후에는 헤드폰으로 전환할 수 없습니다."
-          }
         }
       }
     },
@@ -7691,6 +7775,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このワークアウトは対応ヘッドフォンのモーションで計測します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 운동은 지원되는 헤드폰 동작 감지를 사용합니다."
           }
         },
         "zh-Hans" : {
@@ -7703,12 +7793,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "本次運動使用支援的耳機動作感測。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이 운동은 지원되는 헤드폰 동작 감지를 사용합니다."
           }
         }
       }
@@ -7727,6 +7811,12 @@
             "value" : "時間目標"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시간 목표"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7737,12 +7827,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "時長目標"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "시간 목표"
           }
         }
       }
@@ -7755,6 +7839,12 @@
             "value" : "時間進捗"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시간 진행률"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7765,12 +7855,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "時間進度"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "시간 진행률"
           }
         }
       }
@@ -7789,6 +7873,12 @@
             "value" : "今日の縄跳び"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오늘의 줄넘기"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7799,12 +7889,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今日跳繩"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "오늘의 줄넘기"
           }
         }
       }
@@ -7818,6 +7902,12 @@
             "value" : "今日のワークアウトは%lld回、合計%@回のジャンプ、消費カロリーは%lld kcalです。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오늘 운동 %lld회, 총 줄넘기 %@회, 소모 칼로리 %lld kcal입니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7828,12 +7918,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今日運動 %lld 次，總計跳躍 %@ 下，消耗熱量 %lld 大卡。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "오늘 운동 %lld회, 총 줄넘기 %@회, 소모 칼로리 %lld kcal입니다."
           }
         }
       }
@@ -7852,6 +7936,12 @@
             "value" : "総ジャンプ回数"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "총 줄넘기 횟수"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7863,12 +7953,6 @@
             "state" : "translated",
             "value" : "總跳躍次數"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "총 줄넘기 횟수"
-          }
         }
       }
     },
@@ -7878,6 +7962,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apple Watchで計測中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch에서 측정 중"
           }
         },
         "zh-Hans" : {
@@ -7891,12 +7981,6 @@
             "state" : "translated",
             "value" : "正在 Apple Watch 上追蹤"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch에서 측정 중"
-          }
         }
       }
     },
@@ -7906,6 +7990,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ で計測中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@로 측정 중"
           }
         },
         "zh-Hans" : {
@@ -7919,12 +8009,6 @@
             "state" : "translated",
             "value" : "正在使用 %@ 追蹤"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@로 측정 중"
-          }
         }
       }
     },
@@ -7934,6 +8018,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アクセス許可を更新できません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "권한을 업데이트할 수 없음"
           }
         },
         "zh-Hans" : {
@@ -7947,12 +8037,6 @@
             "state" : "translated",
             "value" : "無法更新權限"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "권한을 업데이트할 수 없음"
-          }
         }
       }
     },
@@ -7962,6 +8046,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この月のデータを読み込めません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이번 달 데이터를 불러올 수 없습니다."
           }
         },
         "zh-Hans" : {
@@ -7974,12 +8064,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無法載入本月資料。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이번 달 데이터를 불러올 수 없습니다."
           }
         }
       }
@@ -7998,6 +8082,12 @@
             "value" : "この年のデータを読み込めません。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "올해 데이터를 불러올 수 없습니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8008,12 +8098,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無法載入本年資料。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "올해 데이터를 불러올 수 없습니다."
           }
         }
       }
@@ -8027,6 +8111,12 @@
             "value" : "ワークアウトのアクセス許可を確認できません。もう一度お試しいただくか、設定でアクセス許可を確認してください。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 권한을 준비할 수 없습니다. 다시 시도하거나 ‘설정’에서 권한을 확인해 주세요."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8038,12 +8128,6 @@
             "state" : "translated",
             "value" : "無法準備運動權限。請重試或在「設定」中檢視權限。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 권한을 준비할 수 없습니다. 다시 시도하거나 ‘설정’에서 권한을 확인해 주세요."
-          }
         }
       }
     },
@@ -8053,6 +8137,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "お気に入りを保存できませんでした"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "즐겨찾기를 저장할 수 없음"
           }
         },
         "zh-Hans" : {
@@ -8066,12 +8156,6 @@
             "state" : "translated",
             "value" : "無法儲存收藏"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "즐겨찾기를 저장할 수 없음"
-          }
         }
       }
     },
@@ -8081,6 +8165,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "不明"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "알 수 없음"
           }
         },
         "zh-Hans" : {
@@ -8093,12 +8183,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未知"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "알 수 없음"
           }
         }
       }
@@ -8117,6 +8201,12 @@
             "value" : "無制限ワークアウト"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무제한 운동"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8127,12 +8217,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無限次運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "무제한 운동"
           }
         }
       }
@@ -8151,6 +8235,12 @@
             "value" : "無制限ワークアウト有効"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무제한 운동 활성화됨"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8161,12 +8251,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無限次運動已啟用"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "무제한 운동 활성화됨"
           }
         }
       }
@@ -8185,6 +8269,12 @@
             "value" : "無制限をアンロック"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무제한 잠금 해제"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8195,12 +8285,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "解鎖無限版"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "무제한 잠금 해제"
           }
         }
       }
@@ -8219,6 +8303,12 @@
             "value" : "無制限ワークアウトをアンロック"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무제한 운동 잠금 해제"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8229,12 +8319,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "解鎖無限次運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "무제한 운동 잠금 해제"
           }
         }
       }
@@ -8253,6 +8337,12 @@
             "value" : "iCloudにアップロード中..."
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud에 업로드 중..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8263,12 +8353,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在上傳至 iCloud..."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud에 업로드 중..."
           }
         }
       }
@@ -8281,6 +8365,12 @@
             "value" : "対応するヘッドフォンを使ってジャンプ数を数えます。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지원되는 헤드폰을 사용해 줄넘기 횟수를 셉니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8291,12 +8381,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "使用支援的耳機來計算跳躍次數。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "지원되는 헤드폰을 사용해 줄넘기 횟수를 셉니다."
           }
         }
       }
@@ -8316,6 +8400,12 @@
             "value" : "バージョン %@"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "버전 %@"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8327,12 +8417,6 @@
             "state" : "translated",
             "value" : "版本 %@"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "버전 %@"
-          }
         }
       }
     },
@@ -8342,6 +8426,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "縄跳びワークアウトを表示"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "줄넘기 운동 보기"
           }
         },
         "zh-Hans" : {
@@ -8355,12 +8445,6 @@
             "state" : "translated",
             "value" : "查看跳繩運動"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "줄넘기 운동 보기"
-          }
         }
       }
     },
@@ -8370,6 +8454,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト内訳"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 상세 분석"
           }
         },
         "zh-Hans" : {
@@ -8383,12 +8473,6 @@
             "state" : "translated",
             "value" : "運動分段統計"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 상세 분석"
-          }
         }
       }
     },
@@ -8398,6 +8482,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトデバイス"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 기기"
           }
         },
         "zh-Hans" : {
@@ -8411,12 +8501,6 @@
             "state" : "translated",
             "value" : "運動裝置"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 기기"
-          }
         }
       }
     },
@@ -8426,6 +8510,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동"
           }
         },
         "zh-Hans" : {
@@ -8438,12 +8528,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "運動"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동"
           }
         }
       }
@@ -8462,6 +8546,12 @@
             "value" : "%d年のワークアウト"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d년 운동"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8473,12 +8563,6 @@
             "state" : "translated",
             "value" : "%d 年運動"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%d년 운동"
-          }
         }
       }
     },
@@ -8488,6 +8572,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今月のワークアウト"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이번 달 운동"
           }
         },
         "zh-Hans" : {
@@ -8501,18 +8591,18 @@
             "state" : "translated",
             "value" : "本月運動"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이번 달 운동"
-          }
         }
       }
     },
     "Watch" : {
       "localizations" : {
         "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Watch"
+          }
+        },
+        "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Watch"
@@ -8525,12 +8615,6 @@
           }
         },
         "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Watch"
-          }
-        },
-        "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Watch"
@@ -8546,6 +8630,12 @@
             "value" : "対応ヘッドフォンが利用可能な場合、Apple WatchではなくiPhoneで開始します。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "호환되는 헤드폰을 사용할 수 있을 때 Apple Watch 대신 iPhone에서 시작합니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8557,12 +8647,6 @@
             "state" : "translated",
             "value" : "當相容的耳機可用時，在 iPhone 上開始運動而非 Apple Watch。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "호환되는 헤드폰을 사용할 수 있을 때 Apple Watch 대신 iPhone에서 시작합니다."
-          }
         }
       }
     },
@@ -8572,6 +8656,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト完了！"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 완료!"
           }
         },
         "zh-Hans" : {
@@ -8585,12 +8675,6 @@
             "state" : "translated",
             "value" : "運動完成！"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 완료!"
-          }
         }
       }
     },
@@ -8600,6 +8684,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト数"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 횟수"
           }
         },
         "zh-Hans" : {
@@ -8613,12 +8703,6 @@
             "state" : "translated",
             "value" : "運動次數"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 횟수"
-          }
         }
       }
     },
@@ -8628,6 +8712,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト詳細"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 상세 정보"
           }
         },
         "zh-Hans" : {
@@ -8640,12 +8730,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "運動詳細資料"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 상세 정보"
           }
         }
       }
@@ -8664,6 +8748,12 @@
             "value" : "ワークアウト目標タイプ"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 목표 유형"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8674,12 +8764,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "運動目標類型"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 목표 유형"
           }
         }
       }
@@ -8693,6 +8777,12 @@
             "value" : "ワークアウトのアクセス許可"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 권한"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8703,12 +8793,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "運動權限"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 권한"
           }
         }
       }
@@ -8727,6 +8811,12 @@
             "value" : "ワークアウト統計"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 통계"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8737,12 +8827,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "運動統計"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 통계"
           }
         }
       }
@@ -8761,6 +8845,12 @@
             "value" : "ワークアウト統計"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 통계"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8771,12 +8861,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "運動統計"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 통계"
           }
         }
       }
@@ -8790,6 +8874,12 @@
             "value" : "ワークアウト：%lld回 • %lld kcal"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 %lld회 • %lld kcal"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8801,12 +8891,6 @@
             "state" : "translated",
             "value" : "運動 %lld 次 • %lld 大卡"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 %lld회 • %lld kcal"
-          }
         }
       }
     },
@@ -8816,6 +8900,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト開始カウントダウン"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 카운트다운"
           }
         },
         "zh-Hans" : {
@@ -8829,12 +8919,6 @@
             "state" : "translated",
             "value" : "運動開始倒數"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 카운트다운"
-          }
         }
       }
     },
@@ -8844,6 +8928,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト進行中"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 진행 중"
           }
         },
         "zh-Hans" : {
@@ -8857,12 +8947,6 @@
             "state" : "translated",
             "value" : "運動進行中"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 진행 중"
-          }
         }
       }
     },
@@ -8872,6 +8956,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトはApple Watchで開始されます"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch에서 운동이 시작됩니다"
           }
         },
         "zh-Hans" : {
@@ -8885,12 +8975,6 @@
             "state" : "translated",
             "value" : "運動將在 Apple Watch 上開始"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch에서 운동이 시작됩니다"
-          }
         }
       }
     },
@@ -8900,6 +8984,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@が利用可能な場合は、ワークアウトの計測に使用します"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용 가능할 때 %@로 운동을 측정합니다"
           }
         },
         "zh-Hans" : {
@@ -8913,12 +9003,6 @@
             "state" : "translated",
             "value" : "可用時將使用 %@ 記錄運動"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사용 가능할 때 %@로 운동을 측정합니다"
-          }
         }
       }
     },
@@ -8928,6 +9012,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウトの書き込みが許可されていません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 쓰기 권한이 허용되지 않았습니다."
           }
         },
         "zh-Hans" : {
@@ -8940,12 +9030,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "尚未授予運動寫入權限。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 쓰기 권한이 허용되지 않았습니다."
           }
         }
       }
@@ -8964,6 +9048,12 @@
             "value" : "Apple WatchまたはiPhoneで記録したワークアウトがここに表示されます。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Watch 또는 iPhone에서 기록한 운동이 여기에 표시됩니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8974,12 +9064,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在 Apple Watch 或 iPhone 上記錄的運動將顯示在這裡。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Watch 또는 iPhone에서 기록한 운동이 여기에 표시됩니다."
           }
         }
       }
@@ -8992,6 +9076,12 @@
             "value" : "ワークアウトコメントを作成しています..."
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 코멘트를 작성하는 중..."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9002,12 +9092,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "正在撰寫運動評語..."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "운동 코멘트를 작성하는 중..."
           }
         }
       }
@@ -9026,6 +9110,12 @@
             "value" : "年"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "연도"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9036,12 +9126,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "年"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "연도"
           }
         }
       }
@@ -9055,6 +9139,12 @@
             "value" : "%lld年のワークアウトは%lld回、合計%@回のジャンプ、消費カロリーは%lld kcalです。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld년 운동 %lld회, 총 줄넘기 %@회, 소모 칼로리 %lld kcal입니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9065,12 +9155,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld 年運動 %lld 次，總計跳躍 %@ 下，消耗熱量 %lld 大卡。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld년 운동 %lld회, 총 줄넘기 %@회, 소모 칼로리 %lld kcal입니다."
           }
         }
       }
@@ -9089,6 +9173,12 @@
             "value" : "無制限のワークアウト記録が有効になっています。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "평생 무제한 운동 기록이 잠금 해제되었습니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9099,12 +9189,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您已解鎖終身無限次運動記錄。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "평생 무제한 운동 기록이 잠금 해제되었습니다."
           }
         }
       }
@@ -9124,6 +9208,12 @@
             "value" : "今日はまだ縄跳びワークアウトが記録されていません。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오늘 아직 기록된 줄넘기 운동이 없습니다."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9134,12 +9224,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您今天還沒有記錄任何跳繩運動。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "오늘 아직 기록된 줄넘기 운동이 없습니다."
           }
         }
       }
@@ -9158,6 +9242,12 @@
             "value" : "無料枠%2$lld回のうち%1$lld回のワークアウトを記録しました。1回限りの購入でいつでも無制限にアップグレードできます。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무료 운동 %2$lld회 중 %1$lld회를 기록했습니다. 단 한 번의 구매로 무제한 운동 기록을 잠금 해제해 보세요."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9168,12 +9258,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您已記錄 %1$lld / %2$lld 次免費運動。透過單次買斷即可解鎖無限次運動記錄。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "무료 운동 %2$lld회 중 %1$lld회를 기록했습니다. 단 한 번의 구매로 무제한 운동 기록을 잠금 해제해 보세요."
           }
         }
       }
@@ -9192,6 +9276,12 @@
             "value" : "JumpRecで10回のワークアウトを記録しました。1回限りの購入で、無制限のワークアウト記録をアンロックできます。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JumpRec으로 멋진 운동을 10회나 기록했어요! 단 한 번의 구매로 평생 무제한 운동 기록을 잠금 해제해 보세요."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9202,12 +9292,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您已經在 JumpRec 中完成了 10 次精彩運動。只需單次買斷，即可永久解鎖無限次運動記錄。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JumpRec으로 멋진 운동을 10회나 기록했어요! 단 한 번의 구매로 평생 무제한 운동 기록을 잠금 해제해 보세요."
           }
         }
       }
@@ -9226,6 +9310,12 @@
             "value" : "データはいつでも確認可能"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "내 데이터는 언제나 내 것"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9237,12 +9327,6 @@
             "state" : "translated",
             "value" : "您的資料永遠屬於您"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "내 데이터는 언제나 내 것"
-          }
         }
       }
     },
@@ -9252,6 +9336,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ワークアウト全体を通した、平均的なカロリー消費効率です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "전체 운동 동안의 평균 칼로리 소모 효율입니다."
           }
         },
         "zh-Hans" : {
@@ -9265,12 +9355,6 @@
             "state" : "translated",
             "value" : "整個運動期間的平均熱量消耗效率。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "전체 운동 동안의 평균 칼로리 소모 효율입니다."
-          }
         }
       }
     },
@@ -9281,6 +9365,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "前回のワークアウトは%@でした。%@回、時間は%@、消費カロリーは%lld kcalです。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "마지막 운동은 %@입니다. %@ 동안 %@회 줄넘기하며 %lld kcal를 소모했습니다."
           }
         },
         "zh-Hans" : {
@@ -9294,12 +9384,6 @@
             "state" : "translated",
             "value" : "您上次運動是在 %@：在 %@ 內跳了 %@ 下，消耗 %lld 大卡。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "마지막 운동은 %@입니다. %@ 동안 %@회 줄넘기하며 %lld kcal를 소모했습니다."
-          }
         }
       }
     },
@@ -9310,6 +9394,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "記録されている自己ベストは%lld件です。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개인 최고 기록 수는 %lld개입니다."
           }
         },
         "zh-Hans" : {
@@ -9323,12 +9413,6 @@
             "state" : "translated",
             "value" : "您的個人紀錄數量：%lld 項。"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "개인 최고 기록 수는 %lld개입니다."
-          }
         }
       }
     },
@@ -9341,6 +9425,12 @@
             "value" : "あなたの自己ベスト：%@。"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "개인 최고 기록: %@."
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9351,12 +9441,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您的個人紀錄：%@。"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "개인 최고 기록: %@."
           }
         }
       }
@@ -9375,6 +9459,12 @@
             "value" : "以前の購入が正常に復元されました！"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이전 구매 항목이 성공적으로 복원되었습니다!"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9385,12 +9475,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "您先前的購買項目已成功回復！"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이전 구매 항목이 성공적으로 복원되었습니다!"
           }
         }
       }
@@ -9403,6 +9487,12 @@
             "value" : "kcal"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kcal"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9410,12 +9500,6 @@
           }
         },
         "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "kcal"
-          }
-        },
-        "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "kcal"
@@ -9431,6 +9515,12 @@
             "value" : "iPhoneワークアウト"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone 운동"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9442,12 +9532,6 @@
             "state" : "translated",
             "value" : "iPhone 運動"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iPhone 운동"
-          }
         }
       }
     },
@@ -9457,6 +9541,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "回"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "회"
           }
         },
         "zh-Hans" : {
@@ -9470,12 +9560,6 @@
             "state" : "translated",
             "value" : "下"
           }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "회"
-          }
         }
       }
     },
@@ -9485,6 +9569,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "분"
           }
         },
         "zh-Hans" : {
@@ -9497,12 +9587,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分鐘"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "분"
           }
         }
       }
@@ -9515,6 +9599,12 @@
             "value" : "分"
           }
         },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "분"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -9525,12 +9615,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分鐘"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "분"
           }
         }
       }

@@ -283,6 +283,12 @@ public final class MyDataStore {
         updateUnseenPersonalRecordUpdates([])
     }
 
+    /// Removes a single personal record kind from the unseen badge state.
+    public func clearUnseenPersonalRecordUpdate(for kind: PersonalRecordKind) {
+        guard unseenPersonalRecordKinds.contains(kind) else { return }
+        updateUnseenPersonalRecordUpdates(unseenPersonalRecordKinds.filter { $0 != kind })
+    }
+
     /// Refreshes observable iCloud diagnostics and logs.
     public func refreshCloudDiagnostics() {
         guard !isScreenshotStore else { return }

@@ -10,6 +10,8 @@ struct RecordsSheetView: View {
     @Query(sort: \PersonalRecord.kindRawValue) private var records: [PersonalRecord]
     @Environment(MyDataStore.self) private var dataStore
     @State private var isShowingClearRecordsConfirmation = false
+    @State private var recordPendingDeletion: RecordItem?
+    @State private var isShowingDeleteRecordConfirmation = false
 
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -22,6 +24,7 @@ struct RecordsSheetView: View {
         records
             .compactMap { record in
                 guard
+                    !record.isDeleted,
                     let kindRawValue = record.kindRawValue,
                     let kind = PersonalRecordKind(rawValue: kindRawValue),
                     let metricValue = record.metricValue,
@@ -31,12 +34,25 @@ struct RecordsSheetView: View {
                 }
 
                 return RecordItem(
+                    id: record.persistentModelID,
+                    record: record,
                     kind: kind,
                     metricValue: metricValue,
                     achievedAt: achievedAt
                 )
             }
-            .sorted { $0.achievedAt > $1.achievedAt }
+            .sorted {
+                if $0.achievedAt != $1.achievedAt {
+                    return $0.achievedAt > $1.achievedAt
+                }
+                if $0.kind.rawValue != $1.kind.rawValue {
+                    return $0.kind.rawValue < $1.kind.rawValue
+                }
+                if $0.metricValue != $1.metricValue {
+                    return $0.metricValue > $1.metricValue
+                }
+                return String(describing: $0.id) < String(describing: $1.id)
+            }
     }
 
     private var unseenRecordKinds: [PersonalRecordKind] {
@@ -45,39 +61,57 @@ struct RecordsSheetView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Records list
-                    if displayRecords.isEmpty {
-                        VStack(spacing: 8) {
-                            Spacer()
-                            Text("No records yet")
-                                .font(AppFonts.bodyLabelStrong)
-                                .foregroundStyle(AppColors.textSecondary)
-                            Text("Complete workouts to set personal records!")
-                                .font(AppFonts.bodySmall)
-                                .foregroundStyle(AppColors.textMuted)
+            Group {
+                if displayRecords.isEmpty {
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            VStack(spacing: 8) {
+                                Spacer()
+                                Text("No records yet")
+                                    .font(AppFonts.bodyLabelStrong)
+                                    .foregroundStyle(AppColors.textSecondary)
+                                Text("Complete workouts to set personal records!")
+                                    .font(AppFonts.bodySmall)
+                                    .foregroundStyle(AppColors.textMuted)
+                                Spacer()
+                            }
+                            .frame(maxWidth: .infinity)
+
                             Spacer()
                         }
-                        .frame(maxWidth: .infinity)
-                    } else {
-                        VStack(spacing: 10) {
-                            ForEach(displayRecords) { record in
-                                RecordCardView(
-                                    record: record,
-                                    isHighlighted: unseenRecordKinds.contains(record.kind)
-                                ).padding(.horizontal, 12)
+                        .padding(.top, 16)
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 32)
+                    }
+                    .topSoftScrollEdgeEffect()
+                } else {
+                    List {
+                        ForEach(displayRecords) { record in
+                            RecordCardView(
+                                record: record,
+                                isHighlighted: unseenRecordKinds.contains(record.kind)
+                            )
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets(top: 5, leading: 36, bottom: 5, trailing: 36))
+                            .listRowSeparator(.hidden)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                // Omit role: .destructive so UIKit does not attempt row deletion before confirmation.
+                                Button {
+                                    promptDeleteRecord(record)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                                .tint(.red)
                             }
                         }
                     }
-
-                    Spacer()
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                    .contentMargins(.top, 11, for: .scrollContent)
+                    .contentMargins(.bottom, 27, for: .scrollContent)
+                    .topSoftScrollEdgeEffect()
                 }
-                .padding(.top, 16)
-                .padding(.horizontal, 24)
-                .padding(.bottom, 32)
             }
-            .topSoftScrollEdgeEffect()
             .navigationTitle("Personal Records")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -95,36 +129,50 @@ struct RecordsSheetView: View {
                     }
                 }
             }
-            .alert(
-                "Delete all records?",
-                isPresented: $isShowingClearRecordsConfirmation
-            ) {
-                Button("Delete Records", role: .destructive) {
-                    dataStore.clearAllPersonalRecords()
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("This removes all personal records from this sheet. Your saved workouts stay in history.")
-            }
-            .onDisappear {
-                // Dismissing the records sheet counts as acknowledging any newly achieved records.
-                dataStore.clearUnseenPersonalRecordUpdates()
-            }
+            .modifier(
+                DeleteSingleRecordAlertModifier(
+                    record: $recordPendingDeletion,
+                    isPresented: $isShowingDeleteRecordConfirmation,
+                    onDelete: confirmDeleteRecord
+                )
+            )
         }
+        .alert(
+            "Delete all records?",
+            isPresented: $isShowingClearRecordsConfirmation
+        ) {
+            Button("Delete Records", role: .destructive) {
+                dataStore.clearAllPersonalRecords()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This removes all personal records from this sheet. Your saved workouts stay in history.")
+        }
+        .onDisappear {
+            // Dismissing the records sheet counts as acknowledging any newly achieved records.
+            dataStore.clearUnseenPersonalRecordUpdates()
+        }
+    }
+
+    private func promptDeleteRecord(_ item: RecordItem) {
+        recordPendingDeletion = item
+        if #unavailable(iOS 27.0) {
+            isShowingDeleteRecordConfirmation = true
+        }
+    }
+
+    private func confirmDeleteRecord(_ item: RecordItem) {
+        dataStore.deletePersonalRecord(item.record)
+        recordPendingDeletion = nil
+        isShowingDeleteRecordConfirmation = false
     }
 }
 
 // MARK: - Preview
 
 #Preview {
-    let dataStore = MyDataStore.shared
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(
-        for: JumpSession.self,
-        PersonalRecord.self,
-        SessionRateSeries.self,
-        configurations: config
-    )
+    let dataStore = try! MyDataStore.makePreviewStore(qualifiedWorkoutCount: 0)
+    let context = dataStore.modelContext
 
     let calendar = Calendar.current
     let now = Date()
@@ -144,10 +192,10 @@ struct RecordsSheetView: View {
             caloriesBurned: data.calories,
             longestStreak: data.longestStreak
         )
-        container.mainContext.insert(session)
+        context.insert(session)
     }
 
-    container.mainContext.insert(
+    context.insert(
         PersonalRecord(
             kind: .highestJumpCount,
             metricValue: 2847,
@@ -155,7 +203,7 @@ struct RecordsSheetView: View {
             achievedAt: calendar.date(byAdding: .day, value: -4, to: now)!
         )
     )
-    container.mainContext.insert(
+    context.insert(
         PersonalRecord(
             kind: .longestJumpStreak,
             metricValue: 642,
@@ -163,7 +211,7 @@ struct RecordsSheetView: View {
             achievedAt: calendar.date(byAdding: .day, value: -1, to: now)!
         )
     )
-    container.mainContext.insert(
+    context.insert(
         PersonalRecord(
             kind: .longestSession,
             metricValue: 900,
@@ -171,7 +219,7 @@ struct RecordsSheetView: View {
             achievedAt: calendar.date(byAdding: .day, value: -5, to: now)!
         )
     )
-    container.mainContext.insert(
+    context.insert(
         PersonalRecord(
             kind: .mostCalories,
             metricValue: 384,
@@ -179,7 +227,7 @@ struct RecordsSheetView: View {
             achievedAt: calendar.date(byAdding: .day, value: -2, to: now)!
         )
     )
-    container.mainContext.insert(
+    context.insert(
         PersonalRecord(
             kind: .bestJumpRate,
             metricValue: 186,
@@ -187,7 +235,7 @@ struct RecordsSheetView: View {
             achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
         )
     )
-    container.mainContext.insert(
+    context.insert(
         PersonalRecord(
             kind: .steadyRhythm,
             metricValue: 0.92,
@@ -195,7 +243,7 @@ struct RecordsSheetView: View {
             achievedAt: calendar.date(byAdding: .day, value: -6, to: now)!
         )
     )
-    container.mainContext.insert(
+    context.insert(
         PersonalRecord(
             kind: .bestAverageJumpRate,
             metricValue: 168,
@@ -203,7 +251,7 @@ struct RecordsSheetView: View {
             achievedAt: calendar.date(byAdding: .day, value: -7, to: now)!
         )
     )
-    container.mainContext.insert(
+    context.insert(
         PersonalRecord(
             kind: .sneakyBurn,
             metricValue: 24.6,
@@ -211,7 +259,7 @@ struct RecordsSheetView: View {
             achievedAt: calendar.date(byAdding: .day, value: -8, to: now)!
         )
     )
-    container.mainContext.insert(
+    context.insert(
         PersonalRecord(
             kind: .mostDoubleUnders,
             metricValue: 48,
@@ -224,16 +272,60 @@ struct RecordsSheetView: View {
 
     return
         RecordsSheetView()
-            .modelContainer(container)
+            .modelContainer(dataStore.modelContainer)
             .environment(dataStore)
             .presentationBackground(AppColors.cardSurface)
             .preferredColorScheme(.dark)
 }
 
+// MARK: - Delete Single Record Alert
+
+/// Presents a confirmation alert before deleting an individual personal record.
+private struct DeleteSingleRecordAlertModifier: ViewModifier {
+    @Binding var record: RecordItem?
+    @Binding var isPresented: Bool
+    let onDelete: (RecordItem) -> Void
+
+    func body(content: Content) -> some View {
+        if #available(iOS 27.0, *) {
+            content.alert("Delete this record?", item: $record) { item in
+                Button("Delete Record", role: .destructive) {
+                    onDelete(item)
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: { _ in
+                Text("This removes this personal record from this sheet. Your saved workouts stay in history.")
+            }
+        } else {
+            content
+                .alert(
+                    "Delete this record?",
+                    isPresented: $isPresented,
+                    presenting: record
+                ) { item in
+                    Button("Delete Record", role: .destructive) {
+                        onDelete(item)
+                    }
+                    Button("Cancel", role: .cancel) {
+                        record = nil
+                    }
+                } message: { _ in
+                    Text("This removes this personal record from this sheet. Your saved workouts stay in history.")
+                }
+                .onChange(of: isPresented) { _, presented in
+                    if !presented {
+                        record = nil
+                    }
+                }
+        }
+    }
+}
+
 // MARK: - Record Item Model
 
 private struct RecordItem: Identifiable {
-    let id = UUID()
+    let id: PersistentIdentifier
+    let record: PersonalRecord
     let kind: PersonalRecordKind
     let metricValue: Double
     let achievedAt: Date

@@ -87,6 +87,56 @@ struct JumpRecTests {
         #expect(records.first { $0.kind == .mostDoubleUnders }?.metricValue == 25)
     }
 
+    @MainActor
+    @Test func testDeletePersonalRecordRemovesOnlyTargetRecordAndClearsItsUnseenState() throws {
+        let store = try MyDataStore.makePreviewStore(qualifiedWorkoutCount: 0)
+        let previousUnseenKinds = store.unseenPersonalRecordKinds
+        defer {
+            store.clearUnseenPersonalRecordUpdates()
+            store.markUnseenPersonalRecordUpdates(previousUnseenKinds)
+        }
+
+        let startedAt = Date(timeIntervalSince1970: 1_000_000)
+        let session = JumpSession(
+            startedAt: startedAt,
+            endedAt: startedAt.addingTimeInterval(180),
+            jumpCount: 400,
+            peakRate: 160,
+            caloriesBurned: 45
+        )
+        let highestJumpRecord = PersonalRecord(
+            kind: .highestJumpCount,
+            metricValue: 400,
+            displayValue: "400 jumps",
+            achievedAt: startedAt
+        )
+        let mostCaloriesRecord = PersonalRecord(
+            kind: .mostCalories,
+            metricValue: 45,
+            displayValue: "45 cal",
+            achievedAt: startedAt
+        )
+
+        store.modelContext.insert(session)
+        store.modelContext.insert(highestJumpRecord)
+        store.modelContext.insert(mostCaloriesRecord)
+        try store.modelContext.save()
+
+        store.clearUnseenPersonalRecordUpdates()
+        store.markUnseenPersonalRecordUpdates([.highestJumpCount, .mostCalories])
+
+        store.deletePersonalRecord(highestJumpRecord)
+
+        let remainingRecords = try store.modelContext.fetch(FetchDescriptor<PersonalRecord>())
+        let remainingSessions = try store.modelContext.fetch(FetchDescriptor<JumpSession>())
+
+        #expect(remainingRecords.count == 1)
+        #expect(remainingRecords.first?.kind == .mostCalories)
+        #expect(remainingSessions.count == 1)
+        #expect(!store.unseenPersonalRecordKinds.contains(.highestJumpCount))
+        #expect(store.unseenPersonalRecordKinds.contains(.mostCalories))
+    }
+
     @Test func testMakeRateSamplesForSteady150Rate() async throws {
         let jumpOffsets = stride(from: 0.4, through: 60.0, by: 0.4).map(\.self)
         let samples = SessionMetricsCalculator.makeRateSamples(
