@@ -562,7 +562,7 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
         guard data.contains(Data("stopWorkout".utf8)) else { return }
         Task { @MainActor [weak self] in
             guard self?.session === workoutSession else { return }
-            JumpRecState.shared.end()
+            JumpRecState.shared.end(reason: .manualStop)
         }
     }
 

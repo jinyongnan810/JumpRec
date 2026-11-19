@@ -172,7 +172,7 @@ extension JumpRecState {
     }
 
     /// Saves local results, or requests Watch to finish and return mirrored results.
-    func finish() {
+    func finish(reason: SessionEndReason) {
         guard sessionState == .active, let startTime else { return }
 
         if isMirroredWatchSession {
@@ -193,7 +193,11 @@ extension JumpRecState {
 
         syncIdleTimer()
         notificationFeedbackGenerator.notificationOccurred(.success)
-        speak(text: localizedSessionFinishedAnnouncement, interruptsCurrentSpeech: true)
+        if let announcement = localizedSessionEndedAnnouncement(for: reason) {
+            speak(text: announcement, interruptsCurrentSpeech: true)
+        } else {
+            stopSpeechAndDeactivateAudio()
+        }
         syncLiveActivity()
 
         if let endTime {
@@ -430,7 +434,7 @@ extension JumpRecState {
         guard minutesElapsed > 0 else { return }
 
         if sessionGoalType == .time, isGoalReached(referenceDate: Date()) {
-            finish()
+            finish(reason: .goalReached)
             return
         }
 
@@ -445,7 +449,7 @@ extension JumpRecState {
     /// Finishes the session immediately when the goal is satisfied.
     func finishIfGoalReached() {
         guard isGoalReached(referenceDate: Date()) else { return }
-        finish()
+        finish(reason: .goalReached)
     }
 
     /// Returns whether the active goal has been reached at the given time.

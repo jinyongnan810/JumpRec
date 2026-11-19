@@ -386,6 +386,20 @@ struct JumpRecTests {
         let fiveDoubleUndersResult = try replayMotionCSV(named: "headphone-5-doubleunders.csv", profile: .headphones)
         #expect(fiveDoubleUndersResult.jumpOffsets.count == 200)
     }
+
+    @MainActor
+    @Test func testSessionEndedAnnouncementOnlySpeaksWhenGoalIsReached() {
+        for language in AppLanguage.allCases {
+            #expect(!AppLocalization.goalCompletedAnnouncement(for: language).isEmpty)
+        }
+
+        #expect(AppLocalization.goalCompletedAnnouncement(for: .english) == "Goal Completed!")
+        #expect(AppLocalization.goalCompletedAnnouncement(for: .japanese) == "目標を達成しました")
+
+        let appState = JumpRecState()
+        #expect(appState.localizedSessionEndedAnnouncement(for: .manualStop) == nil)
+        #expect(appState.localizedSessionEndedAnnouncement(for: .goalReached) == AppLocalization.goalCompletedAnnouncement())
+    }
 }
 
 private extension JumpRecTests {

@@ -75,7 +75,7 @@ struct JumpingView: View {
 
                 // Stop button
                 Button {
-                    appState.end()
+                    appState.end(reason: .manualStop)
                 } label: {
                     Text("STOP")
                         .font(AppFonts.watchMetricCompact)

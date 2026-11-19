@@ -370,9 +370,14 @@ extension JumpRecState {
         await speechCoordinator.waitForActiveSpeech()
     }
 
-    /// Returns the localized spoken phrase for session finish.
-    var localizedSessionFinishedAnnouncement: String {
-        AppLocalization.sessionFinishedAnnouncement()
+    /// Returns the localized spoken phrase when a session ends, or `nil` for silent manual stops.
+    func localizedSessionEndedAnnouncement(for reason: SessionEndReason) -> String? {
+        switch reason {
+        case .manualStop:
+            nil
+        case .goalReached:
+            AppLocalization.goalCompletedAnnouncement()
+        }
     }
 
     /// Returns the localized spoken phrase for jump milestones.

@@ -79,6 +79,18 @@ actor PhoneSpeechCoordinator {
         startUtterance(text: text, languageCode: languageCode)
     }
 
+    /// Stops any active or queued speech and releases audio ducking immediately.
+    func stopAndDeactivate() {
+        pendingUtterances.removeAll()
+        activeUtteranceID = nil
+        isWarmupInProgress = false
+
+        if synthesizer.isSpeaking || synthesizer.isPaused {
+            synthesizer.stopSpeaking(at: .immediate)
+        }
+        deactivateAudioSessionIfNeeded()
+    }
+
     // MARK: - Helpers
 
     /// Activates ducking audio and starts a single spoken announcement.
@@ -362,6 +374,13 @@ extension JumpRecState {
         }
     }
 
+    /// Stops any active or queued speech and releases audio ducking.
+    func stopSpeechAndDeactivateAudio() {
+        enqueueSpeechOperation { [speechCoordinator] in
+            await speechCoordinator.stopAndDeactivate()
+        }
+    }
+
     /// Chains speech operations in order so warmup cannot run after a spoken announcement.
     private func enqueueSpeechOperation(_ operation: @escaping @Sendable () async -> Void) {
         let previousTask = speechTask
@@ -376,9 +395,14 @@ extension JumpRecState {
         AppLocalization.sessionStartedAnnouncement()
     }
 
-    /// Returns the localized spoken phrase for session end.
-    var localizedSessionFinishedAnnouncement: String {
-        AppLocalization.sessionFinishedAnnouncement()
+    /// Returns the localized spoken phrase when a session ends, or `nil` for silent manual stops.
+    func localizedSessionEndedAnnouncement(for reason: SessionEndReason) -> String? {
+        switch reason {
+        case .manualStop:
+            nil
+        case .goalReached:
+            AppLocalization.goalCompletedAnnouncement()
+        }
     }
 
     /// Returns the localized spoken phrase for jump milestones.

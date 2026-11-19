@@ -38,7 +38,7 @@ struct ContentView: View {
                         startWorkout(goalType: settings.goalType, goalValue: settings.goalCount)
                     },
                     onStop: {
-                        appState.finish()
+                        appState.finish(reason: .manualStop)
                     }
                 )
                 .tabItem {

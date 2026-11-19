@@ -150,19 +150,19 @@ public nonisolated enum AppLocalization {
         }
     }
 
-    /// Returns the spoken phrase announced when a workout ends.
-    public static func sessionFinishedAnnouncement(for language: AppLanguage = .current) -> String {
+    /// Returns the spoken phrase announced when a workout ends because its goal was reached.
+    public static func goalCompletedAnnouncement(for language: AppLanguage = .current) -> String {
         switch language {
         case .english:
-            "Workout Finished!"
+            "Goal Completed!"
         case .japanese:
-            "ワークアウトが終了しました"
+            "目標を達成しました"
         case .simplifiedChinese:
-            "运动已结束！"
+            "目标已完成！"
         case .traditionalChinese:
-            "運動已結束！"
+            "目標已完成！"
         case .korean:
-            "운동을 마쳤습니다."
+            "목표를 달성했습니다."
         }
     }
 

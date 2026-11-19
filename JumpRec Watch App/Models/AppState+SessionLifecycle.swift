@@ -103,12 +103,12 @@ extension JumpRecState {
         switch goalType {
         case .count:
             if jumpCount >= goal {
-                end()
+                end(reason: .goalReached)
             }
         case .time:
             guard let startTime else { return }
             if Int(Date().timeIntervalSince(startTime)) >= goal {
-                end()
+                end(reason: .goalReached)
             }
         @unknown default:
             break
@@ -116,7 +116,7 @@ extension JumpRecState {
     }
 
     /// Ends the current watch workout and sends the finalized results to the phone.
-    func end() {
+    func end(reason: SessionEndReason) {
         guard jumpState == .jumping else { return }
         cancelMinuteAnnouncements()
 
@@ -128,7 +128,11 @@ extension JumpRecState {
         let doubleUndersCount = motionManager?.doubleUndersCount
             ?? SessionMetricsCalculator.doubleUndersCount(from: jumps)
         WKInterfaceDevice.current().play(.stop)
-        speak(text: localizedSessionFinishedAnnouncement, interruptsCurrentSpeech: true)
+        if let announcement = localizedSessionEndedAnnouncement(for: reason) {
+            speak(text: announcement, interruptsCurrentSpeech: true)
+        } else {
+            stopSpeechAndDeactivateAudio()
+        }
         ConnectivityManager.shared.sendWorkoutEvent(
             MirroredWorkoutPayload(
                 kind: .ended,
@@ -198,7 +202,7 @@ extension JumpRecState {
     func checkJumpLandmark(before: Int, after: Int) {
         // Count goals finish at the target; both goal types announce 100-jump milestones.
         if goalType == .count, jumpCount >= goal {
-            end()
+            end(reason: .goalReached)
             return
         }
         if before / 100 != after / 100 {
@@ -249,7 +253,7 @@ extension JumpRecState {
         let minutesElapsed = Int(Date().timeIntervalSince(startTime)) / 60
         if minutesElapsed <= 0 { return }
         if goalType == .time, minutesElapsed * 60 >= goal {
-            end()
+            end(reason: .goalReached)
             return
         }
 

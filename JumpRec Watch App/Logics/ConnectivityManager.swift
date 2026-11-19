@@ -114,7 +114,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         if let action = message["action"] as? String, action == "stopWorkout" {
             Task { @MainActor in
                 // If the watch session is active, finish the workout upon remote iPhone request.
-                JumpRecState.shared.end()
+                JumpRecState.shared.end(reason: .manualStop)
             }
             return
         }
