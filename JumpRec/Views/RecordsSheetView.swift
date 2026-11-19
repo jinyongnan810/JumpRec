@@ -170,113 +170,115 @@ struct RecordsSheetView: View {
 
 // MARK: - Preview
 
-#Preview {
-    let dataStore = try! MyDataStore.makePreviewStore(qualifiedWorkoutCount: 0)
-    let context = dataStore.modelContext
+#if DEBUG
+    #Preview {
+        let dataStore = try! MyDataStore.makePreviewStore(qualifiedWorkoutCount: 0)
+        let context = dataStore.modelContext
 
-    let calendar = Calendar.current
-    let now = Date()
-    let sampleData: [(daysAgo: Int, jumps: Int, minutes: Int, calories: Double, peakRate: Double, longestStreak: Int)] = [
-        (3, 2847, 15, 384, 186, 642),
-        (10, 1500, 12, 280, 172, 390),
-        (20, 900, 6, 150, 155, 244),
-    ]
-    for data in sampleData {
-        let start = calendar.date(byAdding: .day, value: -data.daysAgo, to: now)!
-        let end = calendar.date(byAdding: .minute, value: data.minutes, to: start)!
-        let session = JumpSession(
-            startedAt: start,
-            endedAt: end,
-            jumpCount: data.jumps,
-            peakRate: data.peakRate,
-            caloriesBurned: data.calories,
-            longestStreak: data.longestStreak
+        let calendar = Calendar.current
+        let now = Date()
+        let sampleData: [(daysAgo: Int, jumps: Int, minutes: Int, calories: Double, peakRate: Double, longestStreak: Int)] = [
+            (3, 2847, 15, 384, 186, 642),
+            (10, 1500, 12, 280, 172, 390),
+            (20, 900, 6, 150, 155, 244),
+        ]
+        for data in sampleData {
+            let start = calendar.date(byAdding: .day, value: -data.daysAgo, to: now)!
+            let end = calendar.date(byAdding: .minute, value: data.minutes, to: start)!
+            let session = JumpSession(
+                startedAt: start,
+                endedAt: end,
+                jumpCount: data.jumps,
+                peakRate: data.peakRate,
+                caloriesBurned: data.calories,
+                longestStreak: data.longestStreak
+            )
+            context.insert(session)
+        }
+
+        context.insert(
+            PersonalRecord(
+                kind: .highestJumpCount,
+                metricValue: 2847,
+                displayValue: "2,847 jumps",
+                achievedAt: calendar.date(byAdding: .day, value: -4, to: now)!
+            )
         )
-        context.insert(session)
+        context.insert(
+            PersonalRecord(
+                kind: .longestJumpStreak,
+                metricValue: 642,
+                displayValue: "642 jumps",
+                achievedAt: calendar.date(byAdding: .day, value: -1, to: now)!
+            )
+        )
+        context.insert(
+            PersonalRecord(
+                kind: .longestSession,
+                metricValue: 900,
+                displayValue: "15:00",
+                achievedAt: calendar.date(byAdding: .day, value: -5, to: now)!
+            )
+        )
+        context.insert(
+            PersonalRecord(
+                kind: .mostCalories,
+                metricValue: 384,
+                displayValue: "384 cal",
+                achievedAt: calendar.date(byAdding: .day, value: -2, to: now)!
+            )
+        )
+        context.insert(
+            PersonalRecord(
+                kind: .bestJumpRate,
+                metricValue: 186,
+                displayValue: "186/min",
+                achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
+            )
+        )
+        context.insert(
+            PersonalRecord(
+                kind: .steadyRhythm,
+                metricValue: 0.92,
+                displayValue: "92%",
+                achievedAt: calendar.date(byAdding: .day, value: -6, to: now)!
+            )
+        )
+        context.insert(
+            PersonalRecord(
+                kind: .bestAverageJumpRate,
+                metricValue: 168,
+                displayValue: "168/min",
+                achievedAt: calendar.date(byAdding: .day, value: -7, to: now)!
+            )
+        )
+        context.insert(
+            PersonalRecord(
+                kind: .sneakyBurn,
+                metricValue: 24.6,
+                displayValue: "24.6 kcal/min",
+                achievedAt: calendar.date(byAdding: .day, value: -8, to: now)!
+            )
+        )
+        context.insert(
+            PersonalRecord(
+                kind: .mostDoubleUnders,
+                metricValue: 48,
+                displayValue: "48 jumps",
+                achievedAt: calendar.date(byAdding: .day, value: -2, to: now)!
+            )
+        )
+
+        dataStore.markUnseenPersonalRecordUpdates([.highestJumpCount, .steadyRhythm, .sneakyBurn])
+
+        return
+            RecordsSheetView()
+                .modelContainer(dataStore.modelContainer)
+                .environment(dataStore)
+                .presentationBackground(AppColors.cardSurface)
+                .preferredColorScheme(.dark)
     }
-
-    context.insert(
-        PersonalRecord(
-            kind: .highestJumpCount,
-            metricValue: 2847,
-            displayValue: "2,847 jumps",
-            achievedAt: calendar.date(byAdding: .day, value: -4, to: now)!
-        )
-    )
-    context.insert(
-        PersonalRecord(
-            kind: .longestJumpStreak,
-            metricValue: 642,
-            displayValue: "642 jumps",
-            achievedAt: calendar.date(byAdding: .day, value: -1, to: now)!
-        )
-    )
-    context.insert(
-        PersonalRecord(
-            kind: .longestSession,
-            metricValue: 900,
-            displayValue: "15:00",
-            achievedAt: calendar.date(byAdding: .day, value: -5, to: now)!
-        )
-    )
-    context.insert(
-        PersonalRecord(
-            kind: .mostCalories,
-            metricValue: 384,
-            displayValue: "384 cal",
-            achievedAt: calendar.date(byAdding: .day, value: -2, to: now)!
-        )
-    )
-    context.insert(
-        PersonalRecord(
-            kind: .bestJumpRate,
-            metricValue: 186,
-            displayValue: "186/min",
-            achievedAt: calendar.date(byAdding: .day, value: -3, to: now)!
-        )
-    )
-    context.insert(
-        PersonalRecord(
-            kind: .steadyRhythm,
-            metricValue: 0.92,
-            displayValue: "92%",
-            achievedAt: calendar.date(byAdding: .day, value: -6, to: now)!
-        )
-    )
-    context.insert(
-        PersonalRecord(
-            kind: .bestAverageJumpRate,
-            metricValue: 168,
-            displayValue: "168/min",
-            achievedAt: calendar.date(byAdding: .day, value: -7, to: now)!
-        )
-    )
-    context.insert(
-        PersonalRecord(
-            kind: .sneakyBurn,
-            metricValue: 24.6,
-            displayValue: "24.6 kcal/min",
-            achievedAt: calendar.date(byAdding: .day, value: -8, to: now)!
-        )
-    )
-    context.insert(
-        PersonalRecord(
-            kind: .mostDoubleUnders,
-            metricValue: 48,
-            displayValue: "48 jumps",
-            achievedAt: calendar.date(byAdding: .day, value: -2, to: now)!
-        )
-    )
-
-    dataStore.markUnseenPersonalRecordUpdates([.highestJumpCount, .steadyRhythm, .sneakyBurn])
-
-    return
-        RecordsSheetView()
-            .modelContainer(dataStore.modelContainer)
-            .environment(dataStore)
-            .presentationBackground(AppColors.cardSurface)
-            .preferredColorScheme(.dark)
-}
+#endif
 
 // MARK: - Delete Single Record Alert
 
