@@ -156,6 +156,11 @@ struct StartView: View {
                     showSettings = false
                 }
             }
+            .onChange(of: settings.hasUnlockedUnlimitedWorkouts) { _, isUnlocked in
+                if isUnlocked {
+                    appState.showQuotaExplanation = false
+                }
+            }
             .task {
                 await requestInitialHealthPermissionsIfNeeded()
             }

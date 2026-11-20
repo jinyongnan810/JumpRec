@@ -36,6 +36,10 @@ struct MainView: View {
         .onChange(of: scenePhase, initial: true) { _, newPhase in
             switch newPhase {
             case .active:
+                if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" {
+                    settings.loadSettings()
+                    ConnectivityManager.shared.refreshEntitlementFromCompanion()
+                }
                 if appState.jumpState == .idle, !appState.isPreparingWorkout, !appState.isCountingDown {
                     appState.prepareSpeechForWorkout()
                 }

@@ -199,12 +199,14 @@ struct SettingsView: View {
             #endif
         }
         .navigationTitle("Settings")
-        #if DEBUG
-            .onAppear {
-                guard ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" else { return }
+        .onAppear {
+            guard ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" else { return }
+            settings.loadSettings()
+            ConnectivityManager.shared.refreshEntitlementFromCompanion()
+            #if DEBUG
                 pendingCSVCount = ConnectivityManager.shared.pendingMotionCSVCount
-            }
-        #endif
+            #endif
+        }
     }
 
     /// Formats the row value so selected state is announced without relying on the checkmark symbol alone.

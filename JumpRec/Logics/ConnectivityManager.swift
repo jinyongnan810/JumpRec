@@ -42,10 +42,26 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     private let settingsStore = NSUbiquitousKeyValueStore.default
     /// Performs potentially delayed iCloud container resolution and file writes away from UI state.
     private let cloudCSVExporter = CloudCSVExporter()
+    /// Tracks an entitlement sync that occurred before WatchConnectivity finished activating or installing.
+    @ObservationIgnored
+    private var hasPendingEntitlementTransfer = false
+    /// Observes verified entitlement updates so Watch sync runs even outside ContentView's lifecycle.
+    @ObservationIgnored
+    private var entitlementObserver: NSObjectProtocol?
 
     /// Configures and activates the shared connectivity session.
     override private init() {
         super.init()
+        entitlementObserver = NotificationCenter.default.addObserver(
+            forName: .jumpRecEntitlementDidUpdate,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            let forceDurableTransfer = notification.userInfo?["forceDurableTransfer"] as? Bool ?? false
+            Task { @MainActor [weak self] in
+                self?.syncCurrentEntitlementToWatch(transferDurably: forceDurableTransfer)
+            }
+        }
         if WCSession.isSupported() {
             session.delegate = self
             session.activate()
@@ -79,10 +95,14 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         let isWatchAppInstalled = session.isWatchAppInstalled
         let isReachable = session.isReachable
         Task { @MainActor [weak self] in
-            self?.activationState = activationState
-            self?.isPaired = isPaired
-            self?.isWatchAppInstalled = isWatchAppInstalled
-            self?.isReachable = isReachable
+            guard let self else { return }
+            self.activationState = activationState
+            self.isPaired = isPaired
+            self.isWatchAppInstalled = isWatchAppInstalled
+            self.isReachable = isReachable
+            if activationState == .activated, hasPendingEntitlementTransfer {
+                syncCurrentEntitlementToWatch(transferDurably: true)
+            }
         }
     }
 
@@ -92,6 +112,9 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         print("[WatchConnectivityManager] Session reachability changed: \(isReachable)")
         Task { @MainActor [weak self] in
             self?.isReachable = isReachable
+            if isReachable {
+                self?.sendCurrentEntitlementMessageIfReachable()
+            }
         }
     }
 
@@ -103,9 +126,13 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             "[WatchConnectivityManager] Session state changed: isPaired(\(isPaired)), isWatchAppInstalled(\(isWatchAppInstalled))"
         )
         Task { @MainActor [weak self] in
+            guard let self else { return }
             // Pairing remains true while the watch is off-wrist; installation is tracked separately.
-            self?.isPaired = isPaired
-            self?.isWatchAppInstalled = isWatchAppInstalled
+            self.isPaired = isPaired
+            self.isWatchAppInstalled = isWatchAppInstalled
+            if isPaired, isWatchAppInstalled, hasPendingEntitlementTransfer {
+                syncCurrentEntitlementToWatch(transferDurably: true)
+            }
         }
     }
 
@@ -141,6 +168,27 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
                 self?.onWorkoutStartCancelled?()
             }
         }
+    }
+
+    /// Responds to synchronous Watch requests for the latest entitlement and quota state.
+    nonisolated func session(
+        _: WCSession,
+        didReceiveMessage message: [String: Any],
+        replyHandler: @escaping ([String: Any]) -> Void
+    ) {
+        print("[WatchConnectivityManager] Received message with reply: \(message)")
+        if message["action"] as? String == "requestEntitlement" {
+            let store = NSUbiquitousKeyValueStore.default
+            store.synchronize()
+            replyHandler([
+                "type": "entitlementState",
+                "hasUnlockedUnlimitedWorkouts": store.bool(forKey: "hasUnlockedUnlimitedWorkouts"),
+                "qualifiedWorkoutCount": Int(store.longLong(forKey: "qualifiedWorkoutCount")),
+                "updatedAt": Date().timeIntervalSince1970,
+            ])
+            return
+        }
+        replyHandler([:])
     }
 
     /// Applies settings synced via application context.
@@ -303,7 +351,13 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         hasUnlockedUnlimitedWorkouts: Bool? = nil,
         qualifiedWorkoutCount: Int? = nil
     ) {
-        var payload: [String: Any] = [
+        guard isSupported, session.activationState == .activated else { return }
+
+        settingsStore.synchronize()
+        let resolvedUnlimited = hasUnlockedUnlimitedWorkouts ?? PurchaseManager.shared.hasUnlockedUnlimitedWorkouts
+        let resolvedQualifiedCount = qualifiedWorkoutCount ?? Int(settingsStore.longLong(forKey: "qualifiedWorkoutCount"))
+
+        let payload: [String: Any] = [
             "type": "goalSettings",
             "accentColor": AppAppearance.shared.accent.rawValue,
             "goalType": goalType.rawValue,
@@ -312,13 +366,10 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             "shouldSpeakJumpCountAnnouncements": shouldSpeakJumpCountAnnouncements,
             "shouldSpeakJumpTimeAnnouncements": shouldSpeakJumpTimeAnnouncements,
             "jumpDetectorThresholdAdjustmentPercentage": jumpDetectorThresholdAdjustmentPercentage,
+            "hasUnlockedUnlimitedWorkouts": resolvedUnlimited,
+            "qualifiedWorkoutCount": resolvedQualifiedCount,
+            "updatedAt": Date().timeIntervalSince1970,
         ]
-        if let hasUnlockedUnlimitedWorkouts {
-            payload["hasUnlockedUnlimitedWorkouts"] = hasUnlockedUnlimitedWorkouts
-        }
-        if let qualifiedWorkoutCount {
-            payload["qualifiedWorkoutCount"] = qualifiedWorkoutCount
-        }
 
         do {
             try session.updateApplicationContext(payload)
@@ -332,6 +383,116 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         session.sendMessage(payload, replyHandler: nil) { error in
             print("[WatchConnectivityManager] Failed to send immediate goal settings message: \(error.localizedDescription)")
         }
+    }
+
+    /// Pushes the latest entitlement state to Watch via application context, durable transfer, and live message.
+    func syncCurrentEntitlementToWatch(transferDurably: Bool) {
+        guard isSupported else { return }
+        guard session.activationState == .activated else {
+            if transferDurably {
+                hasPendingEntitlementTransfer = true
+            }
+            return
+        }
+
+        settingsStore.synchronize()
+        let hasUnlockedUnlimitedWorkouts = PurchaseManager.shared.hasUnlockedUnlimitedWorkouts
+        let qualifiedWorkoutCount = Int(settingsStore.longLong(forKey: "qualifiedWorkoutCount"))
+        let updatedAt = Date().timeIntervalSince1970
+
+        let entitlementPayload = makeEntitlementPayload(
+            hasUnlockedUnlimitedWorkouts: hasUnlockedUnlimitedWorkouts,
+            qualifiedWorkoutCount: qualifiedWorkoutCount,
+            updatedAt: updatedAt
+        )
+        let contextPayload = currentGoalSettingsPayload(
+            hasUnlockedUnlimitedWorkouts: hasUnlockedUnlimitedWorkouts,
+            qualifiedWorkoutCount: qualifiedWorkoutCount,
+            updatedAt: updatedAt
+        )
+
+        do {
+            try session.updateApplicationContext(contextPayload)
+            print("[WatchConnectivityManager] Updated application context with entitlement state")
+        } catch {
+            print("[WatchConnectivityManager] Failed to update entitlement application context: \(error.localizedDescription)")
+        }
+
+        if transferDurably {
+            if session.isPaired, session.isWatchAppInstalled {
+                session.transferUserInfo(entitlementPayload)
+                hasPendingEntitlementTransfer = false
+                print("[WatchConnectivityManager] Queued entitlement state via transferUserInfo")
+            } else if session.isPaired {
+                // Keep pending until the Watch app install state settles after activation.
+                hasPendingEntitlementTransfer = true
+            } else {
+                hasPendingEntitlementTransfer = false
+            }
+        }
+
+        guard session.isReachable else { return }
+        session.sendMessage(entitlementPayload, replyHandler: nil) { error in
+            print("[WatchConnectivityManager] Failed to send immediate entitlement message: \(error.localizedDescription)")
+        }
+    }
+
+    /// Sends a lightweight entitlement snapshot when Watch becomes reachable.
+    private func sendCurrentEntitlementMessageIfReachable() {
+        guard isSupported, session.activationState == .activated, session.isReachable else { return }
+
+        settingsStore.synchronize()
+        let payload = makeEntitlementPayload(
+            hasUnlockedUnlimitedWorkouts: PurchaseManager.shared.hasUnlockedUnlimitedWorkouts,
+            qualifiedWorkoutCount: Int(settingsStore.longLong(forKey: "qualifiedWorkoutCount")),
+            updatedAt: Date().timeIntervalSince1970
+        )
+        session.sendMessage(payload, replyHandler: nil) { error in
+            print("[WatchConnectivityManager] Failed to send entitlement message on reachability: \(error.localizedDescription)")
+        }
+    }
+
+    private func makeEntitlementPayload(
+        hasUnlockedUnlimitedWorkouts: Bool,
+        qualifiedWorkoutCount: Int,
+        updatedAt: TimeInterval
+    ) -> [String: Any] {
+        [
+            "type": "entitlementState",
+            "hasUnlockedUnlimitedWorkouts": hasUnlockedUnlimitedWorkouts,
+            "qualifiedWorkoutCount": qualifiedWorkoutCount,
+            "updatedAt": updatedAt,
+        ]
+    }
+
+    private func currentGoalSettingsPayload(
+        hasUnlockedUnlimitedWorkouts: Bool,
+        qualifiedWorkoutCount: Int,
+        updatedAt: TimeInterval
+    ) -> [String: Any] {
+        let storedGoalType: GoalType = settingsStore.string(forKey: "goalType") == GoalType.time.rawValue ? .time : .count
+        let storedJumpCount = settingsStore.longLong(forKey: "jumpCount")
+        let storedJumpTime = settingsStore.longLong(forKey: "jumpTime")
+        let shouldSpeakJumpCountAnnouncements = settingsStore.object(forKey: "shouldSpeakJumpCountAnnouncements") as? Bool ?? true
+        let shouldSpeakJumpTimeAnnouncements = settingsStore.object(forKey: "shouldSpeakJumpTimeAnnouncements") as? Bool ?? true
+        let storedThresholdAdjustment = (settingsStore.object(forKey: "jumpDetectorThresholdAdjustmentPercentage") as? NSNumber)?.doubleValue
+            ?? DefaultJumpDetectorThresholdAdjustmentPercentage
+
+        return [
+            "type": "goalSettings",
+            "accentColor": AppAppearance.shared.accent.rawValue,
+            "goalType": storedGoalType.rawValue,
+            "jumpCount": storedJumpCount == 0 ? DefaultJumpCount : storedJumpCount,
+            "jumpTime": storedJumpTime == 0 ? DefaultJumpTime : storedJumpTime,
+            "shouldSpeakJumpCountAnnouncements": shouldSpeakJumpCountAnnouncements,
+            "shouldSpeakJumpTimeAnnouncements": shouldSpeakJumpTimeAnnouncements,
+            "jumpDetectorThresholdAdjustmentPercentage": JumpRecSettings.clampedJumpDetectorThresholdAdjustmentPercentage(
+                storedThresholdAdjustment
+            ),
+            "hasUnlockedUnlimitedWorkouts": hasUnlockedUnlimitedWorkouts,
+            "qualifiedWorkoutCount": qualifiedWorkoutCount,
+            "updatedAt": updatedAt,
+        ]
     }
 
     /// Asks the already-running Watch app to start a companion workout when HealthKit skips re-delivery.

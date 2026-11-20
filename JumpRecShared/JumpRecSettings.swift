@@ -18,6 +18,8 @@ public enum GoalType: String, Codable, Sendable {
 public extension Notification.Name {
     /// Posted when settings synced from the paired device change.
     static let jumpRecSettingsDidUpdate = Notification.Name("JumpRecSettingsDidUpdate")
+    /// Posted when the user's unlimited-workout entitlement is verified or updated.
+    static let jumpRecEntitlementDidUpdate = Notification.Name("JumpRecEntitlementDidUpdate")
 }
 
 /// Default jump-count goal used for new installs and resets.

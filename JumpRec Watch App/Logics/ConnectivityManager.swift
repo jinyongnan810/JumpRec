@@ -17,6 +17,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     private let session: WCSession = .default
     /// Persists synced settings received from the phone.
     private let settingsStore = NSUbiquitousKeyValueStore.default
+    /// Tracks the latest applied entitlement timestamp so stale payloads do not overwrite newer state.
+    private var lastAppliedEntitlementTimestamp: TimeInterval = 0
 
     /// Configures and activates the shared connectivity session.
     override private init() {
@@ -43,13 +45,14 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
 
         parseSettingsPayload(session.receivedApplicationContext)
 
-        #if DEBUG
-            if activationState == .activated {
-                Task { @MainActor [weak self] in
+        if activationState == .activated {
+            Task { @MainActor [weak self] in
+                self?.refreshEntitlementFromCompanion()
+                #if DEBUG
                     self?.flushPendingMotionCSVs()
-                }
+                #endif
             }
-        #endif
+        }
     }
 
     #if DEBUG
@@ -129,7 +132,31 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             }
             return
         }
-        parseSettingsPayload(message)
+        parseIncomingPayload(message)
+    }
+
+    /// Re-reads cached application context and queries the companion iPhone for the latest entitlement state.
+    func refreshEntitlementFromCompanion() {
+        guard WCSession.isSupported(), session.activationState == .activated else { return }
+
+        parseEntitlementOnly(from: session.receivedApplicationContext)
+
+        guard session.isReachable else { return }
+        session.sendMessage(
+            ["action": "requestEntitlement"],
+            replyHandler: { [weak self] reply in
+                self?.parseEntitlementPayload(reply)
+            },
+            errorHandler: { error in
+                print("[WatchConnectivityManager] Failed to request entitlement state: \(error.localizedDescription)")
+            }
+        )
+    }
+
+    /// Applies durable entitlement transfers queued by the companion iPhone app.
+    nonisolated func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        print("[WatchConnectivityManager] Received userInfo: \(userInfo)")
+        parseIncomingPayload(userInfo)
     }
 
     /// Reports lifecycle changes without waiting for HealthKit mirroring.
@@ -185,19 +212,33 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
         let isReachable = session.isReachable
         print("[WatchConnectivityManager] Session reachability changed: \(isReachable)")
-        #if DEBUG
-            if isReachable {
-                Task { @MainActor [weak self] in
+        if isReachable {
+            Task { @MainActor [weak self] in
+                self?.refreshEntitlementFromCompanion()
+                #if DEBUG
                     self?.flushPendingMotionCSVs()
-                }
+                #endif
             }
-        #endif
+        }
     }
 
     /// Applies updated goal settings received from the iPhone app.
     nonisolated func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         print("[WatchConnectivityManager] Received application context: \(applicationContext)")
-        parseSettingsPayload(applicationContext)
+        parseIncomingPayload(applicationContext)
+    }
+
+    /// Routes incoming WatchConnectivity payloads by message type.
+    private nonisolated func parseIncomingPayload(_ payload: [String: Any]) {
+        guard let type = payload["type"] as? String else { return }
+        switch type {
+        case "goalSettings":
+            parseSettingsPayload(payload)
+        case "entitlementState":
+            parseEntitlementPayload(payload)
+        default:
+            break
+        }
     }
 
     /// Parses loosely typed settings on the WatchConnectivity callback thread.
@@ -218,8 +259,9 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         let shouldSpeakJumpTimeAnnouncements = payload["shouldSpeakJumpTimeAnnouncements"] as? Bool ?? true
         let jumpDetectorThresholdAdjustmentPercentage = (payload["jumpDetectorThresholdAdjustmentPercentage"] as? NSNumber)?.doubleValue
             ?? 0.0
-        let hasUnlockedUnlimitedWorkouts = payload["hasUnlockedUnlimitedWorkouts"] as? Bool
+        let hasUnlockedUnlimitedWorkouts = parseBool(payload["hasUnlockedUnlimitedWorkouts"])
         let qualifiedWorkoutCount = (payload["qualifiedWorkoutCount"] as? NSNumber)?.intValue
+        let updatedAt = (payload["updatedAt"] as? NSNumber)?.doubleValue
         let accentColor = (payload["accentColor"] as? String).flatMap(AppAccentColor.init(rawValue:))
 
         Task { @MainActor [weak self] in
@@ -235,9 +277,44 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
                 shouldSpeakJumpTimeAnnouncements: shouldSpeakJumpTimeAnnouncements,
                 jumpDetectorThresholdAdjustmentPercentage: jumpDetectorThresholdAdjustmentPercentage,
                 hasUnlockedUnlimitedWorkouts: hasUnlockedUnlimitedWorkouts,
-                qualifiedWorkoutCount: qualifiedWorkoutCount
+                qualifiedWorkoutCount: qualifiedWorkoutCount,
+                updatedAt: updatedAt
             )
         }
+    }
+
+    /// Parses dedicated entitlement payloads delivered via message, reply, or userInfo.
+    private nonisolated func parseEntitlementPayload(_ payload: [String: Any]) {
+        guard let type = payload["type"] as? String, type == "entitlementState" else {
+            return
+        }
+        parseEntitlementOnly(from: payload)
+    }
+
+    /// Extracts only entitlement and quota keys so cached context never overwrites Watch-edited goal settings.
+    private nonisolated func parseEntitlementOnly(from payload: [String: Any]) {
+        let hasUnlockedUnlimitedWorkouts = parseBool(payload["hasUnlockedUnlimitedWorkouts"])
+        let qualifiedWorkoutCount = (payload["qualifiedWorkoutCount"] as? NSNumber)?.intValue
+        let updatedAt = (payload["updatedAt"] as? NSNumber)?.doubleValue
+
+        guard hasUnlockedUnlimitedWorkouts != nil || qualifiedWorkoutCount != nil else {
+            return
+        }
+
+        Task { @MainActor [weak self] in
+            self?.applyEntitlement(
+                hasUnlockedUnlimitedWorkouts: hasUnlockedUnlimitedWorkouts,
+                qualifiedWorkoutCount: qualifiedWorkoutCount,
+                updatedAt: updatedAt
+            )
+        }
+    }
+
+    /// Parses boolean payload values whether bridged as Swift `Bool` or `NSNumber`.
+    private nonisolated func parseBool(_ value: Any?) -> Bool? {
+        if let boolValue = value as? Bool { return boolValue }
+        if let numberValue = value as? NSNumber { return numberValue.boolValue }
+        return nil
     }
 
     /// Persists parsed settings and notifies main-actor observers.
@@ -249,7 +326,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         shouldSpeakJumpTimeAnnouncements: Bool,
         jumpDetectorThresholdAdjustmentPercentage: Double,
         hasUnlockedUnlimitedWorkouts: Bool?,
-        qualifiedWorkoutCount: Int?
+        qualifiedWorkoutCount: Int?,
+        updatedAt: TimeInterval?
     ) {
         settingsStore.set(goalTypeRawValue, forKey: "goalType")
         settingsStore.set(Int64(jumpCount), forKey: "jumpCount")
@@ -260,15 +338,60 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             JumpRecSettings.clampedJumpDetectorThresholdAdjustmentPercentage(jumpDetectorThresholdAdjustmentPercentage),
             forKey: "jumpDetectorThresholdAdjustmentPercentage"
         )
+        _ = applyEntitlementFieldsIfCurrent(
+            hasUnlockedUnlimitedWorkouts: hasUnlockedUnlimitedWorkouts,
+            qualifiedWorkoutCount: qualifiedWorkoutCount,
+            updatedAt: updatedAt
+        )
+        settingsStore.synchronize()
+
+        NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)
+    }
+
+    /// Persists standalone entitlement updates when they are at least as recent as the last applied snapshot.
+    private func applyEntitlement(
+        hasUnlockedUnlimitedWorkouts: Bool?,
+        qualifiedWorkoutCount: Int?,
+        updatedAt: TimeInterval?
+    ) {
+        guard applyEntitlementFieldsIfCurrent(
+            hasUnlockedUnlimitedWorkouts: hasUnlockedUnlimitedWorkouts,
+            qualifiedWorkoutCount: qualifiedWorkoutCount,
+            updatedAt: updatedAt
+        ) else {
+            return
+        }
+
+        settingsStore.synchronize()
+        NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)
+    }
+
+    /// Writes entitlement and quota keys if the snapshot timestamp is not older than the latest applied one.
+    private func applyEntitlementFieldsIfCurrent(
+        hasUnlockedUnlimitedWorkouts: Bool?,
+        qualifiedWorkoutCount: Int?,
+        updatedAt: TimeInterval?
+    ) -> Bool {
+        guard hasUnlockedUnlimitedWorkouts != nil || qualifiedWorkoutCount != nil else {
+            return false
+        }
+
+        if let updatedAt {
+            guard updatedAt >= lastAppliedEntitlementTimestamp else {
+                return false
+            }
+            lastAppliedEntitlementTimestamp = updatedAt
+        } else if lastAppliedEntitlementTimestamp > 0 {
+            return false
+        }
+
         if let hasUnlockedUnlimitedWorkouts {
             settingsStore.set(hasUnlockedUnlimitedWorkouts, forKey: "hasUnlockedUnlimitedWorkouts")
         }
         if let qualifiedWorkoutCount {
             settingsStore.set(Int64(qualifiedWorkoutCount), forKey: "qualifiedWorkoutCount")
         }
-        settingsStore.synchronize()
-
-        NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)
+        return true
     }
 
     #if DEBUG

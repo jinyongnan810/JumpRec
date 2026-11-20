@@ -19,6 +19,7 @@ final class WatchAppDelegate: NSObject, WKApplicationDelegate {
 @main
 struct JumpRec_Watch_AppApp: App {
     @WKApplicationDelegateAdaptor(WatchAppDelegate.self) private var appDelegate
+    @State private var settings = JumpRecSettings()
 
     init() {
         _ = ConnectivityManager.shared
@@ -30,7 +31,7 @@ struct JumpRec_Watch_AppApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(JumpRecSettings())
+                .environment(settings)
         }
     }
 }

@@ -93,7 +93,7 @@ public final class PurchaseManager: Sendable {
     // MARK: - Entitlement Verification
 
     /// Syncs the unlimited license from verified, unrevoked StoreKit entitlements.
-    public func updatePurchasedState() async {
+    public func updatePurchasedState(forceDurableSync: Bool = false) async {
         var isUnlocked = false
 
         for await result in Transaction.currentEntitlements {
@@ -110,7 +110,7 @@ public final class PurchaseManager: Sendable {
             }
         }
 
-        applyEntitlementState(isUnlocked)
+        applyEntitlementState(isUnlocked, forceDurableSync: forceDurableSync)
     }
 
     /// Handles a verified or unverified transaction update delivered from StoreKit.
@@ -122,7 +122,7 @@ public final class PurchaseManager: Sendable {
 
         if transaction.productID == Self.unlimitedWorkoutsProductID {
             let isUnlocked = transaction.revocationDate == nil
-            applyEntitlementState(isUnlocked)
+            applyEntitlementState(isUnlocked, forceDurableSync: true)
         }
 
         // Always finish the transaction to inform StoreKit that delivery was completed.
@@ -130,11 +130,22 @@ public final class PurchaseManager: Sendable {
     }
 
     /// Persists entitlement state locally, in iCloud key-value storage, and notifies observers.
-    private func applyEntitlementState(_ isUnlocked: Bool) {
+    private func applyEntitlementState(_ isUnlocked: Bool, forceDurableSync: Bool = false) {
+        let previousStoredValue = store.bool(forKey: "hasUnlockedUnlimitedWorkouts")
+        let didChange = hasUnlockedUnlimitedWorkouts != isUnlocked || previousStoredValue != isUnlocked
+
         hasUnlockedUnlimitedWorkouts = isUnlocked
         store.set(isUnlocked, forKey: "hasUnlockedUnlimitedWorkouts")
         store.synchronize()
+
+        guard didChange || forceDurableSync else { return }
+
         NotificationCenter.default.post(name: .jumpRecSettingsDidUpdate, object: nil)
+        NotificationCenter.default.post(
+            name: .jumpRecEntitlementDidUpdate,
+            object: nil,
+            userInfo: ["forceDurableTransfer": forceDurableSync || didChange]
+        )
     }
 
     // MARK: - Purchase Flow
@@ -172,7 +183,7 @@ public final class PurchaseManager: Sendable {
                     return false
 
                 case let .verified(transaction):
-                    applyEntitlementState(true)
+                    applyEntitlementState(true, forceDurableSync: true)
                     await transaction.finish()
                     return true
                 }
@@ -207,7 +218,7 @@ public final class PurchaseManager: Sendable {
         do {
             // Sync may request authentication and updates current entitlements.
             try await AppStore.sync()
-            await updatePurchasedState()
+            await updatePurchasedState(forceDurableSync: true)
         } catch {
             print("[PurchaseManager] Restore purchases failed: \(error.localizedDescription)")
             errorMessage = error.localizedDescription

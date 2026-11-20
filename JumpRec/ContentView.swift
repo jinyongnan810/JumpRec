@@ -83,6 +83,9 @@ struct ContentView: View {
                 refreshQuotaAndEntitlements()
                 syncSettingsToWatch()
                 processPendingIntentStartIfNeeded()
+                Task {
+                    await purchaseManager.updatePurchasedState()
+                }
             }
         }
         .onChange(of: dataStore.qualifiedWorkoutCount) { _, count in

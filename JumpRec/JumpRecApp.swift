@@ -14,6 +14,8 @@ struct JumpRecApp: App {
 
     init() {
         WorkoutMirrorManager.shared.activate()
+        _ = ConnectivityManager.shared
+        _ = PurchaseManager.shared
     }
 
     var body: some Scene {
