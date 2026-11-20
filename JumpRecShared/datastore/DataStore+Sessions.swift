@@ -7,6 +7,19 @@ import Foundation
 import SwiftData
 
 public extension MyDataStore {
+    /// Result of persisting a completed session and evaluating personal records.
+    struct SavedSessionResult {
+        /// The persisted workout session.
+        public let session: JumpSession
+        /// Personal record kinds newly set or improved by this session.
+        public let achievedRecordKinds: [PersonalRecordKind]
+
+        public init(session: JumpSession, achievedRecordKinds: [PersonalRecordKind]) {
+            self.session = session
+            self.achievedRecordKinds = achievedRecordKinds
+        }
+    }
+
     /// Fetches scalar summaries for [January 1, next January 1), or all history when year is omitted.
     func sessionsForStatistics(year: Int?) throws -> [JumpSession] {
         var descriptor = FetchDescriptor<JumpSession>()
@@ -61,7 +74,8 @@ public extension MyDataStore {
     }
 
     /// Inserts a session and its encoded rate series into the model context.
-    func addSession(session: JumpSession, rateSamples: [RateSamplePoint] = [], goalType: GoalType? = nil) {
+    @discardableResult
+    func addSession(session: JumpSession, rateSamples: [RateSamplePoint] = [], goalType: GoalType? = nil) -> [PersonalRecordKind] {
         modelContext.insert(session)
         attachRateSeries(rateSamples, to: session)
         let updatedRecordKinds = upsertPersonalRecords(for: session, goalType: goalType)
@@ -73,6 +87,7 @@ public extension MyDataStore {
         print("inserted session and encoded rate series")
         print("session: \(session)")
         print("samples: \(rateSamples.count)")
+        return updatedRecordKinds
     }
 
     /// Creates a finalized session record and persists it with normalized rate samples.
@@ -87,7 +102,7 @@ public extension MyDataStore {
         averageHeartRate: Int? = nil,
         peakHeartRate: Int? = nil,
         goalType: GoalType? = nil
-    ) -> JumpSession {
+    ) -> SavedSessionResult {
         let breakMetrics = SessionMetricsCalculator.breakMetrics(from: jumpOffsets)
         let session = JumpSession(
             startedAt: startedAt,
@@ -114,12 +129,12 @@ public extension MyDataStore {
             durationSeconds: session.durationSeconds
         )
 
-        addSession(session: session, rateSamples: rateSamples, goalType: goalType)
+        let achievedRecordKinds = addSession(session: session, rateSamples: rateSamples, goalType: goalType)
         Task { @MainActor [weak self] in
             guard let self else { return }
             await SessionAICommentGenerator.generateIfNeeded(for: session, in: modelContext)
         }
-        return session
+        return SavedSessionResult(session: session, achievedRecordKinds: achievedRecordKinds)
     }
 
     @discardableResult

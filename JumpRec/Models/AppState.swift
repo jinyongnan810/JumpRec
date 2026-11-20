@@ -74,6 +74,8 @@ final class JumpRecState: NSObject, @unchecked Sendable {
     var sessionShouldSpeakJumpTimeAnnouncements = true
     /// Stores the saved session shown on the completion screen.
     var completedSession: JumpSession?
+    /// Stores personal record kinds newly achieved by the completed session.
+    var completedSessionAchievedRecordKinds: [PersonalRecordKind] = []
 
     // MARK: - Motion State
 
@@ -191,7 +193,7 @@ final class JumpRecState: NSObject, @unchecked Sendable {
             self.peakHeartRate = peakHeartRate
             syncLiveActivity()
         }
-        connectivityManager.onCompletedSessionReceived = { [weak self] startedAt, endedAt, jumpCount, caloriesBurned, jumpOffsets, averageHeartRate, peakHeartRate, session in
+        connectivityManager.onCompletedSessionReceived = { [weak self] startedAt, endedAt, jumpCount, caloriesBurned, jumpOffsets, averageHeartRate, peakHeartRate, session, achievedRecordKinds in
             self?.applyCompletedWatchSession(
                 startedAt: startedAt,
                 endedAt: endedAt,
@@ -200,7 +202,8 @@ final class JumpRecState: NSObject, @unchecked Sendable {
                 jumpOffsets: jumpOffsets,
                 averageHeartRate: averageHeartRate,
                 peakHeartRate: peakHeartRate,
-                session: session
+                session: session,
+                achievedRecordKinds: achievedRecordKinds
             )
         }
         connectivityManager.onWorkoutStartCancelled = { [weak self] in

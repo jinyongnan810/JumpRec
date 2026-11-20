@@ -71,9 +71,9 @@ struct SessionCompleteView: View {
         return session
     }
 
-    /// The exact personal record kinds that are still waiting to be acknowledged by the user.
-    private var unseenRecordKinds: [PersonalRecordKind] {
-        dataStore.unseenPersonalRecordKinds
+    /// Personal record kinds newly achieved by this completed session.
+    private var achievedRecordKinds: [PersonalRecordKind] {
+        appState.completedSessionAchievedRecordKinds
     }
 
     // MARK: - View
@@ -147,7 +147,7 @@ struct SessionCompleteView: View {
                     averageHeartRate: summary.formattedAverageHeartRate(),
                     peakHeartRate: summary.formattedPeakHeartRate(),
                     rateSamples: samples,
-                    achievedRecordKinds: unseenRecordKinds
+                    achievedRecordKinds: achievedRecordKinds
                 )
                 .staggeredAppearance(isVisible: hasContentAppeared, index: 2)
             }
@@ -295,11 +295,10 @@ struct SessionCompleteView: View {
     appState.averageHeartRate = session.averageHeartRate
     appState.peakHeartRate = session.peakHeartRate
     appState.completedSession = session
+    appState.completedSessionAchievedRecordKinds = [.highestJumpCount, .steadyRhythm, .sneakyBurn]
     #if DEBUG
         appState.motionCSVShareURL = URL(fileURLWithPath: "/tmp/jumprec-preview-motion.csv")
     #endif
-
-    dataStore.markUnseenPersonalRecordUpdates([.highestJumpCount, .steadyRhythm, .sneakyBurn])
 
     return SessionCompleteView(appState: appState, onDone: {})
         .environment(dataStore)

@@ -137,6 +137,110 @@ struct JumpRecTests {
         #expect(store.unseenPersonalRecordKinds.contains(.mostCalories))
     }
 
+    @MainActor
+    @Test func testSaveCompletedSessionReturnsOnlyCurrentSessionAchievedRecordKinds() throws {
+        let store = try MyDataStore.makePreviewStore(qualifiedWorkoutCount: 0)
+        let previousUnseenKinds = store.unseenPersonalRecordKinds
+        defer {
+            store.clearUnseenPersonalRecordUpdates()
+            store.markUnseenPersonalRecordUpdates(previousUnseenKinds)
+        }
+        store.clearUnseenPersonalRecordUpdates()
+
+        let firstStart = Date(timeIntervalSince1970: 1_000_000)
+        let firstOffsets = stride(from: 0.36, through: 180.0, by: 0.36).map(\.self)
+        let firstResult = store.saveCompletedSession(
+            startedAt: firstStart,
+            endedAt: firstStart.addingTimeInterval(180),
+            jumpCount: 500,
+            caloriesBurned: 50,
+            jumpOffsets: firstOffsets
+        )
+
+        #expect(firstResult.achievedRecordKinds.contains(.highestJumpCount))
+        #expect(store.unseenPersonalRecordKinds.contains(.highestJumpCount))
+
+        let secondStart = firstStart.addingTimeInterval(600)
+        let secondOffsets = stride(from: 0.60, through: 180.0, by: 0.60).map(\.self)
+        let secondResult = store.saveCompletedSession(
+            startedAt: secondStart,
+            endedAt: secondStart.addingTimeInterval(180),
+            jumpCount: 300,
+            caloriesBurned: 80,
+            jumpOffsets: secondOffsets
+        )
+
+        #expect(!secondResult.achievedRecordKinds.contains(.highestJumpCount))
+        #expect(secondResult.achievedRecordKinds.contains(.mostCalories))
+        #expect(store.unseenPersonalRecordKinds.contains(.highestJumpCount))
+        #expect(store.unseenPersonalRecordKinds.contains(.mostCalories))
+    }
+
+    @MainActor
+    @Test func testCompletedSessionAchievedRecordKindsResetBetweenWorkouts() {
+        let appState = JumpRecState()
+        let firstStart = Date(timeIntervalSince1970: 1_700_000_000)
+        let firstEnd = firstStart.addingTimeInterval(180)
+        let firstSession = JumpSession(
+            startedAt: firstStart,
+            endedAt: firstEnd,
+            jumpCount: 500,
+            peakRate: 170,
+            caloriesBurned: 50
+        )
+
+        appState.handleMirroredWorkoutPayload(
+            MirroredWorkoutPayload(kind: .started, startTime: firstStart, goalType: .count, goalValue: 500)
+        )
+        appState.applyCompletedWatchSession(
+            startedAt: firstStart,
+            endedAt: firstEnd,
+            jumpCount: 500,
+            caloriesBurned: 50,
+            jumpOffsets: [],
+            averageHeartRate: nil,
+            peakHeartRate: nil,
+            session: firstSession,
+            achievedRecordKinds: [.highestJumpCount]
+        )
+        #expect(appState.completedSessionAchievedRecordKinds == [.highestJumpCount])
+
+        appState.reset()
+        #expect(appState.completedSessionAchievedRecordKinds.isEmpty)
+
+        let secondStart = firstStart.addingTimeInterval(600)
+        let secondEnd = secondStart.addingTimeInterval(180)
+        let secondSession = JumpSession(
+            startedAt: secondStart,
+            endedAt: secondEnd,
+            jumpCount: 300,
+            peakRate: 150,
+            caloriesBurned: 80
+        )
+
+        appState.handleMirroredWorkoutPayload(
+            MirroredWorkoutPayload(kind: .started, startTime: secondStart, goalType: .count, goalValue: 300)
+        )
+        appState.applyCompletedWatchSession(
+            startedAt: secondStart,
+            endedAt: secondEnd,
+            jumpCount: 300,
+            caloriesBurned: 80,
+            jumpOffsets: [],
+            averageHeartRate: nil,
+            peakHeartRate: nil,
+            session: secondSession,
+            achievedRecordKinds: [.mostCalories]
+        )
+        #expect(appState.completedSessionAchievedRecordKinds == [.mostCalories])
+
+        let thirdStart = secondStart.addingTimeInterval(600)
+        appState.handleMirroredWorkoutPayload(
+            MirroredWorkoutPayload(kind: .started, startTime: thirdStart, goalType: .count, goalValue: 300)
+        )
+        #expect(appState.completedSessionAchievedRecordKinds.isEmpty)
+    }
+
     @Test func testMakeRateSamplesForSteady150Rate() async throws {
         let jumpOffsets = stride(from: 0.4, through: 60.0, by: 0.4).map(\.self)
         let samples = SessionMetricsCalculator.makeRateSamples(

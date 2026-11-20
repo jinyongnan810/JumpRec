@@ -46,7 +46,8 @@ extension JumpRecState {
         jumpOffsets: [TimeInterval],
         averageHeartRate: Int?,
         peakHeartRate: Int?,
-        session: JumpSession
+        session: JumpSession,
+        achievedRecordKinds: [PersonalRecordKind]
     ) {
         // Epoch timestamps can lose precision during WatchConnectivity serialization.
         guard isMirroredWatchSession, let currentStartTime = startTime,
@@ -63,6 +64,7 @@ extension JumpRecState {
         self.peakHeartRate = peakHeartRate
         doubleUndersCount = session.doubleUndersCount
         completedSession = session
+        completedSessionAchievedRecordKinds = achievedRecordKinds
         sessionState = .complete
         syncIdleTimer()
         syncLiveActivity()
@@ -97,6 +99,7 @@ extension JumpRecState {
         peakHeartRate = payload.peakHeartRate
         doubleUndersCount = 0
         completedSession = nil
+        completedSessionAchievedRecordKinds = []
         startTime = incomingStartTime
         endTime = nil
         jumpCount = payload.jumpCount ?? 0

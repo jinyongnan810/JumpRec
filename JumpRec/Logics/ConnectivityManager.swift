@@ -30,7 +30,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
     /// Stores the latest WatchConnectivity activation state.
     var activationState: WCSessionActivationState = .notActivated
     /// Delivers fully reconstructed sessions received from Apple Watch.
-    var onCompletedSessionReceived: ((Date, Date, Int, Double, [TimeInterval], Int?, Int?, JumpSession) -> Void)?
+    var onCompletedSessionReceived: ((Date, Date, Int, Double, [TimeInterval], Int?, Int?, JumpSession, [PersonalRecordKind]) -> Void)?
     var onWorkoutStartCancelled: (() -> Void)?
     /// Delivers lifecycle events before HealthKit mirroring is ready.
     var onWorkoutEventReceived: ((MirroredWorkoutPayload) -> Void)?
@@ -266,7 +266,7 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
         peakHeartRate: Int?,
         goalType: GoalType?
     ) {
-        let session = MyDataStore.shared.saveCompletedSession(
+        let savedSession = MyDataStore.shared.saveCompletedSession(
             startedAt: startedAt,
             endedAt: endedAt,
             jumpCount: jumpCount,
@@ -286,7 +286,8 @@ final class ConnectivityManager: NSObject, WCSessionDelegate {
             jumpOffsets,
             averageHeartRate,
             peakHeartRate,
-            session
+            savedSession.session,
+            savedSession.achievedRecordKinds
         )
         print("[WatchConnectivityManager] Saved completed session from watch: \(jumpCount) jumps")
     }

@@ -257,7 +257,7 @@ extension JumpRecState {
         }
 
         if let endTime {
-            completedSession = dataStore.saveCompletedSession(
+            let savedSession = dataStore.saveCompletedSession(
                 startedAt: startTime,
                 endedAt: endTime,
                 jumpCount: jumpCount,
@@ -267,6 +267,8 @@ extension JumpRecState {
                 peakHeartRate: peakHeartRate,
                 goalType: sessionGoalType
             )
+            completedSession = savedSession.session
+            completedSessionAchievedRecordKinds = savedSession.achievedRecordKinds
             #if DEBUG
                 exportMotionCSVIfNeeded(samples: motionSamples, startedAt: startTime, endedAt: endTime)
             #endif
@@ -307,6 +309,7 @@ extension JumpRecState {
         sessionShouldSpeakJumpTimeAnnouncements = true
         isMirroredWatchSession = false
         completedSession = nil
+        completedSessionAchievedRecordKinds = []
         pendingMirroredStart = false
         syncIdleTimer()
         syncLiveActivity()
@@ -346,6 +349,7 @@ extension JumpRecState {
             motionCSVShareURL = nil
         #endif
         completedSession = nil
+        completedSessionAchievedRecordKinds = []
         startTime = sessionStartDate
         endTime = nil
         heartRate = nil
