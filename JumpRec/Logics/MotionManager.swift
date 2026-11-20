@@ -144,10 +144,10 @@ final class MotionManager: NSObject {
 
     // MARK: - Motion Managers
 
-    /// Reads motion data from supported headphones.
-    private let headphoneMotionManager = CMHeadphoneMotionManager()
+    /// Lazily created only after Motion access is authorized so Watch mirroring never touches Core Motion.
+    private var headphoneMotionManager: CMHeadphoneMotionManager?
     /// Reports compatible headphone connections before motion tracking starts.
-    private let headphoneActivityManager = CMHeadphoneActivityManager()
+    private var headphoneActivityManager: CMHeadphoneActivityManager?
     /// Serializes motion processing work off the main thread.
     private let queue = OperationQueue()
 
@@ -171,6 +171,8 @@ final class MotionManager: NSObject {
     private var connectedHeadphoneName: String?
     /// Tracks whether Core Motion headphone status/connection observers have been started.
     private var hasStartedConnectionMonitoring = false
+    /// Avoids calling `stopDeviceMotionUpdates()` when no stream was started, which triggers a TCC prompt.
+    private var hasStartedDeviceMotionUpdates = false
 
     // MARK: - Initialization
 
@@ -184,7 +186,6 @@ final class MotionManager: NSObject {
         self.onJumpDetected = onJumpDetected
         self.onAvailabilityChanged = onAvailabilityChanged
         super.init()
-        headphoneMotionManager.delegate = self
         // ⭐️Detect headphone is connected by detecting audio route changes
         NotificationCenter.default.addObserver(
             self,
@@ -203,11 +204,11 @@ final class MotionManager: NSObject {
     isolated deinit {
         NotificationCenter.default.removeObserver(self)
         if hasStartedConnectionMonitoring {
-            headphoneActivityManager.stopStatusUpdates()
-            headphoneMotionManager.stopConnectionStatusUpdates()
+            headphoneActivityManager?.stopStatusUpdates()
+            headphoneMotionManager?.stopConnectionStatusUpdates()
         }
-        headphoneMotionManager.stopDeviceMotionUpdates()
-        headphoneMotionManager.delegate = nil
+        stopHeadphoneDeviceMotionIfStarted()
+        headphoneMotionManager?.delegate = nil
         // Cancel queued Core Motion callbacks before disconnecting observers and delegates.
         queue.cancelAllOperations()
     }
@@ -216,7 +217,14 @@ final class MotionManager: NSObject {
 
     /// Returns whether supported headphone motion is currently available.
     var isHeadphoneMotionAvailable: Bool {
-        headphoneMotionManager.isDeviceMotionAvailable && isHeadphoneConnected && hasConnectedHeadphoneRoute()
+        guard hasStartedConnectionMonitoring,
+              isHeadphoneConnected,
+              hasConnectedHeadphoneRoute(),
+              let headphoneMotionManager
+        else {
+            return false
+        }
+        return headphoneMotionManager.isDeviceMotionAvailable
     }
 
     /// Returns whether an audio headphone route is connected without touching Core Motion permissions.
@@ -273,7 +281,7 @@ final class MotionManager: NSObject {
     func cancelPreparation() {
         guard !isTracking else { return }
 
-        headphoneMotionManager.stopDeviceMotionUpdates()
+        stopHeadphoneDeviceMotionIfStarted()
         sampleProcessor.resetIfNotTracking()
     }
 
@@ -287,7 +295,7 @@ final class MotionManager: NSObject {
         guard isTracking else { return }
 
         sampleProcessor.stopTracking()
-        headphoneMotionManager.stopDeviceMotionUpdates()
+        stopHeadphoneDeviceMotionIfStarted()
     }
 
     /// Returns and clears any recorded motion samples collected during the session.
@@ -297,12 +305,17 @@ final class MotionManager: NSObject {
 
     // MARK: - Motion Updates
 
-    /// Starts headphone motion updates when supported hardware is available.
+    /// Starts headphone motion updates when authorized and supported hardware is available.
     private func startHeadphoneMonitoringIfAvailable() {
+        guard CMHeadphoneMotionManager.authorizationStatus() == .authorized else { return }
+
+        let headphoneMotionManager = ensureHeadphoneMotionManager()
         guard headphoneMotionManager.isDeviceMotionAvailable,
+              !hasStartedDeviceMotionUpdates,
               !headphoneMotionManager.isDeviceMotionActive
         else { return }
 
+        hasStartedDeviceMotionUpdates = true
         let sampleProcessor = sampleProcessor
         headphoneMotionManager.startDeviceMotionUpdates(to: queue) { [weak self] motion, _ in
             guard let motion else { return }
@@ -341,12 +354,14 @@ final class MotionManager: NSObject {
         }
 
         hasStartedConnectionMonitoring = true
+        let headphoneMotionManager = ensureHeadphoneMotionManager()
         startHeadphoneStatusUpdatesIfAvailable()
         headphoneMotionManager.startConnectionStatusUpdates()
     }
 
     /// Monitors headphone status, including compatible headphones connected before startup.
     private func startHeadphoneStatusUpdatesIfAvailable() {
+        let headphoneActivityManager = ensureHeadphoneActivityManager()
         guard headphoneActivityManager.isStatusAvailable else { return }
 
         headphoneActivityManager.startStatusUpdates(to: queue) { [weak self] status, _ in
@@ -471,6 +486,34 @@ final class MotionManager: NSObject {
         connectedHeadphoneName = currentConnectedHeadphoneName()
         guard isHeadphoneConnected != wasConnected || connectedHeadphoneName != previousHeadphoneName else { return }
         notifyAvailabilityChanged()
+    }
+
+    /// Creates the headphone motion manager lazily once Motion authorization is granted.
+    private func ensureHeadphoneMotionManager() -> CMHeadphoneMotionManager {
+        if let headphoneMotionManager {
+            return headphoneMotionManager
+        }
+        let manager = CMHeadphoneMotionManager()
+        manager.delegate = self
+        headphoneMotionManager = manager
+        return manager
+    }
+
+    /// Creates the headphone activity manager lazily once Motion authorization is granted.
+    private func ensureHeadphoneActivityManager() -> CMHeadphoneActivityManager {
+        if let headphoneActivityManager {
+            return headphoneActivityManager
+        }
+        let manager = CMHeadphoneActivityManager()
+        headphoneActivityManager = manager
+        return manager
+    }
+
+    /// Stops headphone motion updates only when started to avoid triggering TCC prompts on cleanup.
+    private func stopHeadphoneDeviceMotionIfStarted() {
+        guard hasStartedDeviceMotionUpdates else { return }
+        hasStartedDeviceMotionUpdates = false
+        headphoneMotionManager?.stopDeviceMotionUpdates()
     }
 }
 

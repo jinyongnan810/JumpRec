@@ -27,13 +27,11 @@ struct PermissionsSettingsContent: View {
                     status: healthStatus(workoutStatus),
                     explanation: "Saves completed workouts to Apple Health."
                 )
-                #if os(watchOS)
-                    permissionRow(
-                        title: "Save Active Energy",
-                        status: healthStatus(energyStatus),
-                        explanation: "Saves calories burned during Watch workouts."
-                    )
-                #endif
+                permissionRow(
+                    title: "Save Active Energy",
+                    status: healthStatus(energyStatus),
+                    explanation: "Saves calories burned during workouts."
+                )
                 permissionRow(
                     title: "Read Health Data",
                     status: .reviewInHealth,

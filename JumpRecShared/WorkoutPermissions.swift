@@ -50,22 +50,17 @@ enum WorkoutPermissions {
     }
 
     static var typesToShare: Set<HKSampleType> {
-        var types: Set<HKSampleType> = [HKObjectType.workoutType()]
-        #if os(watchOS)
-            types.insert(HKQuantityType(.activeEnergyBurned))
-        #endif
-        return types
+        [
+            HKObjectType.workoutType(),
+            HKQuantityType(.activeEnergyBurned),
+        ]
     }
 
     static var typesToRead: Set<HKObjectType> {
-        var types: Set<HKObjectType> = [
+        [
             HKQuantityType(.activeEnergyBurned),
             HKQuantityType(.heartRate),
         ]
-        #if os(iOS)
-            types.insert(HKObjectType.workoutType())
-        #endif
-        return types
     }
 
     /// Deduplicates overlapping HealthKit authorization prompts across launch and workout start.

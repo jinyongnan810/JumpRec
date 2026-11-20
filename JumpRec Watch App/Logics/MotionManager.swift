@@ -7,10 +7,12 @@
 
 import CoreMotion
 import Foundation
+import OSLog
 import Synchronization
 
 /// Manages motion detection and jump counting using device sensors
 class MotionManager: NSObject {
+    private nonisolated static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "JumpRec.watch", category: "Motion")
     /// Holds lock-protected motion detection state shared between the main actor and sensor queue.
     private final nonisolated class SampleProcessor: Sendable {
         private struct State {
@@ -260,7 +262,11 @@ class MotionManager: NSObject {
         let addJump = addJump
 
         // Forward samples into the detector only after tracking is armed at countdown completion.
-        motionManager.startDeviceMotionUpdates(to: queue) { motion, _ in
+        motionManager.startDeviceMotionUpdates(to: queue) { motion, error in
+            if let error {
+                Self.logger.error("Device motion update failed: \(error.localizedDescription, privacy: .public)")
+                return
+            }
             guard let motion else { return }
             let sample = MotionSample(
                 userAccelerationX: motion.userAcceleration.x,

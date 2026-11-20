@@ -1098,6 +1098,34 @@
         }
       }
     },
+    "Save Active Energy" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクティブエネルギーの保存"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "활동 에너지 저장"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存活动能量"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存活動能量"
+          }
+        }
+      }
+    },
     "Save Workouts" : {
       "localizations" : {
         "ja" : {
@@ -1122,6 +1150,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "儲存運動"
+          }
+        }
+      }
+    },
+    "Saves calories burned during workouts." : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワークアウト中に消費したカロリーを保存します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "운동 중 소모한 칼로리를 저장합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存运动期间消耗的热量。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存運動期間消耗的卡路里。"
           }
         }
       }
